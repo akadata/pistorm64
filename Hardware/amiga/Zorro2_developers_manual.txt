@@ -1,0 +1,1625 @@
+SCHEMATICS AND
+
+EXPANSION SPECIFICATIONS
+
+June 9, 1986
+
+PAL EQUATIONS
+
+PAL16L8 v
+
+DPALCAS 252128-02 REV 3 15-MAY-85
+
+Copyright 1985 Commodore-Amiga Inc.,
+
+/ARW A20 A19 /PRW /UDS /LDS /ROME /RE /RGAE GND /DAE /ROMO01 /C1 /RRW LCEN UCEN /CDR /CDW /NC1 VCC
+
+ROMO1 =ROME*A20*A19*/PWR + ROME*/A20*/A19*/PRW
+
+CDR =RE*/PWR*/C1 + RGAE*/PRW*/C1 + CDR*LDS + CDR*UDS
+
+CDhW =RE*PRW + RGAE*PRW + CDW*/C1 + /DAE*/UDS*/UCEN
+
+/UCEN =/DAE*/RE*/UCEN + /DAE*/RE*C1 +/DAE*UDS*C1 + /DAE*/UDS*/UCEN /LCEN =/DAE*/RE*/LCEN + /DAE*/RE*C1 +/DAE*/LDS*C1 + /DAE*/LDS*/LCEN RRW =RE*PRW + DAE*ARW*C1 + RRW*DAE
+
+Description
+
+In RRW equation, may not need RRW*/C1 hold term, but doesn’t hurt
+
+PRELIMINARY
+
+PAL 16L8
+
+DAUGCAS ram/rom CAS 252128-04 REV 1 16-APR-85
+
+Copyright 1985 Commodore-Amiga Inc.
+
+/SPROM A18 A17 /PRW /UDS /LDS /RE /RES /ROME GND /C1 /BERR /WPRO /RRW /LCEN /UCEN /CDR /CDW /ROMO1 VCC
+
+ROMO1 =ROME*/A18*/WPRO*/SROM */PRW
+
+CDR =CDR*LDS + CDR*UDS + RE*/PRW*/C1*A18 + RE*/PRW*/C1*/A18*WPRO + RE*/PRW*/C1/A18*SROM
+
+CDW = RE*PRW + CDW*/C1
+
+UCEN =UCEN*/C1 + RE*UDS*A18 RE*UDS*/A18*WPRO + RE*UDS*/A18*SROM
+
+LCEN =LCEN*/C1 + RE*LDS*A18 + RE*LDS*/A18*WPRO + RE*LDS*/A18*SROM
+
+RRW =RE*PRW*A18/WPRO*/SROM
+
+BERR =WPRO*PRW*RE
+
+WPRO =WPRO*/RES + PRW*RE/A18
+
+Description
+
+This is the CAS PAL for the RAMROM board
+
+PRELIMINARY
+
+PORT DESCRIPTORS
+
+Parallel Interface Connector Specification
+
+The 25 pin D type connector with pins (DB25P) at the rear of the Amiga is nominally used to interface to parallel printers. In this capacity, data flows from the Amiga to the printer. This interface may also be used for input or bidirectional data transfers. The implementation is similar to Centronics, but the pin assignment and drive characteristics vary
+
+significantly from the specification.
+
+Parallel Connector Pin Assignment (J8)
+
+Pin Name 1 DRDY* 2 DO
+
+3 D1
+
+4 D2
+
+5 D3
+
+6 D4
+
+7 D5
+
+8 Dé6
+
+9 D7
+
+10 ACK* i1 BUSY 12 POUT
+
+dir
+
+O
+
+1/0 1/0 I/0 1/0
+
+I/0 1/0 1/0 /0 I
+
+1/0
+
+I/0
+
+Notes
+
+Output data ready signal to parallel devices in output mode, used in conjunction with ACK* (pin 10) for a 2 line asynchronous handshake. Functions as input data accepted from Amiga in input mode (similar to ACK* in output mode). See timing diagrams in following section.
+
+D0-D7 comprise an 8 bit bidirections bus for communication with parallel devices, nominally, a printer.
+
+Output data acknowledge from parallel device in output mode, used in conjunction with DRDY* (pin 1) for a 2 line asynchronous handshake. Functions as input data ready from parallel device in input mode (similar to DRDY* in output mode). See timing diagram in following section. The 8520 can be programmed to conditionally generate a level 2 interrupt to the 68000 whenever the ACK* input goes active.
+
+This is a general purpose I/O pin shorted to a serial data I/0 pin (serial clock on pin 12). Note: Nominally used to indicate printer buffer full.
+
+This is a general purpose 1/O pin shored to a serial clock
+
+1/0 pin (serial data on pin 11). Note: Nominally used to indicate printer paper out.
+
+PRELIMINARY
+
+Parallel Connector Interface Timing, Output Cycle
+
+R F—
+
+ACK* output data acknowledge
+
+microseconds min typ max T1: 4.3 5.3 Output Data setup to ready delay T2: nsp upc Output Data hold time. T3: nsp 1.4 nsp Output Data ready width T4: 0 upc Ready to acknowledge delay TS: nsp upc Acknowledge width
+
+nsp = not specified upc = under program control
+
+PRELIMINARY
+
+Serial Interface Connector Specification
+
+The 25 pin D type connector with sockets (DB25S) is used to interface to RS232C standard signals.
+
+WARNING: Pins 14, 21 and 23 carry power. Do not connect to these pins inadvertantly as they can permanently damage external equipment. Also, pins 15-18, 23-25 carry non-standard signals and should not be inadvertantly connected.
+
+NEVER use a fully wired 25 line cablel
+
+Serial Interface Connector Pin Assignment (J6)
+
+Pin Name Dir Std Notes
+
+1 FGND y frame ground
+
+2 TXD 0 y transmit data
+
+3 RXD I y receive data
+
+4 RTS 0 y request to send
+
+5 CTS I y clear to send
+
+6 DSR I y data set ready
+
+7 GND y signal ground
+
+8 CD I y carrier detect
+
+9 - n
+
+10 - n
+
+11 — y
+
+12 — n
+
+13 — n
+
+14 -5V n* 50 ma maximum 15 AUDO 0 n* audio output
+
+16 AUDI I n* audio input
+
+17 EB 0 n* 716 KHz
+
+18 INT2* I y OPEN COLLECTOR Amiga Interrupt level 2 19 - n
+
+20 DTR 0 y data terminal ready 21 +5V n* 100 ma maximum 22 -— n
+
+23 +12V n* 50 ma maximum 24 ca* 0 n* 3.58 MHz
+
+25 RESB* 0 n* Amiga system reset n*:
+
+WARNING: Pins 14, 21 and 23 carry power. Do not connect to these pins inadvertantly as they can permanently damage external equipment. Also, pins 15-18, 23-25 carry non-standard signals and should not be inadvertantly connected.
+
+NEVER use a fully wired 25 line cable!
+
+PRELIMINARY
+
+External Disk Interface Connector Specification
+
+The 23 pins D type connector with sockets (DB23S) at the rear of the Amiga is nominally used to interface to MFM devices.
+
+External Disk Connector Pin Assignment (J7)
+
+Pin Name Dir Notes
+
+1 RDY* I/0 If motor on, indicates disk installed and up to speed If motor not on, Identification mode. See below.
+
+2 DKRD* I MFM input data to Amiga
+
+3 GND
+
+4 GND
+
+5 GND
+
+6 GND
+
+7 GND
+
+8 MTRXD* OC Motor on data, clocked into drive’s motor on flip flops
+
+by the active transistion of SELxB*. Guaranteed setup time is 1.4 usec. Guaranteed hold time is 1.4 used.
+
+9 SEL2B* OC Select drive 2
+
+10 DRESB* OC Amiga system reset. Drive should reset their motor on flip flops and set their write protect flip flops.
+
+11 CHNG* /0 Note: Nomially used as an open collector input. Drives
+
+change flop is set at powe up or when no disk is not installed. Flop is reset when drive is selected and the head stepped, but only is a disk is installed. 12 +5V ‘ 270 ma maximum; 410 ma surge
+
+When below 3.75V, drives are required to reset their motor on flops, and set their write protect on flops.
+
+13 SIDEB* o) Side 1 if active, side 0 if inactive
+
+14 WPRO* I/0 Asserted by selected, write protected disk
+
+15 TKO* I/0 Asserted by selected drive when read/write head is positioned over track 0
+
+16 DKWDB* OC Write gate (enable) to drive
+
+17 DKWDB* OC MFM output data from Amiga
+
+18 STEPB* OC . Selected drive steps one cylinder in the direction indicated by DIRB. ’
+
+19 DIRB oC Direction to step the head. Inactive to step towards center of disk (higher humbered tracks).
+
+20 SEL3B* OC Select drive 3
+
+21 SEL1B ocC Select drive 1
+
+22 INDEX* 1/O Index is a pulse generated once per disk revolution,
+
+between the end and geginning of cyliners. The 8520 can be programmed to conditinally generate a level 6
+
+interrupt to the 68000 whenever the INDEX* input goes active ' 23 +12V 160 ma maximum; 540 ma surge
+
+g PRELIMINARY
+
+Apr 17 13:59 1986 ex.041786 Page 1
+
+kkkkhkkkhkkkkkkkkhkhkkkkkhkhkhkhkkhkhkhk*x MEMO **khkkkhhkhhkkhhkhkhkhkkhkkhhkhkhkhkkhkkhkhkkkkhkhkkkxk
+
+Commodore—-Amiga
+
+TO: Hardware Developers FM: H. Stolz - C=AMIGA DT: 4/17/86
+
+- Dear developer;
+
+In this package are the latest drawings of the Expansion Boards for the Amiga. We are releasing these drawings to you with the warning that the dimensions may change and are not final until FCC testing is completed. We feel confident about the 24.0mm (.945 in) center to center on the PCB's and we hope to increase the maximum component height allowed if the current rear panel scheme works out.
+
+The Zorro Backplane Bd. Control Drawing # 327310-01 is included for refrence only. It is a board that was intended for lab use only and is not indicative of the Production backplane PCB.
+
+Apr 24 21:00 1986 memo.expan Page 1
+
+4-24-86
+
+Dear Hardware Developers,
+
+This memo is to inform you of two updates to the expansion architecture.
+
+The first is that Amiga will put -12Volts @ 250ma on pin 20 of the hundred pin connector. This voltage is optional on 3rd party expansion boxes. Boards should be designed to not use this current, because Amiga has aleady assigned it's use. We recommend that you do include this voltage unless the cost is prohibitive (for instance
+
+if you have already ordered power supplies that do not include -12V.)
+
+The other addition is that the RES* line needs a 10K pullup resistor.
+
+You must not put more than one load on RES*, and you should make this load as small as possible.
+
+I apologize that these minor additions keep trickling in. However, we are developing this standard as fast as we can, and are trying to give you third party developers the earliest possible notice of
+
+our work. At this time, the changes are all minor and only those that are absolutely necessary are made.
+
+Amiga Engineering
+
+PRELIMINARY
+
+Amiga Expansion Architecture Preliminary
+
+Designing Hardware for the Amiga Expansion Architecture
+
+Introduction
+
+This document gives guidelines for designing hardware to reside on the Amiga expansion bus. The Amiga expansion bus is a relatively straightforward extension of the 68000 bus.
+
+Hardware for the bus can be viewed as two categories: backplanes and PICs. Backplanes interface to the 86-pin
+
+connector of either another backplane or the Amiga itself. Backplanes buffer the bus and provide 100-pin connectors for PICs to plug into.
+
+PIC is an acronym for plug-in card. A PIC is usually a card that plugs into the standard 100 pin Amiga backplane (as defined in this document).
+
+A sub-type of PIC is a combination of backplane and PIC integrated into one package. These combination products should follow all of the applicable backplane and PIC rules, especially auto-configuration.
+
+Software never sees backplanes, all expansion hardware appears to the software as PICs.
+
+1. Expansion Architecture Overview
+
+As shown in the figure “Expansion Architecture Overview,” the expansion bus is implemented as daisy-chained backplanes (expansion boxes) which accept PICs (boards). For timing and FCC reasons, it is probably not feasible
+
+to configure a system with more than two external backplanes attached. Even with only two, the timing is very tight, so the designer must be careful.
+
+This document attempts to address the worst case, which is designing PICs and backplanes that are fast enough to use two such backplanes daisy-chained. It should be noted that a similar box that is designed to be the only backplane on the system could make some reductions in speed requirements and logic complexity.
+
+s . s e e S S S S S S —— s — {— — —— — ————— — " " T S ST e S e . s s e e e S e S S o o S S e S S B S S S S o S s
+
+I --DMA*------- | BUS STEERING and ENABLE| BUS ARBITRATION |
+
+| | BUS ARBITRATION
+
+| | I I | I || || N | I | | | | | | | | PIC | | PIC | | PIC | | | | PIC | | PIC | | PIC | | I I | | | | || I I | | | | | | I | s | | |1 || | I | | || | | | | L || || | | I I | | || | | | B | AO| | || | | I | | | | | | | | U | Vvw | | | | | I I || | | | | | F | EN| | || | | | | | | | | | | | F | o* *] | || | | I I | | | | | | E | V.V - [ p— || I P [ P [ I | R ] " | I el " o | S__ LI LI L I — 1 11 AERE Al e Vo VeV | o DATA |<| VeV V- M |__] N |1 AR I -1 11 | 1] L I __ Il |1 L o — 1l |11 R G_|<| e V| e A2 [ (— V|| _—__ADDRESS___|<| V|| A4 P A2 0 p— A ] | | | I [ p— L | [ | | | |l I | | |l I | VV______ VWV______ VW_ | | VW____ W___ VW_ | | | COLLISION |<- -SLAVE*- - - - - | COLLISION | | | BUS STEERING and ENABLE |< | || | I I | I
+
+Expansion Architecture Overview
+
+Due to timing considerations it is not possible to daisy chain more than two buffered backplanes without inserting wait states.
+
+February 4, 1986 Page 1
+
+Amiga Expansion Architecture Preliminary
+
+2.1.5. List of Signals on 86-Pin and 100-Pin Connectors
+
+Appendix X lists all signal names on the 86 and 100 pin connectors. Note: If appendix X is not in this document yet, see accompanying schematic of backplane for pin lists.
+
+List of signals that are unique to each connector.
+
+List of signals that are on 100 pin conn but not on 86 pin
+
+Describe function of each Amiga specific signal, eg SLAVEx, DMAOUT*, ASDELAYED*, 7TM, OWNx, others?
+
+2.2. The Protocols
+
+The bus protocols are basically the same as standard 68000 protocols, however the timing margins are tighter due to the potentially long paths of Amiga and PICs talking to each other across two buffered backplanes.
+
+One unusual feature is that when you are doing a DMA transfer into or out of the Amiga display RAM (the half megabyte starting at address 000000), the DTACK* circuit will synch the master up with C1. Because Cl is twice as slow as 7M, there are two possible phase relationships between C1 and the beginning of the DMA bus cycle. If AS* is asserted during the last quartile of C1 (C1 low and C3 low, see clock timing diagram), we call this an “in sync” bus cycle, and DTACK* will be given in time to do a normal 4-clock (7M) bus cycle (Note: occasion-
+
+ally DTACK* will be delayed due to contention with the graphics chips also, but that does not matter in this discussion).
+
+However DTACK works differently if the DMA controller asserts AS* in the other phase. In the second quartile
+
+(C1 high and C3 high) the DTACKx* circuit will hold off DTACK* long enough to insert one wait state, thus syncing up the “out of sync” bus cycle.
+
+2.2.1. Read or Write Cycle with Amiga as Master
+
+Since the Amiga bus master is a 68000, the bus cycle is a 68000 cycle. However, the responding slave does not pull DTACK*. Our internal circuitry will pull DTACK* unless the slave pulls XRDY low.
+
+Also, the slave (PIC) must pull its SLAVE* output low as soon as it is selected, and at the end of the cycle . disassert SLAVE* when AS* goes away.
+
+2.2.2. Read or Write Cycle with a PIC as Master
+
+A PIC as master must drive the bus using the same protocol as the 68000. Some of the timing margins must be better than those from the 68000, because the PIC is driving through several levels of buffers, and the Amiga logic
+
+is designed to the 68000 (8 megahertz part) specs. Specific timing requirements can be found in the tables in the timing appendix (Appendix A).
+
+2.2.3. Bus Arbitration
+
+The bus arbitration scheme is based on the 68000 BR*BG* BGACK* protocol. PICs are required to assert BR*
+
+clocked by the rising edge of 7M. This makes it less expensive to design bus arbitration logic that will be reliable. Specifically, synchronous arbitration logic can be clocked on 7M without danger of going metastable.
+
+2.3. Timing General Discussion See appendix A for timing specifications.
+
+There are two main problems to be dealt with in the expansion architecture timing: propagation delays and skews in the clock, address, data, and control paths. The timing is tight, thus we recommend using FAST and AS parts to buffer these lines. To guarantee meeting the timing requirements, you must be careful to not exceed the recommended operating conditions of the parts you chose, for example the capacitive loading. In calculating your loading, note that all PICs are specified to present no more than two “F”’ loads plus minimal trace capacitance to each connector pin. Backplanes are specified to present no more than one “F” load plus trace capacitance to the Amiga. Do not use “typical” numbers, reliable systems can be built by using “worst case’”” numbers.
+
+Appendix A gives the timing required in order to meet the timing requirements of two buffered backplanes with PICs.
+
+February 4, 1986 Page 3
+
+Amiga Expansion Architecture Preliminary
+
+I Chained config request, indicates that the next auto-config device in the daisy chain is physically tied to this device.
+
+(20/22) 76543210 Optional serial number, byte 2 (24/26) 76543210 Optional serial number, byte 3 (1lsb) (28/2A) 76543210 Optional init/diagnostic vector high byte (2C/2E) 765432 0 Optional init/diagnostic vector low byte (30/32) 76543210 Reserved, must be 0 (34/36) 76543210 Reserved, must be O (38/3A) 76543210 Reserved, must be 0 (3C/3E) 76543210 Reserved, must be 0 (40/42) 76543210 Optional control status register (44/46) 76543210 Reserved, must be 0 (48/4A) 76543210 Base address register (4C/4E) X X X X X X X X Optional ¢‘shut up’’ address (50/52) 76543210 Reserved, must be O (54/56) 76543210 Reserved, must be 0 (58/5A) 76543210 Reserved, must be 0 (5C/5E) 76543210 Reserved, must be 0 (60/62) 76543210 Réserved, must be O (64/66) 76543210 Reserved, must be O (68/6A) 76543210 Reserved, must be O (6C/6E) 76543210 Reserved, must be O (70/72) 76543210 Reserved, must be O (74/76) 76543210 Reserved, must be O (78/7A) 76543210 Reserved, must be O (7C/7E) 76543210 Reserved, must be O Descriptions: (00/02) 7 43210 Board type and size | } } | |_l _____ Memory size
+
+| | 000 = 8 megabytes
+
+|| 001 = 64 kilobytes
+
+| | 010 = 128 kilobytes
+
+| | _ 011 = 256 kilobytes
+
+| | 100 = 512 kilobytes
+
+| | 101 = 1 megabytes
+
+|| 110 = 2 megabytes
+
+| | 111 = 4 megabytes
+
+| |
+
+|
+
+|
+
+l
+
+|
+
+|
+
+Diagnostic address valid
+
+Link into memory free list
+
+February 4, 1986 - Page 5
+
+Amiga Expansion Architecture
+
+Preliminary R O T O O ‘ O O O A Write Read R e L L L P R LR LR EEEE T T I T T O Interrupt enable Interrupt enable | T I O I must be 0 don’t care I T I I P Local reset must be O I T I must be O don’t care I N . must be O INT2 pending T N must be 0 INT6 pending b ] must be 0 INT7 pending e must be 0 I am pulling INT (44/46) 76543210 Reserved Write Read Not defined must be 00 % Neil - what is this? (48/4A) 76543210 Base address register, write-only
+
+These bits are compared with A23 through Af
+
+(or fewer) to determine the base address of this board.
+
+(4C/4E) X X X X X X X X Optional ‘‘shut up’’ address, a write ' to this address will cause the board to pass its config out and then never
+
+again respond to any address. RESET
+
+will re-enable the board. The actual
+
+address that has this effect is 4C. A
+
+write to 4E is ignored. This is write
+
+only. (50/52) 76543210 Reserved, must be 00 (54/56) 76543210 Reserved, must be 00 (58/5A) 76543210 Reserved, must be 00 (5C/5E) 76543210 Reserved, must be 00 (60/62) 76543210 Reserved, must be 00 (64/66) 76543210 Reserved, must be 00 (68/6A) 76543210 Reserved, must be 00 (6C/6E) 76543210 Reserved, must be 00 (70/72) 76543210 Reserved, must be 00 (74/76) 76543210, Reserved, must be 00 (78/7A) 76543210 Reserved, must be 00 (7C/7E) 76543210 Reserved, must be 00
+
+3.4. Mechanical
+
+Two mechanical drawings are included in this package. The first gives the physical dimensions and pin locations for a PIC board.
+
+The second gives detailed dimensions of the 86-pin expansion connector on the right side of the Amiga.
+
+Board center to top of highest component should not exceed .60 inches on PICs. The backplane should provide a minimum of .80 inches center to center for the boards.
+
+February 4, 1986 Page 7
+
+Amiga Expansion Architecture Preliminary
+
+DMAOUT = DMAIN + OWN
+
+DMAIN is active when the bus master is upstream from this backplane. So when DMAIN is active, DMAOUT must go active.
+
+OWN* is the wire OR’ed signal which means that this backplane has the current bus master. Thus because all
+
+PICs on this backplane are upstream from the address (and data) buffers, DMAOUT must be active when OWN (or OWNH#) is active.
+
+4.2.1.2. Generating ADDR_OE=*
+
+This section explains the PAL equation for ADDR_OE=*. Refer to the “STEERING PAL” appendix to see the equation (AOE).
+
+ADDR_OE* is active (enabling the address drivers) most of the time. It only disables the drivers when ownership
+
+of the bus is changing (for example a new master takes control). At these transition times ADDR_OE* is inactive so that the tri-state drivers will not fight the drivers on the next backplane while they are changing direction.
+
+Refer to the equation for AOE in the “STEERING PAL” appendix. AOE = ADDR_OE* inverted. The inverter is in the output stage of the PAL. '
+
+BGACK is asserted (BGACK* pulled low) by all bus masters (except the 68000) when they are the current master, so ADDR_OE* is active when BGACK is active.
+
+The term (BG* * DMAOUT?*) is true most of the time that the 68000 owns the bus. However, when the 68000 is about to give up the bus, BG* will go active and thus (BG* * DMAOUT*) will go inactive. It is important that the address drivers remain on until the end of the final 68000 bus cycle when the 68000 is giving up the bus, so the term AS holds AOE active when BG goes active during the bus cycle.
+
+AS does not last quite long enough, so ASQ90 (which is a slightly delayed AS) holds AOE active long enough to finish the cycle.
+
+4.2.2. The Data Buffers
+
+This section describes when and why the data drivers are turned on and off. It also describes control of data direction.
+
+4.2.2.1. Generating DBOE=* Refer to the STEERING PAL equation for DBOE.
+
+Note that all the bus drivers are enabled for every bus cycle unless BERR# is asserted. This allows for easier use of bus-monitoring tools such as state analyzers.
+
+It is fairly difficult to avoid tri-state fights on the data buffers. In order to get data out to dynamic RAM PICs at
+
+an early enough time, we do not use the data strobes to enable the data drivers, because these strobes can go active very late in a write cycle.
+
+On a read cycle we use the data strobes, so that in case the cycle turns out to be a Read-Modify-Write cycle, the drivers will be turned off (to avoid tri-state fight) while the R/W line is changing state.
+
+Refer to the PAL equation for DBOE in the STEERING PAL appendix. The term (AS * RD#) turns on the drivers for all write cycles, including the write portion of Read-Modify-Write cycles. Note that since AS turns off
+
+the data drivers, the data hold time is not guaranteed beyond AS going inactive, so it is poor design practice to try to use the rising edge of AS*, UDS*, or LDS* to latch data.
+
+The terms (UDS * RD * ASQ) and (LDS * RD * ASQ) turn on the drivers for all read cycles. The UDS and LDS turn off the drivers in the middle of a read-modify-write cycle. Note that since AS turns off the data drivers, the
+
+data-hold time is not guaranteed beyond AS going inactive. Therefore it is poor design practice to try to use the rising edge of AS*, UDS*, or LDS* to latch data.
+
+The terms (UDS * RD * ASQ) and (LDS * RD * ASQ) turn on the drivers for all read cycles. The ASQ (ASDE- LAYED equivalent) keeps the data buffers from turning on until after there has been enough time for the collision
+
+February 4, 1986 ' Page 9
+
+Amiga Expansion Architecture Preliminary
+
+4.4. Bus Arbitration Circuit
+
+The bus arbitration circuit’s main job is to determine which PIC will receive BG* active (Bus Grant) when the 68000 asserts BG*. The circuit we recommend does this based on priority, where the closest PIC to the 68000 is the highest priority. You could implement something fancier as long as only one PIC owns the bus at a time.
+
+PICs are only allowed to assert BR* off the rising edge of 7M. This allows the bus arbitration circuit to operate synchronously, clocked by the rising edge of 7M.
+
+The output of the bus arbitration circuit only changes when the 68000 changes the state of BG*. If the 68000 is
+
+asserting BG*, the arbitration circuit passes BG* active to the highest priority active requester. When the 68000 disasserts BG*, the arbitration disasserts BG* also. Therefore no PIC has a grant.
+
+4.5. RES* and RESB*
+
+Note that there are two reset lines going to every PIC, RES* on pin 53 and RESB* on pin 94. The RESB+* line is intended to be the normal reset input to the PIC. All normal PICs will use this line as an input, so it is buffered.
+
+RES* is intended only to be used by those PICs which are designed to have the capability of reseting the system.
+
+Normal PICs will not drive nor load this line. Note that because RES* is not buffered, it can reset the Amiga, as well as resetting all PICs (via RESB*).
+
+4.8. CONFIG_IN* CONFIG_OUT* Daisy Chain
+
+The CONFIG_IN* signal will be passed to CONFIG_OUT* at the appropriate time if there is a PIC plugged in the slot. On this backplane, we have used 74LS32s to pass CONFIG_OUT#* to the next slot if there is no PIC. The pull down resistor allows the CONFIG_IN* signal to pass directly through the gate to CONFIG_IN* of the
+
+next slot if there is no PIC installed, thus bypassing the empty slot. If a PIC is installed, the PIC’s CONFIG_OUT#* driver will override the pull down resistor.
+
+Another method that would work is to use special pins on the connector at pins 11 and 12, such that 11 and 12
+
+short to each other when there is no PIC inserted in the connector. This would eliminate the need for the 74LS32 gates.
+
+4.7. Backplane Timing Generation 4.7.1. Clock Buffers
+
+The clock buffers for C1*, C3%, and CDAC were chosen for minimum propagation delay and minimum skew. Notice that buffered clocks are passed to the 100 pin edge connectors, but that the unbuffered clocks are passed to the 86 pin connector that goes on to the next box in order to minimize propagation delay to the next backplane.
+
+4.7.2. Generating 7TM We generate 7M (equivalent to the processor clock) by: 7M = C1* XNOR C3* This yields a 7.16Mhz clock which is used to generate ASDELAYED*, DOE, and ASQ90*. 7M is also passed to the PICs on pin 92 of the edge connectors, so.they will have a cheap clock for accessing the bus. 4.7.3. DOE, ASDELAYED=*, ASQ90+
+
+DOE (Data output enable) and ASDELAYED* are the compliment of each other. ASDELAYED%is used in the steering PAL (ASQ = ASDELAYED in the PAL equations) to time turning on of the data drivers during a read
+
+cycle. DOE is passed to the PICs on pin 93 of the edge connectors, to tell the PICs when to turn on data drivers during a read cycle.
+
+February 4, 1986 Page 11
+
+Amiga Expansion Architecture Preliminary
+
+Notice that whenever BOARD_SEL* goes active, SLAVE* will go active unless SHUT_UP_FOREVER is latched active. SHUT_UP_FOREVERH* is a feedback latch in the PAL. It is only set by the software if the board cannot
+
+be configured into the system (for instance if the user has plugged in too many large address space PICs and there is no room left for this one).
+
+If you analyze the PAL equations for BD15 through BD12, you will see that their data drivers turn on for all reads
+
+ANDed with BOARD_SEL active, until CONFIG_OUT* is set active (or some exception happens such as reset, bus error, or shutup).
+
+By the way, if you’re not used to PALs, it’s normal old Boolean: * means AND, / is bar, + is OR, IF(term) means “If the term evaluates to TRUE then turn on the tri-state driver”.
+
+Further analysis of the BD15-BD12 equations will show that almost all addresses put out ones; however, remember that most of the nibbles are inverted because the spec says they have to be (not all of course, noooo that would be too simple.) The inversion makes it possible to implement the codes in active low PALs; it is just a cost reduction.
+
+Analysis of the equations shows that the only nibbles (we don’t care about above HEX 80) that are outputting any zeros are:
+
+00/02 1100 0001 04/06 1111 1001 10/12 1111 1110 40/42 0000 0000
+
+To interpret this code, we need to remember that the spec says that all nibbles get inverted except 00, 02, 40, and 42. So our new table looks like this:
+
+00/02 1100 0001 04/06 0000 0110 10/12 0000 0001 40/42 0000 0000
+
+And all the other nibbles that were ones are now inverted to zeros. What do these codes mean?
+
+Nibble Data 00/02 1100 0001
+
+N P 001 = 64 kilobytes, the smallest size that can | can be requested
+
+| : | | | | | | | | | i [ (=} I
+
+|
+
+| There are no more PICs on this physical | board. It is possible to put more than
+
+| one PIC on a physical board, but in
+
+| most cases including this one, we don’t. |
+
+|
+
+[=) I
+
+This board does not have any Init or diagnostic code.
+
+(=} I
+
+Don’t link into memory free list. The reason I didn’t want it linked in is that the processor might have tried to use it | ] and it was only 16 kilobytes masquerading to the system as 64 kilobytes.
+
+I [ — ____11 = Required by the spec.
+
+04/06 0000 0110 = Product number = 6
+
+10/12 0000 0001 High byte of manufacturers number 14/16 0000 0OOO___________ Low byte of manufacturers number
+
+February 4, 1988 Page 13
+
+Amiga Expansion Architecture Preliminary
+
+Guaranteed Timing to Backplane
+
+Characteristic Unit
+
+AS* Low to CDAC low (Setup) AS* High to CDAC High (Setup
+
+68.4. Guaranteed Timing to PIC Guaranteed Timing to PIC (PIC in Slave Mode
+
+Characteristic
+
+Valid Address to AS* Low Valid Data from 7M High(S4) on Wr to PIC
+
+[ 1 [ Valid Data setup to Local ™M low(S7) | 15 | [ ns |
+
+7. Appendix B - Backplane Loading Spec Note: The Amiga is designed to drive into a device that meets the backplane specification. % need to spec how many pf a box may present to the upstream box
+
+All backplane 86-pin connectors at the processor end of the backplane must present no more than 1 “F” load plus ??7pf to the connecting device, with the following exceptions:
+
+Pin 53 RES*
+
+7.1. Appendix C - PIC Loading Spec
+
+All PIC pins must present no more than 2 “F” loads plus trace capacitance.
+
+7.2. Appendix D - Clocks
+
+14M (RN U I R UG Y U B
+
+|---"139ns----- >|
+
+February 4, 1986 Page 15
+
+Apr 24 19:32 1986 steering.rbnewpins Page 1
+
+PAL16L8
+
+STEERING150R17 REV3
+
+11-17-85 AMIGA
+
+/SLVOUT RD /ASQ /ASQ90 COLLIS /BG /AS /BGACK /DMAIN GND JOWN /AOE /UDS /BERR /DMAOUT /LDS /DBOE /RES /D2P VCC
+
+DBOE = AS * /RD * /BERR + :DATA DRIVERS DURING WRITE CYCLE UDS * RD * ASQ * /BERR + ;TURN ON DRIVERS LATE FOR RD LDS * RD * ASQ * /BERR ;UDS AND LDS PROTECT RD MOD WR ;TO AVOID TRI_STATE FIGHT D2P = /DMAOUT * SLVOUT * RD + ; DOWNSTREAM READS UPSTREAM SLAVE DMAOUT * /SLVOUT * /RD + ;UPSTREAM WRITES DOWNSTREAM SLAVE DMAOUT * = SLVOUT ;MASTER AND SLAVE ARE UPSTREAM ) AOE = BGACK + /BG * /DMAOUT + As + ;AS KEEPS ADDR WHEN /BG DROPS ASQ90 ;ASQ90 MAINTAINS VALID ADDR ON
+
+DMAOUT =
+
+IF (/RES
+
+. LAST PROC CYCLE DMAIN + OWN
+
+* COLLIS) BERR = VCC
+
+DESCRIPTION
+
+SLVOUT=SLAVEOUT, ASQ=AS DELAYED, ASQ90=AS CLKD ON LOW EDGE OF 7M, BG=BUS GRANT, OWN=LOCAL OWN
+
+COLLIS=BUS COLLISION,AOCE=ADDR OUTPUT EN,DOE=DATA OE
+
+RES=RESET, D2P=DATA TO PROCESSOR
+
+UDS LDS PROTECT AGAINST RDMODIEYWRITE 3STEIGHT & BERR= /DOE
+
+PRELIMINARY
+
+Mar 6 03:31 1986 testram.palr2 Page 1
+
+PAL20L10 TESTRAM 9-11-85 COMMODORE -AMIGA
+
+/ASQ /ASQQ RD /BDSEL /BERR A6 AS A4 A3 A2
+
+Al GND /RAMOE
+
+DBCE =
+
+WP
+
+/RES BD12 BD13 BD14 BD15 /PRECON /CONOUT /SHUTUP /WP /DBOE VCC
+
+/RES*BDSEL* /BERR* /SHUTUP* /RD + /RES*BDSEL* /BERR * /SHUTUP* RD*ASQ
+
+/RES*ASQ* /ASQQ*BDSEL * CONOUT * /SHUTUP * /RD* /BERR
+
+RAMOE =
+
+SHUTUP
+
+PRECON
+
+CONOUT
+
+IF (/RES*BDSEL*/CONOUT*RD* /BERR * /SHUTUP) /BD15 JA6* /AS* /A4* /A3* /A2*AL +
+
+IF (/RES*BDSEL* /CONOUT*RD* /BERR * /SHUTUP) /BD14 /JAG* /AS* /A4* /A3*AL +
+
+IF (/RES*BDSEL* /CONOUT*RD* /BERR * /SHUTUP) /BD13 JAG* /AS* /A&* /A3* /A2 + /A6* /AS* /A4* /AI*A2*AL +
+
+IF (/RES*BDSEL* /CONOUT*RD* /BERR * /SHUTUP) /BD12 /JA6* /AS* /A4* /A3* /A2% /AL + /AG* /AS*A4* /A3* /A2*AL +
+
+/RES*ASQ*RD*CONOUT* /BERR*BDSEL
+
+JWRITES TURN ON EARLY ;ASQ DELAYS THE READ
+
+/RES*BDSEL* /RD*ASQ* /CONOUT*AG * /AS* /A4*A3*A2 +
+
+/RES*SHUTUP
+
+/RES*SHUTUP +
+
+/RES* /RD*BDSEL*ASQQ*A6* /AS* /A4*A3* /A2* /ALl +
+
+/RES*PRECON
+
+/RES* /ASQ*PRECON + /RES*CONOUT
+
+A6* /AS* /A4* /A3* /A2
+
+AG* /AS* /A4* /A3* /A2
+
+A6* /AS* /A4* /A3* /A2
+
+AG* /AS* /A4* /A3* /A2
+
+DESCRIPTION
+
+THING
+
+f
+
+PRELIMINARY
+
+Nov 25 19:32 1985 physical.new Page 1
+
+INTERFACING TO THE 68K BUS CONNECTOR ON THE AMIGA
+
+0. Scope WARNING: While care has been taken to make this document as accurate as possible, it is preliminary and is subject to change without notice. v This document is intended to give the necessary information for interfacing to the 68000 bus connector on the right side of the Amiga computer. It will be updated as people give feedback. 0.1 References The Amiga Hardware Manual gives the address map and other useful information. Appendix E of the hardware manual gives the complete pinout for the 86 pin connector. 1. Form Factors 1.1 Form Factors For Standard Box With Cards We are planning on recommending a standard form factor for motherboards and daughter cards for the Amiga. While this definition is not yet solid, we have some preliminary information. See attached drawing for the proposed daughter card form factor. 1.2 The Connector On The Amiga The connector is a standard dual row 86 finger (43 on a side) edge connector, spaced on .1" centers. Here are some part numbers of connectors that are compatible: solder tail AMP 2-530841-1 wire wrap AMP 4-530396-7 card extender AMP 1-530826-2 Mitsumi also makes connectors that fit. See accompanying draw1ng for physical dimensions of this connector. 2. Timing 2.1 Clocks
+
+For this discussion see figure 1.
+
+The entire computer board is run synchronously to the 3.57954Mhz color clock (Cl). This is accomplished by generating a number of sub-multiple frequencies from our master 28.63636Mhz crystal oscillator. The following are the primary clocks on the board:
+
+PRELIMINARY
+
+Nov 25 19:32 1985 physical.new Page 3
+
+The 68000 is connected directly to the 86 pin connector, there are no buffers between the 68000 and the connector. Two control inputs, VPA* and DTACK* are driven by logic on the Amiga and should not be driven by your circuitry.
+
+Many boxes are being designed which pass the bus (buffered) out in daisy chain fashion.
+
+In order to allow your device to be the second in the chain, you must take into account an extra level of signal buffers on:
+
+AS*, UDS*, LDS*, Address, Data, Clocks
+
+We will be publishing guidelines on how to design compatible expansion boards, so that boards and boxes from various companies will be able to coexist on the bus. One of the requirements will probably be that data drivers should not be enabled until early in S4 on a Read cycle.
+
+Futhermore, if you are designing a DMA device, the Amiga provides data in response to a Read very late (approx 50ns prior to the fall of S6). If your DMA device is looking at this data through two or three 74F245's (7ns each), this data will not
+
+be valid at your DMA controller until approximately 25ns prior to the fall of S6.
+
+Our bus timing is based on an 8Mhz 68000, with only one exception: under normal operation our bus control PAL will assert DTACK* for you. DO NOT ASSERT DTACK*; do not attach any outputs to the DTACK* line.
+
+2.21 Slave Bus Timing
+
+Details of 68000 timing are available in the Motorola 68000 hardware manual. If you are designing a bus slave, most bus timing is per the 68000 spec, except that we will pull DTACK* for you. If you need to delay our assertion of DTACK*, you must pull XRDY (Pin 18) no later than 60ns after the assertion of AS*. You should release XRDY when you are ready to complete the bus cycle.
+
+Also remember that in the expansion architecture, data drivers should not turn on during a Read cycle until S4.
+
+For those of you who have not designed anything on the 68K bus before, this description is intended to make looking at the Motorola timing diagrams easier. For more details and timing specs see Motorola hardware manual (fold out timing diagrams in the back of the book.)
+
+See figure 2 in this document.
+
+Motorola labels the states of the processor clock
+
+S0-S7. The processor starts driving the address lines during S1, and asserts AS* (Address Strobe) during S2. If the cycle is a read, the data strobes (UDS*,LDS*) are asserted during S2 also (they are delayed until S4 on a write).
+
+Our board responds to AS* by asserting DTACK* (unless you deléy DTACK*
+
+PRELIMINARY
+
+Nov 25 19:32 1985 physical.new Page 5
+
+S0 S1 S2 S3 S4 SW SW S5 S6 S7 S0 etc
+
+™M=CK _/ \—/ '/ 'Y/ N/ \/
+
+A23-A1 COXXKXXX XXX AS* - N~ XRDY _—_'_i_\_______/ 60ns max-->| |<-- | DTACK* ——— ~_ D15-DO XX ¥xx
+
+Fig. 4 Using XRDY to Delay DTACK*
+
+2.22 Master Bus Timing
+
+All bus masters must run synchronously to 7M (equivalent), as does the 68000 in the Amiga.
+
+The necessary information for designing a bus master is in the 68000 hardware manual. In our system, a master must meet all of the bus timing specs of an 8Mhz 68000 , for example valid address must precede
+
+AS* by at least
+
+30ns just as the spec says it will on an 8Mhz 68000, etc etc.
+
+If you are designing a bus master card that will plug into a box, remember that the address will have to propagate through the address drivers that are built into the box; you should probably allow for the prop delay of three 74F245's in addition to the required 30ns.
+
+The strobes such as AS*,UDS*,LDS* must all function as they would based on the 68000 spec. A master must also respond to DTACK*, HALT*, and BERR* correctly.
+
+- 2.23 Bus Arbitration Timing
+
+The bus arbitration logic is based on the BR* BG* OWN* BGACK* protocol as specified by Motorola in the 68000 and 68440 manuals.
+
+All changes in state of BR* BG* and BGACK* should be clocked off the rising edge of 7M (equivalent). This allows the parallel bus arbitration logic to run synchronously to 7M without danger of clocking flip flops while these signals are changing.-
+
+The following design is for illustration, and has not been tested at this time. Notice that all state changes are synchronous to 7M and
+
+PRELIMINARY
+
+Nov 25 19:32 1985 physical.new Page 8
+
+If your slave uses the VPA VMA protocol to be synchronous with the E clock, you must only use addresses in which Al2 and A13 are high. This is because we have synchronous ports on board which are activated by (Al12* AND VMA), also (Al3* AND VMA). 3.6 Do Not Use Pins Marked EXP
+
+Do not drive or load pins marked EXP or RESERVE. 3.7 CONFIG* The CONFIG* output is discussed in the Appendix (Autoconfiguration) . Only use CONEFIG* as a logical input. On the first version of the Amiga it is tied to ground, but on future versions it may be driven High or Low as appropriate. Do not tie this pin to an output or to VCC or GND. . 4., Loading There is 1 AMP available on the plus 5 volts. Put your buffers as close to connector as you possibly can. You can put one 74F load on each signal. 5. Warning The Auto Configuration information in Appendix G of the Amiga Hardware Manual (Rev 1.0 8.27.85) is out of date and should not
+
+be implemented. We will soon be releasing information on the supported Auto Configuration Architecture.
+
+HOUSING DATUM REF ONLY
+
+4.23 107.5
+
+CASE DATUM REF- ONLY
+
+3.170 80.5
+
+DETAIL 2
+
+SCALE 2X (2 PO
+
+SEE DETAIL 2
+
+SEE DETAIL 1
+
+SEE DETAIL 3
+
+13.05 3315
+
+REVISIONS
+
+| [o as/es 5472| 02 | ADDED DIMs TO EX (ART FINGERS
+
+NOTES:
+
+327001-01 HOUSING, BOTTOM, COMPUTER 327002-01 HOUSING, TOP, COMPUTER 327004-01 BEZEL, COMPUTER
+
+327049-01 CONTROL DWG, PCB, COMPUTER 327038-01 RF SHIELD, EXPANSION COLOR—BORG WARNER NO. 33596, LIGHT BEIGE TEXTURE — BEALON BK—1058B
+
+TO RECEIVE M3 SELF-TAPPING SCREWS FROM EXPANSION CARTRIDGE
+
+= o PR
+
+STEWART ENGIN‘G SERVICES (408) 466-24
+
+SN BY: COMMODORE-AMIGA, INC. —ABLERS OTHEpIsE - as COMMODOREAMIGI
+
+aLs s on: 11/66 ] e LOS GATOS, CA 95030
+
+. E= OUTLINE DRAWING
+
+S — AMIGA EXPANSION s"‘|327275 6|T
+
+SCALE |]| SHEEY | OF 2
+
+REVISIONS A escmPon
+
+M3 SELF-TAPPING (2 PL) -
+
+039 , .039 2e68 o X "o OF 134.0 RECESS ALL AROUND : 4.875
+
+'gfézoo"‘ PIN 2 Wl SALD Gk~ PN 86 SEE DETAIL 4 2 PL TIN PLATED STEEL gl 1o SECTION A-A Bl 2o SCALE 2X 1%.]—* f._.& DETAIL 3 i SCALE 2X EXPANSION CARTRIDGE 30° (REF ONLY) 2PL Km—{ o 0.4 (2P DETAIL 4 SCALE 4X
+
+|I|nlllllllillIllllilllllllllilIIIIII‘]IIIIIlIIiIIIlIhI |
+
+4.20 40 706.68 ON 5.6 CENTERS
+
+08y 45° CHAMFER 0 (@ PV
+
+4,390 4000 =010 1.5 +0.0 -0.3
+
+DETAIL | hd SCALE 2X
+
+STEWART ENGIN'G SERVICES (408) 466-2452
+
+DRAWN BY. [ oave } -IMW COMMODORE-AMIGA, INC. m 983 UNIVERSITY AVE. 8D Tesiances on: EE—= &M 55 GATOS, CA 95030 [ewon | X > ] OUTLINE DRAWING
+
+_=— AMIGA EXPANSION
+
+REV
+
+32727570l oz
+
+weETy o2
+
+b
+
+= = MATERIAL:
+
+REVISIONS
+
+[ZONE[ LTR] DESCRIPTION APPROVED | [o04]| REPRAWN 2/14l8e | A5 | 05| 17919 was PaceP wRONG 3/8e | Ha
+
+APDED PANEL MOUNTING-HOLES, CHANGED BARE (OPPER AREA.
+
+o820 cuanced!
+
+198.12 8.89 " (:350)
+
+(7.800)
+
+O ,2 §\\ (353) SN ¢ 2.18 E (-129) g § 2pus E y e § / § N 5 3 i N 185.42 g N (1.3) N N E COMPONENT § , 5 5IDE BARE BD, N N NO COPPER N N N N N N : s N N § N § N § N ' § N N \ = 8 N = 8
+
+i =
+
+2.8 A 0.30 (15) ooR 28 TYP MAX — le— 1.5 THK 2P (2PLS) i 129.19 5.0 COMPONENT —— 12.6
+
+1.0x1.0___ (5:086) (,20) HEIGHT Cio)_'l
+
+CHAM
+
+1,0 MAX (2PLCs) LEAD - LENGTH NOTES ¢ I. EVEN PIN NO.s ON COMPONENT SIPE. 2.0DD PIN NO.5 ON CIRCUIT SIDE. aelhe PRELIMINARY /
+
+A\ EXTERNAL CONNECTORS ALONG THIS EDGE. == : —UNLESS OTHEPWISE ﬁ COMMODORE-AMIGA, INC.
+
+. & 983 UNIVERSITY AVE. #D
+
+TRtatsEs oM %E= - [0S GATOS, CA 95030 o >’°‘g L R CONTROL Dwg, : + 1 1 EXPANSION BD
+
+X 41,29 . MATERIAL: NEXT ASSY 327290-01 |06
+
+. *
+
+22028
+
+REVISIONS
+
+DESCRIPTION DATE
+
+1257 (10 PLCS) .25# CLEARANCE (10 PLCS)
+
+—-_/—————— 1.6375
+
+L 1.5575
+
+5025 REF .250
+
+NOTES.
+
+I.MATL ! FR4 .090 THK
+
+2.GOLP FINGERS
+
+3, THESE DIMENSIONS ARE NOT ORRECT FOR P THEY ARE TO BE uUSED ON THG PROTOTYPE PCB ONLY,
+
+COMPONENT SIDE
+
+_UNLESS QTHERWISE osre COMMODORE-AMIGA, INC. rousiEarED N 983 UNIVERSITY AVE_ #D oec.mii‘s"E ' - LOS GATOS, CA 95030
+
+CONTROL DwaG, Z ORRO BACKPLANE BD
+
+MATERIAL NEXT ASSY 327310 -01 FINISH
+
+REVISIONS ZONE | LTR DESCRIPTION DATE APPROVED
+
+EXPAN?ION BD
+
+ol el E COMMODORE-AMIGA, INC.
+
+983 UNIVERSITY AVE. #D oo 11 ¥ LOS GATOS, CA 95030 P T -
+
+m—— LAYOUT, EX. BOX
+
+ASSY . T B
+
+TOLERANCES ON: DECIMALS
+
+XX
+
+X 00¢
+
+x *
+
+= *
+
+5.16 14 (203) 2°PL5
+
+¢
+
+24.0 TYP
+
+¢
+
+127 "' (.50) _’i | mrer |
+
+2433
+
+—
+
+= - 240 (.940) TYP
+
+(940)
+
+f—
+
+DETAIL
+
+SCALE 1i1
+
+|
+
+CAPTIVE SCREW! SOUTHCO # 09-13-4035-26
+
+RETAMER ! S50UTHWO # 09- 49-101-12
+
+MATES WITH SOUTH(O # 09-44-101- 11
+
+DETAIL 2 2 EA RedD HAE 191
+
+THIS AREA TO BE
+
+FREE OF PAINT 157 \ (062) TYP
+
+3° (2PLC5)
+
+B
+
+M3 (OR 4-40 THP @ 245 (WY reF 2T
+
+1.04 (041)
+
+¢60)
+
+THIS AREA TO BE
+
+- / FREE OF PAINT
+
+REVISIONS
+
+ZONE | LTR DESCRIPTION DATE —] APPROVED ot | PrOTO Reease -l alo/oe | s 02 |ADDED PAINT NOTE, BRKT WIDTH q/u/€6 S 03 |CHG'D PCB A SCREW HEIGHT —l_uu./sc 3
+
+NOTES:
+
+1. MATL. 0.73 (.0O29)THK CR STEEL,
+
+Alsl
+
+1010,
+
+2.FINISH! PAINT = HiGH SOLIPS , POLY URETHANE BASE, 9EMI GLOSS, SMOQTH COAT, CLASS-A (WHERE INDICATED) OVER CLEAR Z|NC.
+
+PANEL SUPPORT USING 2 ANGLE BRACKETS A%
+
+COLOR - LT BEIGE: PANTONE PRO.NO.
+
+130905.
+
+SHOWN OR 2 SUB- MINI'D' CONNRS.
+
+4. SEE EXPANSION PCB CONTROL PW& 327290-0L1.
+
+METRIC (INCHES)
+
+S R
+
+TOLERANCES ON:
+
+SERIOUSLY
+
+PRELIMINARY/
+
+amew LOS GATOS, CA 95030
+
+DRAWN BY: [ oave |
+
+vag COMMODORE-AMIGA, INC. T - [eweR 1
+
+USED ON
+
+NEXT ABSY
+
+SIZE
+
+CONTROL DWG, END PANEL, EX. BD
+
+REV
+
+D| 327335-00 |o3
+
+SCALE 11
+
+SHEET |
+
+oF 1
+
+A15
+
+A13 U A12
+
+mﬂa_' Ui
+
+As Ui A
+
+A2 U
+
+J1 Je
+
+J1 Je
+
+NoheNche o T N0 TR R
+
+o 7yF257
+
+- —
+
+U 2 H——]
+
+1o JUF257
+
+nrobabalonluhalea
+
+S
+
+O
+
+gy = )
+
+1o 7UF257
+
+R
+
+w35y U2L-9
+
+b L v k!
+
+1877781y y2L-8
+
++
+
+g SET192x
+
+umM
+
+cr
+
+cCe —— C3
+
+Ccu
+
+-RAS
+
+I<ABA [<ASV [*ASA [ASV [“RSA
+
+™
+
+l
+
+[
+
+02 | 03l
+
+BAC
+
+U1K
+
+uaL-1 y
+
+v
+
+>» U3H-18
+
+it
+
+feofualepatasfiatis
+
+c17
+
+i P 835 U3H-20 *7uLS373 -H-f % i |2 U3y-9 %) 5 FIn -9 3T, %t‘l 2 'll : 18 >>U Hr‘5_7 w Ve ulitge TuLs2uY A USH-1 »— wa U3H-183) 5 uSEHE U3H- 155 U3l 7) Ut Ey ; 5 u3Kk-th : L > U3K-20 )))ll.:%K:lB AL 2 Usik
+
+vee MAIN_PHAR
+
+MAIN_GND
+
+==
+
+!0
+
+! 0
+
+e
+
+[ I
+
+REVISION HISTORY
+
+FEV ECO_NUNBER ORTE BY +
+
+WARNING :
+
+THIS PRODUCT WILL UNDERGO MAJOR REVISIONS IN THE FUTURE; THEREFORE ALL PERIPHERALS SHOULD BE DESIGNED ACCORDING TO THE INTERFACING GUIDELINES AS PROVIDED BY COMMODORE-AMIGR, INC.
+
+COMMODORE-RMIGA, INC. RESERVES THE RIGHT TO MODIFY OR DISCONTINUE THIS PRODUCT WITHOUT NOTICE.
+
+A CONSCIENTIOUS ATTEMPT HRS BEEN MADE TO MAKE THIS DOCUMENT ACCURATE. NO WARRANTY IS EXPRESSED OR IMPLIED.
+
+SET_ROM=
+
+Re
+
+228
+
+L) DPALCAS J 1 RAS® £ ROMx o« » U60-28 DPALEN UoRTL % il E—T———» Usa-10 . u o mm—_ E R 1 6019 Uoda: = - > UBA-14 MW 2 FE SR j s o o;fo W —__ga 18 81y USP-18 - i = : i4° 2 :- i VPAX ), UBP-1: u §§9;>> : = !ﬁEK:_‘:)) 0l Lt 2 oy 4 L UHt;L:! »)%_[é’&flds usa-11»= " : 2 e 3 B oritke ——o U8Pr « “'I R > UBP~17 Usa-13 v > = 7 mm s s \NW»z PTLE” : IR0 vt He paL16ie o 11 B £ a2 U2F 39x8_DIP DRUGEN \£ —_— DAUGCAS - - Z 5 éu 19 ROME: l N : : 3 ROMO1X s 6g-12 | pL— : 4 RRKx 16 : S| :n % RE= z . : PALIGLE ": ——————l : ~RESET T e vee & A}a 470x9_SIP
+
+U2E ULlE uz20
+
+C EMN
+
+u1cC ueB uis [
+
+VCCI—
+
+L c1e,c11,€12,015,£18, €19, €21, €22, C23, C24, C26, 27,28, €38
+
+L c2.c3,cu.c5.06.C7.08.C9
+
+T .22 ! ~ RAM_ARRAY | Lret
+
+T 18718 TANT S |
+
+T e
+
+L+ c13,cd5
+
+T es/1e
+
+15(17|3 |2 |1517|3 |2
+
+1517|3 |2 |15/17|3 |2 |15[17[3 |2 | 1517
+
+COMMODORE-RMIGA INC. 983 UNIVERSITY AVE.#D AFea L0S GATOS, CA 95030
+
+328016-01
+
+RAM/ROM Daughter Boerd
+
+REV | gﬁz D Needle 10-18-850. 5 1
+
+UM StnkouidoteEl [ OF
+
+J3, 4 Js, 2 J3,3 J3,1
+
+J5, 18
+
+J5, 10
+
+J5,17 J5,16 J5,23 J5, 22 J5,5 J5,7 Js, 9 J5,11 J5,13
+
+5VPC>- . SGROUNDE>———— SGROUNDC— 6 g AN1 P — SEL1->— U2 L 12 9 —8 10 ROY - WRPRO-C— OKRD-C> INDEX-D> TKB-T> CHNG-—————— =g WRPRO {>ROY- J5,1 WRPRO-> - >WAPRO- JS, U4 DKRD-C> - —>okpo- J5,3 INDEX-> >INDEX- J5,20 TKO-C> THE- >1ke- J5,8 CHNG-> L >cHNG- J5.21 MTAX->J i t aETLnl J&, LI%B - - JI DRESB->— 1 ourR- S, 16 >SI1DE- Jt , 3% SIDE-D> O>STEP- s e STEP-T>— —we- Y4, 24 WG-C> —upat- J4, 22 WOAT -] , a1 ~ o JUu-18 I —o>seano i 1 b >scrnp J4, 3 }——>sernn J4. D I:gscrmn Ju, 7 L C>SGRND “E'?l e Ju. 13 soAND i » ——>scrnp J45 15 {——>seanp J4. 17 b——>5GAND Jt » 19 F——C>SGAND ~ t+ Sé ——>sernD J4 f— r~>seanp JH. 25 {——>sernp J4, 27 ——>s6AND ~t .29 F——O>soAND S s gé L >seano J4, L wumAx- 42,8 L Ress- J2, 10 osioe- 42,13 —>step- J2, 18 —Due- 42,16 oupAT- 92,17 ~bIR J2,19 SEL2-C> — >seLix J2. 2l SEL3-C> — ir>seLax Y2, 9 5YPC> _—~5vP J2,12 12vPC> ! i >i2ve J2,23 SGAND seAND JJ2s 3 SGAND seAnD J2, 4 SGAND GRND J2,5 SGRND GRND J2,6 SGRNDC> GAND J2,7 —>NC J2,2@
+
+REVISION HISTORY
+
+REV EC0_NUNBER DATE BY 3
+
+WARNING:
+
+THIS PRODUCT WILL UNDERGO MAJOR REVISIONS IN THE FUTURE; THEREFORE ALL PERIPHERALS SHOULD BE DESIGNED ACCORDING TQ THE INTERFACING GUIDELINES AS PROVIDED BY COMMODORE-AMIGA, INC.
+
+COMMODORE-AMIGA, INC. RESERVES THE RIGHT TO MODIFY OR DISCONTINUE THIS PRODUCT WITHOUT NOTICE.
+
+A CONSCIENTIOUS ATTEMPT HAS BEEN MADE TO MRKE THIS DOCUMENT ACCURRTE.
+
+NO WARRANTY IS EXPRESSED OR IMPLIED.
+
+COMMODORE-AMIGA INC. (K|983 UNIVERSITY AVE.#D 22105 GATOS, CA 95030
+
+326018-01
+
+EXT3ICRD
+
+EXTERNAL 3.5 DISC CONTROL PCB
+
+REV | S CRAIMER___ %
+
+06-04-85
+
+(D "MW SinkoulcttEl 1 OF ]
+
+Js, 2 J5,1
+
+J3,18
+
+Ju, 34 Ju, 28 Ju, 30 Ju,8 J4, 26
+
+Je, 1 Je, 14 Je, 2 Je,22 J2,15 Je, 11
+
+| GRS G (N Gy S wwwwwuww — = 0D N\ _0o n wul
+
+« e w e owow ow
+
+J3,17 J3,16 J3,23 J3,22 J3,5 J3,7 J3,9 J3,11 J3,13
+
+SVLOC> 1
+
+SGROUND>—— .AuF 1K 1K AN1 lKé 2 1K 1K —1 3 [ u “Tea y » Eus S U3)S S ——| = T T ry [Ty ) 7u38 T SEL1 u2 Lg ! 1 T 745132 [7uLs7y 12 11 ue SEL1I->—— uLs7u RDY- > WRPRO-> DKRD-C— INDEX-C> TKa-C> RDY-> A —~>roy- 43,1 WRPRO-- HRPRO- - ~>WRPRO-J 3. 4 DKRO-C— 1 DKRD- e —~DKRD- 43,3 INDEX-D— L a >InpEX-J3, 20 TKO-C> { THe- —>1ke- J3,6 CHNG-C> C>CHNG- 3?, El T2 it is —>sEL1- JU, 10 MTRX- > ——>Ne2 J4,2,6,12, 14 DRESB-D> SIDE-> —>s1pe- J4, 32 STEP-> —>STEP- Ju, 20 WG-C> upe- Ji, 24 WDRT-> SWDAT- ".JL ’ 2e IR > >DIR Jh-%s C>SGRND S 4 » : /\/\/\ 4 T =scanp J4. 3 RLV VIK +— »—DSGHND-t-g u +——C>SGRND S 3 s|UL)E U3\ I >sernp J4. 9 b2 b——>sornp J4, 11 7ULS132 7438 ——>scanp Y4, 13 . t——o>seanp J4, 15 t S, 3 {——T>SGRND ~%= 17 REE p——o>scano J45 19 201 »——DSGHNqu-Sé PSTS518B [ EX3CAND mr 5E scRND JH . I:gSGHND Ju, 27 . TR +—>SGAND th? 1+ s [ig +———>SGAND S s @@r———[ L >scanp J4. 33 7uLs132 7438 _ Je,s L [SMTRX , L pRess-J2, 10 >sioe- J2, 13 - LuF o>sTEp- 42,18 - >We- J2,16 e —HoART- J2, 17 o J2,19 SEL2-> — —>seLix Jesel SEL3-C> — —[>SEL2X Je , 9 SVPC>- Ssyp J2,12 12VPC> _—>i12ve J2,23 SGRNDC> - + sGAND Y2, 3 SGRND = sgRno J2 s 4 SGRND sGAND J2,5 SGAND GanD J2, 06 SGRAND SGAND J2, 7 —one J2,20
+
+REVISION HISTORY
+
+[REV_ ECO_NUMBER ORTE. BY +
+
+WHRNING:
+
+THIS PRODUCT WILL UNDERGO MAJOR REVISIONS IN THE FUTURE; THEREFORE ALL PERIPHERALS SHOULD BE DESIGNED ACCORDING TO THE INTERFACING
+
+GUIDELINES RS PROVIDED BY COMMODORE-AMIGR, INC.
+
+COMMODORE-AMIGA, INC. RESERVES THE RIGHT TO MODIFY OR DISCONTINUE THIS PRODUCT WITHOUT NOTICE.
+
+A CONSCIENTIOUS ATTEMPT HAS BEEN MADE TO MAKE THIS DOCUMENT ARCCURATE.
+
+NO WARRANTY IS EXPRESSED OR IMPLIED.
+
+COMMODORE-AMIGA INC. CK 983 UNIVERSITY AVE.«D Aea L0S GATOS, CA 95630
+
+328018-01
+
+EXTSICRO
+
+EXTERNAL 5.25 FDD SELECT PCB
+
+REV D S CRAI MEFéu—ms—as 1.3
+
+N W Sinkowid o 1 0F
+
+SLAVER2x
+
+CONFIG_0UT2x ¢ CONFI0_IN2k,
+
+SLAVE3x
+
+F1G._DUTSx(q NF1G_IN9xSy—]
+
+HB PRRY 180T a2 A28 e CERr T LS D o s | RSy “5{:5' [+ :1?“3‘;?9 DHAOUY S [TS—-pomante ETarY mif A8 55 SLAVE1x oIS cmng " > CONFIG_OUTnd¢— 5| nvsuua.g- twrs yd > corTFm_l;éu))— cunhn_mx- cowr 1 suie 1871 AT ese ] ST Reone T eSS mov AL .WTTE“gv A wp== INT2e Armmic ue > AE g reseave ':: " > INIB= SOy e Lo o 5> E;ﬁ. LA " > 4 DMAOUT 5 — L. N T e i U3 s PE E\':‘ /n-“‘ ntb )> vee P i} 3 £ I~ 3 gug ) o . R 38T S TN 1p[ 22 K> » e 35 1En D — - Wt e S S o] > FERD gE> BFCR = gt HiSE ) xR oon Rl sas o , aagmg ) vomcEs b s 1h | o i >; 861 ag[w: > 01us ,E;I. i )) 3 —ror o IE > 3’;= ) 570) l%gEEHIQ wromocesy—] ot 5 X 3aHeS oooce 3 6 5 > PR1BES P07 8 . 017> L 0 dw FY.{ e m— R uLsaus 7ia )> Ig (\)r o '}’c— Fuu. UG Hsei— Q€ . s ] T SR I B2 T i 3 g 0 ¢ N ) | — ah NELR: 18 N <7 o_1a_reaca py—- 0 g | I 8ot ) ('___‘"’*‘-\\ N vee ~3>CONFIG_IN1x BUS HNE% n:‘;éuéméwémé 1 RRBITRATION 18K BAL ' ? >3 T‘ TS iﬁ Ul 5 |11 ' i . > Bha CONFIG_INix BAZE i 0 _ S = = BAS» e oY1 > BGIN=) b — Sh B )_l [ —— M Bbs " RAT M) Lir 2 Z2 M —— ‘y:";‘ulut [ poour i‘ J8 %" CONFIG_INTm)— | —— | -5y>—0 -Sv CONF1G_BUT1x)) ] HVP>—Or 174 GND| vee vge +5| AN3 ANt [D>——» TICKU 103103 1K 16KS 1013 1 COLLISION |, 10K L_____I Yoo - ?1 s s <u s [z uie >n BRguy ANL.8 2 e sLAvES 1 z =i L siaveaurs SLVEIE ) i ne ) iy e = Ri2l Syt e [ B4 1080F Cl - C18 c17,c18 " N 720 RESB)
+
+ocommmz | Coooo
+
+DCONFIC_IN2%
+
+CONFIG_IN2% CONFIG_IN3»
+
+CONF m_oum-»—g]u( b= =z
+
+% BUS_LOLLISION
+
+» CORCB
+
+J3
+
+]
+
+T+ XX
+
+B
+
+2
+
+AL_OHNw
+
+S 1
+
++
+
+TOIDE) D D DCD—0CX XX
+
+DD Z e e D T NI Z o OY ZUTTIZDC o CROZ
+
+T I < MO < DD~ D—D—IXDC) D W DD
+
+—=EZ AN =Th=T Z O M—"D’
+
+oxc
+
+| Z O~ IDDONRO D D Z el oA T
+
+DT B <<< O-J
+
+8.0V VOTO~IO.O.0. . 4. £ 6 XXX ICHICXI TITOE) VOIS
+
+| oommMmzw CooDo
+
+DOMMMCOIMOXOHOOOUT. ZZOwoM ZZZzZZ O
+
+PUUNF LG_LNdn
+
+I 19 74F 8
+
+us.u
+
+SLAYVEYm
+
+CONFIG_0UTYx, CONFIG_IN!
+
+e Ty G2 ANANN e TheE 2 D[ Th—s DD ~Drmps 2 e Th—t TR0 TR Z - 0) Z UT NZ DO
+
+DOOOCOCDOCHATCDOICO0 DXE PNNIIDUD<MO< DID—D~~D—~DDIO DIDUDAL DDDDE DD==DD—>OONNE)
+
+A=~ KON~ D DZ
+
+0.0 DICIO-0.0.0.0.0.06) CICMM MO MCCEC X0 OOUTZ
+
+ZZBURN AT ZZZZZ
+
+»CONF IG_INe
+
+CONFIG_IN4=
+
+D RESBx
+
+LOCAL_DH|
+
+CAL_ONNx
+
+SLAVESx
+
+CONFIG_OUTSw(
+
+CONFIG_INS®)>—
+
+T X N Dz
+
+=<
+
+nN
+
+3 o H
+
+o
+
+[=} N - @
+
+N e x X
+
+DA O WO 000 «
+
+x *
+
+=
+
+BRS™
+
+r' Ed »
+
+BGSH
+
+® b o O 0 X X E
+
+B UDI~TNUDWODE NIZ0 W—E—KOANHD DD
+
+o
+
+RNL
+
+16K 10K
+
+s
+
+RNS
+
+RNS
+
+CONFI6_DUTw))-
+
+DNRIN®
+
+SLAVEINE
+
+Il
+
+RNS
+
+RNS
+
+CDACEw
+
+PauL urm-:nsl u. 19,MT, W0, NND, Il:ﬂ
+
+|
+
+ANS_B A
+
+RNS_7 8 A
+
+NS B .
+
+ng i ANE_2 RNB_S 3 NNG_N ANE_S ANB_B& RHE_8
+
+—] — —- ANT_2 — wis oot ANI R — - - —
+
+[
+
+DX D—CDr—D = 2D 6 T IOCU LD
+
+V
+
+KN/ S LY ] RN7_7 aN?_8
+
+0
+
+CKx
+
+Sw Sx
+
+COODOOOOOCODDCEORODOOS OWE TODLLDI DM UTZ M~ AR VD =+ O DL+ Tt
+
+o
+
+:
+
+=z E u
+
+PCONF IG_0UTx
+
+STEERING |
+
+uis
+
+SLAYED!
+
+UTu D
+
+B3—3» D_To_pROCK
+
+3 DBOEX
+
+[a] NOTE1:_RNS_thru_RN1B_lnclusive, ere_BOTH_pullup_AND_pulldown.
+
+O NOTE2:_Al 1_eignels_ere_common,Unless_the_signal
+
+In] name_1s_to_the_LEFT_of_1iils_respective_J_connector. 0] For_example_BGACKX_ls_eo_common_slgnel_while
+
+00 BGiw_is_NOT_e_common_signal.
+
+0 Exceptions_are_J8_end_J10.
+
+LAST USED NOT USED
+
+|
+
+Cel J1@ RN1G Ulig
+
+J6, J7
+
+AN2-4, -5, -6, -7, -10 RN3-9,-10
+
+RNU-7, -8, -3, -18
+
+9,10,8;12,13, 11 9,10,8;12,13,11
+
+oooooooo
+
+AN2 asu:ur"c:" BUS_LOLLISIY
+
+r;V_L 20D Jreen B
+
+~% DMAOUTa
+
+COMMODORE-AMIGA INC. ERSITY AVE.»D REVISION HISTOAY ADIGA S
+
+[i——> BERAN m
+
+25 ne
+
+5> ADDR_OEx
+
+|
+
+CEEEEEL] SEEENERE
+
+e
+
+SHEET 1 OF
+
+P1 tedge ¢ingers) vee GND GND N ghb A o5 10K fA23 3 A22 LOcAL_OuNe RRRR N SLAVES »SLAVES Alg si2 A8 ONE \a CONF1G_OUT= 17 ONF Nis CONFIG_INIn» THLSIN g2s RI6 1" GND B01S % 3 - C3s >C3m 8014 7 LLEd . . R0t > bl » e Ul ks CONFIG_IN Mt R b - RS »AS > 1N16n , A ] ! Y g as PRE_CONF 1G_0UT oy . KU } gj—sfw 1 A2 IH CONF1G_QUTa ) x 18— A7 /7 R1 Al /8 R8 fFCe L » P18 BASE ) - ALl »AlL GND R12 R12 A13 R13 A13 1PLBa 12 Alg pRIL A1l I1PLIn A6 ALS > ALS A9 1PL2e R8 A1 > R1E A7 BEARs % BEARe RE AL7 > AL1 RS VPR= Al GND A3 vee £ A2 VHRw R LY »A18 . N RESa RESETs 3 JE M1 »Ris : < - = < A28 2020 o U = R22 ES? 8Kx8_188ns RAM & 8Kx8_188ns RAN X R2i g tiszssact [(XTTTEET] R23 A23 BR» 1 1 i 15 TuF2us mH—er 8015 B : . 8013 DIACKs utlls 8012 o3 T - 8011 ERD . 8018 012 u 809 BLOSe » n B08 i FEgH BA A 8?:- PBA3S conns_nut?g Bl o eETFaus = L 9 16 1 ) ! | 28 1 nsE US & 03 - s w[lex Co 3 w2208 END 5 Eém 1871 N ol dGND RERD GND —> RESERVS RESERVY RESEAYS RESEAVE RESEAV] RESEAVE dGND RN2 PRE_CONF1G_DUTw 18K
+
+"
+
+NRITE PULSEw
+
+5> MAM_DATR_DEw
+
+» PRE_CONF1G_0UT
+
+{—
+
+RAS_DELAYEDRY) ) ngpse_su;»—ﬁ" oE BOARD_SELs N i hu3 SR © B e 5 =it :;u ;))_lm - , Al »: wn - RESET=D) FaLzsLie
+
+» RS_DELAYED=
+
+t) CONF1G_OUTe
+
+S
+
+§ U10_RN2
+
+D AS_SGx
+
+Pullup2
+
+» BORRD_SEL®
+
+SHUT_UP_FOREVER
+
+WARNING::
+
+TH1S PRODUCT WILL UNDERGO MAJOR REVISIONS IN THE FUTURE; THEREFORE ALL PERIPHERALS SHOULD bE DESIGNED ACCORDING TO THE INTERFRCIKG
+
+GUIDELINES RS PROVIDED BY CONMODORE-RMIGA, INC.
+
+COMMODORE-RMIGA, INC. RESERVES THE RIGHT YO MODIFY OR DISCONTINUE TH1S PRODUCY WI1THOUT NOTICE.
+
+A CONSCIENTIOUS RTTEMPT HRS BEEN HADE TO MAKE THIS DOCUMENT RCCURRTE. NO WRARRNTY IS EXPRESSED DR IMPLIEO.
+
+COMMODORE-RMIGR INC. 983 UNIVERSITY AVE.=D acvea L0S GATOS, CA 95038 328060-01
+
+- — Expansion Test RAM
+
+B KO 1 b 81-14-86 ™0 Stnkoutd i 1 O

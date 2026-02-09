@@ -1,88 +1,207 @@
-# AGENTS.md
+PiStorm64 UAE JIT / Musashi memory mapping plan
 
-## Current focus: UAE JIT backend bring-up (AArch64)
+Goal
 
-We are integrating the UAE/JIT core (from Z3660-derived UAE tree) into `pistorm64` and wiring it into the existing emulator. This is **not** a full UAE emulator port; it is a CPU backend using PiStorm memory + bus code.
+* Keep A500 real-chip ranges on the real bus (through kmod / ps_read/ps_write), never direct-mapped into UAE JIT.
+* Only give JIT a direct pointer (addrbank.baseaddr) for Pi-owned RAM/ROM (Kick-in-RAM, Z2/Z3 fast, RTG, etc.).
+* Make behaviour depend on the config file: holes in the map table are "real Amiga" space.
+* Make JIT automatically fall back to non-JIT/Musashi when Kickstart is not Pi-mapped.
 
-### What exists now
-- **UAE JIT library** builds into `build/uae/libuae.a`.
-- **Bridge layer:** `src/uae/pistorm_uae_bridge.cc` and `.h` provide the UAE → PiStorm glue.
-- **Stubs:** `src/uae/pistorm_uae_stubs.cc` fills in missing symbols (dmmy_bank, do_get_mem_*, fpuop_* stubs, etc.).
-- **Memory address translation:** `pistorm_xlate()` uses `cfg->map_*` to map emulated address to host buffers (ROM/RAM).
-- **OVL handling:** JIT resets now force ROM overlay at 0 by setting `map_mirror` for ROM mappings at runtime (see `pistorm_force_rom_overlay()`).
+Key hardware ranges (24-bit A500/A2000)
 
-### Key files
-- `src/uae/pistorm_uae_bridge.cc`
-  - Implements `pistorm_*` addrbank (lget/wget/bget/lput/wput/bput).
-  - Hooks `cpu_set_fc()` using `regs.sfc/dfc`.
-  - `uae_pistorm_init/run/set_irq/pulse_reset` exported for emulator.
-  - **OVL fix:** `pistorm_force_rom_overlay()` sets ROM map_mirror to 0 when JIT enabled.
-  - Applies reset vectors from ROM and sets `m68k_pc_indirect = 1` for indirect fetch.
+* $000000-$001FFFFF  Chip/Slow space
 
-- `src/uae/pistorm_uae_stubs.cc`
-  - Minimal UAE support glue (dummy addrbank, do_get_mem_*, fpuop_* no-ops, etc.).
+  * On A500 with 1MB chip on board: $000000-$0FFFFF real chip RAM on motherboard.
+  * PiStorm should snoop these via the bus only; no UAE direct mapping into JIT.
+* $00200000-$009FFFFF  Zorro II memory expansion space (8MB) – RAM-type for Z2 cards.
+* $00A00000-$00B7FFFF  Zorro II I/O expansion space (1.5MB)
+* $00B80000-$00BEFFFF  Reserved
+* $00BF0000-$00BFFFFF  CIA / ports region
+* $00C00000-$00CFFFFF  Misc expansion / extra chip RAM
+* $00DC0000-$00DDFFFF  Clock / SCSI / motherboard resources
+* $00DF0000-$00DFFFFF  Custom chip registers
+* $00E80000-$00EFFFFF  Zorro II I/O & Autoconfig
+* $00F80000-$00FFFFFF  System ROM (Kickstart, 512K here in 3.1)
 
-- `src/uae/include/memory.h`
-  - `get_real_address()` uses `memory_get_real_address()` when `USE_UAE_JIT` defined.
+What we want for PiStorm64
 
-- **Makefile**
-  - `USE_UAE_JIT=1` builds `libuae.a` and links it into `emulator`.
-  - Adds `pistorm_uae_bridge.o` and `pistorm_uae_stubs.o`.
+1. Treat real chip RAM as "Amiga-only" space
 
-### Build commands
-- Build UAE JIT backend and emulator:
-  ```bash
-  make USE_UAE_JIT=1 uae-jit
+* Addresses: $000000-$0FFFFF (1MB chip on A500 in this setup).
+* Implementation rule:
+
+  * Do NOT install a UAE addrbank with a baseaddr for this range when JIT is active.
+  * Provide bank handlers that always go through ps_read/ps_write (kmod) to the physical bus.
+  * That keeps all chip cycles visible to Agnus/Gary and honours the real DRAM timing.
+
+2. Treat Z2/Z3 fast and RTG memory as Pi-owned fast memory
+
+* Addresses coming from cfg:
+
+  * map type=ram address=0x08000000 size=0x08000000 id=cpu_slot_ram (128MB)
+  * map type=ram address=0x10000000 size=0x10000000 id=z3_autoconf_fast (256MB)
+  * map type=ram address=0xD0000000 size=0x10000000 id=z3_autoconf_fast (256MB)
+  * map type=ram address=0x00400000 size=0x00400000 id=z2_autoconf_fast (4MB)
+  * map type=ram_noalloc address=0x70010000 size=0x04000000 id=rtg_mem
+* Implementation rule:
+
+  * For every map entry with type=ram / ram_noalloc that is not directly on the A500 24-bit bus, allocate host memory and install a UAE addrbank with baseaddr!=NULL.
+  * Under JIT: call put_mem_bank(addr, &fastmem_bank[n], realstart) so baseaddr[] gets filled.
+  * Use fastmem_bank for 32-bit/Z3 style addresses, while the autoconf windows at $10000000/$D0000000 are just bridge points from the 24-bit space.
+
+3. Kickstart ROM detection and policy
+
+* Kick ROM region: $00F80000-$00FFFFFF
+* Two operating modes:
+
+  A) Pi-mapped Kickstart (recommended JIT mode)
+
+  * CFG line: map type=rom address=0xF80000 size=0x80000 file=../Amiga/kick/Kickstart-v3.1-r40.068.rom ovl=0 id=kickstart
+  * Loader allocates host buffer for the ROM file.
+  * UAE side: install kickmem_bank with baseaddr pointing at that buffer, and set mem_banks[] for $F80000..$FFFFFF.
+  * JIT: get_real_address(PC) for PC=$00F800D2 returns a real pointer; JIT can safely decode and run reset vector code directly from Pi RAM.
+
+  B) Real motherboard Kick ROM (no Pi mapping)
+
+  * No map entry overlapping 0x00F80000-0x00FFFFFF.
+  * Implementation:
+
+    * Do not install a baseaddr for this range. Instead, install a handler bank that forwards to ps_read/ps_write so reads go out over the bus.
+    * At reset, PC is read from address 4, which lives in ROM. For JIT, get_real_address(PC) will return NULL.
+    * When get_real_address() returns NULL for the initial PC, mark JIT as unsupported for this configuration and fall back to Musashi CPU core.
+
+4. Define "Pi vs Amiga" ownership based on cfg map table
+
+* Rule: the cfg map table defines everything that Pi owns directly.
+
+* For 24-bit addresses:
+
+  * Start from the canonical A500 memory map (chip, custom, CIA, Z2, autoconfig, ROM).
+  * For any interval that is covered by a cfg map entry of type=ram/rom/ram_noalloc with host backing, set up a direct UAE addrbank.
+  * For other intervals (holes), set a bank that always goes through ps_read/ps_write to the A500 bus.
+
+* Concrete classifications for this build:
+
+  * $000000-$0FFFFF: real chip RAM -> ps_read/ps_write only; no JIT direct mapping.
+  * $00200000-$009FFFFF: Z2 memory space -> part of this is used by autoconfig RAM window (e.g. $00200000-$00600000). Backed by Pi RAM and set as fastmem bank with baseaddr. Remaining ranges stay as bus-forward.
+  * $00A00000-$00B7FFFF: Z2 I/O space -> autoconfig + devices; use handler-only banks (no baseaddr) because accesses must hit Zorro bus logic in the emulator (Z2 PICs, pissa, rng, etc.).
+  * $00BF0000-$00BFFFFF: CIA/ports -> custom/cia banks, no baseaddr.
+  * $00C00000-$00CFFFFF: chipram_extra map provides 1MB of extra chip or pseudo-chip; decide per board design whether that is Pi RAM or real bus. For safety under JIT, treat it as handler-only unless explicitly Pi-owned.
+  * $00DC0000-$00DDFFFF: clock/scsi/mb resources -> handler-only banks.
+  * $00DF0000-$00DFFFFF: custom chip registers -> custom_bank with handlers only.
+  * $00E80000-$00EFFFFF: Z2 I/O and autoconfig registers -> expamem_bank/uaeboard_bank handlers only.
+  * $00F80000-$00FFFFFF: Kick ROM -> either Pi mapped (baseaddr) or bus-forward depending on cfg.
+
+Code changes (high-level)
+
+1. During config parsing (cfg.c / platform_amiga.c)
+
+* After all map entries are loaded, walk the full 24-bit address space in 64k banks.
+
+* For each bank:
+
+  * Determine which map entry (if any) owns it.
+  * Determine whether that entry is Pi RAM/ROM or a pure register/forward region.
+
+* Pseudocode:
+
+  for (addr = 0; addr < 0x01000000; addr += 0x10000) {
+  map = find_cfg_map_for(addr);
+  if (!map) {
+  // No Pi mapping: real Amiga bus only
+  install_bus_forward_bank(addr);
+  continue;
+  }
+
   ```
-- Run:
-  ```bash
-  PISTORM_ENABLE_QUEUE=0 ./emulator --jit
+  switch (map->type) {
+  case MAP_RAM:
+  case MAP_RAM_NOALLOC:
+  case MAP_ROM:
+      if (is_safe_for_direct_map(addr, map)) {
+          install_direct_uae_bank(addr, map);
+      } else {
+          install_bus_forward_bank(addr);
+      }
+      break;
+  case MAP_REGISTER:
+  case MAP_Z2_DEVICE:
+  case MAP_Z3_DEVICE:
+      install_bus_forward_bank(addr);
+      break;
+  }
   ```
 
-### Current runtime issue
-Before the overlay fix, UAE reset was reading vectors from **chipram at 0** (because default.cfg sets `ovl=0`), causing:
-```
-Read PC from address 4 : 0x00000000
-PC map: unmapped
-```
-Now `pistorm_force_rom_overlay()` forces ROM mirror at 0 during JIT init/reset, so UAE reset should read Kickstart vectors correctly:
-```
-Read PC from address 4 : 0x00F800D2
-```
-If still 0, the overlay is still not forced early enough and must be applied before `m68k_reset_newcpu()` or in UAE `get_long()`.
+  }
 
-### Important config notes
-- **default.cfg** currently maps Kickstart with `ovl=0`:
-  ```
-  map type=rom address=0xF80000 size=0x80000 file=... ovl=0 id=kickstart
-  ```
-- For JIT bring-up, ROM must be visible at 0 during reset. The bridge now forces this at runtime.
-- Chip RAM should be mapped at `0x00000000` (1 MB) for post‑OVL execution:
-  ```
-  map type=ram address=0x00000000 size=0x100000 id=chipram
-  ```
+2. is_safe_for_direct_map()
 
-### CPU models
-- 68060 is **not** accepted by config parser and falls back to 68000.
-- JIT currently tested with 68020/68030/68040.
+* Returns true only for ranges that are pure Pi RAM/ROM and not mirrored onto the physical A500 bus.
+* Examples: cpu_slot_ram, z3_autoconf_fast (high 32-bit), rtg_mem.
+* Returns false for:
 
-### Next steps
-1. Verify new overlay fix works (see `Read PC from address 4` log).
-2. If PC still drops to 0, move overlay forcing earlier (or patch UAE get_long to check `ovl`/ROM mirror).
-3. Once reset vectors are stable, re-enable devices incrementally (Z2/Z3, RTG, PISCSI, A314).
+  * $000000-$0FFFFF chip
+  * $00200000-$009FFFFF when used purely as a Z2 autoconf window onto 32-bit fast memory (the actual fast memory lives at 0x08000000+ or 0x10000000+).
+  * All I/O and custom ranges.
 
-### Current observed runtime (latest)
-- JIT init succeeds:
-  - valid reset vectors (`PC=00F800D2`)
-  - `m68k_pc_indirect=1`
-  - translation cache allocated (32 MB)
-- Runtime still reaches `OVL:0` after startup and does not yet reach stable
-  Workbench boot in JIT mode.
-- Z2 autoconfig WORD probes can generate high warning volume under JIT.
+3. Kickstart / JIT check at CPU init
 
-### Pause/resume point
-- Use `docs/wiki/UAE-JIT-Status.md` as the primary session handoff.
-- Start each new session with:
-  1. `make USE_UAE_JIT=1 uae-jit`
-  2. `PISTORM_ENABLE_QUEUE=0 ./emulator --jit`
-  3. only then re-add devices/features incrementally.
+* After memory banks are initialized, in the CPU/JIT setup:
+
+  bool kick_mapped_by_pi = (mem_banks[bankindex(0x00F80000)]->baseaddr != NULL);
+
+  if (jit_enabled_in_cfg) {
+  if (!kick_mapped_by_pi) {
+  log("[CPU][JIT] Kickstart ROM not Pi-mapped; disabling JIT and using Musashi core.\n");
+  disable_uae_jit();
+  use_musashi_core();
+  } else {
+  enable_uae_jit();
+  }
+  }
+
+* This prevents the segfault seen when PC=00F800D2 and get_real_address() returns garbage or an unmapped host pointer.
+
+4. JIT get_real_address() integration
+
+* baseaddr[] table is already defined under #ifdef JIT in pistorm_sources_h.
+
+* put_mem_bank(addr, bank, realstart) already fills baseaddr[bankindex(addr)] when bank->baseaddr != NULL.
+
+* get_real_address(pc) effectively does:
+
+  bank = mem_banks[bankindex(pc)];
+  if (!bank->baseaddr) return NULL;
+  return baseaddr[bankindex(pc)] + (pc & bank->mask);
+
+* With the new mapping rules:
+
+  * For chip RAM and real-Kick configurations, baseaddr is NULL, so JIT never sees a real pointer and will not try to JIT those ranges.
+  * For Pi-owned fast and Pi Kick, baseaddr is valid and JIT can build translations.
+
+5. Keeping Musashi path unchanged
+
+* Musashi core still goes through ps_read/ps_write for any address not backed by Pi RAM/ROM.
+* For Pi RAM/ROM, there are two options:
+
+  * Keep using ps_read/ps_write wrappers that hit the same host buffer (simpler and consistent).
+  * Or let Musashi use its own direct mapping for fast mem.
+* Either way, the primary fix for the crash is about ensuring UAE JIT only ever executes from ranges where baseaddr is valid.
+
+Testing plan
+
+* Config A: current setup with map type=rom for Kick, JIT on.
+
+  * Expected: no segfault, JIT runs reset code at $00F800D2.
+  * Verify PC trace shows valid pointer from get_real_address().
+
+* Config B: remove the Kick map so ROM is only on A500 board.
+
+  * Expected: on startup, log message about Kick not Pi-mapped and JIT disabled; Musashi core runs instead; no SIGSEGV.
+
+* Config C: JIT off (Musashi only).
+
+  * Expected: unchanged behaviour compared to today.
+
+These changes cleanly separate real Amiga bus ranges (chip, real ROM, custom, CIA, Z2 I/O) from Pi-owned RAM/ROM, and feed UAE JIT only with memory that truly lives in host RAM.
+
