@@ -1,3 +1,21 @@
+# Tunables: edit here instead of hunting through rule bodies.
+# WARNINGS   : compiler warnings; keep strict by default.
+# OPT_LEVEL  : optimisation level (-Os/-O2/-O3). Can also set O=2,3,...
+# USE_GOLD   : set to 1 to prefer gold linker (if installed).
+# USE_RAYLIB : set to 0 to drop raylib/DRM deps and use a null RTG backend.
+# USE_ALSA   : set to 0 to drop ALSA/ahi builds and -lasound.
+# USE_PMMU   : set to 1 to enable Musashi PMMU support (experimental).
+# USE_EC_FPU : set to 1 to force FPU on EC/020/LC/EC040 variants (for 68881/68882 emu).
+# ARCH_FEATURES : optional AArch64 feature modifiers (e.g. +crc+simd+fp16+lse).
+# CPUFLAGS   : per-platform tuning defaults below; override if needed.
+# RAYLIB_*   : raylib include/lib paths; adjust for custom builds.
+# USE_VC     : legacy (no longer required for pistorm-dev).
+# USE_LTO    : set to 1 to enable link-time optimisation (-flto) on build and link.
+# USE_NO_PLT : set to 1 to pass -fno-plt for direct calls (glibc-specific; default off).
+# OMIT_FP    : set to 1 to omit frame pointers (-fomit-frame-pointer) for perf.
+# USE_PIPE   : set to 1 to add -pipe to compile steps.
+# M68K_WARN_SUPPRESS : extra warning suppressions for the generated Musashi core.
+
 # Centralized configuration for PiStorm64 project
 # Values here can be overridden on the make command line, for example:
 #   make USE_UAE_JIT=1 PLATFORM=PI4_64BIT
@@ -5,6 +23,25 @@
 # Target binary name and base platform profile
 EXENAME ?= emulator
 PLATFORM ?= PI4_64BIT
+
+# Rebuild raylib_drm as part of the normal build if RTG is enabled
+REBUILD_RAYLIB_DRM ?= 1
+
+
+# Default build tunables
+USE_GOLD   ?= 1
+USE_RAYLIB ?= 1
+USE_ALSA   ?= 1
+USE_PMMU   ?= 1
+USE_EC_FPU ?= 0
+USE_VC     ?= 0
+USE_LTO    ?= 0
+USE_NO_PLT ?= 1
+OMIT_FP    ?= 1
+USE_PIPE   ?= 1
+ARCH_FEATURES ?=
+CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
+NO_UNROLL_FLAGS ?= -fno-unroll-loops
 
 
 # UAE JIT backend (AArch64 UAE CPU core)

@@ -707,7 +707,12 @@ static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
   /* Make sure we're not stopped */
   if (!CPU_STOPPED) {
     /* Return point if we had an address error */
+
+#if M68K_EMULATE_ADDRESS_ERROR
+    /* Return point if we had an address error */
     m68ki_set_address_error_trap(state); /* auto-disable ( see m68kcpu.h ) */
+#endif
+
 
 #ifdef M68K_BUSERR_THING
     m68ki_check_bus_error_trap();
@@ -755,7 +760,7 @@ static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
   }
 
   /* return how many clocks we used */
-  return;
+  //return;
 }
 
 // Backend wrappers ( Musashi default, JIT stub delegates to Musashi for now ).
@@ -1696,6 +1701,11 @@ unsigned int cpu_irq_ack(int level) {
   return (unsigned int)(24 + level);
 }
 
+void cpu_instr_callback(unsigned int pc) {
+    (void)pc;
+    /* Optional: record last PC(s) in a ring buffer for later debugging */
+}
+
 static unsigned int target = 0;
 static uint32_t platform_res, rres;
 
@@ -2223,6 +2233,27 @@ void m68k_write_memory_32(unsigned int address, unsigned int value) {
   lowvec_trace_log("W32 ps", address, value);
   return;
 }
+
+void m68k_write_memory_32_pd(unsigned int address, unsigned int value) {
+    /* Simulate 68k predecrement MOVE.L write ordering:
+     *
+     *   1) write high word to [address + 2]
+     *   2) write low  word to [address]
+     *
+     * Reuse the existing 16-bit path so all the platform checks,
+     * logging and ps_protocol plumbing stay consistent.
+     */
+
+    uint16_t hi = (uint16_t)((value >> 16) & 0xFFFF);
+    uint16_t lo = (uint16_t)( value        & 0xFFFF);
+
+    /* High word first at address+2 */
+    m68k_write_memory_16(address + 2, hi);
+
+    /* Then low word at address */
+    m68k_write_memory_16(address, lo);
+}
+
 static void set_affinity_for(const char* name, int core_id) {
   if (core_id < 0) {
     return;

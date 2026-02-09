@@ -675,23 +675,21 @@ extern sigjmp_buf m68ki_aerr_trap;
 	}
 #else
 extern jmp_buf m68ki_aerr_trap;
-	#define m68ki_set_address_error_trap(state) \
-		if(setjmp(m68ki_aerr_trap) != 0) \
-		{ \
-			m68ki_exception_address_error(); \
-			if(CPU_STOPPED) \
-			{ \
-				SET_CYCLES(0); \
-				return m68ki_initial_cycles; \
-			} \
-			/* ensure we don't re-enter execution loop after an
-			   address error if there's no more cycles remaining */ \
-			if(GET_CYCLES() <= 0) \
-			{ \
-				/* return how many clocks we used */ \
-				return m68ki_initial_cycles - GET_CYCLES(); \
-			} \
-		}
+
+#define m68ki_set_address_error_trap(state)                            \
+    do {                                                               \
+        if (setjmp(m68ki_aerr_trap) != 0) {                            \
+            /* We jumped back here from m68ki_check_address_error */   \
+            m68ki_exception_address_error(state);                      \
+            if (CPU_STOPPED) {                                         \
+                /* Stop consuming cycles after a fatal address error */\
+                SET_CYCLES(0);                                         \
+            }                                                          \
+            /* When cycles are exhausted, the main execute loop in     \
+               m68k_execute_bef will fall out naturally. */            \
+        }                                                              \
+    } while (0)
+
 
 	#define m68ki_check_address_error(state, ADDR, WRITE_MODE, FC) \
 		if((ADDR)&1) \
@@ -702,7 +700,10 @@ extern jmp_buf m68ki_aerr_trap;
 			longjmp(m68ki_aerr_trap, 1); \
 		}
 #endif
-	#define m68ki_bus_error(ADDR,WRITE_MODE) m68ki_aerr_address=ADDR;m68ki_aerr_write_mode=WRITE_MODE;m68ki_exception_bus_error()
+	#define m68ki_bus_error(ADDR,WRITE_MODE) \
+		m68ki_aerr_address=ADDR; \
+		m68ki_aerr_write_mode=WRITE_MODE; \
+		m68ki_exception_bus_error()
 
 	#define m68ki_check_address_error_010_less(state, ADDR, WRITE_MODE, FC) \
 		if (CPU_TYPE_IS_010_LESS(CPU_TYPE)) \
@@ -1579,6 +1580,7 @@ static inline void m68ki_write_32_pd_fc(uint address, uint fc, uint value)
     m68k_write_memory_32_pd(ADDRESS_68K(address), value);
 }
 #endif
+
 
 
 /* --------------------- Effective Address Calculation -------------------- */

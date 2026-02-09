@@ -989,7 +989,7 @@ int m68k_execute(m68ki_cpu_core *state, int num_cycles)
 		m68ki_set_address_error_trap(state); /* auto-disable (see m68kcpu.h) */
 
 #ifdef M68K_BUSERR_THING
-		m68ki_check_bus_error_trap();
+		m68ki_check_bus_error_trap(state);
 #endif
 
 		/* Main loop.  Keep going until we run out of clock cycles */

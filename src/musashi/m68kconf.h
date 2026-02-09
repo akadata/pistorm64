@@ -175,15 +175,15 @@
  * access a word or longword at an odd address.
  * NOTE: This is only emulated properly for 68000 mode.
  */
-#define M68K_EMULATE_ADDRESS_ERROR  OPT_OFF
+#define M68K_EMULATE_ADDRESS_ERROR  OPT_OFF  // was OFF
 
 
 /* Turn ON to enable logging of illegal instruction calls.
  * M68K_LOG_FILEHANDLE must be #defined to a stdio file stream.
  * Turn on M68K_LOG_1010_1111 to log all 1010 and 1111 calls.
  */
-#define M68K_LOG_ENABLE             OPT_OFF
-#define M68K_LOG_1010_1111          OPT_OFF
+#define M68K_LOG_ENABLE             OPT_OFF  // was OFF
+#define M68K_LOG_1010_1111          OPT_OFF  // was OFF
 #define M68K_LOG_FILEHANDLE         some_file_handle
 
 
@@ -203,8 +203,7 @@
 */
 #define M68K_USE_64_BIT  OPT_ON
 
-
-#include "src/emulator.h"
+//#include "src/emulator.h"
 
 
 //#define m68k_read_memory_8(A)  read16(A)
