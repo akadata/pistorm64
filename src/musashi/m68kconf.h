@@ -65,7 +65,7 @@
 /* ======================================================================== */
 
 /* Turn ON if you want to use the following M68K variants */
-#define M68K_EMULATE_010            OPT_OFF
+#define M68K_EMULATE_010            OPT_ON
 #define M68K_EMULATE_EC020          OPT_ON
 #define M68K_EMULATE_020            OPT_ON
 #define M68K_EMULATE_030            OPT_ON
@@ -83,7 +83,7 @@
  * To simulate real 68k behavior, m68k_write_32_pd() must first write the high
  * word to [address+2], and then write the low word to [address].
  */
-#define M68K_SIMULATE_PD_WRITES     OPT_OFF
+#define M68K_SIMULATE_PD_WRITES     OPT_ON
 
 /* If ON, CPU will call the interrupt acknowledge callback when it services an
  * interrupt.
@@ -139,7 +139,7 @@
  * You should put OPT_SPECIFY_HANDLER here if you cant to use it, otherwise it will
  * use a dummy default handler and you'll have to call m68k_set_illg_instr_callback explicitely
  */
-#define M68K_ILLG_HAS_CALLBACK	    OPT_OFF
+#define M68K_ILLG_HAS_CALLBACK	    OPT_ON
 #define M68K_ILLG_CALLBACK(opcode)  op_illg(opcode)
 
 /* If ON, CPU will call the set fc callback on every memory access to

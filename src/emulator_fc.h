@@ -28,6 +28,7 @@ void cpu_set_fc(uint32_t fc);
 void fc_set_mode(enum fc_mode mode);
 enum fc_mode fc_get_mode(void);
 
+
 // Additional functions for SFC/DFC register handling (following Atari approach)
 uint32_t get_current_sfc(void);
 uint32_t get_current_dfc(void);

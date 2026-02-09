@@ -76,7 +76,12 @@ static uint8_t fc_shadow_type = 0;
 static uint8_t fc_shadow_is_write = 0;
 static int fc_boot_log_remaining = 0;
 static int use_uae_jit = 0;
+
+#if USE_UAE_JIT
+
+
 static int lowvec_trace = -1;
+
 
 static inline int lowvec_trace_enabled(void) {
   if (lowvec_trace == -1) {
@@ -85,6 +90,7 @@ static inline int lowvec_trace_enabled(void) {
   }
   return lowvec_trace;
 }
+#endif /* USE_UAE_JIT */
 
 static inline void lowvec_trace_log(const char* op, uint32_t addr, uint32_t val) {
 #ifdef USE_UAE_JIT
@@ -108,6 +114,7 @@ static inline void lowvec_trace_log(const char* op, uint32_t addr, uint32_t val)
   (void)val;
 #endif
 }
+
 
 static const char* fc_mode_name(enum fc_mode mode) {
   switch (mode) {
@@ -151,6 +158,8 @@ static inline uint32_t cpu_backend_get_pc(void) {
   return m68k_get_reg(NULL, M68K_REG_PC);
 }
 
+#if USE_UAE_JIT
+
 static int uae_cpu_model_from_musashi(unsigned int type) {
   switch (type) {
   case M68K_CPU_TYPE_68000:
@@ -171,6 +180,7 @@ static int uae_cpu_model_from_musashi(unsigned int type) {
     return 68030;
   }
 }
+#endif /* USE_UAE_JIT */
 
 static inline void fc_shadow_touch(uint8_t type, uint32_t addr, uint8_t is_write) {
   if (fc_get_mode() == FC_MODE_OFF) {
@@ -261,7 +271,8 @@ int mem_fd_gpclk;
 int irq;
 int gayleirq;
 
-#define CORE_AUTO -1
+//#define CORE_AUTO -1  // ITS A GHOST...
+#define CORE_MAIN  1   // keep main thread on core 1
 #define CORE_CPU 3
 #define CORE_IO 1
 #define CORE_INPUT 2
@@ -284,8 +295,12 @@ static void apply_affinity_from_env(const char* role, int default_core);
 static void set_realtime_priority(const char* name, int prio);
 static void apply_realtime_from_env(const char* role, int default_prio);
 static int realtime_allowed(void);
+/*  // not needed apparently. .... 09/02/2026 AKADATA 
 static void amiga_reset_and_wait(const char* tag);
+*/
+/*
 static void amiga_warmup_bus(void);
+*/
 static void configure_ipl_nops(void);
 static void print_help(const char* prog);
 static void print_about(const char* prog);
@@ -359,6 +374,8 @@ static int illg_instr_callback(int opcode) {
   return 0; // let Musashi raise the exception normally
 }
 
+
+#if UAE_UAE_JIT
 static void crash_signal_handler(int sig_num) {
   crash_signal = sig_num;
   crash_fault_addr = 0;
@@ -375,6 +392,7 @@ static void crash_signal_handler_siginfo(int sig_num, siginfo_t* info, void* uct
   dump_cpu_state("Signal", -1);
   _exit(128 + sig_num);
 }
+#endif
 
 
 #define CLI_MAX_LINES 32
@@ -418,7 +436,7 @@ extern int m68ki_remaining_cycles;
 #endif
 
 // Configurable emulator options
-unsigned int cpu_type = M68K_CPU_TYPE_68030;
+unsigned int cpu_type = M68K_CPU_TYPE_68000;
 unsigned int loop_cycles = 1024;
 static unsigned int ipl_nop_count = 8;
 static const unsigned int ipl_nop_count_default = 8;
@@ -434,6 +452,7 @@ unsigned int amiga_reset = 0;
 unsigned int amiga_reset_last = 0;
 unsigned int do_reset = 0;
 
+/*
 static void amiga_warmup_bus(void) {
   for (int i = 0; i < 64; i++) {
     (void)ps_read_status_reg();
@@ -442,7 +461,9 @@ static void amiga_warmup_bus(void) {
     }
   }
 }
+*/
 
+/*
 static void amiga_reset_and_wait(const char* tag) {
   for (int attempt = 0; attempt < 3; attempt++) {
     ps_reset_state_machine();
@@ -462,6 +483,7 @@ static void amiga_reset_and_wait(const char* tag) {
   }
   printf("[RST] Warning: TXN_IN_PROGRESS still set after reset (%s)\n", tag);
 }
+*/
 
 static void configure_ipl_nops(void) {
   unsigned int value = ipl_nop_count_default;
@@ -529,6 +551,7 @@ static void* ipl_task(void* args) {
       goto noppers;
     }
 
+#if USE_UAE_JIT
     if (use_uae_jit) {
       if (!(value & (1 << PIN_IPL_ZERO)) || ipl_enabled[amiga_emulated_ipl()]) {
         if (!irq) {
@@ -599,6 +622,7 @@ static void* ipl_task(void* args) {
       ps_flush_batch_queue();
       goto noppers;
     }
+#endif /* USE_UAE_JIT */
 
     if (!(value & (1 << PIN_IPL_ZERO)) || ipl_enabled[amiga_emulated_ipl()]) {
       old_irq = irq_delay;
@@ -797,9 +821,12 @@ static void* cpu_task(void *arg) {
 #else
   state->gpio = NULL; // When kernel module is disabled, use NULL for gpio
 #endif
+  
+#if USE_UAE_JIT
   if (!use_uae_jit) {
     m68k_pulse_reset(state);
   }
+#endif /* USE_UAE_JIT */
   apply_affinity_from_env("cpu", CORE_CPU);
   apply_realtime_from_env("cpu", RT_DEFAULT_CPU);
 
@@ -1120,6 +1147,7 @@ static void sigint_handler(int sig_num) {
 }
 
 int main(int argc, char* argv[]) {
+  apply_affinity_from_env("main", CORE_MAIN);
   int g;
 
   for (g = 1; g < argc; g++) {
@@ -1293,11 +1321,15 @@ int main(int argc, char* argv[]) {
   }
 
 switch_config:
+  ;
+
+#if USE_UAE_JIT
   struct timespec ts_seed;
   clock_gettime(CLOCK_MONOTONIC, &ts_seed);
   srand((unsigned int)(ts_seed.tv_sec ^ ts_seed.tv_nsec));
+#endif
 
-  amiga_reset_and_wait("startup");
+ // amiga_reset_and_wait("startup");
 
   if (load_new_config != 0) {
     uint8_t config_action = load_new_config - 1;
@@ -1432,7 +1464,10 @@ switch_config:
 
   InitGayle();
 
-  struct sigaction sa_int, sa_term, sa_crash;
+    struct sigaction sa_int, sa_term;
+#if USE_UAE_JIT
+  struct sigaction sa_crash;
+#endif
 
   // Setup SIGINT handler for graceful shutdown
   sa_int.sa_handler = sigint_handler;
@@ -1446,24 +1481,27 @@ switch_config:
   sa_term.sa_flags = 0; // Don't restart system calls, allow interruption
   sigaction(SIGTERM, &sa_term, NULL);
 
-  // Setup crash signal handlers
+#if USE_UAE_JIT
+  // Setup crash signal handlers (JIT diagnostics)
   sa_crash.sa_sigaction = crash_signal_handler_siginfo;
   sigemptyset(&sa_crash.sa_mask);
-  sa_crash.sa_flags = SA_SIGINFO; // Include fault address/code details
+  sa_crash.sa_flags = SA_SIGINFO;
   sigaction(SIGSEGV, &sa_crash, NULL);
   sigaction(SIGBUS, &sa_crash, NULL);
   sigaction(SIGILL, &sa_crash, NULL);
   sigaction(SIGABRT, &sa_crash, NULL);
+#endif
 
-  amiga_reset_and_wait("pre-cpu");
 
-  #ifdef USE_UAE_JIT
+  //amiga_reset_and_wait("pre-cpu");
+
+#ifdef USE_UAE_JIT
   if (enable_jit_backend) {
     use_uae_jit = 1;
     printf("[CPU] UAE JIT backend enabled\n");
     uae_pistorm_init(uae_cpu_model_from_musashi(cpu_type), 1, enable_fpu_jit_backend ? 1 : 0);
   }
-  #endif
+#endif
 
   if (!use_uae_jit) {
     m68k_init();

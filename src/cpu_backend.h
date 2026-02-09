@@ -6,6 +6,9 @@
 void musashi_backend_execute(m68ki_cpu_core* state, int cycles);
 void musashi_backend_set_irq(int level);
 
+
+#if USE_UAE_JIT
 // JIT backend stubs (currently delegate to Musashi); replace when JIT is added.
 void jit_backend_execute(m68ki_cpu_core* state, int cycles);
 void jit_backend_set_irq(int level);
+#endif /* USE_UAE_JIT */

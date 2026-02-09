@@ -120,10 +120,10 @@ USE_ALSA   ?= 1
 # Toggle PMMU emulation (68030/040). Default on; disable with USE_PMMU=0 if needed.
 USE_PMMU   ?= 1
 
-# Optional: build UAE/JIT objects (AArch64 JIT backend from Amiberry).
-# This does not replace Musashi in the main emulator yet; it builds a standalone
-# libuae.a for bring-up and integration work.
-USE_UAE_JIT ?= 1
+# USE_UAE_JIT is configured in config.mk or on the make command line.
+# No default here; config.mk owns the default.
+$(info USE_UAE_JIT=$(USE_UAE_JIT))
+
 
 # Force FPU on EC/020/EC040/LC040 for 68881/68882 emulation (optional).
 USE_EC_FPU ?= 0
@@ -177,9 +177,9 @@ AMIGA_AHI_INC ?= $(AMIGA_TOOLCHAIN)/src/m68k-amigaos-gcc/build-Linux-m68k-amigao
 AMIGA_HEADERS ?= $(CURDIR)/src/platforms/amiga/headers/include
 AMIGA_SUBMAKE = $(MAKE) AMIGA_TOOLCHAIN=$(AMIGA_TOOLCHAIN) VBCC=$(AMIGA_VBCC) P96DEV=$(AMIGA_P96DEV) AHI_INC=$(AMIGA_AHI_INC) AMIGA_HEADERS=$(AMIGA_HEADERS)
 
-PISTORM_GPCLK_SRC ?= 5
-PISTORM_GPCLK_DIV ?= 6
-PISTORM_KMOD_PARAMS ?= run_batch_enable=0 berr_reset_input=0 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV)
+PISTORM_GPCLK_SRC ?= $(PISTORM_GPCLK_SRC)
+PISTORM_GPCLK_DIV ?= $(PISTORM_GPCLK_DIV)
+PISTORM_KMOD_PARAMS ?= $(PISTORM_KMOD_PARAMS) 
 
 PS_PROTOCOL_SRC := src/gpio/ps_protocol_kmod.c
 
@@ -283,6 +283,7 @@ M68KFILES = $(MUSASHIFILES) $(MUSASHIGENCFILES)
 .CFILES   = $(MAINFILES) $(M68KFILES)
 .OFILES   = $(.CFILES:%.c=%.o) src/a314/a314.o
 
+ifeq ($(USE_UAE_JIT),1)
 # UAE/JIT build (optional, AArch64 only)
 UAE_SRCDIR   := src/uae
 UAE_BUILDDIR := build/uae
@@ -315,10 +316,7 @@ UAE_CXXFLAGS = $(CXX_WARNINGS) $(UAE_OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(UAE_INC
 UAE_TOOL_INCLUDES := -Isrc -I$(UAE_SRCDIR) -I$(UAE_SRCDIR)/include -I$(UAE_SRCDIR)/include/uae \
 	-I$(UAE_SRCDIR)/machdep -I$(UAE_SRCDIR)/jit
 UAE_TOOL_CXXFLAGS := -O2 -g -std=c++11 -DUAE $(UAE_TOOL_INCLUDES)
-EXTRA_CXX_OBJS :=
-EXTRA_LINK_DEPS :=
 
-ifeq ($(USE_UAE_JIT),1)
 UAE_C_SRCS   :=
 UAE_CXX_SRCS := \
 	$(UAE_SRCDIR)/cpudefs.cpp \
@@ -346,6 +344,11 @@ EXTRA_LINK_DEPS += $(UAE_TARGET)
 UAE_LINK_FLAGS := -Wl,--whole-archive $(UAE_TARGET) -Wl,--no-whole-archive
 DEFINES += -DUSE_UAE_JIT
 endif
+
+
+EXTRA_CXX_OBJS :=
+EXTRA_LINK_DEPS :=
+
 
 CC  ?= gcc
 CXX ?= g++
@@ -590,11 +593,14 @@ pistorm_truth_test: tools/pistorm_truth_test.c include/uapi/linux/pistorm.h
 src/a314/a314.o: src/a314/a314.cc src/a314/a314.h
 	$(CXX) -MMD -MP -c -o src/a314/a314.o $(CXXFLAGS) $(NO_LTO_FLAGS) src/a314/a314.cc
 
+ifeq ($(USE_UAE_JIT),1)
 src/uae/pistorm_uae_bridge.o: src/uae/pistorm_uae_bridge.cc src/uae/pistorm_uae_bridge.h
 	$(CXX) -MMD -MP -c -o $@ $(CXXFLAGS) $(NO_LTO_FLAGS) $<
 
 src/uae/pistorm_uae_stubs.o: src/uae/pistorm_uae_stubs.cc
 	$(CXX) -MMD -MP -c -o $@ $(UAE_CXXFLAGS) $(NO_LTO_FLAGS) $<
+
+
 
 $(UAE_BUILDDIR)/%.o: $(UAE_SRCDIR)/%.c
 	@mkdir -p $(dir $@)
@@ -611,6 +617,8 @@ $(UAE_BUILDDIR)/%.o: $(UAE_SRCDIR)/%.cpp
 $(UAE_BUILDDIR)/%.o: $(UAE_SRCDIR)/%.cxx
 	@mkdir -p $(dir $@)
 	$(CXX) -MMD -MP $(UAE_CXXFLAGS) -c -o $@ $<
+endif
+
 
 $(MUSASHIGENCFILES) $(MUSASHIGENHFILES): $(MUSASHIGENERATOR)$(EXE)
 	cp $(MUSASHIGENERATOR)$(EXE) src/musashi/ && cd src/musashi && ./$(MUSASHIGENERATOR)$(EXE) && rm -f src/musashi/$(MUSASHIGENERATOR)$(EXE)
@@ -735,11 +743,11 @@ full:
 	-pkill -x emulator 2>/dev/null || true
 	-sudo rmmod pistorm 2>/dev/null || true
 	$(MAKE) clean
-	$(MAKE) USE_UAE_JIT=1 uae-jit
-	$(MAKE) USE_UAE_JIT=1 PISTORM_KMOD=$(PISTORM_KMOD)
+	$(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) uae-jit
+	$(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD)
 	$(MAKE) kernel_module
 	sudo $(MAKE) kernel_install
-	sudo $(MAKE) USE_UAE_JIT=1 PISTORM_KMOD=$(PISTORM_KMOD) install
+	sudo $(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD) install
 	# Copy boot configuration files
 	#sudo cp -f boot/firmware/config.txt /boot/firmware/config.txt
 	#sudo cp -f boot/firmware/cmdline.txt /boot/firmware/cmdline.txt

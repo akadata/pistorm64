@@ -19,6 +19,9 @@
 #include "src/musashi/m68k.h"
 #include "log.h"
 
+#define STATUS_MASK_IPL  0xe000u
+#define STATUS_SHIFT_IPL 13
+
 // Compile-time toggle for batching - default to disabled to ensure stability
 #ifndef PISTORM_ENABLE_BATCH
 #define PISTORM_ENABLE_BATCH 0

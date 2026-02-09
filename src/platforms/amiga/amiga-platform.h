@@ -5,6 +5,7 @@
 
 #include "config_file/config_file.h"
 
+
 // Function prototypes for amiga-platform.c
 int setup_platform_amiga(struct emulator_config* cfg);
 void handle_reset_amiga(struct emulator_config* cfg);

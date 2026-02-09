@@ -149,9 +149,11 @@ uint32_t ac_z3_current_pic = 0;
 int ac_z2_done = 0;
 int ac_z3_done = 0;
 
-// why put special cases in global code, commented them out  and fixed in the switch.
-//uint32_t piscsi_base = 0;
-//uint32_t pistorm_dev_base = 0;
+/* Base addresses for autoconfig devices that need to be visible
+ * across modules (PiSCSI, pistorm-dev, platform custom range).
+ */
+uint32_t piscsi_base = 0;
+uint32_t pistorm_dev_base = 0;
 
 extern uint8_t* piscsi_rom_ptr;
 extern uint32_t piscsi_base;

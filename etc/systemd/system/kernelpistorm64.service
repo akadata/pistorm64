@@ -4,17 +4,15 @@ StartLimitIntervalSec=0
 
 [Service]
 Type=simple
+User=pistorm
 Restart=always
 RestartSec=1
-User=smalley
-#LimitCORE=0
-ExecStart=${PISTORM_ROOT}/emulator
-WorkingDirectory=${PISTORM_ROOT}
-Nice=-10
-IOSchedulingClass=1
-IOSchedulingPriority=2
-CPUAffinity=1-3
-OOMScoreAdjust=-1000
+
+# Absolute paths only here
+WorkingDirectory=/opt/pistorm64
+ExecStart=/opt/pistorm64/emulator
+
+# Environment visible *inside* emulator
 Environment=PISTORM_ROOT=/opt/pistorm64
 Environment=PISTORM_A314=/opt/pistorm64/a314
 Environment=PISTORM_DATA=/opt/pistorm64/data
@@ -25,6 +23,12 @@ Environment=A314_FS_CONF=/opt/pistorm64/a314/a314fs.conf
 Environment=RAYLIB_DRM_DEVICE=/dev/dri/card0
 Environment=RAYLIB_DRM_CONNECTOR=HDMI-A-1
 
+Nice=-10
+IOSchedulingClass=1
+IOSchedulingPriority=2
+CPUAffinity=1-3
+OOMScoreAdjust=-1000
 
 [Install]
 WantedBy=multi-user.target
+

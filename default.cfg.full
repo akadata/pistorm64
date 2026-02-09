@@ -15,7 +15,7 @@ platform amiga
 # Kickstart / ROMs
 # -----------------------------------------------------------------------------
 # Map 512KB kickstart ROM to default offset.
-map type=rom address=0xF80000 size=0x80000 file=../Amiga/kick/Kickstart-v3.1-r40.068.rom ovl=0 id=kickstart autodump_mem
+map type=rom address=0xF80000 size=0x80000 file=/opt/Amiga/kick/Kickstart-v3.1-r40.068.rom ovl=0 id=kickstart autodump_mem
 
 # Comment out the line above and uncomment the line below to automatically copy
 # the ROM contents to Pi RAM if the file isn't found
@@ -157,7 +157,7 @@ setvar rtg-height 720
 setvar piscsi
 # Use setvar piscsi0 through piscsi6 to add up to seven mapped drives to the
 # interface.
-setvar piscsi0  ../Amiga/hdf/KernelPiStormBench.hdf 
+setvar piscsi0  /opt/Amiga/hdf/KernelPiStormBench.hdf 
 
 #setvar piscsi1 PI1.hdf
 

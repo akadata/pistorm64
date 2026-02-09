@@ -1561,20 +1561,25 @@ static inline void m68ki_write_32_fc(m68ki_cpu_core *state, uint address, uint f
  */
 static inline void m68ki_write_32_pd_fc(uint address, uint fc, uint value)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
-	state->mmu_tmp_fc = (uint16)fc;
-	state->mmu_tmp_rw = 0;
-	state->mmu_tmp_sz = M68K_SZ_LONG;
-	m68ki_check_address_error_010_less(state, address, MODE_WRITE, fc); /* auto-disable (see m68kcpu.h) */
+    /* Bind the CPU core so all the state->... uses and ADDRESS_68K() work */
+    m68ki_cpu_core *state = &m68ki_cpu;
+
+    m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+    state->mmu_tmp_fc = (uint16)fc;
+    state->mmu_tmp_rw = 0;
+    state->mmu_tmp_sz = M68K_SZ_LONG;
+
+    m68ki_check_address_error_010_less(state, address, MODE_WRITE, fc); /* auto-disable */
 
 #if M68K_EMULATE_PMMU
-	if (PMMU_ENABLED)
-	    address = pmmu_translate_addr(state,address,0);
+    if (PMMU_ENABLED)
+        address = pmmu_translate_addr(state, address, 0);
 #endif
 
-	m68k_write_memory_32_pd(ADDRESS_68K(address), value);
+    m68k_write_memory_32_pd(ADDRESS_68K(address), value);
 }
 #endif
+
 
 /* --------------------- Effective Address Calculation -------------------- */
 
