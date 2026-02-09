@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-#define _GNU_SOURCE
+//#define _GNU_SOURCE
 
 #include "config_file/config_file.h"
 #include "platforms/amiga/pistorm-dev/pistorm-dev-enums.h"

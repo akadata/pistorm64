@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: MIT
 
-#define _POSIX_C_SOURCE 199309L
-
 #include "m68k.h"
 #include "emulator.h"
 #include "platforms/platforms.h"
@@ -39,6 +37,7 @@ extern "C" {
 #include <endian.h>
 #include <fcntl.h>
 #include <poll.h>
+#include <time.h>
 #include <pthread.h>
 #include <sched.h>
 #include <signal.h>
@@ -53,8 +52,8 @@ extern "C" {
 #include <sys/mman.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include <sys/types.h>
-#include <time.h>
 #include <unistd.h>
 
 

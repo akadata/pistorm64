@@ -1,2 +1,2 @@
 #pragma once
-#include "uae/time.h"
+#include "frame_time.h"

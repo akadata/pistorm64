@@ -15,6 +15,7 @@
 #include "uae/types.h"
 #include "options.h"
 #include "newcpu.h"
+#include "frame_time.h"
 
 #undef EVENT_DEBUG
 

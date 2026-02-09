@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 #include <errno.h>
+#include <time.h>
 #include <pthread.h>
 #include <pty.h>
 #include <stdio.h>

@@ -340,7 +340,8 @@ UAE_OBJS :=
 UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cc,$(UAE_BUILDDIR)/%.o,$(filter %.cc,$(UAE_CXX_SRCS)))
 UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cpp,$(UAE_BUILDDIR)/%.o,$(filter %.cpp,$(UAE_CXX_SRCS)))
 UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cxx,$(UAE_BUILDDIR)/%.o,$(filter %.cxx,$(UAE_CXX_SRCS)))
-EXTRA_CXX_OBJS += src/uae/pistorm_uae_bridge.o src/uae/pistorm_uae_stubs.o
+EXTRA_CXX_OBJS += src/uae/pistorm_uae_bridge.o
+EXTRA_CXX_STUB_OBJS += src/uae/pistorm_uae_stubs.o
 EXTRA_LINK_DEPS += $(UAE_TARGET)
 UAE_LINK_FLAGS := -Wl,--whole-archive $(UAE_TARGET) -Wl,--no-whole-archive
 DEFINES += -DUSE_UAE_JIT
@@ -349,7 +350,7 @@ endif
 CC  ?= gcc
 CXX ?= g++
 
-DEFINES  += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1
+DEFINES  += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 
 # Allow command-line override of batching and rate limiting for performance tuning
 PISTORM_USE_DIRECT_OPS ?= 0
 DEFINES  += -DPISTORM_ENABLE_BATCH=$(PISTORM_ENABLE_BATCH) -DPISTORM_IPL_RATELIMIT_US=$(PISTORM_IPL_RATELIMIT_US) -DPISTORM_USE_DIRECT_OPS=$(PISTORM_USE_DIRECT_OPS)
@@ -380,7 +381,7 @@ CPUFLAGS = -mcpu=native -mtune=native -march=native
 RAYLIB_DIR := $(CURDIR)/src/raylib_drm
 RAYLIB_INC := -I$(RAYLIB_DIR)/src
 RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
-DEFINES      += -DRPI4_TEST
+DEFINES += -DRPI4_TEST
 
 else ifeq ($(PLATFORM),PI4_NATIVE)
 CPUFLAGS = -march=native
@@ -516,7 +517,7 @@ clean:
 # Link is atomic: write to $@.tmp then move into place on success.
 OBJS_LINK = $(filter %.o,$^)
 
-$(TARGET): $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) $(MUSASHIFILES:%.c=%.o) src/a314/a314.o $(EXTRA_CXX_OBJS) $(EXTRA_LINK_DEPS)
+$(TARGET): $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) $(MUSASHIFILES:%.c=%.o) src/a314/a314.o $(EXTRA_CXX_OBJS) $(EXTRA_CXX_STUB_OBJS) $(EXTRA_LINK_DEPS)
 	$(CC) $(LDFLAGS) -o $@.tmp $(OBJS_LINK) $(UAE_LINK_FLAGS) $(LDLIBS) && mv -f $@.tmp $@
 
 uae-jit: $(UAE_TARGET)

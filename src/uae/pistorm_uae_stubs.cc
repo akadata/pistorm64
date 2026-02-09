@@ -7,6 +7,7 @@
 #include "newcpu.h"
 #include "events.h"
 #include "machdep/maccess.h"
+#include "uae/ppc.h"
 #include "../config_file/config_file.h"
 #include "../memory_mapped.h"
 #include <stdint.h>
@@ -377,9 +378,27 @@ void custom_reset(bool hardreset, bool keyboardreset) {
 
 // Provide a minimal intlev() to satisfy newcpu references.
 extern "C" int read_irq;
-extern "C" int intlev(void) {
+int intlev(void) {
   return read_irq;
 }
+
+volatile int ppc_state = 0;
+bool ppc_interrupt(int) { return false; }
+void uae_ppc_execute_check(void) {}
+void do_copper(void) {}
+
+int vpos = 0;
+int maxvpos = 262; /* typical to avoid division by zero */
+int maxvpos_nom = 262;
+int maxvpos_display = 262;
+
+uint32_t piscsi_base = 0;
+uint32_t pistorm_dev_base = 0;
+
+int current_maxvpos(void) {
+    return maxvpos;
+}
+
 
 bool is_cycle_ce(uaecptr) {
   return false;

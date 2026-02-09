@@ -1,7 +1,9 @@
 // src/gpio/ps_protocol_kmod.c
+
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <time.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -31,6 +33,10 @@
 #ifndef PISTORM_BATCH_MAX
 #define PISTORM_BATCH_MAX 256
 #endif
+
+/* Make sure nanosleep is declared even in strict C modes */
+int nanosleep(const struct timespec *req, struct timespec *rem);
+
 
 static unsigned int ps_batch_max_ops = PISTORM_BATCH_MAX;
 static uint8_t ps_batch_last_fc = 0xff;
