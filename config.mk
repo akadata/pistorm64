@@ -2,7 +2,7 @@
 
 # Build defaults (override on make command line or in local config)
 EXENAME ?= emulator
-PLATFORM ?= PI4_64BIT
+PLATFORM ?= PI4_64BIT_NATIVE
 
 # Build JIT
 USE_UAE_JIT = 0

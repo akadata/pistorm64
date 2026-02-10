@@ -13,13 +13,14 @@ enum log_level {
   LOG_LEVEL_VERBOSE = 4,
 };
 
-void log_set_level(int level);
-int log_get_level(void);
-int log_parse_level(const char* level);
+void log_set_level(enum log_level level);
+enum log_level log_get_level(void);
+enum log_level log_parse_level(const char* level);  // or int with -1, see below
+
 int log_set_file(const char* path);
 int log_set_syslog(int enable);
 int log_syslog_enabled(void);
-void log_message(int level, const char* fmt, ...);
+void log_message(enum log_level level, const char* fmt, ...);
 
 #define LOG_ERROR(...) log_message(LOG_LEVEL_ERROR, __VA_ARGS__)
 #define LOG_WARN(...) log_message(LOG_LEVEL_WARN, __VA_ARGS__)

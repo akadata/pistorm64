@@ -30,7 +30,8 @@ endif
 
 SRC ?= pigfx-2.c
 
-CFLAGS ?= $(CPUFLAG) -O3 -Wall -Wextra -Wno-unused-parameter -fomit-frame-pointer -nostartfiles
+//CFLAGS ?= $(CPUFLAG) -O3 -Wall -Wextra -Wno-unused-parameter -fomit-frame-pointer -nostartfiles
+CFLAGS ?= $(CPUFLAG) -O3 -noixemul -Wall -Wextra -Wno-unused-parameter -fomit-frame-pointer -nostartfiles -lamiga -DIRTG
 
 ifneq ($(P96DEV),)
 CFLAGS += -I$(P96DEV)/Include

@@ -17,6 +17,22 @@
 
 #include "m68k.h"
 
+/*
+static zorro_device_t z3_rtg_device = {
+    .name         = "pistorm-rtg",
+    .bus          = ZORRO_BUS_Z3,
+    .size         = PIGFX_RTG_SIZE,          // whatever the spec wants
+    .manufacturer = PISTORM_MANUF_ID,
+    .product      = PISTORM_PROD_PI_RTG,     // add to the enum
+    .flags        = 0,
+    .ac_rom       = z3_rtg_rom,              // autoconf ROM bytes
+    .ac_rom_size  = sizeof(z3_rtg_rom),
+    .reset        = z3_rtg_reset,
+    .read8        = z3_rtg_read8,
+    .write8       = z3_rtg_write8,
+    .priv         = &rtg_state,
+};
+*/
 static inline uint16_t read_be16(const uint8_t* ptr) {
   uint16_t tmp;
   memcpy(&tmp, ptr, sizeof(tmp));
