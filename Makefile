@@ -275,7 +275,11 @@ ifeq ($(USE_EC_FPU),1)
 DEFINES += -DPISTORM_ENABLE_020_FPU -DPISTORM_ENABLE_EC040_FPU
 endif
 
-MUSASHIFILES     = src/musashi/m68kcpu.c src/musashi/m68kdasm.c src/musashi/softfloat/softfloat.c src/musashi/softfloat/softfloat_fpsp.c
+MUSASHIFILES     = 	src/musashi/m68kcpu.c \
+										src/musashi/m68kdasm.c \
+										src/musashi/softfloat/softfloat.c \
+										src/musashi/softfloat/softfloat_fpsp.c \
+										src/musashi/m68k_enhanced.c
 MUSASHIGENCFILES = src/musashi/m68kops.c
 MUSASHIGENHFILES = src/musashi/m68kops.h
 MUSASHIGENERATOR = m68kmake
