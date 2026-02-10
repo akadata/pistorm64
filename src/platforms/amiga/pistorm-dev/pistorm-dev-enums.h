@@ -3,6 +3,7 @@
 // Currently "2011" / 0x07DB - Defined as "Reserved for Hackers Only" in old Commodore documentation
 #define PISTORM_AC_MANUF_ID 0x0, 0x7, 0xD, 0xB
 
+
 // [R], [W] and [RW] indicate read, write or both access modes for register
 // Any failure or result code from a write command should be put in PI_CMDRESULT
 // Try to make sure to align any new registers to word/longword offsets

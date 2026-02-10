@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <pthread.h>
 #include <stddef.h>
 #include "config_file/config_file.h"
 #include "log.h"

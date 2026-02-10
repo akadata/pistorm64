@@ -1,0 +1,441 @@
+src/a314/software-amiga/disk_pistorm/device.c:#define A314Base (dev->a314_base)
+src/a314/software-amiga/disk_pistorm/device.c:    ior->a314_Socket = dev->a314_socket;
+src/a314/software-amiga/disk_pistorm/device.c:    if (dev->connection_resetted || dev->pending_operation)
+src/a314/software-amiga/disk_pistorm/device.c:        ior = (struct IOStdReq *)RemHead(&dev->request_queue);
+src/a314/software-amiga/disk_pistorm/device.c:            dev->req_msg.unit = ds->unit;
+src/a314/software-amiga/disk_pistorm/device.c:    dev->pending_operation = ior;
+src/a314/software-amiga/disk_pistorm/device.c:        dev->req_msg.kind = MSG_READ_TRACK_REQ;
+src/a314/software-amiga/disk_pistorm/device.c:            WriteMemA314(dev->track_buffer_address, ior->io_Data, ior->io_Length);
+src/a314/software-amiga/disk_pistorm/device.c:        dev->req_msg.kind = MSG_WRITE_TRACK_REQ;
+src/a314/software-amiga/disk_pistorm/device.c:        buf_address = dev->track_buffer_address;
+src/a314/software-amiga/disk_pistorm/device.c:    dev->req_msg.length = ior->io_Length;
+src/a314/software-amiga/disk_pistorm/device.c:    dev->req_msg.offset = ior->io_Offset;
+src/a314/software-amiga/disk_pistorm/device.c:    dev->req_msg.address = buf_address;
+src/a314/software-amiga/disk_pistorm/device.c:    send_a314_cmd(dev, &dev->write_ior, A314_WRITE, (char *)&dev->req_msg, sizeof(struct RequestMsg));
+src/a314/software-amiga/disk_pistorm/device.c:    dev->pending_write = TRUE;
+src/a314/software-amiga/disk_pistorm/device.c:    struct DriveState *ds = &dev->drive_states[dev->res_msg.unit];
+src/a314/software-amiga/disk_pistorm/device.c:    switch (dev->res_msg.kind)
+src/a314/software-amiga/disk_pistorm/device.c:        switch (dev->res_msg.u.error)
+src/a314/software-amiga/disk_pistorm/device.c:            if (dev->res_msg.kind == MSG_READ_TRACK_RES &&
+src/a314/software-amiga/disk_pistorm/device.c:                    TranslateAddressA314(dev->pending_operation->io_Data) == INVALID_A314_ADDRESS)
+src/a314/software-amiga/disk_pistorm/device.c:                ReadMemA314(dev->pending_operation->io_Data, dev->track_buffer_address, dev->pending_operation->io_Length);
+src/a314/software-amiga/disk_pistorm/device.c:            dev->pending_operation->io_Actual = dev->pending_operation->io_Length;
+src/a314/software-amiga/disk_pistorm/device.c:            dev->pending_operation->io_Error = TDERR_DiskChanged;
+src/a314/software-amiga/disk_pistorm/device.c:            dev->pending_operation->io_Error = TDERR_WriteProt;
+src/a314/software-amiga/disk_pistorm/device.c:        ReplyMsg(&dev->pending_operation->io_Message);
+src/a314/software-amiga/disk_pistorm/device.c:        dev->pending_operation = NULL;
+src/a314/software-amiga/disk_pistorm/device.c:        handle_insert_msg(ds, &dev->res_msg);
+src/a314/software-amiga/disk_pistorm/device.c:        handle_set_geometry_msg(ds, &dev->res_msg);
+src/a314/software-amiga/disk_pistorm/device.c:        dev->pending_connect = FALSE;
+src/a314/software-amiga/disk_pistorm/device.c:            dev->connection_resetted = TRUE;
+src/a314/software-amiga/disk_pistorm/device.c:        dev->pending_read = FALSE;
+src/a314/software-amiga/disk_pistorm/device.c:        if (dev->read_ior.a314_Request.io_Error == A314_READ_OK)
+src/a314/software-amiga/disk_pistorm/device.c:        else if (dev->read_ior.a314_Request.io_Error == A314_READ_RESET)
+src/a314/software-amiga/disk_pistorm/device.c:            dev->connection_resetted = TRUE;
+src/a314/software-amiga/disk_pistorm/device.c:        dev->pending_write = FALSE;
+src/a314/software-amiga/disk_pistorm/device.c:        if (dev->write_ior.a314_Request.io_Error != A314_WRITE_OK)
+src/a314/software-amiga/disk_pistorm/device.c:            dev->connection_resetted = TRUE;
+src/a314/software-amiga/disk_pistorm/device.c:        dev->pending_reset = FALSE;
+src/a314/software-amiga/disk_pistorm/device.c:    if (!dev->connection_resetted && !dev->pending_connect && !dev->pending_read)
+src/a314/software-amiga/disk_pistorm/device.c:        send_a314_cmd(dev, &dev->read_ior, A314_READ, (char *)&dev->res_msg, sizeof(struct ResponseMsg));
+src/a314/software-amiga/disk_pistorm/device.c:        dev->pending_read = TRUE;
+src/a314/software-amiga/disk_pistorm/device.c:    send_a314_cmd(dev, &dev->read_ior, A314_CONNECT, (char *)service_name, strlen(service_name));
+src/a314/software-amiga/disk_pistorm/device.c:    dev->pending_connect = TRUE;
+src/a314/software-amiga/disk_pistorm/device.c:            while ((ior = (struct A314_IORequest *)GetMsg(&dev->a314_mp)))
+src/a314/software-amiga/disk_pistorm/device.c:            while ((ior = (struct IOStdReq *)GetMsg(&dev->op_req_mp)))
+src/a314/software-amiga/disk_pistorm/device.c:                AddTail(&dev->request_queue, &ior->io_Message.mn_Node);
+src/a314/software-amiga/disk_pistorm/device.c:    char *stack = dev->task_stack;
+src/a314/software-amiga/disk_pistorm/device.c:    struct Task *task = &dev->task;
+src/a314/software-amiga/disk_pistorm/device.c:            PutMsg(&dev->op_req_mp, &ior->io_Message);
+src/a314/software-amiga/disk_pistorm/device.c:            PutMsg(&dev->op_req_mp, &ior->io_Message);
+src/a314/software-amiga/disk_pistorm/device.c:    dev->saved_seg_list = seg_list;
+src/a314/software-amiga/disk_pistorm/device.c:    dev->lib.lib_Node.ln_Type = NT_DEVICE;
+src/a314/software-amiga/disk_pistorm/device.c:    dev->lib.lib_Node.ln_Name = (char *)device_name;
+src/a314/software-amiga/disk_pistorm/device.c:    dev->lib.lib_Flags = LIBF_SUMUSED | LIBF_CHANGED;
+src/a314/software-amiga/disk_pistorm/device.c:    dev->lib.lib_Version = 1;
+src/a314/software-amiga/disk_pistorm/device.c:    dev->lib.lib_Revision = 0;
+src/a314/software-amiga/disk_pistorm/device.c:    dev->lib.lib_IdString = (APTR)id_string;
+src/a314/software-amiga/disk_pistorm/device.c:    init_message_port(&dev->a314_mp, SIGB_A314, &dev->task);
+src/a314/software-amiga/disk_pistorm/device.c:    init_message_port(&dev->op_req_mp, SIGB_OP_REQ, &dev->task);
+src/a314/software-amiga/disk_pistorm/device.c:    init_a314_ioreq(&dev->read_ior, &dev->a314_mp);
+src/a314/software-amiga/disk_pistorm/device.c:    if (OpenDevice((char *)a314_device_name, 0, &dev->read_ior.a314_Request, 0))
+src/a314/software-amiga/disk_pistorm/device.c:    dev->a314_base = &(dev->read_ior.a314_Request.io_Device->dd_Library);
+src/a314/software-amiga/disk_pistorm/device.c:    memcpy(&dev->write_ior, &dev->read_ior, sizeof(struct A314_IORequest));
+src/a314/software-amiga/disk_pistorm/device.c:    memcpy(&dev->reset_ior, &dev->read_ior, sizeof(struct A314_IORequest));
+src/a314/software-amiga/disk_pistorm/device.c:    dev->track_buffer_address = alloc_a314_buffer(TRACK_SIZE);
+src/a314/software-amiga/disk_pistorm/device.c:    if (dev->track_buffer_address == INVALID_A314_ADDRESS)
+src/a314/software-amiga/disk_pistorm/device.c:        struct DriveState *ds = &dev->drive_states[i];
+src/a314/software-amiga/disk_pistorm/device.c:    NewList(&dev->request_queue);
+src/a314/software-amiga/disk_pistorm/device.c:    dev->a314_socket = get_socket_id();
+src/a314/software-amiga/disk_pistorm/device.c:    dev->task_stack = AllocMem(TASK_STACK_SIZE, MEMF_CLEAR);
+src/a314/software-amiga/disk_pistorm/device.c:    if (!dev->task_stack)
+src/a314/software-amiga/disk_pistorm/device.c:                add_boot_node(expansion_base, &dev->drive_states[i]);
+src/a314/software-amiga/disk_pistorm/device.c:    return &dev->lib;
+src/a314/software-amiga/disk_pistorm/device.c:    free_a314_buffer(dev->track_buffer_address, TRACK_SIZE);
+src/a314/software-amiga/disk_pistorm/device.c:    CloseDevice(&dev->read_ior.a314_Request);
+src/a314/software-amiga/disk_pistorm/device.c:    FreeMem((char *)dev - dev->lib.lib_NegSize, dev->lib.lib_NegSize + dev->lib.lib_PosSize);
+src/a314/software-amiga/disk_pistorm/device.c:    if (dev->lib.lib_OpenCnt != 0)
+src/a314/software-amiga/disk_pistorm/device.c:        dev->lib.lib_Flags |= LIBF_DELEXP;
+src/a314/software-amiga/disk_pistorm/device.c:    struct DriveState *ds = &dev->drive_states[unitnum];
+src/a314/software-amiga/disk_pistorm/device.c:    dev->lib.lib_OpenCnt++;
+src/a314/software-amiga/disk_pistorm/device.c:    dev->lib.lib_OpenCnt--;
+src/a314/software-amiga/disk_pistorm/device.c:    if (dev->lib.lib_OpenCnt == 0 && (dev->lib.lib_Flags & LIBF_DELEXP))
+src/a314/software-amiga/ethernet_pistorm/device-2.c:  dev->lib_Node.ln_Type = NT_DEVICE;
+src/a314/software-amiga/ethernet_pistorm/device-2.c:  dev->lib_Node.ln_Name = (char*)device_name;
+src/a314/software-amiga/ethernet_pistorm/device-2.c:  dev->lib_Flags = LIBF_SUMUSED | LIBF_CHANGED;
+src/a314/software-amiga/ethernet_pistorm/device-2.c:  dev->lib_Version = 1;
+src/a314/software-amiga/ethernet_pistorm/device-2.c:  dev->lib_Revision = 0;
+src/a314/software-amiga/ethernet_pistorm/device-2.c:  dev->lib_IdString = (APTR)device_id_string;
+src/a314/software-amiga/ethernet_pistorm/device-2.c:  if (dev->lib_OpenCnt) {
+src/a314/software-amiga/ethernet_pistorm/device-2.c:    dev->lib_Flags |= LIBF_DELEXP;
+src/a314/software-amiga/ethernet_pistorm/device-2.c:  Remove(&dev->lib_Node);
+src/a314/software-amiga/ethernet_pistorm/device-2.c:  FreeMem((char*)dev - dev->lib_NegSize, dev->lib_NegSize + dev->lib_PosSize);
+src/a314/software-amiga/ethernet_pistorm/device-2.c:  if (unitnum != 0 || dev->lib_OpenCnt)
+src/a314/software-amiga/ethernet_pistorm/device-2.c:  dev->lib_OpenCnt++;
+src/a314/software-amiga/ethernet_pistorm/device-2.c:  dev->lib_OpenCnt--;
+src/a314/software-amiga/ethernet_pistorm/device-2.c:  dev->lib_OpenCnt--;
+src/a314/software-amiga/ethernet_pistorm/device-2.c:  if (dev->lib_OpenCnt == 0 && (dev->lib_Flags & LIBF_DELEXP))
+src/a314/a314device/device.c:  dev->lib_Node.ln_Type = NT_DEVICE;
+src/a314/a314device/device.c:  dev->lib_Node.ln_Name = device_name;
+src/a314/a314device/device.c:  dev->lib_Flags = LIBF_SUMUSED | LIBF_CHANGED;
+src/a314/a314device/device.c:  dev->lib_Version = 1;
+src/a314/a314device/device.c:  dev->lib_Revision = 0;
+src/a314/a314device/device.c:  dev->lib_IdString = (APTR)id_string;
+src/a314/a314device/device.c:  if (TRUE) // dev->lib_OpenCnt != 0)
+src/a314/a314device/device.c:    dev->lib_Flags |= LIBF_DELEXP;
+src/a314/a314device/device.c:  Remove(&dev->lib_Node);
+src/a314/a314device/device.c:  FreeMem((char *)dev - dev->lib_NegSize, dev->lib_NegSize + dev->lib_PosSize);
+src/a314/a314device/device.c:  dev->lib_OpenCnt++;
+src/a314/a314device/device.c:  if (dev->lib_OpenCnt == 1 && !running) {
+src/a314/a314device/device.c:      dev->lib_OpenCnt--;
+src/a314/a314device/device.c:  dev->lib_OpenCnt--;
+src/a314/a314device/device.c:  if (dev->lib_OpenCnt == 0 && (dev->lib_Flags & LIBF_DELEXP))
+src/platforms/amiga/amiga-autoconf.c:#include "pistorm-dev/pistorm-dev-enums.h"
+src/platforms/amiga/amiga-autoconf.c:  if (dev->bus == ZORRO_BUS_Z3) {
+src/platforms/amiga/amiga-autoconf.c:        if (dev->flags & Z3_FLAGS_MEMORY)
+src/platforms/amiga/amiga-autoconf.c:        if (dev->size > 8 * SIZE_MEGA)
+src/platforms/amiga/amiga-autoconf.c:          val |= get_autoconf_size_ext(dev->size);
+src/platforms/amiga/amiga-autoconf.c:          val |= get_autoconf_size(dev->size);
+src/platforms/amiga/amiga-autoconf.c:        val = (unsigned char)(dev->product & 0xFF);
+src/platforms/amiga/amiga-autoconf.c:        val |= (unsigned char)(dev->flags & 0xF0);
+src/platforms/amiga/amiga-autoconf.c:        if (dev->size > 8 * SIZE_MEGA)
+src/platforms/amiga/amiga-autoconf.c:        val = (unsigned char)(dev->manufacturer & 0x00FF);
+src/platforms/amiga/amiga-autoconf.c:        val = (unsigned char)(dev->manufacturer >> 8);
+src/platforms/amiga/amiga-autoconf.c:        dev->base = ac_base[ac_z3_current_pic];
+src/platforms/amiga/amiga-autoconf.c:        dev->base = ac_base[ac_z3_current_pic];
+src/platforms/amiga/amiga-autoconf.c:    if (dev && dev->ac_rom) {
+src/platforms/amiga/amiga-autoconf.c:      rom = dev->ac_rom;
+src/platforms/amiga/amiga-autoconf.c:      rom_size = dev->ac_rom_size;
+src/platforms/amiga/amiga-autoconf.c:        zorro_dev->base = zorro_temp_base;
+src/platforms/amiga/amiga-autoconf.c:        LOG_INFO("[AUTOCONF] Zorro device %s assigned to $%.8X\n", zorro_dev->name ? zorro_dev->name : "unnamed",
+src/platforms/amiga/amiga-autoconf.c:                 zorro_dev->base);
+src/platforms/amiga/amiga-autoconf.c:        zorro_dev->base = base ? *base : 0;
+src/platforms/amiga/amiga-autoconf.c:                 zorro_dev->name ? zorro_dev->name : "unnamed",
+src/platforms/amiga/amiga-autoconf.c:                 zorro_dev->base);
+src/platforms/amiga/zorro/z2_pissa/z2_pissa.c:#include "platforms/amiga/pistorm-dev/pistorm-dev-enums.h"
+src/platforms/amiga/zorro/serial_echo/serial_echo.c:#include "platforms/amiga/pistorm-dev/pistorm-dev-enums.h"
+src/platforms/amiga/zorro/serial_echo/serial_echo.c:  z2_serial_state_t *st = (z2_serial_state_t *)dev->priv;
+src/platforms/amiga/zorro/serial_echo/serial_echo.c:  z2_serial_state_t *st = (z2_serial_state_t *)dev->priv;
+src/platforms/amiga/zorro/serial_echo/serial_echo.c:  z2_serial_state_t *st = (z2_serial_state_t *)dev->priv;
+src/platforms/amiga/zorro/z2_rng/z2_rng.c:#include "platforms/amiga/pistorm-dev/pistorm-dev-enums.h"
+src/a314/import_for_reference_only/upstream/disk/device.c:#define A314Base (dev->a314_base)
+src/a314/import_for_reference_only/upstream/disk/device.c:    ior->a314_Socket = dev->a314_socket;
+src/a314/import_for_reference_only/upstream/disk/device.c:    if (dev->connection_resetted || dev->pending_operation)
+src/a314/import_for_reference_only/upstream/disk/device.c:        ior = (struct IOStdReq *)RemHead(&dev->request_queue);
+src/a314/import_for_reference_only/upstream/disk/device.c:            dev->req_msg.unit = ds->unit;
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->pending_operation = ior;
+src/a314/import_for_reference_only/upstream/disk/device.c:        dev->req_msg.kind = MSG_READ_TRACK_REQ;
+src/a314/import_for_reference_only/upstream/disk/device.c:            WriteMemA314(dev->track_buffer_address, ior->io_Data, ior->io_Length);
+src/a314/import_for_reference_only/upstream/disk/device.c:        dev->req_msg.kind = MSG_WRITE_TRACK_REQ;
+src/a314/import_for_reference_only/upstream/disk/device.c:        buf_address = dev->track_buffer_address;
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->req_msg.length = ior->io_Length;
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->req_msg.offset = ior->io_Offset;
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->req_msg.address = buf_address;
+src/a314/import_for_reference_only/upstream/disk/device.c:    send_a314_cmd(dev, &dev->write_ior, A314_WRITE, (char *)&dev->req_msg, sizeof(struct RequestMsg));
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->pending_write = TRUE;
+src/a314/import_for_reference_only/upstream/disk/device.c:    struct DriveState *ds = &dev->drive_states[dev->res_msg.unit];
+src/a314/import_for_reference_only/upstream/disk/device.c:    switch (dev->res_msg.kind)
+src/a314/import_for_reference_only/upstream/disk/device.c:        switch (dev->res_msg.u.error)
+src/a314/import_for_reference_only/upstream/disk/device.c:            if (dev->res_msg.kind == MSG_READ_TRACK_RES &&
+src/a314/import_for_reference_only/upstream/disk/device.c:                    TranslateAddressA314(dev->pending_operation->io_Data) == INVALID_A314_ADDRESS)
+src/a314/import_for_reference_only/upstream/disk/device.c:                ReadMemA314(dev->pending_operation->io_Data, dev->track_buffer_address, dev->pending_operation->io_Length);
+src/a314/import_for_reference_only/upstream/disk/device.c:            dev->pending_operation->io_Actual = dev->pending_operation->io_Length;
+src/a314/import_for_reference_only/upstream/disk/device.c:            dev->pending_operation->io_Error = TDERR_DiskChanged;
+src/a314/import_for_reference_only/upstream/disk/device.c:            dev->pending_operation->io_Error = TDERR_WriteProt;
+src/a314/import_for_reference_only/upstream/disk/device.c:        ReplyMsg(&dev->pending_operation->io_Message);
+src/a314/import_for_reference_only/upstream/disk/device.c:        dev->pending_operation = NULL;
+src/a314/import_for_reference_only/upstream/disk/device.c:        handle_insert_msg(ds, &dev->res_msg);
+src/a314/import_for_reference_only/upstream/disk/device.c:        handle_set_geometry_msg(ds, &dev->res_msg);
+src/a314/import_for_reference_only/upstream/disk/device.c:        dev->pending_connect = FALSE;
+src/a314/import_for_reference_only/upstream/disk/device.c:            dev->connection_resetted = TRUE;
+src/a314/import_for_reference_only/upstream/disk/device.c:        dev->pending_read = FALSE;
+src/a314/import_for_reference_only/upstream/disk/device.c:        if (dev->read_ior.a314_Request.io_Error == A314_READ_OK)
+src/a314/import_for_reference_only/upstream/disk/device.c:        else if (dev->read_ior.a314_Request.io_Error == A314_READ_RESET)
+src/a314/import_for_reference_only/upstream/disk/device.c:            dev->connection_resetted = TRUE;
+src/a314/import_for_reference_only/upstream/disk/device.c:        dev->pending_write = FALSE;
+src/a314/import_for_reference_only/upstream/disk/device.c:        if (dev->write_ior.a314_Request.io_Error != A314_WRITE_OK)
+src/a314/import_for_reference_only/upstream/disk/device.c:            dev->connection_resetted = TRUE;
+src/a314/import_for_reference_only/upstream/disk/device.c:        dev->pending_reset = FALSE;
+src/a314/import_for_reference_only/upstream/disk/device.c:    if (!dev->connection_resetted && !dev->pending_connect && !dev->pending_read)
+src/a314/import_for_reference_only/upstream/disk/device.c:        send_a314_cmd(dev, &dev->read_ior, A314_READ, (char *)&dev->res_msg, sizeof(struct ResponseMsg));
+src/a314/import_for_reference_only/upstream/disk/device.c:        dev->pending_read = TRUE;
+src/a314/import_for_reference_only/upstream/disk/device.c:    send_a314_cmd(dev, &dev->read_ior, A314_CONNECT, (char *)service_name, strlen(service_name));
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->pending_connect = TRUE;
+src/a314/import_for_reference_only/upstream/disk/device.c:            while ((ior = (struct A314_IORequest *)GetMsg(&dev->a314_mp)))
+src/a314/import_for_reference_only/upstream/disk/device.c:            while ((ior = (struct IOStdReq *)GetMsg(&dev->op_req_mp)))
+src/a314/import_for_reference_only/upstream/disk/device.c:                AddTail(&dev->request_queue, &ior->io_Message.mn_Node);
+src/a314/import_for_reference_only/upstream/disk/device.c:    char *stack = dev->task_stack;
+src/a314/import_for_reference_only/upstream/disk/device.c:    struct Task *task = &dev->task;
+src/a314/import_for_reference_only/upstream/disk/device.c:            PutMsg(&dev->op_req_mp, &ior->io_Message);
+src/a314/import_for_reference_only/upstream/disk/device.c:            PutMsg(&dev->op_req_mp, &ior->io_Message);
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->saved_seg_list = seg_list;
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->lib.lib_Node.ln_Type = NT_DEVICE;
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->lib.lib_Node.ln_Name = (char *)device_name;
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->lib.lib_Flags = LIBF_SUMUSED | LIBF_CHANGED;
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->lib.lib_Version = 1;
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->lib.lib_Revision = 0;
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->lib.lib_IdString = (APTR)id_string;
+src/a314/import_for_reference_only/upstream/disk/device.c:    init_message_port(&dev->a314_mp, SIGB_A314, &dev->task);
+src/a314/import_for_reference_only/upstream/disk/device.c:    init_message_port(&dev->op_req_mp, SIGB_OP_REQ, &dev->task);
+src/a314/import_for_reference_only/upstream/disk/device.c:    init_a314_ioreq(&dev->read_ior, &dev->a314_mp);
+src/a314/import_for_reference_only/upstream/disk/device.c:    if (OpenDevice((char *)a314_device_name, 0, &dev->read_ior.a314_Request, 0))
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->a314_base = &(dev->read_ior.a314_Request.io_Device->dd_Library);
+src/a314/import_for_reference_only/upstream/disk/device.c:    memcpy(&dev->write_ior, &dev->read_ior, sizeof(struct A314_IORequest));
+src/a314/import_for_reference_only/upstream/disk/device.c:    memcpy(&dev->reset_ior, &dev->read_ior, sizeof(struct A314_IORequest));
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->track_buffer_address = AllocMemA314(TRACK_SIZE);
+src/a314/import_for_reference_only/upstream/disk/device.c:    if (dev->track_buffer_address == INVALID_A314_ADDRESS)
+src/a314/import_for_reference_only/upstream/disk/device.c:        struct DriveState *ds = &dev->drive_states[i];
+src/a314/import_for_reference_only/upstream/disk/device.c:    NewList(&dev->request_queue);
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->a314_socket = get_socket_id();
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->task_stack = AllocMem(TASK_STACK_SIZE, MEMF_CLEAR);
+src/a314/import_for_reference_only/upstream/disk/device.c:    if (!dev->task_stack)
+src/a314/import_for_reference_only/upstream/disk/device.c:                add_boot_node(expansion_base, &dev->drive_states[i]);
+src/a314/import_for_reference_only/upstream/disk/device.c:    return &dev->lib;
+src/a314/import_for_reference_only/upstream/disk/device.c:    FreeMemA314(dev->track_buffer_address, TRACK_SIZE);
+src/a314/import_for_reference_only/upstream/disk/device.c:    CloseDevice(&dev->read_ior.a314_Request);
+src/a314/import_for_reference_only/upstream/disk/device.c:    FreeMem((char *)dev - dev->lib.lib_NegSize, dev->lib.lib_NegSize + dev->lib.lib_PosSize);
+src/a314/import_for_reference_only/upstream/disk/device.c:    if (dev->lib.lib_OpenCnt != 0)
+src/a314/import_for_reference_only/upstream/disk/device.c:        dev->lib.lib_Flags |= LIBF_DELEXP;
+src/a314/import_for_reference_only/upstream/disk/device.c:    struct DriveState *ds = &dev->drive_states[unitnum];
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->lib.lib_OpenCnt++;
+src/a314/import_for_reference_only/upstream/disk/device.c:    dev->lib.lib_OpenCnt--;
+src/a314/import_for_reference_only/upstream/disk/device.c:    if (dev->lib.lib_OpenCnt == 0 && (dev->lib.lib_Flags & LIBF_DELEXP))
+src/a314/import_for_reference_only/upstream/a314device/startup.c:	struct Task *task = &dev->task;
+src/a314/import_for_reference_only/upstream/a314device/startup.c:	struct MsgPort *mp = &dev->task_mp;
+src/a314/import_for_reference_only/upstream/a314device/startup.c:	mp->mp_SigTask = &dev->task;
+src/a314/import_for_reference_only/upstream/a314device/startup.c:		FreeMem(dev->task.tc_SPLower, TASK_STACK_SIZE);
+src/a314/import_for_reference_only/upstream/a314device/startup.c:	AddTask(&dev->task, (void *)task_main, 0);
+src/a314/import_for_reference_only/upstream/a314device/config_file.c:						dev->clockport_address = value;
+src/a314/import_for_reference_only/upstream/a314device/config_file.c:						dev->interrupt_number = value;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	memset(&dev->vertb_interrupt, 0, sizeof(struct Interrupt));
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	dev->vertb_interrupt.is_Node.ln_Type = NT_INTERRUPT;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	dev->vertb_interrupt.is_Node.ln_Pri = -60;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	dev->vertb_interrupt.is_Node.ln_Name = device_name;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	dev->vertb_interrupt.is_Data = (APTR)&dev->task;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	dev->vertb_interrupt.is_Code = IntServer;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	AddIntServer(INTB_VERTB, &dev->vertb_interrupt);
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	memset(&dev->int_x_interrupt, 0, sizeof(struct Interrupt));
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	dev->int_x_interrupt.is_Node.ln_Type = NT_INTERRUPT;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	dev->int_x_interrupt.is_Node.ln_Pri = 0;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	dev->int_x_interrupt.is_Node.ln_Name = device_name;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	dev->int_x_interrupt.is_Data = (APTR)&dev->task;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	dev->int_x_interrupt.is_Code = IntServer;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	LONG int_num = dev->interrupt_number == 6 ? INTB_EXTER : INTB_PORTS;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	AddIntServer(int_num, &dev->int_x_interrupt);
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	dev->interrupt_number = 2;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	dev->fw_flags = read_fw_flags();
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	dev->ca = (struct ComArea *)AllocMem(sizeof(struct ComArea), MEMF_A314 | MEMF_CLEAR);
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	if (dev->ca == NULL)
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	write_base_address(a314base_translate_address(dev, dev->ca));
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	UBYTE *r2a_buffer = dev->ca->r2a_buffer;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_td.c:	struct ComArea *ca = dev->ca;
+src/a314/import_for_reference_only/upstream/a314device/fix_mem_region.c:	ULONG *bank_address = dev->bank_address;
+src/a314/import_for_reference_only/upstream/a314device/fix_mem_region.c:	dev->is_a600 = FALSE;
+src/a314/import_for_reference_only/upstream/a314device/fix_mem_region.c:	if (dev->fw_flags & FW_FLAG_A600)
+src/a314/import_for_reference_only/upstream/a314device/fix_mem_region.c:		dev->is_a600 = TRUE;
+src/a314/import_for_reference_only/upstream/a314device/fix_mem_region.c:	if (dev->fw_flags & FW_FLAG_AUTODETECT)
+src/a314/import_for_reference_only/upstream/a314device/fix_mem_region.c:	mark_region_a314(dev->a314_mem_address, QUARTER_MB);
+src/a314/import_for_reference_only/upstream/a314device/fix_mem_region.c:	if (dev->is_a600)
+src/a314/import_for_reference_only/upstream/a314device/fix_mem_region.c:	if (dev->bank_address[0] != -1)
+src/a314/import_for_reference_only/upstream/a314device/fix_mem_region.c:		ULONG offset = (ULONG)address - dev->bank_address[0];
+src/a314/import_for_reference_only/upstream/a314device/fix_mem_region.c:	if (dev->bank_address[1] != -1)
+src/a314/import_for_reference_only/upstream/a314device/fix_mem_region.c:		ULONG offset = (ULONG)address - dev->bank_address[1];
+src/a314/import_for_reference_only/upstream/a314device/fix_mem_region.c:	ULONG offset = (ULONG)address - dev->a314_mem_address;
+src/a314/import_for_reference_only/upstream/a314device/fix_mem_region.c:	return (void *)(dev->bank_address[bank] + offset);
+src/a314/import_for_reference_only/upstream/a314device/fix_mem_region.c:	return (void *)(dev->a314_mem_address + address);
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	memset(&dev->vertb_interrupt, 0, sizeof(struct Interrupt));
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	dev->vertb_interrupt.is_Node.ln_Type = NT_INTERRUPT;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	dev->vertb_interrupt.is_Node.ln_Pri = -60;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	dev->vertb_interrupt.is_Node.ln_Name = device_name;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	dev->vertb_interrupt.is_Data = (APTR)dev;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	dev->vertb_interrupt.is_Code = IntServer;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	AddIntServer(INTB_VERTB, &dev->vertb_interrupt);
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	memset(&dev->int_x_interrupt, 0, sizeof(struct Interrupt));
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	dev->int_x_interrupt.is_Node.ln_Type = NT_INTERRUPT;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	dev->int_x_interrupt.is_Node.ln_Pri = 0;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	dev->int_x_interrupt.is_Node.ln_Name = device_name;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	dev->int_x_interrupt.is_Data = (APTR)dev;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	dev->int_x_interrupt.is_Code = IntServer;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	LONG int_num = dev->interrupt_number == 6 ? INTB_EXTER : INTB_PORTS;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	AddIntServer(int_num, &dev->int_x_interrupt);
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	volatile UWORD *p = &(dev->ca->lock_word);
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	if (!check_overlap_region(dev->a314_mem_address, dev->a314_mem_address + QUARTER_MB))
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	if (!detect_board_present(dev->a314_mem_address))
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	dev->interrupt_number = 2;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:		dev->a314_mem_address = address;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	dev->ca = (struct ComArea *)AllocMem(sizeof(struct ComArea), MEMF_A314 | MEMF_CLEAR);
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	if (dev->ca == NULL)
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	dev->ca->interrupt = 0x1f1f;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	dev->ca->interrupt = 0x8000 | IRQ_BASE_ADDRESS;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	dev->ca->interrupt = 0x8000 | (IRQ_R2A_TAIL << 8);
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	UBYTE *r2a_buffer = dev->ca->r2a_buffer;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_fe.c:	struct ComArea *ca = dev->ca;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	ULONG cpa = dev->clockport_address;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	ULONG cpa = dev->clockport_address;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	ULONG cpa = dev->clockport_address;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	ULONG cpa = dev->clockport_address;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	ULONG cpa = dev->clockport_address;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	dev->cap.r2a_tail = *CP_REG_PTR(cpa, REG_SRAM);
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	dev->cap.a2r_head = *CP_REG_PTR(cpa, REG_SRAM);
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	ULONG cpa = dev->clockport_address;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	*CP_REG_PTR(cpa, REG_SRAM) = dev->cap.a2r_tail;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	*CP_REG_PTR(cpa, REG_SRAM) = dev->cap.r2a_head;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	ULONG cpa = dev->clockport_address;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	UBYTE offset = dev->cap.a2r_tail;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	ULONG cpa = dev->clockport_address;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	dev->cap.a2r_tail = offset;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	ULONG cpa = dev->clockport_address;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	dev->clockport_address = DEFAULT_CLOCKPORT_ADDRESS;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	dev->interrupt_number = 6;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	ULONG cpa = dev->clockport_address;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	ULONG cpa = dev->clockport_address;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	memset(&dev->int_x_interrupt, 0, sizeof(struct Interrupt));
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	dev->int_x_interrupt.is_Node.ln_Type = NT_INTERRUPT;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	dev->int_x_interrupt.is_Node.ln_Pri = 0;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	dev->int_x_interrupt.is_Node.ln_Name = device_name;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	dev->int_x_interrupt.is_Data = (APTR)dev;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	dev->int_x_interrupt.is_Code = IntServer;
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	LONG int_num = dev->interrupt_number == 6 ? INTB_EXTER :
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:		(dev->interrupt_number == 2 ? INTB_PORTS : INTB_VERTB);
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	AddIntServer(int_num, &dev->int_x_interrupt);
+src/a314/import_for_reference_only/upstream/a314device/pi_if_cp.c:	memset(&dev->cap, 0, sizeof(dev->cap));
+src/a314/import_for_reference_only/upstream/a314device/device.h:#define CAP_PTR(dev) (&(dev->ca->cap))
+src/a314/import_for_reference_only/upstream/a314device/device.h:#define CAP_PTR(dev) (&(dev->cap))
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:		if (dev->send_queue_head == NULL && room_in_a2r(CAP_PTR(dev), 0))
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:	while (dev->send_queue_head != NULL)
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:		struct Socket *s = dev->send_queue_head;
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:		if (dev->send_queue_head == NULL && room_in_a2r(CAP_PTR(dev), len))
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:			if (dev->send_queue_head == NULL && room_in_a2r(CAP_PTR(dev), len))
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:			if (dev->send_queue_head == NULL && room_in_a2r(CAP_PTR(dev), 0))
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:			while (msg = GetMsg(&dev->task_mp))
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:				if (dev->send_queue_head == NULL)
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:				else if (!room_in_a2r(cap, dev->send_queue_head->send_queue_required_length))
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:		dev->ca->interrupt = 0x0303;
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:			while (msg = GetMsg(&dev->task_mp))
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:				if (dev->send_queue_head == NULL)
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:				else if (!room_in_a2r(cap, dev->send_queue_head->send_queue_required_length))
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:		dev->ca->interrupt = 0x8000 | set_int_bits;
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:		dbg_trace("Read CAP, r2a_tail=$b, a2r_head=$b", dev->cap.r2a_tail, dev->cap.a2r_head);
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:		UBYTE prev_a2r_tail = dev->cap.a2r_tail;
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:		UBYTE prev_r2a_head = dev->cap.r2a_head;
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:			while (msg = GetMsg(&dev->task_mp))
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:		if (prev_a2r_tail != dev->cap.a2r_tail || prev_r2a_head != dev->cap.r2a_head)
+src/a314/import_for_reference_only/upstream/a314device/driver_task.c:			dbg_trace("Writing CAP, a2r_tail=$b, r2a_head=$b", dev->cap.a2r_tail, dev->cap.r2a_head);
+src/a314/import_for_reference_only/upstream/a314device/memory_allocator.c:	dev->first_chunk = mc;
+src/a314/import_for_reference_only/upstream/a314device/memory_allocator.c:	struct MyMemChunk *mc = dev->first_chunk;
+src/a314/import_for_reference_only/upstream/a314device/memory_allocator.c:					dev->first_chunk = mc->next;
+src/a314/import_for_reference_only/upstream/a314device/memory_allocator.c:	struct MyMemChunk *succ = dev->first_chunk;
+src/a314/import_for_reference_only/upstream/a314device/memory_allocator.c:			dev->first_chunk = mc;
+src/a314/import_for_reference_only/upstream/a314device/device.c:	dev->saved_seg_list = seg_list;
+src/a314/import_for_reference_only/upstream/a314device/device.c:	dev->running = FALSE;
+src/a314/import_for_reference_only/upstream/a314device/device.c:	dev->lib.lib_Node.ln_Type = NT_DEVICE;
+src/a314/import_for_reference_only/upstream/a314device/device.c:	dev->lib.lib_Node.ln_Name = device_name;
+src/a314/import_for_reference_only/upstream/a314device/device.c:	dev->lib.lib_Flags = LIBF_SUMUSED | LIBF_CHANGED;
+src/a314/import_for_reference_only/upstream/a314device/device.c:	dev->lib.lib_Version = 1;
+src/a314/import_for_reference_only/upstream/a314device/device.c:	dev->lib.lib_Revision = 0;
+src/a314/import_for_reference_only/upstream/a314device/device.c:	dev->lib.lib_IdString = (APTR)id_string;
+src/a314/import_for_reference_only/upstream/a314device/device.c:	return &dev->lib;
+src/a314/import_for_reference_only/upstream/a314device/device.c:	if (TRUE) //dev->lib_OpenCnt != 0)
+src/a314/import_for_reference_only/upstream/a314device/device.c:		dev->lib.lib_Flags |= LIBF_DELEXP;
+src/a314/import_for_reference_only/upstream/a314device/device.c:	Remove(&dev->lib_Node);
+src/a314/import_for_reference_only/upstream/a314device/device.c:	FreeMem((char *)dev - dev->lib_NegSize, dev->lib_NegSize + dev->lib_PosSize);
+src/a314/import_for_reference_only/upstream/a314device/device.c:	dev->lib.lib_OpenCnt++;
+src/a314/import_for_reference_only/upstream/a314device/device.c:	if (dev->lib.lib_OpenCnt == 1 && !dev->running)
+src/a314/import_for_reference_only/upstream/a314device/device.c:			dev->lib.lib_OpenCnt--;
+src/a314/import_for_reference_only/upstream/a314device/device.c:		dev->running = TRUE;
+src/a314/import_for_reference_only/upstream/a314device/device.c:	dev->lib.lib_OpenCnt--;
+src/a314/import_for_reference_only/upstream/a314device/device.c:	if (dev->lib.lib_OpenCnt == 0 && (dev->lib.lib_Flags & LIBF_DELEXP))
+src/a314/import_for_reference_only/upstream/a314device/device.c:	PutMsg(&dev->task_mp, (struct Message *)ior);
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:	NewList(&dev->active_sockets);
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:	dev->send_queue_head = NULL;
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:	dev->send_queue_tail = NULL;
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:	dev->next_stream_id = 1;
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:	for (struct Node *node = dev->active_sockets.lh_Head; node->ln_Succ != NULL; node = node->ln_Succ)
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:	for (struct Node *node = dev->active_sockets.lh_Head; node->ln_Succ != NULL; node = node->ln_Succ)
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:		UBYTE stream_id = dev->next_stream_id;
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:		dev->next_stream_id += 2;
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:	return dev->next_stream_id;
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:	AddTail(&dev->active_sockets, (struct Node *)s);
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:	if (dev->send_queue_head == NULL)
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:		dev->send_queue_head = s;
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:		dev->send_queue_tail->next_in_send_queue = s;
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:	dev->send_queue_tail = s;
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:		if (dev->send_queue_head == s)
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:			dev->send_queue_head = s->next_in_send_queue;
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:			if (dev->send_queue_head == NULL)
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:				dev->send_queue_tail = NULL;
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:			struct Socket *curr = dev->send_queue_head;
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:			if (dev->send_queue_tail == s)
+src/a314/import_for_reference_only/upstream/a314device/sockets.c:				dev->send_queue_tail = curr;
+src/platforms/amiga/ahi/ahi_driver_amiga/pi-ahi.c:  dev->lib_OpenCnt++;
+src/platforms/amiga/rtg/rtg-output-raylib.c:#include "platforms/amiga/pistorm-dev/pistorm-dev-enums.h"
+src/platforms/amiga/amiga-platform.c:#include "pistorm-dev/pistorm-dev-enums.h"
+src/platforms/atari/pistorm-dev/pistorm-dev.c:#include "pistorm-dev-enums.h"
+src/platforms/atari/atari-platform.c:#include "pistorm-dev/pistorm-dev-enums.h"
+src/platforms/atari/atari-autoconf.c:#include "pistorm-dev/pistorm-dev-enums.h"
+src/emulator.c:#include "platforms/amiga/pistorm-dev/pistorm-dev-enums.h"
+src/platforms/amiga/amiga_zorro.c:  dev->slot = slot;
+src/platforms/amiga/amiga_zorro.c:  dev->base = 0;  // autoconfig will assign a real base later
+src/platforms/amiga/amiga_zorro.c:           dev->name ? dev->name : "unnamed",
+src/platforms/amiga/amiga_zorro.c:           dev->bus == ZORRO_BUS_Z2 ? "Z2" : "Z3",
+src/platforms/amiga/amiga_zorro.c:           dev->size, dev->base, dev->slot);
+src/platforms/amiga/amiga_zorro.c:    if (dev->base != 0 && addr >= dev->base && addr < dev->base + dev->size) {
+src/platforms/amiga/amiga_zorro.c:    if (dev->read8) {
+src/platforms/amiga/amiga_zorro.c:      *val = dev->read8(dev, offset);
+src/platforms/amiga/amiga_zorro.c:    if (dev->read16) {
+src/platforms/amiga/amiga_zorro.c:      *val = dev->read16(dev, offset);
+src/platforms/amiga/amiga_zorro.c:    if (dev->read32) {
+src/platforms/amiga/amiga_zorro.c:      *val = dev->read32(dev, offset);
+src/platforms/amiga/amiga_zorro.c:    if (dev->write8) {
+src/platforms/amiga/amiga_zorro.c:      dev->write8(dev, offset, (uint8_t)val);
+src/platforms/amiga/amiga_zorro.c:    if (dev->write16) {
+src/platforms/amiga/amiga_zorro.c:      dev->write16(dev, offset, (uint16_t)val);
+src/platforms/amiga/amiga_zorro.c:    if (dev->write32) {
+src/platforms/amiga/amiga_zorro.c:      dev->write32(dev, offset, (uint32_t)val);
+src/platforms/amiga/amiga_zorro.c:  uint32_t offset = addr - dev->base;
+src/platforms/amiga/amiga_zorro.c:  uint32_t offset = addr - dev->base;
+src/janus/janus-ipc.c:#include "../platforms/amiga/pistorm-dev/pistorm-dev-enums.h"
+src/janus/amiga/janusd.c:#include "../../platforms/amiga/pistorm-dev/pistorm-dev-enums.h"
+src/platforms/amiga/pistorm-dev/pistorm_dev_amiga/simple_interact.c:#include "../pistorm-dev-enums.h"
+src/janus/ipc-plan.md:  src/platforms/amiga/pistorm-dev/pistorm-dev-enums.h
+src/platforms/amiga/pistorm-dev/pistorm_dev_amiga/pistorm_dev.c:#include "../pistorm-dev-enums.h"
+src/platforms/amiga/pistorm-dev/pistorm_dev_amiga/gui_interact.c:#include "../pistorm-dev-enums.h"
+src/platforms/amiga/pistorm-dev/pistorm_dev_amiga/copymems.c:#include "../pistorm-dev-enums.h"
+src/platforms/amiga/pistorm-dev/pistorm-dev.c:#include "pistorm-dev-enums.h"
+src/a314/import_for_reference_only/upstream/ethernet/device.c:	dev->lib_Node.ln_Type = NT_DEVICE;
+src/a314/import_for_reference_only/upstream/ethernet/device.c:	dev->lib_Node.ln_Name = (char *)device_name;
+src/a314/import_for_reference_only/upstream/ethernet/device.c:	dev->lib_Flags = LIBF_SUMUSED | LIBF_CHANGED;
+src/a314/import_for_reference_only/upstream/ethernet/device.c:	dev->lib_Version = 1;
+src/a314/import_for_reference_only/upstream/ethernet/device.c:	dev->lib_Revision = 0;
+src/a314/import_for_reference_only/upstream/ethernet/device.c:	dev->lib_IdString = (APTR)id_string;
+src/a314/import_for_reference_only/upstream/ethernet/device.c:	if (dev->lib_OpenCnt)
+src/a314/import_for_reference_only/upstream/ethernet/device.c:		dev->lib_Flags |= LIBF_DELEXP;
+src/a314/import_for_reference_only/upstream/ethernet/device.c:	Remove(&dev->lib_Node);
+src/a314/import_for_reference_only/upstream/ethernet/device.c:	FreeMem((char *)dev - dev->lib_NegSize, dev->lib_NegSize + dev->lib_PosSize);
+src/a314/import_for_reference_only/upstream/ethernet/device.c:	if (unitnum != 0 || dev->lib_OpenCnt)
+src/a314/import_for_reference_only/upstream/ethernet/device.c:	dev->lib_OpenCnt++;
+src/a314/import_for_reference_only/upstream/ethernet/device.c:	dev->lib_OpenCnt--;
+src/a314/import_for_reference_only/upstream/ethernet/device.c:	dev->lib_OpenCnt--;
+src/a314/import_for_reference_only/upstream/ethernet/device.c:	if (dev->lib_OpenCnt == 0 && (dev->lib_Flags & LIBF_DELEXP))
+src/raylib_drm/examples/shapes/raygui.h:*       raygui is a tools-dev-focused immediate-mode-gui library based on raylib but also
+src/raylib_drm/HISTORY.md: - NEW **Platform** supported: **Raspberry Pi 4 native mode** (no X11 windows) through [DRM](https://en.wikipedia.org/wiki/Direct_Rendering_Manager) subsystem and GBM API. Actually this is a really interesting improvement because it opens the door to raylib to support other embedded platforms (Odroid, GameShell, NanoPi...). Also worth mentioning the un-official homebrew ports of raylib for [PS4](https://github.com/orbisdev/orbisdev-orbisGl2) and [PSVita](https://github.com/psp2dev/raylib4Vita).

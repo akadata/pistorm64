@@ -345,6 +345,7 @@ mapid[sizeof(mapid) - 1] = '\0';  // Ensure null termination
       }
     }
     add_mapping(cfg, maptype, mapaddr, mapsize, mirraddr, mapfile, mapid, autodump);
+
     break;
   }
   case CONFITEM_LOOPCYCLES:
@@ -471,13 +472,13 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
   FILE* in = NULL;
 
   while (index < MAX_NUM_MAPPED_ITEMS) {
-    if (cfg->map_type[index] == MAPTYPE_NONE)
+    if (cfg->map_type[index] == MAPTYPE_NONE) {
       break;
+    }
     index++;
   }
   if (index == MAX_NUM_MAPPED_ITEMS) {
-    printf("[CFG] Unable to map item, only %d items can be mapped with current binary.\n",
-           MAX_NUM_MAPPED_ITEMS);
+    printf("[CFG] Unable to map item, only %d items can be mapped with current binary.\n", MAX_NUM_MAPPED_ITEMS);
     return;
   }
 
@@ -524,31 +525,26 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
     in = fopen(filename, "rb");
     if (!in) {
       if (!autodump) {
-        printf("[CFG] Failed to open file %s for ROM mapping. Using onboard ROM instead, if "
-               "available.\n",
+        printf("[CFG] Failed to open file %s for ROM mapping. Using onboard ROM instead, if available.\n",
                filename);
         goto mapping_failed;
       } else if (autodump == MAPCMD_AUTODUMP_FILE) {
-        printf("[CFG] Could not open file %s for ROM mapping. Autodump flag is set, dumping to "
-               "file.\n",
+        printf("[CFG] Could not open file %s for ROM mapping. Autodump flag is set, dumping to file.\n",
                filename);
         dump_range_to_file((uint32_t)cfg->map_offset[index], cfg->map_size[index], filename);
         in = fopen(filename, "rb");
         if (in == NULL) {
-          printf("[CFG] Could not open dumped file for reading. Using onboard ROM instead, if "
-                 "available.\n");
+          printf("[CFG] Could not open dumped file for reading. Using onboard ROM instead, if available.\n");
           goto mapping_failed;
         }
       } else if (autodump == MAPCMD_AUTODUMP_MEM) {
-        printf("[CFG] Could not open file %s for ROM mapping. Autodump flag is set, dumping to "
-               "memory.\n",
+        printf("[CFG] Could not open file %s for ROM mapping. Autodump flag is set, dumping to memory.\n",
                filename);
         cfg->map_data[index] =
             dump_range_to_memory((uint32_t)cfg->map_offset[index], cfg->map_size[index]);
         cfg->rom_size[index] = cfg->map_size[index];
         if (cfg->map_data[index] == NULL) {
-          printf(
-              "[CFG] Could not dump range to memory. Using onboard ROM instead, if available.\n");
+          printf("[CFG] Could not dump range to memory. Using onboard ROM instead, if available.\n");
           goto mapping_failed;
         }
         goto skip_file_ops;
@@ -619,8 +615,10 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
 
 mapping_failed:;
   cfg->map_type[index] = MAPTYPE_NONE;
-  if (in)
+  if (in) {
     fclose(in);
+  }
+cfg->ranges_dirty = 1;  
 }
 
 void free_config_file(struct emulator_config* cfg) {

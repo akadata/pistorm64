@@ -620,9 +620,8 @@ unsigned int autoconfig_read_memory_32(struct emulator_config* cfg, unsigned int
 }
 
 
-
-void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address,
-                               unsigned int value) {
+/*
+void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address, unsigned int value) {
   int done = 0;
   int index = ac_z2_index[ac_z2_current_pic];
 
@@ -645,6 +644,7 @@ void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address
     break;
   case ACTYPE_ZORRO_GENERIC:
     zorro_dev = zorro_get_device_by_index((uint8_t)ac_z2_index[ac_z2_current_pic]);
+
     base = &zorro_temp_base;
     break;
   default:
@@ -720,17 +720,13 @@ void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address
     case ACTYPE_ZORRO_GENERIC:
       if (zorro_dev) {
         zorro_dev->base = zorro_temp_base;
-        LOG_INFO("[AUTOCONF] Zorro device %s assigned to $%.8X\n",
-                 zorro_dev->name ? zorro_dev->name : "unnamed",
+        LOG_INFO("[AUTOCONF] Zorro device %s assigned to $%.8X\n", zorro_dev->name ? zorro_dev->name : "unnamed",
                  zorro_dev->base);
       }
       break;
 
-
-
     default:
-      LOG_WARN("[AUTOCONF] Unknown Z2 device assigned to $%.8X?\n",
-               base ? *base : 0);
+      LOG_WARN("[AUTOCONF] Unknown Z2 device assigned to $%.8X?\n", base ? *base : 0);
       break;
   }
 
@@ -741,4 +737,134 @@ void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address
   }
 }
 
+
+}
+*/
+
+// Rewrite: make Zorro generic base accumulation persistent across 0x4A/0x48 writes.
+// Key change: remove stack-local zorro_temp_base and use ac_base[ac_z2_current_pic]
+// as the per-PIC accumulator (already persistent across calls).
+
+void autoconfig_write_memory_8(struct emulator_config* cfg,
+                               unsigned int address,
+                               unsigned int value) {
+  int done = 0;
+  int index = ac_z2_index[ac_z2_current_pic];
+
+  uint32_t* base = NULL;
+  zorro_device_t* zorro_dev = NULL;
+
+  switch (ac_z2_type[ac_z2_current_pic]) {
+    case ACTYPE_MAPFAST_Z2:
+      base = &ac_base[ac_z2_current_pic];
+      break;
+
+    case ACTYPE_A314:
+      base = &a314_base;
+      break;
+
+    case ACTYPE_PISCSI:
+      base = &piscsi_base;
+      break;
+
+    case ACTYPE_PISTORM_DEV:
+      base = &pistorm_dev_base;
+      break;
+
+    case ACTYPE_ZORRO_GENERIC:
+      // IMPORTANT: use a persistent accumulator so that the two nibble writes
+      // (0x4A then 0x48) combine into the final base address.
+      base = &ac_base[ac_z2_current_pic];
+      zorro_dev = zorro_get_device_by_index((uint8_t)ac_z2_index[ac_z2_current_pic]);
+      break;
+
+    default:
+      break;
+  }
+
+  if (base == NULL) {
+    LOG_WARN("[AUTOCONF] Failed to set up base for Z2 PIC %d (type=%d).\n",
+             ac_z2_current_pic, (int)ac_z2_type[ac_z2_current_pic]);
+    done = 1;
+  } else {
+    // Zorro-II autoconfig encodes the base in 4-bit chunks written as high-nibble.
+    // 0x4A: base[19:16]  (value[7:4])
+    // 0x48: base[23:20]  (value[7:4])  -> typically the "commit" write
+    if (address == 0x4a) {
+      // update only bits 19:16
+      *base &= 0xfff0ffff;
+      *base |= (uint32_t)((value & 0xf0) << (16 - 4));
+    } else if (address == 0x48) {
+      // update only bits 23:20
+      *base &= 0xff0fffff;
+      *base |= (uint32_t)((value & 0xf0) << (20 - 4));
+
+      // optional device-side callback could go here (A314 etc.)
+      done = 1;
+    } else if (address == 0x4c) {
+      // shut up
+      LOG_INFO("[AUTOCONF] Write to Z2 shutup register for PIC %d.\n", ac_z2_current_pic);
+      done = 1;
+    }
+  }
+
+  if (!done) {
+    return;
+  }
+
+  switch (ac_z2_type[ac_z2_current_pic]) {
+    case ACTYPE_MAPFAST_Z2:
+      cfg->map_offset[index] = ac_base[ac_z2_current_pic];
+      cfg->map_high[index]   = cfg->map_offset[index] + cfg->map_size[index];
+
+      LOG_INFO("[AUTOCONF] Address of Z2 autoconf RAM assigned to $%.8X\n",
+               ac_base[ac_z2_current_pic]);
+
+      m68k_add_ram_range((uint32_t)cfg->map_offset[index],
+                         (uint32_t)cfg->map_high[index],
+                         cfg->map_data[index]);
+
+      LOG_INFO("[AUTOCONF] Z2 PIC %d at $%.8lX-%.8lX, Size: %d MB\n",
+               ac_z2_current_pic,
+               cfg->map_offset[index],
+               cfg->map_high[index],
+               cfg->map_size[index] / SIZE_MEGA);
+      break;
+
+    case ACTYPE_PISCSI:
+      LOG_INFO("[AUTOCONF] PiSCSI Z2 device assigned to $%.8X\n", base ? *base : 0);
+      break;
+
+    case ACTYPE_A314:
+      LOG_INFO("[AUTOCONF] A314 emulation device assigned to $%.8X\n", a314_base);
+      break;
+
+    case ACTYPE_PISTORM_DEV:
+      LOG_INFO("[AUTOCONF] PiStorm Interaction Z2 device assigned to $%.8X\n", base ? *base : 0);
+      break;
+
+    case ACTYPE_ZORRO_GENERIC:
+      if (zorro_dev) {
+        zorro_dev->base = base ? *base : 0;
+        LOG_INFO("[AUTOCONF] Zorro device %s assigned to $%.8X\n",
+                 zorro_dev->name ? zorro_dev->name : "unnamed",
+                 zorro_dev->base);
+      } else {
+        LOG_WARN("[AUTOCONF] Zorro generic device index=%d missing during assignment. base=$%.8X\n",
+                 (int)ac_z2_index[ac_z2_current_pic], base ? *base : 0);
+      }
+      break;
+
+    default:
+      LOG_WARN("[AUTOCONF] Unknown Z2 device type=%d assigned to $%.8X?\n",
+               (int)ac_z2_type[ac_z2_current_pic], base ? *base : 0);
+      break;
+  }
+
+  ac_z2_current_pic++;
+  if (ac_z2_current_pic == ac_z2_pic_count) {
+    ac_z2_done = 1;
+    cfg->ranges_dirty = 1;
+    adjust_ranges_amiga(cfg);
+  }
 }

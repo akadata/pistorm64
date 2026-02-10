@@ -18,21 +18,6 @@
 
 # Build defaults live in config.mk (override there or via make VAR=...)
 
-# Default compilers (can still override with CC=... directly)
-CC  ?= gcc
-CXX ?= g++
-AR  ?= ar
-
-# Legacy shorthand: make C=clang or make C=gcc
-ifeq ($(C),clang)
-CC  := clang
-CXX := clang++
-endif
-
-ifeq ($(C),gcc)
-CC  := gcc
-CXX := g++
-endif
 
 
 #EXTRA_CFLAGS ?= -g -O0
@@ -58,8 +43,38 @@ endif
 # USE_PIPE   : set to 1 to add -pipe to compile steps.
 # M68K_WARN_SUPPRESS : extra warning suppressions for the generated Musashi core.
 #
+
+# Set USE_GOLD=1 to link with gold if available.
+USE_GOLD   ?= 1
+
+# Toggle RTG output backends: 1=raylib (default), 0=null stub.
+USE_RAYLIB ?= 1
+# Toggle ALSA-based audio (Pi AHI). If 0, drop pi_ahi and -lasound.
+USE_ALSA   ?= 1
+
+# Toggle PMMU emulation (68030/040). Default on; disable with USE_PMMU=0 if needed.
+USE_PMMU   ?= 1
+
+# Optional: build UAE/JIT objects (AArch64 JIT backend from Amiberry).
+# This does not replace Musashi in the main emulator yet; it builds a standalone
+# libuae.a for bring-up and integration work.
+USE_UAE_JIT ?= 1
+
+# Force FPU on EC/020/EC040/LC040 for 68881/68882 emulation (optional).
+USE_EC_FPU ?= 0
+
+ARCH_FEATURES ?=
+# Toggle Pi host (/opt/vc) support for dev tools.
+USE_VC     ?= 0
+# Perf toggles
+USE_LTO    ?= 0
+USE_NO_PLT ?= 1 
+OMIT_FP    ?= 1
+USE_PIPE   ?= 1
+include config.mk
 # Base warnings
 VERBOSE ?= 0
+
 WARNINGS_VERBOSE ?= -Wall -Wextra -pedantic
 WARNINGS_QUIET   ?= -Wall
 ifeq ($(VERBOSE),1)
@@ -67,6 +82,23 @@ WARNINGS ?= $(WARNINGS_VERBOSE)
 else
 WARNINGS ?= $(WARNINGS_QUIET)
 endif
+
+# Default compilers (can still override with CC=... directly)
+CC  ?= gcc
+CXX ?= g++
+AR  ?= ar
+
+# Legacy shorthand: make C=clang or make C=gcc
+ifeq ($(C),clang)
+CC  := clang
+CXX := clang++
+endif
+
+ifeq ($(C),gcc)
+CC  := gcc
+CXX := g++
+endif
+
 
 # Extra-aggressive warnings for emulator / non-Musashi code
 ifeq ($(VERBOSE),1)
@@ -95,7 +127,6 @@ OPT_LEVEL := -O$(O)
 endif
 
 
-include config.mk
 
 # Detect host CPU and adjust defaults for homer (x86_64)
 CPU ?= $(shell uname -m)
@@ -107,15 +138,11 @@ ifeq ($(CPU_UPPER),X86_64)
   EXENAME  := emulator.homer
 endif
 
-# Set USE_GOLD=1 to link with gold if available.
-# Toggle RTG output backends: 1=raylib (default), 0=null stub.
-# Toggle ALSA-based audio (Pi AHI). If 0, drop pi_ahi and -lasound.
-# Toggle PMMU emulation (68030/040). Default on; disable with USE_PMMU=0 if needed.
-# USE_UAE_JIT is configured in config.mk or on the make command line.
-# No default here; config.mk owns the default.
-$(info USE_UAE_JIT=$(USE_UAE_JIT))
 
 
+
+# Keep loop transforms conservative while debugging JIT bring-up.
+NO_UNROLL_FLAGS ?= -fno-unroll-loops
 
 # Quiet noisy-but-benign warnings from the generated 68k core.
 # Split into common + GCC-only; clang doesn't support every GCC flag.
@@ -155,9 +182,9 @@ AMIGA_AHI_INC ?= $(AMIGA_TOOLCHAIN)/src/m68k-amigaos-gcc/build-Linux-m68k-amigao
 AMIGA_HEADERS ?= $(CURDIR)/src/platforms/amiga/headers/include
 AMIGA_SUBMAKE = $(MAKE) AMIGA_TOOLCHAIN=$(AMIGA_TOOLCHAIN) VBCC=$(AMIGA_VBCC) P96DEV=$(AMIGA_P96DEV) AHI_INC=$(AMIGA_AHI_INC) AMIGA_HEADERS=$(AMIGA_HEADERS)
 
-PISTORM_GPCLK_SRC ?= $(PISTORM_GPCLK_SRC)
-PISTORM_GPCLK_DIV ?= $(PISTORM_GPCLK_DIV)
-PISTORM_KMOD_PARAMS ?= $(PISTORM_KMOD_PARAMS) 
+PISTORM_GPCLK_SRC ?= 5
+PISTORM_GPCLK_DIV ?= 6
+PISTORM_KMOD_PARAMS ?= run_batch_enable=0 berr_reset_input=0 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV)
 
 PS_PROTOCOL_SRC := src/gpio/ps_protocol_kmod.c
 
@@ -261,7 +288,7 @@ M68KFILES = $(MUSASHIFILES) $(MUSASHIGENCFILES)
 .CFILES   = $(MAINFILES) $(M68KFILES)
 .OFILES   = $(.CFILES:%.c=%.o) src/a314/a314.o
 
-ifeq ($(USE_UAE_JIT),1)
+ifeq ($(USE_UAE_JIT),1) 
 # UAE/JIT build (optional, AArch64 only)
 UAE_SRCDIR   := src/uae
 UAE_BUILDDIR := build/uae
@@ -285,12 +312,12 @@ UAE_OPT_LEVEL ?= -O2
 UAE_WARN_SUPPRESS = -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable \
 	-Wno-sign-compare -Wno-misleading-indentation -Wno-format -Wno-int-to-pointer-cast
 UAE_EXTRA_CFLAGS ?=
-	UAE_CFLAGS   = $(EMU_WARNINGS) $(UAE_OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(UAE_INCLUDES) \
-		$(UAE_PIE_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(NO_UNROLL_FLAGS) \
-		$(UAE_EXTRA_CFLAGS) $(LTO_FLAGS) -fPIC
-	UAE_CXXFLAGS = $(CXX_WARNINGS) $(UAE_OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(UAE_INCLUDES) \
-		$(UAE_PIE_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(NO_UNROLL_FLAGS) $(UAE_EXTRA_CFLAGS) \
-		$(LTO_FLAGS) -fpermissive $(UAE_WARN_SUPPRESS) -fPIC
+UAE_CFLAGS   = $(EMU_WARNINGS) $(UAE_OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(UAE_INCLUDES) \
+	$(UAE_PIE_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(NO_UNROLL_FLAGS) \
+	$(UAE_EXTRA_CFLAGS) $(NO_LTO_FLAGS) -fPIC
+UAE_CXXFLAGS = $(CXX_WARNINGS) $(UAE_OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(UAE_INCLUDES) \
+	$(UAE_PIE_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(NO_UNROLL_FLAGS) $(UAE_EXTRA_CFLAGS) \
+	$(NO_LTO_FLAGS) -fpermissive $(UAE_WARN_SUPPRESS) -fPIC
 UAE_TOOL_INCLUDES := -Isrc -I$(UAE_SRCDIR) -I$(UAE_SRCDIR)/include -I$(UAE_SRCDIR)/include/uae \
 	-I$(UAE_SRCDIR)/machdep -I$(UAE_SRCDIR)/jit
 UAE_TOOL_CXXFLAGS := -O2 -g -std=c++11 -DUAE $(UAE_TOOL_INCLUDES)
@@ -333,12 +360,12 @@ CXX ?= g++
 
 DEFINES  += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 
 # Allow command-line override of batching and rate limiting for performance tuning
-PISTORM_USE_DIRECT_OPS ?= $(PISTORM_USE_DIRECT_OPS)
+PISTORM_USE_DIRECT_OPS ?= 0
 DEFINES  += -DPISTORM_ENABLE_BATCH=$(PISTORM_ENABLE_BATCH) -DPISTORM_IPL_RATELIMIT_US=$(PISTORM_IPL_RATELIMIT_US) -DPISTORM_USE_DIRECT_OPS=$(PISTORM_USE_DIRECT_OPS)
 DEFINES  += -DRTG_GFX_MEM=$(RTG_GFX_MEM) -DRTG_WIDTH=$(RTG_WIDTH) -DRTG_HEIGHT=$(RTG_HEIGHT)
 LD_GOLD   = $(if $(filter 1,$(USE_GOLD)),-fuse-ld=gold,)
 LTO_FLAGS = $(if $(filter 1,$(USE_LTO)),-flto=auto,)
-NO_LTO_FLAGS = $(if $(filter 1,$(USE_LTO)),-fno-lto,)
+NO_LTO_FLAGS = $(if $(filter 0,$(USE_LTO)),-fno-lto,)
 PLT_FLAGS = $(if $(filter 1,$(USE_NO_PLT)),-fno-plt,)
 FP_FLAGS  = $(if $(filter 1,$(OMIT_FP)),-fomit-frame-pointer,)
 PIPE_FLAGS= $(if $(filter 1,$(USE_PIPE)),-pipe,)
@@ -504,7 +531,7 @@ $(TARGET): $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) 
 uae-jit: $(UAE_TARGET)
 ifeq ($(USE_UAE_JIT),1)
 uae-jit: $(TARGET)
-endif
+
 
 $(UAE_GENTOOL_DIR):
 	mkdir -p $@
@@ -539,21 +566,22 @@ $(UAE_FPP_NATIVE_CPP): $(UAE_FPP_NATIVE_IN)
 			'#include "fpp_native.cpp.in"'; \
 	} > $@
 
+endif
 # Explicit rules to keep the generated 68k core quiet on unused-temp warnings.
 src/musashi/m68kcpu.o: src/musashi/m68kcpu.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(M68K_CFLAGS) $(NO_LTO_FLAGS) -c -o $@ $<
 
 src/musashi/m68kops.o: src/musashi/m68kops.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(M68K_CFLAGS) $(NO_LTO_FLAGS) -c -o $@ $<
 
 src/musashi/m68kdasm.o: src/musashi/m68kdasm.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(M68K_CFLAGS) $(NO_LTO_FLAGS) -c -o $@ $<
 
 src/musashi/softfloat/softfloat.o: src/musashi/softfloat/softfloat.c
-	$(CC) -MMD -MP $(CFLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(CFLAGS) $(NO_LTO_FLAGS) -c -o $@ $<
 
 src/musashi/softfloat/softfloat_fpsp.o: src/musashi/softfloat/softfloat_fpsp.c
-	$(CC) -MMD -MP $(CFLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(CFLAGS) $(NO_LTO_FLAGS) -c -o $@ $<
 
 src/emulator.o: src/emulator.c src/musashi/m68kops.h
 	$(CC) -MMD -MP $(CFLAGS) -c -o $@ $<
@@ -569,16 +597,15 @@ pistorm_truth_test: tools/pistorm_truth_test.c include/uapi/linux/pistorm.h
 	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
 
 src/a314/a314.o: src/a314/a314.cc src/a314/a314.h
-	$(CXX) -MMD -MP -c -o src/a314/a314.o $(CXXFLAGS) src/a314/a314.cc
+	$(CXX) -MMD -MP -c -o src/a314/a314.o $(CXXFLAGS) $(NO_LTO_FLAGS) src/a314/a314.cc
 
 ifeq ($(USE_UAE_JIT),1)
 src/uae/pistorm_uae_bridge.o: src/uae/pistorm_uae_bridge.cc src/uae/pistorm_uae_bridge.h
-	$(CXX) -MMD -MP -c -o $@ $(CXXFLAGS) $<
+	$(CXX) -MMD -MP -c -o $@ $(CXXFLAGS) $(NO_LTO_FLAGS) $<
 
 src/uae/pistorm_uae_stubs.o: src/uae/pistorm_uae_stubs.cc
-	$(CXX) -MMD -MP -c -o $@ $(UAE_CXXFLAGS) $<
-
-
+	$(CXX) -MMD -MP -c -o $@ $(UAE_CXXFLAGS) $(NO_LTO_FLAGS) $<
+endif
 
 $(UAE_BUILDDIR)/%.o: $(UAE_SRCDIR)/%.c
 	@mkdir -p $(dir $@)
@@ -595,8 +622,6 @@ $(UAE_BUILDDIR)/%.o: $(UAE_SRCDIR)/%.cpp
 $(UAE_BUILDDIR)/%.o: $(UAE_SRCDIR)/%.cxx
 	@mkdir -p $(dir $@)
 	$(CXX) -MMD -MP $(UAE_CXXFLAGS) -c -o $@ $<
-endif
-
 
 $(MUSASHIGENCFILES) $(MUSASHIGENHFILES): $(MUSASHIGENERATOR)$(EXE)
 	cp $(MUSASHIGENERATOR)$(EXE) src/musashi/ && cd src/musashi && ./$(MUSASHIGENERATOR)$(EXE) && rm -f src/musashi/$(MUSASHIGENERATOR)$(EXE)

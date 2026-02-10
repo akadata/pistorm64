@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 #include <string.h>
-
+#include "platforms/amiga/amiga-autoconf.h"
+#include "platforms/amiga/amiga_zorro.h"
+#include "platforms/amiga/pistorm-dev/pistorm-dev-enums.h"
 #include "z3bus_demo.h"
 #include "log.h"
 
@@ -55,8 +57,8 @@ static zorro_device_t z3bus_demo_device = {
     .name         = "z3bus-demo",
     .bus          = ZORRO_BUS_Z3,
     .size         = Z3BUS_DEMO_SIZE,
-    .manufacturer = 0x07DB,
-    .product      = 0x060C,
+    .manufacturer = PISTORM_MANUF_ID,
+    .product      = PISTORM_PROD_Z3BUS_DEMO,
     .flags        = 0,
 
     .ac_rom       = NULL,

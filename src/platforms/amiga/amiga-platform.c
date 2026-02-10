@@ -36,6 +36,35 @@
 #define DEBUG(...)
 #endif
 
+/* Convert half-open [lo, hi) to inclusive end for printing.
+ * Handles hi==0 or hi<=lo safely (prints hi as-is in those edge cases).
+ */
+#define RANGE_END_INCL(_lo, _hi) \
+  ((uint32_t)(((_hi) != 0 && (_hi) > (_lo)) ? ((uint32_t)(_hi) - 1u) : (uint32_t)(_hi)))
+
+#define CUSTOM_RANGE_STEP(TAG, NEW_LO_IN, NEW_HI_IN) do {                     \
+  uint32_t _old_lo = (uint32_t)cfg->custom_low;                               \
+  uint32_t _old_hi = (uint32_t)cfg->custom_high;                              \
+  uint32_t _new_lo = (uint32_t)(NEW_LO_IN);                                   \
+  uint32_t _new_hi = (uint32_t)(NEW_HI_IN);                                   \
+                                                                               \
+  /* cfg->custom_* remain half-open: [low, high) */                            \
+  cfg->custom_low  = (_old_lo == 0) ? _new_lo : min(_old_lo, _new_lo);         \
+  cfg->custom_high = max(_old_hi, _new_hi);                                   \
+                                                                               \
+  int mapped = ((uint32_t)cfg->custom_low  != _old_lo) ||                      \
+               ((uint32_t)cfg->custom_high != _old_hi);                        \
+                                                                               \
+  LOG_INFO("[AMIGA][CUSTOM] %-12s mapped=%d now=%08X-%08X (was %08X-%08X) "    \
+           "add=%08X-%08X\n",                                                  \
+           (TAG), mapped,                                                      \
+           (uint32_t)cfg->custom_low,  RANGE_END_INCL((uint32_t)cfg->custom_low,  (uint32_t)cfg->custom_high), \
+           _old_lo,               RANGE_END_INCL(_old_lo, _old_hi),            \
+           _new_lo,               RANGE_END_INCL(_new_lo, _new_hi));           \
+} while (0)
+
+
+
 int handle_register_read_amiga(unsigned int addr, unsigned char type, unsigned int* val);
 int handle_register_write_amiga(unsigned int addr, unsigned int value, unsigned char type);
 
@@ -278,7 +307,7 @@ int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned i
   }
 
   if (a314_emulation_enabled && addr >= a314_base && addr < a314_base + (64 * SIZE_KILO)) {
-    printf("%s read from A314 @$%.8X\n", op_type_names[type], addr);
+    //printf("%s read from A314 @$%.8X\n", op_type_names[type], addr);
     switch (type) {
     case OP_TYPE_BYTE:
       *val = a314_read_memory_8(addr - a314_base);
@@ -380,90 +409,224 @@ int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned 
   return -1;
 }
 
+
+
 void adjust_ranges_amiga(struct emulator_config* cfg) {
+
   cfg->mapped_high = 0;
   cfg->mapped_low = 0;
   cfg->custom_high = 0;
   cfg->custom_low = 0;
   int have_mapped_range = 0;
 
-  // Set up the min/max ranges for mapped reads/writes
+  // Set up the min/max ranges for mapped reads/writes (map_high is treated as EXCLUSIVE)
   for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
-    if (cfg->map_type[i] != MAPTYPE_NONE) {
-      if (!have_mapped_range || cfg->map_offset[i] < cfg->mapped_low) {
-        cfg->mapped_low = (unsigned int)cfg->map_offset[i];
-      }
-      if (!have_mapped_range || cfg->map_offset[i] + cfg->map_size[i] > cfg->mapped_high) {
-        cfg->mapped_high = (unsigned int)(cfg->map_offset[i] + cfg->map_size[i]);
-      }
-      have_mapped_range = 1;
+    if (cfg->map_type[i] == MAPTYPE_NONE)
+      continue;
+
+    uint32_t off      = (uint32_t)cfg->map_offset[i];
+    uint32_t sz       = (uint32_t)cfg->map_size[i];
+    uint32_t end_excl = off + sz;                 // exclusive end
+    uint32_t end_incl = (sz ? (end_excl - 1) : off); // inclusive end for logging only
+
+    uint32_t old_lo      = cfg->mapped_low;
+    uint32_t old_hi_excl = cfg->mapped_high;
+    uint32_t old_hi_incl = (old_hi_excl ? (old_hi_excl - 1) : 0);
+
+    int lo_changed = 0, hi_changed = 0;
+
+    if (!have_mapped_range || off < cfg->mapped_low) {
+      cfg->mapped_low = off;
+      lo_changed = 1;
     }
+    if (!have_mapped_range || end_excl > cfg->mapped_high) {
+      cfg->mapped_high = end_excl;  // keep exclusive internally
+      hi_changed = 1;
+    }
+
+    have_mapped_range = 1;
+
+    uint32_t now_hi_incl = (cfg->mapped_high ? (cfg->mapped_high - 1) : 0);
+    int mapped = lo_changed || hi_changed;
+
+    LOG_INFO(
+      "[AMIGA][MAP] i=%02d type=%d off=%08X sz=%08X end=%08X mapped=%d lochg=%d hichg=%d "
+      "now=%08X-%08X (was %08X-%08X)\n",
+      i, cfg->map_type[i],
+      off, sz, end_incl,
+      mapped, lo_changed, hi_changed,
+      cfg->mapped_low, now_hi_incl,
+      old_lo, old_hi_incl
+    );
   }
 
-  if ((ac_z2_pic_count || ac_z3_pic_count) && (!ac_z2_done || !ac_z3_done)) {
-    if (cfg->custom_low == 0) {
-      cfg->custom_low = AC_Z2_BASE;
-    } else {
-      cfg->custom_low = min(cfg->custom_low, AC_Z2_BASE);
-    }
-    cfg->custom_high = max(cfg->custom_high, AC_Z2_BASE + AC_SIZE);
-  }
-  if (ac_z3_pic_count && !ac_z3_done) {
-    if (cfg->custom_low == 0) {
-      cfg->custom_low = AC_Z3_BASE;
-    } else {
-      cfg->custom_low = min(cfg->custom_low, AC_Z3_BASE);
-    }
-    cfg->custom_high = max(cfg->custom_high, AC_Z3_BASE + AC_SIZE);
-  }
-  if (rtg_enabled) {
-    if (cfg->custom_low == 0) {
-      cfg->custom_low = PIGFX_RTG_BASE;
-    } else {
-      cfg->custom_low = min(cfg->custom_low, PIGFX_RTG_BASE);
-    }
-    cfg->custom_high = max(cfg->custom_high, PIGFX_UPPER);
-  }
-  if (piscsi_enabled) {
-    if (cfg->custom_low == 0) {
-      cfg->custom_low = PISCSI_OFFSET;
-    } else {
-      cfg->custom_low = min(cfg->custom_low, PISCSI_OFFSET);
-    }
-    cfg->custom_high = max(cfg->custom_high, PISCSI_UPPER);
-    if (piscsi_base != 0) {
-      cfg->custom_low = min(cfg->custom_low, piscsi_base);
-    }
-  }
-  if (zorro_get_device_count() > 0) {
-    if (cfg->custom_low == 0) {
-      cfg->custom_low = AC_Z2_BASE;
-    } else {
-      cfg->custom_low = min(cfg->custom_low, AC_Z2_BASE);
-    }
-    cfg->custom_high = max(cfg->custom_high, AC_Z2_BASE + AC_SIZE);
-  }
-  if (pi_ahi_enabled) {
-    if (cfg->custom_low == 0) {
-      cfg->custom_low = PI_AHI_OFFSET;
-    } else {
-      cfg->custom_low = min(cfg->custom_low, PI_AHI_OFFSET);
-    }
-    cfg->custom_high = max(cfg->custom_high, PI_AHI_UPPER);
-  }
-  if (pinet_enabled) {
-    if (cfg->custom_low == 0) {
-      cfg->custom_low = PINET_OFFSET;
-    } else {
-      cfg->custom_low = min(cfg->custom_low, PINET_OFFSET);
-    }
-    cfg->custom_high = max(cfg->custom_high, PINET_UPPER);
-  }
+  if (rtg_enabled)    CUSTOM_RANGE_STEP("rtg",   PIGFX_RTG_BASE, PIGFX_UPPER);
+  if (piscsi_enabled) CUSTOM_RANGE_STEP("piscsi", min(PISCSI_OFFSET, piscsi_base ? piscsi_base : PISCSI_OFFSET), PISCSI_UPPER);
+  if (pinet_enabled)  CUSTOM_RANGE_STEP("pinet", PINET_OFFSET, PINET_UPPER);
+  if (pi_ahi_enabled) CUSTOM_RANGE_STEP("ahi",   PI_AHI_OFFSET, PI_AHI_UPPER);
 
-  LOG_INFO("[AMIGA] Platform custom range: %.8X-%.8X\n", cfg->custom_low, cfg->custom_high);
-  LOG_INFO("[AMIGA] Platform mapped range: %.8X-%.8X\n", cfg->mapped_low, cfg->mapped_high);
+  if (zorro_get_device_count() > 0) CUSTOM_RANGE_STEP("zorro", AC_Z2_BASE, AC_Z2_BASE + AC_SIZE);
+
+  if (ac_z2_pic_count && !ac_z2_done) CUSTOM_RANGE_STEP("ac_z2", AC_Z2_BASE, AC_Z2_BASE + AC_SIZE);
+  if (ac_z3_pic_count && !ac_z3_done) CUSTOM_RANGE_STEP("ac_z3", AC_Z3_BASE, AC_Z3_BASE + AC_SIZE);
+
 }
 
+
+
+int setup_platform_amiga(struct emulator_config* cfg) {
+  LOG_INFO("[AMIGA] Performing setup for Amiga platform.\n");
+
+  /* --------------------------------------------------------------------
+   * Subsystem handling (board “personality”)
+   * ------------------------------------------------------------------ */
+  if (cfg->platform && cfg->platform->subsys && strlen(cfg->platform->subsys)) {
+    const char *sub = cfg->platform->subsys;
+    LOG_INFO("[AMIGA] Subsystem is [%s]\n", sub);
+
+    /* Big-box / tower machines using the A3000/A4000-style Gayle quirks */
+    if (!strcmp(sub, "3000") || !strcmp(sub, "3000T") ||
+        !strcmp(sub, "4000") || !strcmp(sub, "4000T")) {
+      LOG_INFO("[AMIGA] Adjusting Gayle accesses for A3000/4000 Kickstart.\n");
+      adjust_gayle_4000();
+
+    /* Compact Gayle-based machines */
+    } else if (!strcmp(sub, "600")  ||
+               !strcmp(sub, "1200") ||
+               !strcmp(sub, "cd32")) {
+      LOG_INFO("[AMIGA] Adjusting Gayle accesses for A600/A1200/CD32 Kickstart.\n");
+      adjust_gayle_1200();
+
+    /* CDTV personality (emulated on 500/2000) */
+    } else if (!strcmp(sub, "cdtv")) {
+      LOG_INFO("[AMIGA] Configuring platform for CDTV emulation.\n");
+      cdtv_mode = 1;
+      rtc_type  = RTC_TYPE_MSM;
+
+    } else {
+      /* Known-to-us, but no special handling yet: 500, 500+, 1000, 1500, 2000, 2500, etc. */
+      LOG_INFO("[AMIGA] Subsystem [%s] has no special Gayle/RTC handling.\n", sub);
+    }
+  } else {
+    LOG_INFO("[AMIGA] No sub system specified.\n");
+  }
+
+  /* --------------------------------------------------------------------
+   * Z2 AutoConfig Fast RAM
+   * ------------------------------------------------------------------ */
+  int index;
+  int z2_found = 0;
+
+  while ((index = get_named_mapped_item(cfg, z2_autoconf_id)) != -1) {
+    /* "Zap" config items as they are processed so they are not found again */
+    cfg->map_id[index][0] = '^';
+
+    unsigned int resize_data = 0;
+
+    if (cfg->map_size[index] > 8 * SIZE_MEGA) {
+      LOG_WARN("[AMIGA] Attempted to configure more than 8MB of Z2 Fast RAM, downsizing to 8MB.\n");
+      resize_data = 8 * SIZE_MEGA;
+    } else if (cfg->map_size[index] != 2 * SIZE_MEGA &&
+               cfg->map_size[index] != 4 * SIZE_MEGA &&
+               cfg->map_size[index] != 8 * SIZE_MEGA) {
+      if (cfg->map_size[index] > 8 * SIZE_MEGA) {
+        resize_data = 8 * SIZE_MEGA;
+      } else if (cfg->map_size[index] > 4 * SIZE_MEGA) {
+        resize_data = 4 * SIZE_MEGA;
+      } else {
+        resize_data = 2 * SIZE_MEGA;
+      }
+      LOG_WARN("[AMIGA] Z2 Fast RAM may only provision 2, 4 or 8MB of memory, resizing to %dMB.\n",
+               resize_data / SIZE_MEGA);
+    }
+
+    if (resize_data) {
+      free(cfg->map_data[index]);
+      cfg->map_size[index] = (unsigned int)resize_data;
+      cfg->map_data[index] = (unsigned char *)malloc(cfg->map_size[index]);
+    }
+
+    LOG_INFO("[AMIGA] %dMB of Z2 Fast RAM configured at $%lx\n",
+             cfg->map_size[index] / SIZE_MEGA,
+             cfg->map_offset[index]);
+
+    add_z2_pic(ACTYPE_MAPFAST_Z2, (uint8_t)(index & 0xFF));
+    z2_found = 1;
+  }
+
+  if (!z2_found) {
+    LOG_INFO("[AMIGA] No Z2 Fast RAM configured.\n");
+  }
+
+  /* Restore any "zapped" Z2 autoconf items so they can be reinitialized later */
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (cfg->map_id[i] && strcmp(cfg->map_id[i], z2_autoconf_zap_id) == 0) {
+      cfg->map_id[i][0] = z2_autoconf_id[0];
+    }
+  }
+
+  /* --------------------------------------------------------------------
+   * Z3 AutoConfig Fast RAM
+   * ------------------------------------------------------------------ */
+  int z3_found = 0;
+
+  while ((index = get_named_mapped_item(cfg, z3_autoconf_id)) != -1) {
+    cfg->map_id[index][0] = '^';
+
+    LOG_INFO("[AMIGA] %dMB of Z3 Fast RAM configured at $%lx\n",
+             cfg->map_size[index] / SIZE_MEGA,
+             cfg->map_offset[index]);
+
+    ac_z3_type[ac_z3_pic_count]  = ACTYPE_MAPFAST_Z3;
+    ac_z3_index[ac_z3_pic_count] = index;
+    ac_z3_pic_count++;
+
+    z3_found = 1;
+  }
+
+  if (!z3_found) {
+    LOG_INFO("[AMIGA] No Z3 Fast RAM configured.\n");
+  }
+
+  /* Restore any "zapped" Z3 autoconf items */
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (cfg->map_id[i] && strcmp(cfg->map_id[i], z3_autoconf_zap_id) == 0) {
+      cfg->map_id[i][0] = z3_autoconf_id[0];
+    }
+  }
+
+  /* --------------------------------------------------------------------
+   * CPU slot RAM (if present)
+   * ------------------------------------------------------------------ */
+  index = get_named_mapped_item(cfg, "cpu_slot_ram");
+  if (index != -1) {
+    m68k_add_ram_range((uint32_t)cfg->map_offset[index],
+                       (uint32_t)cfg->map_high[index],
+                       cfg->map_data[index]);
+  }
+
+  /* --------------------------------------------------------------------
+   * Final range bookkeeping + CDTV SRAM + PiStorm dev
+   * ------------------------------------------------------------------ */
+  adjust_ranges_amiga(cfg);
+
+  if (cdtv_mode) {
+    FILE *in = fopen("data/cdtv.sram", "rb");
+    if (in != NULL) {
+      LOG_INFO("[AMIGA] Loaded CDTV SRAM.\n");
+      fread(cdtv_sram, 32 * SIZE_KILO, 1, in);
+      fclose(in);
+    }
+  }
+
+  if (pistorm_dev_enabled) {
+    add_z2_pic(ACTYPE_PISTORM_DEV, (uint8_t)0);
+  }
+
+  return 0;
+}
+
+/*
 int setup_platform_amiga(struct emulator_config* cfg) {
   LOG_INFO("[AMIGA] Performing setup for Amiga platform.\n");
 
@@ -582,6 +745,10 @@ more_z3_fast:;
 
   return 0;
 }
+*/
+
+
+
 
 #define CHKVAR(a) (strcmp(var, a) == 0)
 

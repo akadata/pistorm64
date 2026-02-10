@@ -93,12 +93,27 @@ void autoconf_register_zorro_device(uint8_t zorro_index);
 #define Z3_FLAGS_EXTENSION 0x20
 #define Z3_FLAGS_RESERVED 0x10
 
-#define PISTORM_MANUF_ID     0xDEBE     // existing
+#define PISTORM_MANUF_ID     0x07DB     // existing IT IS not 0xDEBE
 #define PISTORM_PRODUCT_ID   0x0001     // example
 
-#define PISTORM64_MANUF_ID   0xBABE     // new
-#define PISTORM64_PRODUCT_ID 0x0001     // or 0x0002, etc.
 
+// PiStorm virtual product IDs (one per logical device)
+enum {
+  PISTORM_PROD_Z2_FAST       = 0x0001,
+  PISTORM_PROD_Z3_FAST       = 0x0002,
+
+  PISTORM_PROD_PISCSI_Z2     = 0x0010,
+  PISTORM_PROD_PISTORM_DEV   = 0x0011,
+
+  PISTORM_PROD_Z2_SERIAL     = 0x0020,
+  PISTORM_PROD_Z2_RNG        = 0x0021,
+  PISTORM_PROD_Z2_PISSA      = 0x0022,
+
+  PISTORM_PROD_PI_NET        = 0x0030,
+  PISTORM_PROD_PI_AHI        = 0x0031,
+
+  PISTORM_PROD_Z3BUS_DEMO    = 0x00F0,
+};
 
 unsigned int autoconfig_read_memory_8(struct emulator_config* cfg, unsigned int address);
 void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address,

@@ -94,7 +94,9 @@ struct emulator_config {
   unsigned int mapped_high;
   unsigned int custom_low;
   unsigned int custom_high;
+  uint8_t  ranges_dirty;
 };
+
 
 struct platform_config {
   char* subsys;
