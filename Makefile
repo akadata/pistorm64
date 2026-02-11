@@ -43,7 +43,7 @@
 # USE_PIPE   : set to 1 to add -pipe to compile steps.
 # M68K_WARN_SUPPRESS : extra warning suppressions for the generated Musashi core.
 #
-
+M68K_ENHANCE ?= 0 
 # Set USE_GOLD=1 to link with gold if available.
 USE_GOLD   ?= 1
 
@@ -184,7 +184,7 @@ AMIGA_SUBMAKE = $(MAKE) AMIGA_TOOLCHAIN=$(AMIGA_TOOLCHAIN) VBCC=$(AMIGA_VBCC) P9
 
 PISTORM_GPCLK_SRC ?= 5
 PISTORM_GPCLK_DIV ?= 6
-PISTORM_KMOD_PARAMS ?= run_batch_enable=0 berr_reset_input=0 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV)
+PISTORM_KMOD_PARAMS ?= run_batch_enable=1 berr_reset_input=1 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV)
 
 PS_PROTOCOL_SRC := src/gpio/ps_protocol_kmod.c
 
@@ -275,7 +275,14 @@ ifeq ($(USE_EC_FPU),1)
 DEFINES += -DPISTORM_ENABLE_020_FPU -DPISTORM_ENABLE_EC040_FPU
 endif
 
-MUSASHIFILES     = src/musashi/m68kcpu.c src/musashi/m68kdasm.c src/musashi/softfloat/softfloat.c src/musashi/softfloat/softfloat_fpsp.c
+MUSASHIFILES     =  src/musashi/m68kcpu.c 
+MUSASHIFILES     += src/musashi/m68kdasm.c 
+ifeq ($(M68K_ENHANCE),1)
+#MUSASHIFILES     += src/musashi/m68k_enhanced.c 
+endif
+MUSASHIFILES     += src/musashi/softfloat/softfloat.c 
+MUSASHIFILES     += src/musashi/softfloat/softfloat_fpsp.c
+
 MUSASHIGENCFILES = src/musashi/m68kops.c
 MUSASHIGENHFILES = src/musashi/m68kops.h
 MUSASHIGENERATOR = m68kmake
@@ -746,7 +753,11 @@ full:
 	-pkill -x emulator 2>/dev/null || true
 	-sudo rmmod pistorm 2>/dev/null || true
 	$(MAKE) clean
+ifeq ($(USE_UAE_JIT),1)
 	$(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) uae-jit
+else
+	$(MAKE) 
+endif
 	$(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD)
 	$(MAKE) kernel_module
 	sudo $(MAKE) kernel_install
