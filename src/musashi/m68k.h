@@ -212,6 +212,10 @@ void m68k_add_ram_range(uint32_t addr, uint32_t upper, unsigned char *ptr);
 void m68k_add_rom_range(uint32_t addr, uint32_t upper, unsigned char *ptr);
 void m68k_remove_range(unsigned char *ptr);
 void m68k_clear_ranges(void);
+void m68k_add_ram_range_state(struct m68ki_cpu_core *state, uint32_t addr, uint32_t upper, unsigned char *ptr);
+void m68k_add_rom_range_state(struct m68ki_cpu_core *state, uint32_t addr, uint32_t upper, unsigned char *ptr);
+void m68k_remove_range_state(struct m68ki_cpu_core *state, unsigned char *ptr);
+void m68k_clear_ranges_state(struct m68ki_cpu_core *state);
 
 /* Special call to simulate undocumented 68k behavior when move.l with a
  * predecrement destination mode is executed.
@@ -356,12 +360,17 @@ int m68k_cycles_run(void);              /* Number of cycles run so far */
 int m68k_cycles_remaining(void);        /* Number of cycles left */
 void m68k_modify_timeslice(int cycles); /* Modify cycles left */
 void m68k_end_timeslice(void);          /* End timeslice now */
+int m68k_cycles_run_state(struct m68ki_cpu_core *state);
+int m68k_cycles_remaining_state(struct m68ki_cpu_core *state);
+void m68k_modify_timeslice_state(struct m68ki_cpu_core *state, int cycles);
+void m68k_end_timeslice_state(struct m68ki_cpu_core *state);
 
 /* Set the IPL0-IPL2 pins on the CPU (IRQ).
  * A transition from < 7 to 7 will cause a non-maskable interrupt (NMI).
  * Setting IRQ to 0 will clear an interrupt request.
  */
 void m68k_set_irq(unsigned int int_level);
+void m68k_set_irq_state(struct m68ki_cpu_core *state, unsigned int int_level);
 
 /* Set the virtual irq lines, where the highest level
  * active line is automatically selected.  If you use this function,
@@ -369,9 +378,12 @@ void m68k_set_irq(unsigned int int_level);
  */
 void m68k_set_virq(unsigned int level, unsigned int active);
 unsigned int m68k_get_virq(unsigned int level);
+void m68k_set_virq_state(struct m68ki_cpu_core *state, unsigned int level, unsigned int active);
+unsigned int m68k_get_virq_state(struct m68ki_cpu_core *state, unsigned int level);
 
 /* Halt the CPU as if you pulsed the HALT pin. */
 void m68k_pulse_halt(void);
+void m68k_pulse_halt_state(struct m68ki_cpu_core *state);
 
 
 /* Trigger a bus error exception */

@@ -411,14 +411,21 @@ typedef uint32 uint64;
 #define FLAG_C           state->c_flag
 #define FLAG_INT_MASK    state->int_mask
 
-#define CPU_INT_LEVEL    m68ki_cpu.int_level /* ASG: changed from CPU_INTS_PENDING */
-#define CPU_STOPPED      m68ki_cpu.stopped
+#define CPU_INT_LEVEL    state->int_level
+#define CPU_STOPPED      state->stopped
 #define CPU_PREF_ADDR    state->pref_addr
 #define CPU_PREF_DATA    state->pref_data
 #define CPU_ADDRESS_MASK state->address_mask
 #define CPU_SR_MASK      state->sr_mask
 #define CPU_INSTR_MODE   state->instr_mode
 #define CPU_RUN_MODE     state->run_mode
+#define CPU_INITIAL_CYCLES state->initial_cycles
+#define CPU_REMAINING_CYCLES state->remaining_cycles
+#define CPU_TRACING      state->tracing
+#define CPU_ADDRESS_SPACE state->address_space
+#define CPU_AERR_ADDRESS state->aerr_address
+#define CPU_AERR_WRITE_MODE state->aerr_write_mode
+#define CPU_AERR_FC state->aerr_fc
 
 #define CYC_INSTRUCTION  state->cyc_instruction
 #define CYC_EXCEPTION    state->cyc_exception
@@ -526,7 +533,7 @@ typedef uint32 uint64;
 	#if M68K_EMULATE_INT_ACK == OPT_SPECIFY_HANDLER
 		#define m68ki_int_ack(state, A) M68K_INT_ACK_CALLBACK(A)
 	#else
-		#define m68ki_int_ack(state, A) CALLBACK_INT_ACK(A)
+		#define m68ki_int_ack(state, A) (CALLBACK_INT_ACK ? CALLBACK_INT_ACK(A) : ((state)->int_level = 0, M68K_INT_ACK_AUTOVECTOR))
 	#endif
 #else
 	/* Default action is to used autovector mode, which is most common */
@@ -621,9 +628,9 @@ typedef uint32 uint64;
 	#else
 		#define m68ki_set_fc(state, A) CALLBACK_SET_FC(A)
 	#endif
-	#define m68ki_use_data_space() m68ki_address_space = FUNCTION_CODE_USER_DATA
-	#define m68ki_use_program_space() m68ki_address_space = FUNCTION_CODE_USER_PROGRAM
-	#define m68ki_get_address_space() m68ki_address_space
+	#define m68ki_use_data_space() CPU_ADDRESS_SPACE = FUNCTION_CODE_USER_DATA
+	#define m68ki_use_program_space() CPU_ADDRESS_SPACE = FUNCTION_CODE_USER_PROGRAM
+	#define m68ki_get_address_space() CPU_ADDRESS_SPACE
 #else
 	#define m68ki_set_fc(state, A)
 	#define m68ki_use_data_space()
@@ -635,13 +642,13 @@ typedef uint32 uint64;
 /* Enable or disable trace emulation */
 #if M68K_EMULATE_TRACE
 	/* Initiates trace checking before each instruction (t1) */
-	#define m68ki_trace_t1() m68ki_tracing = FLAG_T1
+	#define m68ki_trace_t1() CPU_TRACING = FLAG_T1
 	/* adds t0 to trace checking if we encounter change of flow */
-	#define m68ki_trace_t0() m68ki_tracing |= FLAG_T0
+	#define m68ki_trace_t0() CPU_TRACING |= FLAG_T0
 	/* Clear all tracing */
-	#define m68ki_clear_trace() m68ki_tracing = 0
+	#define m68ki_clear_trace() CPU_TRACING = 0
 	/* Cause a trace exception if we are tracing */
-	#define m68ki_exception_if_trace(a) if(m68ki_tracing) m68ki_exception_trace(a)
+	#define m68ki_exception_if_trace(a) if(CPU_TRACING) m68ki_exception_trace(a)
 #else
 	#define m68ki_trace_t1()
 	#define m68ki_trace_t0()
@@ -657,33 +664,30 @@ typedef uint32 uint64;
 
 /* sigjmp() on Mac OS X and *BSD in general saves signal contexts and is super-slow, use sigsetjmp() to tell it not to */
 #ifdef _BSD_SETJMP_H
-extern sigjmp_buf m68ki_aerr_trap;
 #define m68ki_set_address_error_trap(state) \
-	if(sigsetjmp(m68ki_aerr_trap, 0) != 0) \
+	if(sigsetjmp((state)->aerr_trap, 0) != 0) \
 	{ \
 		m68ki_exception_address_error(state); \
 		if(CPU_STOPPED) \
 		{ \
-			if (m68ki_remaining_cycles > 0) \
-				m68ki_remaining_cycles = 0; \
-			return m68ki_initial_cycles; \
+			if (CPU_REMAINING_CYCLES > 0) \
+				CPU_REMAINING_CYCLES = 0; \
+			return CPU_INITIAL_CYCLES; \
 		} \
 	}
 
 #define m68ki_check_address_error(state, ADDR, WRITE_MODE, FC) \
 	if((ADDR)&1) \
 	{ \
-		m68ki_aerr_address = ADDR; \
-		m68ki_aerr_write_mode = WRITE_MODE; \
-		m68ki_aerr_fc = FC; \
-		siglongjmp(m68ki_aerr_trap, 1); \
+		CPU_AERR_ADDRESS = ADDR; \
+		CPU_AERR_WRITE_MODE = WRITE_MODE; \
+		CPU_AERR_FC = FC; \
+		siglongjmp((state)->aerr_trap, 1); \
 	}
 #else
-extern jmp_buf m68ki_aerr_trap;
-
 #define m68ki_set_address_error_trap(state)                            \
     do {                                                               \
-        if (setjmp(m68ki_aerr_trap) != 0) {                            \
+        if (setjmp((state)->aerr_trap) != 0) {                         \
             /* We jumped back here from m68ki_check_address_error */   \
             m68ki_exception_address_error(state);                      \
             if (CPU_STOPPED) {                                         \
@@ -696,19 +700,19 @@ extern jmp_buf m68ki_aerr_trap;
     } while (0)
 
 
-	#define m68ki_check_address_error(state, ADDR, WRITE_MODE, FC) \
-		if((ADDR)&1) \
-		{ \
-			m68ki_aerr_address = ADDR; \
-			m68ki_aerr_write_mode = WRITE_MODE; \
-			m68ki_aerr_fc = FC; \
-			longjmp(m68ki_aerr_trap, 1); \
-		}
+		#define m68ki_check_address_error(state, ADDR, WRITE_MODE, FC) \
+			if((ADDR)&1) \
+			{ \
+				CPU_AERR_ADDRESS = ADDR; \
+				CPU_AERR_WRITE_MODE = WRITE_MODE; \
+				CPU_AERR_FC = FC; \
+				longjmp((state)->aerr_trap, 1); \
+			}
 #endif
-	#define m68ki_bus_error(ADDR,WRITE_MODE) \
-		m68ki_aerr_address=ADDR; \
-		m68ki_aerr_write_mode=WRITE_MODE; \
-		m68ki_exception_bus_error()
+	#define m68ki_bus_error(state, ADDR,WRITE_MODE) \
+		CPU_AERR_ADDRESS = ADDR; \
+		CPU_AERR_WRITE_MODE = WRITE_MODE; \
+		m68ki_exception_bus_error(state)
 
 	#define m68ki_check_address_error_010_less(state, ADDR, WRITE_MODE, FC) \
 		if (CPU_TYPE_IS_010_LESS(CPU_TYPE)) \
@@ -924,11 +928,11 @@ extern jmp_buf m68ki_aerr_trap;
 
 /* ---------------------------- Cycle Counting ---------------------------- */
 
-#define ADD_CYCLES(A)    m68ki_remaining_cycles += (A)
-#define USE_CYCLES(A)    m68ki_remaining_cycles -= (A)
-#define SET_CYCLES(A)    m68ki_remaining_cycles = A
-#define GET_CYCLES()     m68ki_remaining_cycles
-#define USE_ALL_CYCLES() m68ki_remaining_cycles %= CYC_INSTRUCTION[REG_IR]
+#define ADD_CYCLES(A)    CPU_REMAINING_CYCLES += (A)
+#define USE_CYCLES(A)    CPU_REMAINING_CYCLES -= (A)
+#define SET_CYCLES(A)    CPU_REMAINING_CYCLES = A
+#define GET_CYCLES()     CPU_REMAINING_CYCLES
+#define USE_ALL_CYCLES() CPU_REMAINING_CYCLES %= CYC_INSTRUCTION[REG_IR]
 
 
 
@@ -945,7 +949,7 @@ extern jmp_buf m68ki_aerr_trap;
 #define m68ki_write_32(state, A, V) m68ki_write_32_fc(state, A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
 
 #if M68K_SIMULATE_PD_WRITES
-#define m68ki_write_32_pd(A, V) m68ki_write_32_pd_fc(A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
+#define m68ki_write_32_pd(state, A, V) m68ki_write_32_pd_fc(state, A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
 #else
 #define m68ki_write_32_pd(state, A, V) m68ki_write_32_fc(state, A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
 #endif
@@ -1026,6 +1030,21 @@ typedef struct __attribute__((aligned(16))) m68ki_cpu_core
 	uint sr_mask;      /* Implemented status register bits */
 	uint instr_mode;   /* Stores whether we are in instruction mode or group 0/1 exception mode */
 	uint run_mode;     /* Stores whether we are processing a reset, bus error, address error, or something else */
+	int initial_cycles; /* Number of cycles at start of current timeslice */
+	sint remaining_cycles; /* Number of cycles remaining in current timeslice */
+	uint tracing;      /* Internal tracing flags */
+	uint address_space; /* Current function code space */
+	#if M68K_EMULATE_ADDRESS_ERROR
+	#ifdef _BSD_SETJMP_H
+	sigjmp_buf aerr_trap;
+	#else
+	jmp_buf aerr_trap;
+	#endif
+	#endif
+	uint aerr_address;
+	uint aerr_write_mode;
+	uint aerr_fc;
+	jmp_buf bus_error_jmp_buf;
 	int    has_pmmu;   /* Indicates if a PMMU available (yes on 030, 040, no on EC030) */
 	int    has_fpu;    /* Indicates if a FPU available */
 	int    pmmu_enabled; /* Indicates if the PMMU is enabled */
@@ -1127,18 +1146,11 @@ _Static_assert(offsetof(m68ki_cpu_core, fpr) % 16 == 0, "fpr offset must be 16-b
 
 
 extern m68ki_cpu_core m68ki_cpu;
-extern sint           m68ki_remaining_cycles;
-extern uint           m68ki_tracing;
 extern const uint8    m68ki_shift_8_table[];
 extern const uint16   m68ki_shift_16_table[];
 extern const uint     m68ki_shift_32_table[];
 extern const uint8    m68ki_exception_cycle_table[][256];
-extern uint           m68ki_address_space;
 extern const uint8    m68ki_ea_idx_cycle_table[];
-
-extern uint           m68ki_aerr_address;
-extern uint           m68ki_aerr_write_mode;
-extern uint           m68ki_aerr_fc;
 
 /* Forward declarations to keep some of the macros happy */
 static inline uint m68ki_read_16_fc(m68ki_cpu_core *state, uint address, uint fc);
@@ -1565,11 +1577,8 @@ static inline void m68ki_write_32_fc(m68ki_cpu_core *state, uint address, uint f
  * A real 68k first writes the high word to [address+2], and then writes the
  * low word to [address].
  */
-static inline void m68ki_write_32_pd_fc(uint address, uint fc, uint value)
+static inline void m68ki_write_32_pd_fc(m68ki_cpu_core *state, uint address, uint fc, uint value)
 {
-    /* Bind the CPU core so all the state->... uses and ADDRESS_68K() work */
-    m68ki_cpu_core *state = &m68ki_cpu;
-
     m68ki_set_fc(state, fc); /* auto-disable (see m68kcpu.h) */
     state->mmu_tmp_fc = (uint16)fc;
     state->mmu_tmp_rw = 0;
@@ -2020,13 +2029,13 @@ static inline void m68ki_stack_frame_buserr(m68ki_cpu_core *state, uint sr)
 	m68ki_push_32(state, REG_PC);
 	m68ki_push_16(state, sr);
 	m68ki_push_16(state, REG_IR);
-	m68ki_push_32(state, m68ki_aerr_address);	/* access address */
+	m68ki_push_32(state, CPU_AERR_ADDRESS);	/* access address */
 	/* 0 0 0 0 0 0 0 0 0 0 0 R/W I/N FC
 	 * R/W  0 = write, 1 = read
 	 * I/N  0 = instruction, 1 = not
 	 * FC   3-bit function code
 	 */
-	m68ki_push_16(state, m68ki_aerr_write_mode | CPU_INSTR_MODE | m68ki_aerr_fc);
+	m68ki_push_16(state, CPU_AERR_WRITE_MODE | CPU_INSTR_MODE | CPU_AERR_FC);
 }
 
 /* Format 8 stack frame (68010).
@@ -2328,9 +2337,7 @@ static inline void m68ki_exception_privilege_violation(m68ki_cpu_core *state)
 	USE_CYCLES(CYC_EXCEPTION[EXCEPTION_PRIVILEGE_VIOLATION] - CYC_INSTRUCTION[REG_IR]);
 }
 
-extern jmp_buf m68ki_bus_error_jmp_buf;
-
-#define m68ki_check_bus_error_trap() setjmp(m68ki_bus_error_jmp_buf)
+#define m68ki_check_bus_error_trap(state) setjmp((state)->bus_error_jmp_buf)
 
 /* Exception for bus error */
 static inline void m68ki_exception_bus_error(m68ki_cpu_core *state)
@@ -2360,7 +2367,7 @@ static inline void m68ki_exception_bus_error(m68ki_cpu_core *state)
 	m68ki_stack_frame_1000(state, REG_PPC, sr, EXCEPTION_BUS_ERROR);
 
 	m68ki_jump_vector(state, EXCEPTION_BUS_ERROR);
-	longjmp(m68ki_bus_error_jmp_buf, 1);
+	longjmp(state->bus_error_jmp_buf, 1);
 }
 
 extern int cpu_log_enabled;

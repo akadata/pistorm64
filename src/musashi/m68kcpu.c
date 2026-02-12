@@ -56,11 +56,6 @@ extern void m68ki_build_opcode_table(void);
 /* ================================= DATA ================================= */
 /* ======================================================================== */
 
-int  m68ki_initial_cycles;
-int  m68ki_remaining_cycles = 0;                     /* Number of clocks remaining */
-uint m68ki_tracing = 0;
-uint m68ki_address_space;
-
 #ifdef M68K_LOG_ENABLE
 const char *const m68ki_cpu_names[] = {
 	"Invalid CPU",
@@ -79,20 +74,6 @@ const char *const m68ki_cpu_names[] = {
 
 /* The CPU core */
 m68ki_cpu_core m68ki_cpu = {0};
-
-#if M68K_EMULATE_ADDRESS_ERROR
-#ifdef _BSD_SETJMP_H
-sigjmp_buf m68ki_aerr_trap;
-#else
-jmp_buf m68ki_aerr_trap;
-#endif
-#endif /* M68K_EMULATE_ADDRESS_ERROR */
-
-uint    m68ki_aerr_address;
-uint    m68ki_aerr_write_mode;
-uint    m68ki_aerr_fc;
-
-jmp_buf m68ki_bus_error_jmp_buf;
 
 /* Used by shift & rotate instructions */
 const uint8 m68ki_shift_8_table[65] = {
@@ -528,14 +509,6 @@ const uint8 m68ki_ea_idx_cycle_table[64] = {
  * callback is set to NULL
  */
 
-/* Interrupt acknowledge */
-static int default_int_ack_callback_data;
-static int default_int_ack_callback(int int_level) {
-	default_int_ack_callback_data = int_level;
-	CPU_INT_LEVEL = 0;
-	return M68K_INT_ACK_AUTOVECTOR;
-}
-
 /* Breakpoint acknowledge */
 static unsigned int default_bkpt_ack_callback_data;
 static void default_bkpt_ack_callback(unsigned int data) {
@@ -583,16 +556,6 @@ static void default_set_fc_callback(unsigned int new_fc) {
 static void default_instr_hook_callback(unsigned int pc) {
 	(void)pc;
 }
-
-
-#if M68K_EMULATE_ADDRESS_ERROR
-	#include <setjmp.h>
-	#ifdef _BSD_SETJMP_H
-	sigjmp_buf m68ki_aerr_trap;
-	#else
-	jmp_buf m68ki_aerr_trap;
-	#endif
-#endif /* M68K_EMULATE_ADDRESS_ERROR */
 
 /* ======================================================================== */
 /* ================================= API ================================== */
@@ -808,7 +771,7 @@ void m68k_set_reg(void *context, m68k_register_t regnum, unsigned int value) {
 
 /* Set the callbacks */
 void m68k_set_int_ack_callback(m68ki_cpu_core *state, int  (*callback)(int int_level)) {
-	state->int_ack_callback = callback ? callback : default_int_ack_callback;
+	state->int_ack_callback = callback;
 }
 
 void m68k_set_bkpt_ack_callback(m68ki_cpu_core *state, void  (*callback)(unsigned int data)) {
@@ -839,9 +802,6 @@ void m68k_set_pc_changed_callback(m68ki_cpu_core *state, void  (*callback)(unsig
 	state->pc_changed_callback = callback ? callback : default_pc_changed_callback;
 }
 
-//void m68k_set_fc_callback(void  (*callback)(unsigned int new_fc)) {
-//	CALLBACK_SET_FC = callback ? callback : default_set_fc_callback;
-//}
 void m68k_set_fc_callback(m68ki_cpu_core *state, void (*callback)(unsigned int new_fc)) {
     state->set_fc_callback = callback ? callback : default_set_fc_callback;
 }
@@ -1043,7 +1003,7 @@ int m68k_execute(m68ki_cpu_core *state, int num_cycles) {
 
 	/* Set our pool of clock cycles available */
 	SET_CYCLES(num_cycles);
-	m68ki_initial_cycles = num_cycles;
+	CPU_INITIAL_CYCLES = num_cycles;
 
 	/* See if interrupts came in */
 	m68ki_check_interrupts(state);
@@ -1095,28 +1055,44 @@ int m68k_execute(m68ki_cpu_core *state, int num_cycles) {
 	}
 
 	/* return how many clocks we used */
-	return m68ki_initial_cycles - GET_CYCLES();
+	return CPU_INITIAL_CYCLES - GET_CYCLES();
 }
 
 
-int m68k_cycles_run(void) {
-	return m68ki_initial_cycles - GET_CYCLES();
+int m68k_cycles_run_state(m68ki_cpu_core *state) {
+	return CPU_INITIAL_CYCLES - GET_CYCLES();
 }
 
-int m68k_cycles_remaining(void) {
+int m68k_cycles_remaining_state(m68ki_cpu_core *state) {
 	return GET_CYCLES();
 }
 
 /* Change the timeslice */
-void m68k_modify_timeslice(int cycles) {
-	m68ki_initial_cycles += cycles;
+void m68k_modify_timeslice_state(m68ki_cpu_core *state, int cycles) {
+	CPU_INITIAL_CYCLES += cycles;
 	ADD_CYCLES(cycles);
 }
 
 
-void m68k_end_timeslice(void) {
-	m68ki_initial_cycles = GET_CYCLES();
+void m68k_end_timeslice_state(m68ki_cpu_core *state) {
+	CPU_INITIAL_CYCLES = GET_CYCLES();
 	SET_CYCLES(0);
+}
+
+int m68k_cycles_run(void) {
+	return m68k_cycles_run_state(&m68ki_cpu);
+}
+
+int m68k_cycles_remaining(void) {
+	return m68k_cycles_remaining_state(&m68ki_cpu);
+}
+
+void m68k_modify_timeslice(int cycles) {
+	m68k_modify_timeslice_state(&m68ki_cpu, cycles);
+}
+
+void m68k_end_timeslice(void) {
+	m68k_end_timeslice_state(&m68ki_cpu);
 }
 
 
@@ -1124,38 +1100,50 @@ void m68k_end_timeslice(void) {
 /* KS: Modified so that IPL* bits match with mask positions in the SR
  *     and cleaned out remenants of the interrupt controller.
  */
-void m68k_set_irq(unsigned int int_level) {
+void m68k_set_irq_state(m68ki_cpu_core *state, unsigned int int_level) {
 	uint old_level = CPU_INT_LEVEL;
 	CPU_INT_LEVEL = int_level << 8;
 
 	/* A transition from < 7 to 7 always interrupts (NMI) */
 	/* Note: Level 7 can also level trigger like a normal IRQ */
 	if(old_level != 0x0700 && CPU_INT_LEVEL == 0x0700) {
-		m68ki_cpu.nmi_pending = TRUE;
+		state->nmi_pending = TRUE;
 	}
 }
 
-void m68k_set_virq(unsigned int level, unsigned int active) {
-	uint state = m68ki_cpu.virq_state;
+void m68k_set_virq_state(m68ki_cpu_core *state, unsigned int level, unsigned int active) {
+	uint virq_state = state->virq_state;
 	uint blevel;
 
 	if(active) {
-		state |= 1 << level;
+		virq_state |= 1 << level;
 	} else {
-		state &= ~(1 << level);
+		virq_state &= ~(1 << level);
 	}
-	m68ki_cpu.virq_state = state;
+	state->virq_state = virq_state;
 
 	for(blevel = 7; blevel > 0; blevel--) {
-		if(state & (1 << blevel)) {
+		if(virq_state & (1 << blevel)) {
 			break;
 		}
 	}
-	m68k_set_irq(blevel);
+	m68k_set_irq_state(state, blevel);
+}
+
+unsigned int m68k_get_virq_state(m68ki_cpu_core *state, unsigned int level) {
+	return (state->virq_state & (1 << level)) ? 1 : 0;
+}
+
+void m68k_set_irq(unsigned int int_level) {
+	m68k_set_irq_state(&m68ki_cpu, int_level);
+}
+
+void m68k_set_virq(unsigned int level, unsigned int active) {
+	m68k_set_virq_state(&m68ki_cpu, level, active);
 }
 
 unsigned int m68k_get_virq(unsigned int level) {
-	return (m68ki_cpu.virq_state & (1 << level)) ? 1 : 0;
+	return m68k_get_virq_state(&m68ki_cpu, level);
 }
 
 void m68k_init(void) {
@@ -1242,8 +1230,12 @@ void m68k_pulse_reset(m68ki_cpu_core *state) {
 }
 
 /* Pulse the HALT line on the CPU */
-void m68k_pulse_halt(void) {
+void m68k_pulse_halt_state(m68ki_cpu_core *state) {
 	CPU_STOPPED |= STOP_LEVEL_HALT;
+}
+
+void m68k_pulse_halt(void) {
+	m68k_pulse_halt_state(&m68ki_cpu);
 }
 
 /* Get and set the current CPU context */
@@ -1364,152 +1356,168 @@ uint m68ki_read_imm16_addr_slowpath(m68ki_cpu_core *state, uint32_t pc, address_
 #endif /* M68K_EMULATE_PREFETCH */
 }
 
-void m68k_add_ram_range(uint32_t addr, uint32_t upper, unsigned char *ptr) {
-	m68ki_cpu.code_translation_cache.lower = 0;
-	m68ki_cpu.code_translation_cache.upper = 0;
+void m68k_add_ram_range_state(m68ki_cpu_core *state, uint32_t addr, uint32_t upper, unsigned char *ptr) {
+	state->code_translation_cache.lower = 0;
+	state->code_translation_cache.upper = 0;
 	if ((addr == 0 && upper == 0) || upper < addr) {
 		return;
 	}
 
-	for (int i = 0; i < m68ki_cpu.write_ranges; i++) {
-		if (m68ki_cpu.write_addr[i] == addr || m68ki_cpu.write_data[i] == ptr) {
+	for (int i = 0; i < state->write_ranges; i++) {
+		if (state->write_addr[i] == addr || state->write_data[i] == ptr) {
 			uint8_t changed = 0;
-			if (m68ki_cpu.write_addr[i] != addr) {
-				m68ki_cpu.write_addr[i] = addr;
+			if (state->write_addr[i] != addr) {
+				state->write_addr[i] = addr;
 				changed = 1;
 			}
-			if (m68ki_cpu.write_upper[i] != upper) {
-				m68ki_cpu.write_upper[i] = upper;
+			if (state->write_upper[i] != upper) {
+				state->write_upper[i] = upper;
 				changed = 1;
 			}
-			if (m68ki_cpu.write_data[i] != ptr) {
-				m68ki_cpu.write_data[i] = ptr;
+			if (state->write_data[i] != ptr) {
+				state->write_data[i] = ptr;
 				changed = 1;
 			}
 			if (changed) {
-				printf("[MUSASHI] Adjusted mapped write range %d: %.8X-%.8X (%p)\n", m68ki_cpu.write_ranges, addr, upper, (void *)ptr);
+				printf("[MUSASHI] Adjusted mapped write range %d: %.8X-%.8X (%p)\n", state->write_ranges, addr, upper, (void *)ptr);
 			}
 			return;
 		}
 	}
 
-	if (m68ki_cpu.read_ranges + 1 < 8) {
-		m68ki_cpu.read_addr[m68ki_cpu.read_ranges] = addr;
-		m68ki_cpu.read_upper[m68ki_cpu.read_ranges] = upper;
-		m68ki_cpu.read_data[m68ki_cpu.read_ranges] = ptr;
-		m68ki_cpu.read_ranges++;
-		printf("[MUSASHI] Mapped read range %d: %.8X-%.8X (%p)\n", m68ki_cpu.read_ranges, addr, upper, (void *)ptr);
+	if (state->read_ranges + 1 < 8) {
+		state->read_addr[state->read_ranges] = addr;
+		state->read_upper[state->read_ranges] = upper;
+		state->read_data[state->read_ranges] = ptr;
+		state->read_ranges++;
+		printf("[MUSASHI] Mapped read range %d: %.8X-%.8X (%p)\n", state->read_ranges, addr, upper, (void *)ptr);
 	} else {
 		printf("Can't Musashi map more than eight RAM/ROM read ranges.\n");
 	}
-	if (m68ki_cpu.write_ranges + 1 < 8) {
-		m68ki_cpu.write_addr[m68ki_cpu.write_ranges] = addr;
-		m68ki_cpu.write_upper[m68ki_cpu.write_ranges] = upper;
-		m68ki_cpu.write_data[m68ki_cpu.write_ranges] = ptr;
-		m68ki_cpu.write_ranges++;
-		printf("[MUSASHI] Mapped write range %d: %.8X-%.8X (%p)\n", m68ki_cpu.write_ranges, addr, upper, (void *)ptr);
+	if (state->write_ranges + 1 < 8) {
+		state->write_addr[state->write_ranges] = addr;
+		state->write_upper[state->write_ranges] = upper;
+		state->write_data[state->write_ranges] = ptr;
+		state->write_ranges++;
+		printf("[MUSASHI] Mapped write range %d: %.8X-%.8X (%p)\n", state->write_ranges, addr, upper, (void *)ptr);
 	} else {
 		printf("Can't Musashi map more than eight RAM write ranges.\n");
 	}
 }
 
-void m68k_add_rom_range(uint32_t addr, uint32_t upper, unsigned char *ptr) {
-	m68ki_cpu.code_translation_cache.lower = 0;
-	m68ki_cpu.code_translation_cache.upper = 0;
+void m68k_add_rom_range_state(m68ki_cpu_core *state, uint32_t addr, uint32_t upper, unsigned char *ptr) {
+	state->code_translation_cache.lower = 0;
+	state->code_translation_cache.upper = 0;
 	if ((addr == 0 && upper == 0) || upper < addr) {
 		return;
 	}
 
-	for (int i = 0; i < m68ki_cpu.read_ranges; i++) {
-		if (m68ki_cpu.read_addr[i] == addr  || m68ki_cpu.read_data[i] == ptr) {
+	for (int i = 0; i < state->read_ranges; i++) {
+		if (state->read_addr[i] == addr  || state->read_data[i] == ptr) {
 			uint8_t changed = 0;
-			if (m68ki_cpu.read_addr[i] != addr) {
-				m68ki_cpu.read_addr[i] = addr;
+			if (state->read_addr[i] != addr) {
+				state->read_addr[i] = addr;
 				changed = 1;
 			}
-			if (m68ki_cpu.read_upper[i] != upper) {
-				m68ki_cpu.read_upper[i] = upper;
+			if (state->read_upper[i] != upper) {
+				state->read_upper[i] = upper;
 				changed = 1;
 			}
-			if (m68ki_cpu.read_data[i] != ptr) {
-				m68ki_cpu.read_data[i] = ptr;
+			if (state->read_data[i] != ptr) {
+				state->read_data[i] = ptr;
 				changed = 1;
 			}
 			if (changed) {
-				printf("[MUSASHI] Adjusted mapped read range %d: %.8X-%.8X (%p)\n", m68ki_cpu.read_ranges, addr, upper, (void *)ptr);
+				printf("[MUSASHI] Adjusted mapped read range %d: %.8X-%.8X (%p)\n", state->read_ranges, addr, upper, (void *)ptr);
 			}
 			return;
 		}
 	}
 
-	if (m68ki_cpu.read_ranges + 1 < 8) {
-		m68ki_cpu.read_addr[m68ki_cpu.read_ranges] = addr;
-		m68ki_cpu.read_upper[m68ki_cpu.read_ranges] = upper;
-		m68ki_cpu.read_data[m68ki_cpu.read_ranges] = ptr;
-		m68ki_cpu.read_ranges++;
-		printf("[MUSASHI] Mapped read range %d: %.8X-%.8X (%p)\n", m68ki_cpu.read_ranges, addr, upper, (void *)ptr);
+	if (state->read_ranges + 1 < 8) {
+		state->read_addr[state->read_ranges] = addr;
+		state->read_upper[state->read_ranges] = upper;
+		state->read_data[state->read_ranges] = ptr;
+		state->read_ranges++;
+		printf("[MUSASHI] Mapped read range %d: %.8X-%.8X (%p)\n", state->read_ranges, addr, upper, (void *)ptr);
 	} else {
 		printf("Can't Musashi map more than eight RAM/ROM read ranges.\n");
 	}
 }
 
-void m68k_remove_range(unsigned char *ptr) {
+void m68k_remove_range_state(m68ki_cpu_core *state, unsigned char *ptr) {
 	if (!ptr) {
 		return;
 	}
 
-	m68ki_cpu.code_translation_cache.lower = 0;
-	m68ki_cpu.code_translation_cache.upper = 0;
+	state->code_translation_cache.lower = 0;
+	state->code_translation_cache.upper = 0;
 
 	// FIXME: Replace the 8 with a #define, such as MAX_MUSASHI_RANGES
 	for (int i = 0; i < 8; i++) {
-		if (m68ki_cpu.read_data[i] == ptr) {
-			m68ki_cpu.read_data[i] = NULL;
-			m68ki_cpu.read_addr[i] = 0;
-			m68ki_cpu.read_upper[i] = 0;
+		if (state->read_data[i] == ptr) {
+			state->read_data[i] = NULL;
+			state->read_addr[i] = 0;
+			state->read_upper[i] = 0;
 			printf("[MUSASHI] Unmapped read range %d.\n", i);
 			for (int j = i; j < 8 - 1; j++) {
-				m68ki_cpu.read_data[j] = m68ki_cpu.read_data[j + 1];
-				m68ki_cpu.read_addr[j] = m68ki_cpu.read_addr[j + 1];
-				m68ki_cpu.read_upper[j] = m68ki_cpu.read_upper[j + 1];
+				state->read_data[j] = state->read_data[j + 1];
+				state->read_addr[j] = state->read_addr[j + 1];
+				state->read_upper[j] = state->read_upper[j + 1];
 			}
-			m68ki_cpu.read_data[8 - 1] = NULL;
-			m68ki_cpu.read_addr[8 - 1] = 0;
-			m68ki_cpu.read_upper[8 - 1] = 0;
-			m68ki_cpu.read_ranges--;
+			state->read_data[8 - 1] = NULL;
+			state->read_addr[8 - 1] = 0;
+			state->read_upper[8 - 1] = 0;
+			state->read_ranges--;
 		}
-		if (m68ki_cpu.write_data[i] == ptr) {
-			m68ki_cpu.write_data[i] = NULL;
-			m68ki_cpu.write_addr[i] = 0;
-			m68ki_cpu.write_upper[i] = 0;
+		if (state->write_data[i] == ptr) {
+			state->write_data[i] = NULL;
+			state->write_addr[i] = 0;
+			state->write_upper[i] = 0;
 			printf("[MUSASHI] Unmapped write range %d.\n", i);
 			for (int j = i; j < 8 - 1; j++) {
-				m68ki_cpu.write_data[j] = m68ki_cpu.write_data[j + 1];
-				m68ki_cpu.write_addr[j] = m68ki_cpu.write_addr[j + 1];
-				m68ki_cpu.write_upper[j] = m68ki_cpu.write_upper[j + 1];
+				state->write_data[j] = state->write_data[j + 1];
+				state->write_addr[j] = state->write_addr[j + 1];
+				state->write_upper[j] = state->write_upper[j + 1];
 			}
-			m68ki_cpu.write_data[8 - 1] = NULL;
-			m68ki_cpu.write_addr[8 - 1] = 0;
-			m68ki_cpu.write_upper[8 - 1] = 0;
-			m68ki_cpu.write_ranges--;
+			state->write_data[8 - 1] = NULL;
+			state->write_addr[8 - 1] = 0;
+			state->write_upper[8 - 1] = 0;
+			state->write_ranges--;
 		}
 	}
 }
 
-void m68k_clear_ranges(void) {
+void m68k_clear_ranges_state(m68ki_cpu_core *state) {
 	printf("[MUSASHI] Clearing all reads/write memory ranges.\n");
 	for (int i = 0; i < 8; i++) {
-		m68ki_cpu.read_upper[i] = 0;
-		m68ki_cpu.read_addr[i] = 0;
-		m68ki_cpu.read_data[i] = NULL;
-		m68ki_cpu.write_upper[i] = 0;
-		m68ki_cpu.write_addr[i] = 0;
-		m68ki_cpu.write_data[i] = NULL;
+		state->read_upper[i] = 0;
+		state->read_addr[i] = 0;
+		state->read_data[i] = NULL;
+		state->write_upper[i] = 0;
+		state->write_addr[i] = 0;
+		state->write_data[i] = NULL;
 	}
-	m68ki_cpu.write_ranges = 0;
-	m68ki_cpu.read_ranges = 0;
-	m68ki_cpu.code_translation_cache.lower = 0;
-	m68ki_cpu.code_translation_cache.upper = 0;
+	state->write_ranges = 0;
+	state->read_ranges = 0;
+	state->code_translation_cache.lower = 0;
+	state->code_translation_cache.upper = 0;
+}
+
+void m68k_add_ram_range(uint32_t addr, uint32_t upper, unsigned char *ptr) {
+	m68k_add_ram_range_state(&m68ki_cpu, addr, upper, ptr);
+}
+
+void m68k_add_rom_range(uint32_t addr, uint32_t upper, unsigned char *ptr) {
+	m68k_add_rom_range_state(&m68ki_cpu, addr, upper, ptr);
+}
+
+void m68k_remove_range(unsigned char *ptr) {
+	m68k_remove_range_state(&m68ki_cpu, ptr);
+}
+
+void m68k_clear_ranges(void) {
+	m68k_clear_ranges_state(&m68ki_cpu);
 }
 
 /* ======================================================================== */
@@ -1525,19 +1533,22 @@ static struct {
 } m68k_substate;
 
 static void m68k_prepare_substate(void) {
-	m68k_substate.sr = m68ki_get_sr();
+	m68ki_cpu_core *state = &m68ki_cpu;
+	m68k_substate.sr = m68ki_get_sr(state);
 	m68k_substate.stopped = (CPU_STOPPED & STOP_LEVEL_STOP) != 0;
 	m68k_substate.halted  = (CPU_STOPPED & STOP_LEVEL_HALT) != 0;
 }
 
 static void m68k_post_load(void) {
-	m68ki_set_sr_noint_nosp(m68k_substate.sr);
+	m68ki_cpu_core *state = &m68ki_cpu;
+	m68ki_set_sr_noint_nosp(state, m68k_substate.sr);
 	CPU_STOPPED = m68k_substate.stopped ? STOP_LEVEL_STOP : 0
 		        | m68k_substate.halted  ? STOP_LEVEL_HALT : 0;
-	m68ki_jump(REG_PC);
+	m68ki_jump(state, REG_PC);
 }
 
 void m68k_state_register(const char *type, int index) {
+	m68ki_cpu_core *state = &m68ki_cpu;
 	/* Note, D covers A because the dar array is common, REG_A=REG_D+8 */
 	state_save_register_item_array(type, index, REG_D);
 	state_save_register_item(type, index, REG_PPC);

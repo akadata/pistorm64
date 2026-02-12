@@ -345,7 +345,7 @@ static int illg_instr_callback(int opcode) {
 }
 
 
-#if UAE_UAE_JIT
+#if USE_UAE_JIT
 static void crash_signal_handler(int sig_num) {
   crash_signal = sig_num;
   crash_fault_addr = 0;
@@ -452,17 +452,9 @@ static int cli_collect_tokens(int argc, char* argv[], int* index, char* out, siz
 #ifdef MUSASHI_HAX
 #include "m68kcpu.h"
 extern m68ki_cpu_core m68ki_cpu;
-extern int m68ki_initial_cycles;
-extern int m68ki_remaining_cycles;
 
-#define M68K_SET_IRQ(i)                                                                            \
-  old_level = CPU_INT_LEVEL;                                                                       \
-  CPU_INT_LEVEL = ((unsigned int)(i) << 8);                                                        \
-  if (old_level != 0x0700 && CPU_INT_LEVEL == 0x0700)                                              \
-    m68ki_cpu.nmi_pending = TRUE;
-#define M68K_END_TIMESLICE                                                                         \
-  m68ki_initial_cycles = GET_CYCLES();                                                             \
-  SET_CYCLES(0);
+#define M68K_SET_IRQ(i) m68k_set_irq_state(&m68ki_cpu, (i))
+#define M68K_END_TIMESLICE m68k_end_timeslice_state(&m68ki_cpu)
 #else
 #define M68K_SET_IRQ m68k_set_irq
 #define M68K_END_TIMESLICE m68k_end_timeslice()
@@ -743,7 +735,7 @@ static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
 
   /* Set our pool of clock cycles available */
   SET_CYCLES(num_cycles);
-  m68ki_initial_cycles = num_cycles;
+  CPU_INITIAL_CYCLES = num_cycles;
 
   /* See if interrupts came in */
   m68ki_check_interrupts(state);
@@ -759,7 +751,7 @@ static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
 
 
 #ifdef M68K_BUSERR_THING
-    m68ki_check_bus_error_trap();
+    m68ki_check_bus_error_trap(state);
 #endif
 
     /* Main loop.  Keep going until we run out of clock cycles */

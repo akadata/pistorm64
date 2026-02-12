@@ -295,6 +295,10 @@ M68KFILES = $(MUSASHIFILES) $(MUSASHIGENCFILES)
 .CFILES   = $(MAINFILES) $(M68KFILES)
 .OFILES   = $(.CFILES:%.c=%.o) src/a314/a314.o
 
+EXTRA_CXX_OBJS :=
+EXTRA_CXX_STUB_OBJS :=
+EXTRA_LINK_DEPS :=
+
 ifeq ($(USE_UAE_JIT),1) 
 # UAE/JIT build (optional, AArch64 only)
 UAE_SRCDIR   := src/uae
@@ -356,10 +360,6 @@ EXTRA_LINK_DEPS += $(UAE_TARGET)
 UAE_LINK_FLAGS := -Wl,--whole-archive $(UAE_TARGET) -Wl,--no-whole-archive
 DEFINES += -DUSE_UAE_JIT
 endif
-
-
-EXTRA_CXX_OBJS :=
-EXTRA_LINK_DEPS :=
 
 
 CC  ?= gcc
