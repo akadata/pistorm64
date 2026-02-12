@@ -8,13 +8,19 @@
 #include <string.h>
 #include <strings.h>
 #include <ctype.h>
+#include <endian.h>
 #include <sys/mman.h>
 
 #include "rominfo.h"
+#include "gpio/ps_protocol.h"
 
 #define M68K_CPU_TYPES M68K_CPU_TYPE_SCC68070
 #define PI_AFFINITY_ENV "PISTORM_AFFINITY"
 #define PI_RT_ENV "PISTORM_RT"
+
+#ifndef MAP_FIXED_NOREPLACE
+#define MAP_FIXED_NOREPLACE 0x100000
+#endif
 
 const char* cpu_types[M68K_CPU_TYPES] = {
     "68000", 
@@ -67,6 +73,149 @@ const char* mapcmd_names[MAPCMD_NUM] = {
     "autodump_file", 
     "autodump_mem",
 };
+
+static size_t cfg_align_to_page(size_t size) {
+  long page_size = sysconf(_SC_PAGESIZE);
+  size_t page = (page_size > 0) ? (size_t)page_size : 4096u;
+  return (size + page - 1u) & ~(page - 1u);
+}
+
+static void* cfg_try_mmap_low4g(size_t size) {
+#if UINTPTR_MAX <= 0xFFFFFFFFu
+  (void)size;
+  return NULL;
+#else
+  const uintptr_t low_start = 0x10000000ull;
+  const uintptr_t low_end = 0xF0000000ull;
+  const uintptr_t step = 0x02000000ull; // 32MB granularity.
+  const uintptr_t max_addr = 0xFFFFFFFFull;
+  size_t aligned = cfg_align_to_page(size);
+
+  if (aligned == 0 || aligned > (size_t)(low_end - low_start)) {
+    return NULL;
+  }
+
+#ifdef MAP_FIXED_NOREPLACE
+  for (uintptr_t base = low_start; base + aligned <= low_end; base += step) {
+    void* p = mmap((void*)base, aligned, PROT_READ | PROT_WRITE,
+                   MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
+    if (p == MAP_FAILED) {
+      continue;
+    }
+    if (((uintptr_t)p + aligned - 1u) <= max_addr) {
+      return p;
+    }
+    munmap(p, aligned);
+  }
+#endif
+
+  void* p = mmap(NULL, aligned, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+  if (p == MAP_FAILED) {
+    return NULL;
+  }
+  if (((uintptr_t)p + aligned - 1u) <= max_addr) {
+    return p;
+  }
+  munmap(p, aligned);
+  return NULL;
+#endif
+}
+
+unsigned char* cfg_alloc_mapped_data(size_t size, int zero_init, unsigned char* alloc_kind,
+                                     const char* owner) {
+  if (alloc_kind) {
+    *alloc_kind = MAPALLOC_NONE;
+  }
+  if (!size) {
+    return NULL;
+  }
+
+  const char* name = owner ? owner : "map";
+  unsigned char* ptr = NULL;
+  void* low4g = cfg_try_mmap_low4g(size);
+  if (low4g) {
+    ptr = (unsigned char*)low4g;
+    if (zero_init) {
+      memset(ptr, 0x00, size);
+    }
+    if (alloc_kind) {
+      *alloc_kind = MAPALLOC_MMAP_LOW4G;
+    }
+    return ptr;
+  }
+
+  ptr = zero_init ? (unsigned char*)calloc(1, size) : (unsigned char*)malloc(size);
+  if (!ptr) {
+    return NULL;
+  }
+  if (zero_init) {
+    // calloc already zeroes, keep explicit behavior in case allocator changes.
+    memset(ptr, 0x00, size);
+  }
+  if (alloc_kind) {
+    *alloc_kind = MAPALLOC_HEAP;
+  }
+  if (sizeof(void*) > 4 && (((uintptr_t)ptr) >> 32) != 0) {
+    printf("[CFG] Warning: %s allocation not in low 4GB: %p\n", name, (void*)ptr);
+  }
+  return ptr;
+}
+
+void cfg_free_mapped_data(unsigned char* ptr, size_t size, unsigned char alloc_kind) {
+  if (!ptr) {
+    return;
+  }
+
+  switch (alloc_kind) {
+  case MAPALLOC_MMAP_LOW4G: {
+    size_t aligned = cfg_align_to_page(size);
+    if (aligned) {
+      munmap((void*)ptr, aligned);
+    }
+    break;
+  }
+  case MAPALLOC_HEAP:
+    free(ptr);
+    break;
+  case MAPALLOC_EXTERNAL:
+  case MAPALLOC_NONE:
+  default:
+    break;
+  }
+}
+
+void cfg_set_map_data_allocation(struct emulator_config* cfg, int index, unsigned char* ptr,
+                                 size_t alloc_size, unsigned char alloc_kind) {
+  if (!cfg || index < 0 || index >= MAX_NUM_MAPPED_ITEMS) {
+    return;
+  }
+  cfg->map_data[index] = ptr;
+  cfg->map_alloc_size[index] = alloc_size;
+  cfg->map_alloc_kind[index] = alloc_kind;
+}
+
+void cfg_release_map_data(struct emulator_config* cfg, int index) {
+  if (!cfg || index < 0 || index >= MAX_NUM_MAPPED_ITEMS) {
+    return;
+  }
+  if (cfg->map_data[index]) {
+    cfg_free_mapped_data(cfg->map_data[index], cfg->map_alloc_size[index], cfg->map_alloc_kind[index]);
+  }
+  cfg->map_data[index] = NULL;
+  cfg->map_alloc_size[index] = 0;
+  cfg->map_alloc_kind[index] = MAPALLOC_NONE;
+}
+
+static int cfg_alloc_and_assign_map_slot(struct emulator_config* cfg, int index, size_t size,
+                                         const char* owner) {
+  unsigned char alloc_kind = MAPALLOC_NONE;
+  unsigned char* map_ptr = cfg_alloc_mapped_data(size, 1, &alloc_kind, owner);
+  if (!map_ptr) {
+    return 0;
+  }
+  cfg_set_map_data_allocation(cfg, index, map_ptr, size, alloc_kind);
+  return 1;
+}
 
 static int get_config_item_type(char* cmd) {
   if (strcasecmp(cmd, "rt-prio") == 0) {
@@ -344,7 +493,14 @@ mapid[sizeof(mapid) - 1] = '\0';  // Ensure null termination
         break;
       }
     }
-    add_mapping(cfg, maptype, mapaddr, mapsize, mirraddr, mapfile, mapid, autodump);
+    char* map_backing = mapfile;
+    if (maptype == MAPTYPE_RAM_NOALLOC) {
+      if (mapfile[0] != '\0') {
+        printf("[CFG] ram_noalloc ignores file= backing from config; runtime code must bind map_data.\n");
+      }
+      map_backing = NULL;
+    }
+    add_mapping(cfg, maptype, mapaddr, mapsize, mirraddr, map_backing, mapid, autodump);
 
     break;
   }
@@ -487,6 +643,7 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
   cfg->map_size[index] = size;
   cfg->map_high[index] = addr + size;
   cfg->map_mirror[index] = mirr_addr;
+  cfg_set_map_data_allocation(cfg, (int)index, NULL, 0, MAPALLOC_NONE);
   if (strlen(map_id)) {
     if (cfg->map_id[index]) {
       free(cfg->map_id[index]);
@@ -498,27 +655,25 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
   switch (type) {
   case MAPTYPE_RAM_NOALLOC:
     printf("[CFG] Adding %d byte (%d MB) RAM mapping %s...\n", size, size / 1024 / 1024, map_id);
-    cfg->map_data[index] = (unsigned char*)filename;
+    cfg_set_map_data_allocation(cfg, (int)index, (unsigned char*)filename, 0, MAPALLOC_EXTERNAL);
     break;
   case MAPTYPE_RAM_WTC:
     printf("[CFG] Allocating %d bytes for Write-Through Cached RAM mapping (%.1f MB)...\n", size,
            (float)size / 1024.0f / 1024.0f);
-    goto alloc_mapram;
-    break;
-  case MAPTYPE_RAM:
-    printf("[CFG] Allocating %d bytes for RAM mapping (%d MB)...\n", size, size / 1024 / 1024);
-  alloc_mapram:
-    cfg->map_data[index] = (unsigned char*)malloc(size);
-    if (!cfg->map_data[index]) {
+    if (!cfg_alloc_and_assign_map_slot(cfg, (int)index, size, map_id)) {
       printf("[CFG] ERROR: Unable to allocate memory for mapped RAM!\n");
       goto mapping_failed;
     }
-    memset(cfg->map_data[index], 0x00, size);
-    if (type == MAPTYPE_RAM_WTC) {
-      // This may look a bit weird, but it adds a read range for the WTC RAM. Writes still go
-      // through to the mapped read/write functions.
-      m68k_add_rom_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
-                         cfg->map_data[index]);
+    // This may look a bit weird, but it adds a read range for the WTC RAM. Writes still go
+    // through to the mapped read/write functions.
+    m68k_add_rom_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
+                       cfg->map_data[index]);
+    break;
+  case MAPTYPE_RAM:
+    printf("[CFG] Allocating %d bytes for RAM mapping (%d MB)...\n", size, size / 1024 / 1024);
+    if (!cfg_alloc_and_assign_map_slot(cfg, (int)index, size, map_id)) {
+      printf("[CFG] ERROR: Unable to allocate memory for mapped RAM!\n");
+      goto mapping_failed;
     }
     break;
   case MAPTYPE_ROM:
@@ -540,8 +695,15 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
       } else if (autodump == MAPCMD_AUTODUMP_MEM) {
         printf("[CFG] Could not open file %s for ROM mapping. Autodump flag is set, dumping to memory.\n",
                filename);
-        cfg->map_data[index] =
-            dump_range_to_memory((uint32_t)cfg->map_offset[index], cfg->map_size[index]);
+        unsigned char map_alloc_kind = MAPALLOC_NONE;
+        unsigned char* rom_buf = cfg_alloc_mapped_data(cfg->map_size[index], 1, &map_alloc_kind, map_id);
+        if (rom_buf) {
+          for (unsigned int off = 0; off < cfg->map_size[index]; off += 2) {
+            uint16_t in16 = be16toh(read16((uint32_t)cfg->map_offset[index] + off));
+            memcpy(&rom_buf[off], &in16, sizeof(in16));
+          }
+          cfg_set_map_data_allocation(cfg, (int)index, rom_buf, cfg->map_size[index], map_alloc_kind);
+        }
         cfg->rom_size[index] = cfg->map_size[index];
         if (cfg->map_data[index] == NULL) {
           printf("[CFG] Could not dump range to memory. Using onboard ROM instead, if available.\n");
@@ -561,7 +723,9 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
       cfg->map_high[index] = addr + cfg->map_size[index];
     }
     fseek(in, 0, SEEK_SET);
-    cfg->map_data[index] = (unsigned char*)calloc(1, cfg->map_size[index]);
+    unsigned char rom_alloc_kind = MAPALLOC_NONE;
+    unsigned char* rom_buf = cfg_alloc_mapped_data(cfg->map_size[index], 1, &rom_alloc_kind, map_id);
+    cfg_set_map_data_allocation(cfg, (int)index, rom_buf, cfg->map_size[index], rom_alloc_kind);
     cfg->rom_size[index] =
         (cfg->map_size[index] <= (unsigned long)file_size) ? cfg->map_size[index]
                                                            : (unsigned int)file_size;
@@ -569,7 +733,6 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
       printf("[CFG] ERROR: Unable to allocate memory for mapped ROM!\n");
       goto mapping_failed;
     }
-    memset(cfg->map_data[index], 0x00, cfg->map_size[index]);
     fread(cfg->map_data[index], cfg->rom_size[index], 1, in);
     if (in)
       fclose(in);
@@ -614,16 +777,18 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
   return;
 
 mapping_failed:;
+  cfg_release_map_data(cfg, (int)index);
   cfg->map_type[index] = MAPTYPE_NONE;
   if (in) {
     fclose(in);
   }
-cfg->ranges_dirty = 1;  
+  cfg->ranges_dirty = 1;
 }
 
 void free_config_file(struct emulator_config* cfg) {
   if (!cfg) {
     printf("[CFG] Tried to free NULL config, aborting.\n");
+    return;
   }
 
   if (cfg->platform) {
@@ -633,12 +798,7 @@ void free_config_file(struct emulator_config* cfg) {
   }
 
   for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
-    if (cfg->map_data[i]) {
-      if (cfg->map_type[i] != MAPTYPE_RAM_NOALLOC) {
-        free(cfg->map_data[i]);
-      }
-      cfg->map_data[i] = NULL;
-    }
+    cfg_release_map_data(cfg, i);
     if (cfg->map_id[i]) {
       free(cfg->map_id[i]);
       cfg->map_id[i] = NULL;
@@ -695,9 +855,7 @@ struct emulator_config* load_config_file(const char* filename) {
 load_failed:;
   if (cfg) {
     for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
-      if (cfg->map_data[i])
-        free(cfg->map_data[i]);
-      cfg->map_data[i] = NULL;
+      cfg_release_map_data(cfg, i);
     }
     free(cfg);
     cfg = NULL;

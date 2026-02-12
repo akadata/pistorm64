@@ -541,9 +541,15 @@ int setup_platform_amiga(struct emulator_config* cfg) {
     }
 
     if (resize_data) {
-      free(cfg->map_data[index]);
+      cfg_release_map_data(cfg, index);
       cfg->map_size[index] = (unsigned int)resize_data;
-      cfg->map_data[index] = (unsigned char *)malloc(cfg->map_size[index]);
+      unsigned char alloc_kind = MAPALLOC_NONE;
+      unsigned char* map_ptr = cfg_alloc_mapped_data(cfg->map_size[index], 1, &alloc_kind, z2_autoconf_id);
+      cfg_set_map_data_allocation(cfg, index, map_ptr, cfg->map_size[index], alloc_kind);
+      if (!cfg->map_data[index]) {
+        LOG_ERROR("[AMIGA] Failed to reallocate Z2 Fast RAM map[%d].\n", index);
+        return -1;
+      }
     }
 
     LOG_INFO("[AMIGA] %dMB of Z2 Fast RAM configured at $%lx\n",

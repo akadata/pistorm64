@@ -69,7 +69,8 @@ void cpu_set_fc(uint32_t fc)
 #endif
     }
 
-    // Decode for logging according to 68k function code table.
+#ifdef PISTORM_FC_TRACE
+    // Decode for optional FC transition tracing.
     const char *space = "reserved";
 
     switch (fc_val) {
@@ -95,6 +96,7 @@ void cpu_set_fc(uint32_t fc)
 
     LOG_DEBUG("[FC] fc=%u -> %s (mode=%d)\n",
               (unsigned)fc_val, space, (int)fc_mode_state);
+#endif
 }
 
 // Simple SFC/DFC helpers.

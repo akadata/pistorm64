@@ -151,6 +151,74 @@ static int g_jit_trace_ifetch_left = 0;
 static int g_jit_trace_data_left = 0;
 static int g_ovl_holdoff = 0;
 static int g_ovl_holdoff_left = 0;
+static int g_last_init_error = 0;
+static uae_u32 g_last_reset_sp = 0;
+static uae_u32 g_last_reset_pc = 0;
+static int g_last_reset_ovl = 0;
+
+static bool uae_pistorm_ptr_is_low32(const void* p) {
+  return (((uintptr_t)p) >> 32) == 0;
+}
+
+static bool uae_pistorm_jit_host_pointers_ok(void) {
+  if (currprefs.cachesize <= 0) {
+    return true;
+  }
+  /* AArch64 JIT backend assumes Amiga memory pointers fit in 32 bits. */
+  if (sizeof(void*) <= 4) {
+    return true;
+  }
+  if (!cfg) {
+    return false;
+  }
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (!cfg->map_data[i]) {
+      continue;
+    }
+    switch (cfg->map_type[i]) {
+      case MAPTYPE_ROM:
+      case MAPTYPE_RAM:
+      case MAPTYPE_RAM_WTC:
+      case MAPTYPE_RAM_NOALLOC:
+        if (!uae_pistorm_ptr_is_low32(cfg->map_data[i])) {
+          return false;
+        }
+        break;
+      default:
+        break;
+    }
+  }
+  return true;
+}
+
+static bool uae_pistorm_has_low_ram_window(void) {
+  if (!cfg) {
+    return false;
+  }
+  /*
+   * Once OVL drops, vectors and early exception paths use low RAM at 0x000000.
+   * Current JIT path expects direct host pointers for executable fetch regions.
+   */
+  const uae_u32 low_needed = 0x00001000u; // 4KB vector/boot safety window.
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (!cfg->map_data[i]) {
+      continue;
+    }
+    switch (cfg->map_type[i]) {
+      case MAPTYPE_RAM:
+      case MAPTYPE_RAM_WTC:
+      case MAPTYPE_RAM_NOALLOC:
+        if ((uae_u32)cfg->map_offset[i] <= 0x00000000u &&
+            (uae_u32)cfg->map_high[i] >= low_needed) {
+          return true;
+        }
+        break;
+      default:
+        break;
+    }
+  }
+  return false;
+}
 
 static void pistorm_init_ovl_holdoff(void) {
   // Allow delaying the first few overlay drops while JIT is stabilizing.
@@ -513,19 +581,23 @@ static uae_u8* REGPARAM2 pistorm_xlate(uaecptr addr) {
     return nullptr;
   }
   for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
-    if (cfg->map_type[i] == MAPTYPE_NONE) {
+    if (cfg->map_type[i] == MAPTYPE_NONE || !cfg->map_data[i]) {
       continue;
     }
     if (ovl && (cfg->map_type[i] == MAPTYPE_ROM || cfg->map_type[i] == MAPTYPE_RAM_WTC)) {
       if (cfg->map_mirror[i] != ((unsigned int)-1) &&
           addr >= cfg->map_mirror[i] &&
-          addr < (cfg->map_mirror[i] + cfg->map_size[i])) {
+          addr < (cfg->map_mirror[i] + cfg->map_size[i]) &&
+          cfg->rom_size[i] != 0) {
         return cfg->map_data[i] + ((addr - cfg->map_mirror[i]) % cfg->rom_size[i]);
       }
     }
     if (addr >= cfg->map_offset[i] && addr < cfg->map_high[i]) {
       switch (cfg->map_type[i]) {
       case MAPTYPE_ROM:
+        if (cfg->rom_size[i] == 0) {
+          return nullptr;
+        }
         return cfg->map_data[i] + ((addr - cfg->map_offset[i]) % cfg->rom_size[i]);
       case MAPTYPE_RAM:
       case MAPTYPE_RAM_WTC:
@@ -879,7 +951,22 @@ static void uae_pistorm_set_defaults(int cpu_model, int enable_jit, int enable_f
   }
 }
 
-static void uae_pistorm_apply_reset_vectors(void) {
+static bool uae_pistorm_reset_pc_looks_valid(uae_u32 pc) {
+  if (pc == 0 || pc == 0xFFFFFFFFu) {
+    return false;
+  }
+  /* 68k requires word-aligned PC. */
+  if (pc & 1u) {
+    return false;
+  }
+  /* 68000/010 run in 24-bit space. */
+  if (currprefs.address_space_24 && (pc > 0x00FFFFFFu)) {
+    return false;
+  }
+  return true;
+}
+
+static bool uae_pistorm_apply_reset_vectors(void) {
   unsigned int sp_m = 0;
   unsigned int pc_m = 0;
   uae_u32 sp = 0;
@@ -917,11 +1004,46 @@ static void uae_pistorm_apply_reset_vectors(void) {
   regs.t0 = regs.t1 = 0;
   regs.intmask = 7;
   regs.sr = 0x2700;
+  g_last_reset_sp = sp;
+  g_last_reset_pc = pc;
+  g_last_reset_ovl = ovl;
   printf("[UAE] reset vectors: SP=%08X PC=%08X\n", sp, pc);
+  if (!uae_pistorm_reset_pc_looks_valid(pc)) {
+    printf("[UAE] invalid reset PC: SP=%08X PC=%08X (ovl=%d)\n", sp, pc, ovl);
+    g_last_init_error = 1;
+    return false;
+  }
+  /* JIT needs a host pointer for reset PC decode. */
+  if (currprefs.cachesize > 0) {
+    uae_u8* host_pc = get_real_address((uaecptr)pc);
+    if (!host_pc) {
+      printf("[UAE] reset PC has no host mapping for JIT: PC=%08X (ovl=%d)\n", pc, ovl);
+      g_last_init_error = 2;
+      return false;
+    }
+  }
+  return true;
 }
 
 extern "C" int uae_pistorm_init(int cpu_model, int enable_jit, int enable_fpu) {
+  g_last_init_error = 0;
+  g_last_reset_sp = 0;
+  g_last_reset_pc = 0;
+  g_last_reset_ovl = ovl;
   uae_pistorm_set_defaults(cpu_model, enable_jit, enable_fpu);
+  if (!uae_pistorm_jit_host_pointers_ok()) {
+    printf("[UAE] JIT disabled: host mapped pointers exceed 32-bit address space\n");
+    g_last_init_error = 3;
+    return -1;
+  }
+  if (currprefs.cachesize > 0) {
+    if (!uae_pistorm_has_low_ram_window()) {
+      printf("[UAE] JIT disabled: no direct low RAM map at $000000 after OVL drop\n");
+      printf("[UAE] Hint: map low RAM to Pi memory for JIT, otherwise Musashi is required\n");
+      g_last_init_error = 4;
+      return -1;
+    }
+  }
   const char* trace = getenv("PISTORM_UAE_JIT_TRACE");
   const char* trace_ifetch = getenv("PISTORM_UAE_JIT_TRACE_IFETCH");
   const char* trace_data = getenv("PISTORM_UAE_JIT_TRACE_DATA");
@@ -947,7 +1069,9 @@ extern "C" int uae_pistorm_init(int cpu_model, int enable_jit, int enable_fpu) {
   }
 
   m68k_reset_newcpu(true);
-  uae_pistorm_apply_reset_vectors();
+  if (!uae_pistorm_apply_reset_vectors()) {
+    return -1;
+  }
   init_m68k();
   build_cpufunctbl();
   m68k_setpc_normal(regs.pc);
@@ -972,7 +1096,10 @@ extern "C" void uae_pistorm_pulse_reset(void) {
   ovl = 1;
   pistorm_force_rom_overlay();
   pistorm_init_ovl_holdoff();
-  uae_pistorm_apply_reset_vectors();
+  if (!uae_pistorm_apply_reset_vectors()) {
+    regs.stopped = true;
+    return;
+  }
   m68k_setpc_normal(regs.pc);
   fill_prefetch_quick();
   set_cycles(start_cycles);
@@ -1003,6 +1130,22 @@ extern "C" void uae_pistorm_overlay_changed(int ovl_state) {
   }
   // OVL flips change effective low-memory mapping; request core mode refresh.
   set_special(SPCFLAG_MODE_CHANGE | SPCFLAG_CHECK);
+}
+
+extern "C" int uae_pistorm_get_last_init_error(void) {
+  return g_last_init_error;
+}
+
+extern "C" void uae_pistorm_get_last_reset_vectors(uint32_t* sp, uint32_t* pc, int* ovl_state) {
+  if (sp) {
+    *sp = g_last_reset_sp;
+  }
+  if (pc) {
+    *pc = g_last_reset_pc;
+  }
+  if (ovl_state) {
+    *ovl_state = g_last_reset_ovl;
+  }
 }
 
 extern "C" uint32_t uae_pistorm_get_pc(void) {

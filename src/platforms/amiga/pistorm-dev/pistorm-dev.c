@@ -927,7 +927,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
         fclose(tmp);
         if (get_named_mapped_item(cfg, "kickstart") != -1) {
           int32_t index = get_named_mapped_item(cfg, "kickstart");
-          free(cfg->map_data[index]);
+          cfg_release_map_data(cfg, index);
           free(cfg->map_id[index]);
           cfg->map_type[index] = MAPTYPE_NONE;
           // Dirty hack, I am sleepy and lazy.
@@ -959,7 +959,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
         fclose(tmp);
         if (get_named_mapped_item(cfg, "extended") != -1) {
           int32_t index = get_named_mapped_item(cfg, "extended");
-          free(cfg->map_data[index]);
+          cfg_release_map_data(cfg, index);
           free(cfg->map_id[index]);
           cfg->map_type[index] = MAPTYPE_NONE;
           // Dirty hack, I am tired and lazy.

@@ -102,12 +102,39 @@ static void getRomInfo(uint8_t* address, size_t length, struct romInfo* info) {
   return;
 }
 
+int queryRomInfo(uint8_t* address, size_t length, struct romInfo* info) {
+  if (!address || !info || length == 0) {
+    return 0;
+  }
+  memset(info, 0, sizeof(*info));
+  getRomInfo(address, length, info);
+  return info->isDiagRom || info->id != ROM_TYPE_UNKNOWN;
+}
+
+int romInfoRequires68020(const struct romInfo* info) {
+  if (!info || info->isDiagRom || info->id == ROM_TYPE_UNKNOWN) {
+    return 0;
+  }
+  /*
+   * Known 020+ Kickstart families:
+   * 39.106+ (A1200/A4000 class 3.0), 40.68+ (A1200/A4000 class 3.1),
+   * all 45+ modern ROMs.
+   */
+  if (info->major == 39) {
+    return info->minor >= 106;
+  }
+  if (info->major == 40) {
+    return info->minor >= 68;
+  }
+  return info->major >= 45;
+}
+
 void displayRomInfo(uint8_t* address, size_t length) {
   struct romInfo info = {0};
   const char* kversion;
   const char* size;
 
-  getRomInfo(address, length, &info);
+  queryRomInfo(address, length, &info);
 
   if ((!info.isDiagRom) && (info.id != ROM_TYPE_UNKNOWN)) {
     switch (info.major) {

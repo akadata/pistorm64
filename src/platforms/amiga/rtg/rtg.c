@@ -79,6 +79,7 @@ uint16_t rtg_offset_x;
 uint16_t rtg_offset_y;
 
 uint8_t* rtg_mem; // FIXME
+static unsigned char rtg_mem_alloc_kind = MAPALLOC_NONE;
 
 uint32_t framebuffer_addr = 0;
 uint32_t framebuffer_addr_adj = 0;
@@ -128,15 +129,30 @@ static const char* rtg_format_names[RTGFMT_NUM] = {
 static const unsigned int rtg_mem_size = (unsigned int)RTG_GFX_MEM * SIZE_MEGA;
 
 int init_rtg_data(struct emulator_config* cfg_) {
-  rtg_mem = calloc(1, rtg_mem_size);
+  rtg_mem = cfg_alloc_mapped_data(rtg_mem_size, 1, &rtg_mem_alloc_kind, "rtg_mem");
   if (!rtg_mem) {
     LOG_ERROR("Failed to allocate RTG video memory.\n");
     return 0;
   }
 
-  m68k_add_ram_range(PIGFX_RTG_BASE + PIGFX_REG_SIZE, PIGFX_UPPER, rtg_mem);
-  add_mapping(cfg_, MAPTYPE_RAM_NOALLOC, PIGFX_RTG_BASE + PIGFX_REG_SIZE, rtg_mem_size,
-              (unsigned int)-1, (char*)rtg_mem, "rtg_mem", 0);
+  /* Prefer reusing config-provided rtg_mem mapping to avoid duplicate ranges. */
+  int map_index = get_named_mapped_item(cfg_, "rtg_mem");
+  if (map_index >= 0) {
+    unsigned int base = (unsigned int)cfg_->map_offset[map_index];
+    unsigned int size = cfg_->map_size[map_index] ? cfg_->map_size[map_index] : rtg_mem_size;
+    cfg_release_map_data(cfg_, map_index);
+    cfg_->map_type[map_index] = MAPTYPE_RAM_NOALLOC;
+    cfg_->map_size[map_index] = size;
+    cfg_->map_high[map_index] = base + size;
+    cfg_set_map_data_allocation(cfg_, map_index, rtg_mem, 0, MAPALLOC_EXTERNAL);
+    m68k_add_ram_range(base, base + size, rtg_mem);
+    LOG_INFO("[RTG] Bound existing rtg_mem map[%d] to allocated RTG buffer (%u MB).\n",
+             map_index, size / SIZE_MEGA);
+  } else {
+    m68k_add_ram_range(PIGFX_RTG_BASE + PIGFX_REG_SIZE, PIGFX_UPPER, rtg_mem);
+    add_mapping(cfg_, MAPTYPE_RAM_NOALLOC, PIGFX_RTG_BASE + PIGFX_REG_SIZE, rtg_mem_size,
+                (unsigned int)-1, (char*)rtg_mem, "rtg_mem", 0);
+  }
   return 1;
 }
 
@@ -147,8 +163,9 @@ void shutdown_rtg(void) {
     rtg_on = 0;
   }
   if (rtg_mem) {
-    free(rtg_mem);
+    cfg_free_mapped_data(rtg_mem, rtg_mem_size, rtg_mem_alloc_kind);
     rtg_mem = NULL;
+    rtg_mem_alloc_kind = MAPALLOC_NONE;
   }
 }
 

@@ -59,6 +59,7 @@ extern "C" {
 
 #include "m68kops.h"
 #include "emulator_fc.h"
+#include "config_file/rominfo.h"
 
 static void fc_callback_wrapper(unsigned int new_fc) {
   cpu_set_fc((uint32_t)new_fc);
@@ -130,6 +131,81 @@ static const char* fc_mode_name(enum fc_mode mode) {
   default:
     return "unknown";
   }
+}
+
+extern unsigned int cpu_type;
+
+static int cpu_type_at_least_68020(unsigned int type) {
+  switch (type) {
+  case M68K_CPU_TYPE_68EC020:
+  case M68K_CPU_TYPE_68020:
+  case M68K_CPU_TYPE_68EC030:
+  case M68K_CPU_TYPE_68030:
+  case M68K_CPU_TYPE_68EC040:
+  case M68K_CPU_TYPE_68LC040:
+  case M68K_CPU_TYPE_68040:
+  case M68K_CPU_TYPE_SCC68070:
+    return 1;
+  default:
+    return 0;
+  }
+}
+
+static const char* cpu_type_name(unsigned int type) {
+  switch (type) {
+  case M68K_CPU_TYPE_68000: return "68000";
+  case M68K_CPU_TYPE_68010: return "68010";
+  case M68K_CPU_TYPE_68EC020: return "68EC020";
+  case M68K_CPU_TYPE_68020: return "68020";
+  case M68K_CPU_TYPE_68EC030: return "68EC030";
+  case M68K_CPU_TYPE_68030: return "68030";
+  case M68K_CPU_TYPE_68EC040: return "68EC040";
+  case M68K_CPU_TYPE_68LC040: return "68LC040";
+  case M68K_CPU_TYPE_68040: return "68040";
+  case M68K_CPU_TYPE_SCC68070: return "SCC68070";
+  default: return "unknown";
+  }
+}
+
+static void enforce_kickstart_cpu_compat(struct emulator_config* cfg_) {
+  if (!cfg_) {
+    return;
+  }
+  if (cpu_type_at_least_68020(cpu_type)) {
+    return;
+  }
+
+  int kick_idx = -1;
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (cfg_->map_type[i] != MAPTYPE_ROM || !cfg_->map_data[i] || !cfg_->map_id[i]) {
+      continue;
+    }
+    if (strcasecmp(cfg_->map_id[i], "kickstart") == 0) {
+      kick_idx = i;
+      break;
+    }
+  }
+  if (kick_idx < 0) {
+    return;
+  }
+
+  struct romInfo info = {0};
+  size_t rom_len = cfg_->rom_size[kick_idx] ? (size_t)cfg_->rom_size[kick_idx]
+                                             : (size_t)cfg_->map_size[kick_idx];
+  if (!queryRomInfo(cfg_->map_data[kick_idx], rom_len, &info)) {
+    return;
+  }
+  if (!romInfoRequires68020(&info)) {
+    return;
+  }
+
+  unsigned int old_cpu = cpu_type;
+  cpu_type = M68K_CPU_TYPE_68020;
+  cfg_->cpu_type = cpu_type;
+  LOG_WARN("[CPU] Kickstart %u.%u (%s) requires at least 68020; overriding CPU %s -> 68020.\n",
+           info.major, info.minor, cfg_->map_id[kick_idx],
+           cpu_type_name(old_cpu));
+  LOG_WARN("[CPU] Use Kickstart 3.1 r40.63 for 68000/68010-class A500 boot.\n");
 }
 
 static int read_kernel_param_bool(const char* name) {
@@ -291,6 +367,38 @@ static void dump_cpu_state(const char *reason, int opcode) {
   if (crash_signal) {
     LOG_ERROR("[CPU] Signal detail: signo=%d si_code=%d fault_addr=%p\n",
               (int)crash_signal, (int)crash_si_code, (void*)crash_fault_addr);
+    if (cfg && crash_fault_addr) {
+      uintptr_t fa = (uintptr_t)crash_fault_addr;
+      int host_map_found = 0;
+      for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+        if (cfg->map_type[i] == MAPTYPE_NONE || !cfg->map_data[i]) {
+          continue;
+        }
+        uintptr_t base = (uintptr_t)cfg->map_data[i];
+        uintptr_t span = (uintptr_t)cfg->map_size[i];
+        if (cfg->map_type[i] == MAPTYPE_ROM || cfg->map_type[i] == MAPTYPE_RAM_WTC) {
+          if ((uintptr_t)cfg->rom_size[i] > span) {
+            span = (uintptr_t)cfg->rom_size[i];
+          }
+        }
+        if (!span) {
+          continue;
+        }
+        if (fa >= base && fa < (base + span)) {
+          uint32_t off = (uint32_t)(fa - base);
+          uint32_t guest = (uint32_t)cfg->map_offset[i] + off;
+          LOG_ERROR("[CPU] Fault host map[%d]: type=%u id=%s host_base=%p off=0x%X guest=$%.8X\n",
+                    i, (unsigned int)cfg->map_type[i],
+                    cfg->map_id[i] ? cfg->map_id[i] : "None",
+                    (void*)base, off, guest);
+          host_map_found = 1;
+          break;
+        }
+      }
+      if (!host_map_found) {
+        LOG_ERROR("[CPU] Fault host addr not in cfg map_data ranges\n");
+      }
+    }
   }
 
   m68k_disassemble(disasm_buf, pc, cpu_type);
@@ -346,14 +454,6 @@ static int illg_instr_callback(int opcode) {
 
 
 #if USE_UAE_JIT
-static void crash_signal_handler(int sig_num) {
-  crash_signal = sig_num;
-  crash_fault_addr = 0;
-  crash_si_code = 0;
-  dump_cpu_state("Signal", -1);
-  _exit(128 + sig_num);
-}
-
 static void crash_signal_handler_siginfo(int sig_num, siginfo_t* info, void* uctx) {
   (void)uctx;
   crash_signal = sig_num;
@@ -376,8 +476,8 @@ static void fc_boot_log_init(void)
   if (env && *env) {
     fc_boot_log_remaining = (unsigned int)strtoul(env, NULL, 0);
   } else {
-    // Default: small sample on boot, or set to 0 for totally silent
-    fc_boot_log_remaining = 32;
+    // Default silent; set PISTORM_FC_BOOT_LOG to enable.
+    fc_boot_log_remaining = 0;
   }
 }
 
@@ -1436,10 +1536,11 @@ switch_config:
       cfg->platform = make_platform_config("none", "generic");
     }
     cfg->platform->platform_initial_setup(cfg);
+    enforce_kickstart_cpu_compat(cfg);
   }
 
   if (fc_get_mode() != FC_MODE_OFF) {
-    fc_boot_log_remaining = 5;
+    fc_boot_log_init();
     LOG_INFO("[CPU] FC enabled and in use (mode=%s)\n", fc_mode_name(fc_get_mode()));
   } else {
     LOG_INFO("[CPU] FC disabled\n");
@@ -1538,11 +1639,31 @@ switch_config:
 
 #ifdef USE_UAE_JIT
   if (enable_jit_backend) {
-    use_uae_jit = 1;
-    printf("[CPU] UAE JIT backend enabled\n");
-    uae_pistorm_init(uae_cpu_model_from_musashi(cpu_type), 1, enable_fpu_jit_backend ? 1 : 0);
+    int rc = uae_pistorm_init(uae_cpu_model_from_musashi(cpu_type), 1, enable_fpu_jit_backend ? 1 : 0);
+    if (rc == 0) {
+      use_uae_jit = 1;
+      enable_jit_backend = 1;
+      LOG_INFO("[CPU] UAE JIT backend enabled\n");
+    } else {
+      uint32_t rv_sp = 0;
+      uint32_t rv_pc = 0;
+      int rv_ovl = -1;
+      int rv_err = uae_pistorm_get_last_init_error();
+      uae_pistorm_get_last_reset_vectors(&rv_sp, &rv_pc, &rv_ovl);
+      use_uae_jit = 0;
+      enable_jit_backend = 0;
+      LOG_ERROR("[CPU] UAE JIT init failed (rc=%d), falling back to Musashi\n", rc);
+      LOG_ERROR("[CPU] UAE JIT init detail: err=%d reset_sp=$%.8X reset_pc=$%.8X ovl=%d\n",
+                rv_err, rv_sp, rv_pc, rv_ovl);
+      if (rv_err == 4) {
+        LOG_WARN("[CPU] UAE JIT requires direct low RAM mapping at $000000 in this build.\n");
+        LOG_WARN("[CPU] Keep Musashi for real-chip lowmem, or remap low RAM to Pi-owned memory.\n");
+      }
+    }
   }
 #endif
+
+  LOG_INFO("[CPU] Active backend: %s\n", use_uae_jit ? "UAE JIT" : "Musashi");
 
   if (!use_uae_jit) {
     m68k_init();
