@@ -1262,8 +1262,8 @@ void m68k_set_context(void* src) {
 inline unsigned int m68k_read_immediate_16(m68ki_cpu_core *state, unsigned int address) {
 #if M68K_EMULATE_PREFETCH == OPT_ON
 	for (int i = 0; i < state->read_ranges; i++) {
-		if(address >= state->read_addr[i] && address < state->read_upper[i]) {
-			return be16toh(((unsigned short *)(state->read_data[i] + (address - state->read_addr[i])))[0]);
+		if(m68ki_range_contains_16(address, state->read_addr[i], state->read_upper[i])) {
+			return be16toh(ps_load_u16(state->read_data[i] + (address - state->read_addr[i])));
 		}
 	}
 #endif
@@ -1273,8 +1273,8 @@ inline unsigned int m68k_read_immediate_16(m68ki_cpu_core *state, unsigned int a
 inline unsigned int m68k_read_immediate_32(m68ki_cpu_core *state, unsigned int address) {
 #if M68K_EMULATE_PREFETCH == OPT_ON
 	for (int i = 0; i < state->read_ranges; i++) {
-		if(address >= state->read_addr[i] && address < state->read_upper[i]) {
-			return be32toh(((unsigned int *)(state->read_data[i] + (address - state->read_addr[i])))[0]);
+		if(m68ki_range_contains_32(address, state->read_addr[i], state->read_upper[i])) {
+			return be32toh(ps_load_u32(state->read_data[i] + (address - state->read_addr[i])));
 		}
 	}
 #endif
@@ -1285,7 +1285,7 @@ inline unsigned int m68k_read_immediate_32(m68ki_cpu_core *state, unsigned int a
 /* Read data relative to the PC */
 inline unsigned int m68k_read_pcrelative_8(m68ki_cpu_core *state, unsigned int address) {
 	for (int i = 0; i < state->read_ranges; i++) {
-		if(address >= state->read_addr[i] && address < state->read_upper[i]) {
+		if(m68ki_range_contains_8(address, state->read_addr[i], state->read_upper[i])) {
 			return state->read_data[i][address - state->read_addr[i]];
 		}
 	}
@@ -1294,8 +1294,8 @@ inline unsigned int m68k_read_pcrelative_8(m68ki_cpu_core *state, unsigned int a
 }
 inline unsigned int  m68k_read_pcrelative_16(m68ki_cpu_core *state, unsigned int address) {
 	for (int i = 0; i < state->read_ranges; i++) {
-		if(address >= state->read_addr[i] && address < state->read_upper[i]) {
-			return be16toh(((unsigned short *)(state->read_data[i] + (address - state->read_addr[i])))[0]);
+		if(m68ki_range_contains_16(address, state->read_addr[i], state->read_upper[i])) {
+			return be16toh(ps_load_u16(state->read_data[i] + (address - state->read_addr[i])));
 		}
 	}
 
@@ -1303,8 +1303,8 @@ inline unsigned int  m68k_read_pcrelative_16(m68ki_cpu_core *state, unsigned int
 }
 inline unsigned int  m68k_read_pcrelative_32(m68ki_cpu_core *state, unsigned int address) {
 	for (int i = 0; i < state->read_ranges; i++) {
-		if(address >= state->read_addr[i] && address < state->read_upper[i]) {
-			return be32toh(((unsigned int *)(state->read_data[i] + (address - state->read_addr[i])))[0]);
+		if(m68ki_range_contains_32(address, state->read_addr[i], state->read_upper[i])) {
+			return be32toh(ps_load_u32(state->read_data[i] + (address - state->read_addr[i])));
 		}
 	}
 
@@ -1313,15 +1313,15 @@ inline unsigned int  m68k_read_pcrelative_32(m68ki_cpu_core *state, unsigned int
 #endif
 
 uint m68ki_read_imm16_addr_slowpath(m68ki_cpu_core *state, uint32_t pc, address_translation_cache *cache) {
-    uint32_t address = ADDRESS_68K(pc);
+	uint32_t address = ADDRESS_68K(pc);
     uint32_t pc_address_diff = pc - address;
 	for (int i = 0; i < state->read_ranges; i++) {
-		if(address >= state->read_addr[i] && address < state->read_upper[i]) {
+		if(m68ki_range_contains_16(address, state->read_addr[i], state->read_upper[i])) {
 			cache->lower = state->read_addr[i] + pc_address_diff;
 			cache->upper = state->read_upper[i] + pc_address_diff;
 			cache->offset = state->read_data[i] - cache->lower;
 			REG_PC += 2;
-			return be16toh(((unsigned short *)(state->read_data[i] + (address - state->read_addr[i])))[0]);
+			return be16toh(ps_load_u16(state->read_data[i] + (address - state->read_addr[i])));
 		}
 	}
 

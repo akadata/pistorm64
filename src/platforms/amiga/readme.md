@@ -89,6 +89,17 @@ Example: `setvar piscsi0 PI0.hdf`
 The `piscsi0` through `piscsi6` variables allow you to mount an RDB hard drive image or a physical drive for use with the PiSCSI interface.  
 More detailed information is available in the `platforms/amiga/piscsi` readme file.
 
+# piscsi64
+
+Example: `setvar piscsi64`  
+Enables the PiSCSI64 Z3 virtual SCSI host device.
+
+# piscsi64_1-piscsi64_15
+
+Example: `setvar piscsi64_1 /opt/Amiga/hdf/workbench.hdf`  
+The `piscsi64_1` through `piscsi64_15` variables mount images for PiSCSI64 targets.  
+`piscsi64_0` is reserved for controller identity and is not used as a disk target.
+
 # rtg
 
 Example: `setvar rtg`  

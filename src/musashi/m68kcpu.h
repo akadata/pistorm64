@@ -78,6 +78,38 @@ static inline void ps_store_u32(void *p, uint32_t v)
     memcpy(p, &v, sizeof(v));
 }
 
+/* Returns true when [address, address + width - 1] is fully inside [lower, upper). */
+static inline int m68ki_range_contains_access(uint32_t address, uint32_t lower, uint32_t upper, uint32_t width)
+{
+    uint32_t span;
+
+    if (address < lower || upper <= lower) {
+        return 0;
+    }
+
+    span = upper - lower;
+    if (span < width) {
+        return 0;
+    }
+
+    return (address - lower) <= (span - width);
+}
+
+static inline int m68ki_range_contains_8(uint32_t address, uint32_t lower, uint32_t upper)
+{
+    return m68ki_range_contains_access(address, lower, upper, 1u);
+}
+
+static inline int m68ki_range_contains_16(uint32_t address, uint32_t lower, uint32_t upper)
+{
+    return m68ki_range_contains_access(address, lower, upper, 2u);
+}
+
+static inline int m68ki_range_contains_32(uint32_t address, uint32_t lower, uint32_t upper)
+{
+    return m68ki_range_contains_access(address, lower, upper, 4u);
+}
+
 
 /* ======================================================================== */
 /* ==================== ARCHITECTURE-DEPENDANT DEFINES ==================== */
@@ -1244,7 +1276,7 @@ static inline uint m68ki_read_imm_16(m68ki_cpu_core *state)
 	uint32_t pc = REG_PC;
 
 	address_translation_cache *cache = &state->code_translation_cache;
-	if(pc >= cache->lower && pc < cache->upper)
+	if(cache->offset && m68ki_range_contains_16(pc, cache->lower, cache->upper))
 	{
 		REG_PC += 2;
 		return be16toh(ps_load_u16(cache->offset + pc));
@@ -1270,7 +1302,7 @@ static inline uint m68ki_read_imm_32(m68ki_cpu_core *state)
 #endif
 	uint32_t address = ADDRESS_68K(REG_PC);
 	for (int i = 0; i < state->read_ranges; i++) {
-		if(address >= state->read_addr[i] && address < state->read_upper[i]) {
+		if(m68ki_range_contains_32(address, state->read_addr[i], state->read_upper[i])) {
 			REG_PC += 4;
 			return be32toh(ps_load_u32(state->read_data[i] + (address - state->read_addr[i])));
 		}
@@ -1342,13 +1374,13 @@ static inline uint m68ki_read_8_fc(m68ki_cpu_core *state, uint address, uint fc)
 #endif
 
 	address_translation_cache *cache = &state->fc_read_translation_cache;
-	if(cache->offset && address >= cache->lower && address < cache->upper)
+	if(cache->offset && m68ki_range_contains_8(address, cache->lower, cache->upper))
 	{
 		return cache->offset[address - cache->lower];
 	}
 
 	for (int i = 0; i < state->read_ranges; i++) {
-		if(address >= state->read_addr[i] && address < state->read_upper[i]) {
+		if(m68ki_range_contains_8(address, state->read_addr[i], state->read_upper[i])) {
 			SET_FC_TRANSLATION_CACHE_VALUES
 			return state->read_data[i][address - state->read_addr[i]];
 		}
@@ -1378,13 +1410,13 @@ static inline uint m68ki_read_16_fc(m68ki_cpu_core *state, uint address, uint fc
 #endif
 
 	address_translation_cache *cache = &state->fc_read_translation_cache;
-	if(cache->offset && address >= cache->lower && address < cache->upper)
+	if(cache->offset && m68ki_range_contains_16(address, cache->lower, cache->upper))
 	{
 		return be16toh(ps_load_u16(cache->offset + (address - cache->lower)));
 	}
 
 	for (int i = 0; i < state->read_ranges; i++) {
-		if(address >= state->read_addr[i] && address < state->read_upper[i]) {
+		if(m68ki_range_contains_16(address, state->read_addr[i], state->read_upper[i])) {
 			SET_FC_TRANSLATION_CACHE_VALUES
 			return be16toh(ps_load_u16(state->read_data[i] + (address - state->read_addr[i])));
 		}
@@ -1417,13 +1449,13 @@ static inline uint m68ki_read_32_fc(m68ki_cpu_core *state, uint address, uint fc
 #endif
 
 	address_translation_cache *cache = &state->fc_read_translation_cache;
-	if(cache->offset && address >= cache->lower && address < cache->upper)
+	if(cache->offset && m68ki_range_contains_32(address, cache->lower, cache->upper))
 	{
 		return be32toh(ps_load_u32(cache->offset + (address - cache->lower)));
 	}
 
 	for (int i = 0; i < state->read_ranges; i++) {
-		if(address >= state->read_addr[i] && address < state->read_upper[i]) {
+		if(m68ki_range_contains_32(address, state->read_addr[i], state->read_upper[i])) {
 			SET_FC_TRANSLATION_CACHE_VALUES
 			return be32toh(ps_load_u32(state->read_data[i] + (address - state->read_addr[i])));
 		}
@@ -1458,14 +1490,14 @@ static inline void m68ki_write_8_fc(m68ki_cpu_core *state, uint address, uint fc
 #endif
 
 	address_translation_cache *cache = &state->fc_write_translation_cache;
-	if(cache->offset && address >= cache->lower && address < cache->upper)
+	if(cache->offset && m68ki_range_contains_8(address, cache->lower, cache->upper))
 	{
 		cache->offset[address - cache->lower] = (unsigned char)value;
 		return;
 	}
 
 	for (int i = 0; i < state->write_ranges; i++) {
-		if(address >= state->write_addr[i] && address < state->write_upper[i]) {
+		if(m68ki_range_contains_8(address, state->write_addr[i], state->write_upper[i])) {
 			SET_FC_WRITE_TRANSLATION_CACHE_VALUES
 			state->write_data[i][address - state->write_addr[i]] = (unsigned char)value;
 			return;
@@ -1497,14 +1529,14 @@ static inline void m68ki_write_16_fc(m68ki_cpu_core *state, uint address, uint f
 #endif
 
 	address_translation_cache *cache = &state->fc_write_translation_cache;
-	if(cache->offset && address >= cache->lower && address < cache->upper)
+	if(cache->offset && m68ki_range_contains_16(address, cache->lower, cache->upper))
 	{
 		ps_store_u16(cache->offset + (address - cache->lower), htobe16(value));
 		return;
 	}
 
 	for (int i = 0; i < state->write_ranges; i++) {
-		if(address >= state->write_addr[i] && address < state->write_upper[i]) {
+		if(m68ki_range_contains_16(address, state->write_addr[i], state->write_upper[i])) {
 			SET_FC_WRITE_TRANSLATION_CACHE_VALUES
 			ps_store_u16(state->write_data[i] + (address - state->write_addr[i]), htobe16(value));
 			return;
@@ -1541,14 +1573,14 @@ static inline void m68ki_write_32_fc(m68ki_cpu_core *state, uint address, uint f
 #endif
 
 	address_translation_cache *cache = &state->fc_write_translation_cache;
-	if(cache->offset && address >= cache->lower && address < cache->upper)
+	if(cache->offset && m68ki_range_contains_32(address, cache->lower, cache->upper))
 	{
 		ps_store_u32(cache->offset + (address - cache->lower), htobe32(value));
 		return;
 	}
 
 	for (int i = 0; i < state->write_ranges; i++) {
-		if(address >= state->write_addr[i] && address < state->write_upper[i]) {
+		if(m68ki_range_contains_32(address, state->write_addr[i], state->write_upper[i])) {
 			SET_FC_WRITE_TRANSLATION_CACHE_VALUES
 			ps_store_u32(state->write_data[i] + (address - state->write_addr[i]), htobe32(value));
 			return;

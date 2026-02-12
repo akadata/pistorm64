@@ -13,6 +13,7 @@
 #include "platforms/amiga/hunk-reloc.h"
 #include "platforms/amiga/piscsi/piscsi.h"
 #include "platforms/amiga/piscsi/piscsi-enums.h"
+#include "platforms/amiga/piscsi64/piscsi64-api.h"
 #include "platforms/amiga/net/pi-net.h"
 #include "platforms/amiga/net/pi-net-enums.h"
 #include "platforms/amiga/ahi/pi_ahi.h"
@@ -274,6 +275,7 @@ int force_move_slow_to_chip = 0;
 uint8_t mouse_dx = 0;
 uint8_t mouse_dy = 0;
 uint8_t mouse_buttons = 0;
+uint8_t mouse_buttons_latched = 0;
 uint8_t mouse_extra = 0;
 
 extern uint8_t gayle_int;
@@ -1172,7 +1174,7 @@ key_loop:
       if (c && c == cfg->mouse_toggle_key) {
         mouse_hook_enabled ^= 1;
         printf("Mouse hook %s.\n", mouse_hook_enabled ? "enabled" : "disabled");
-        mouse_dx = mouse_dy = mouse_buttons = mouse_extra = 0;
+        mouse_dx = mouse_dy = mouse_buttons = mouse_buttons_latched = mouse_extra = 0;
       }
       if (c == 'r') {
         cpu_emulation_running ^= 1;
@@ -1248,6 +1250,7 @@ mouse_loop:
     uint8_t x, y, b, e;
     while (get_mouse_status(&x, &y, &b, &e)) {
       mouse_buttons = b;
+      mouse_buttons_latched |= (uint8_t)(b & 0x07u);
       mouse_extra = e;
       mouse_dx = x;
       mouse_dy = y;
@@ -1936,10 +1939,16 @@ static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t*
       return amiga_handle_intrqr_read(res);
       break;
     case CIAAPRA:
-      if (mouse_hook_enabled && (mouse_buttons & 0x01)) {
-        rres = (uint32_t)ps_read(type, addr);
-        *res = (rres ^ 0x40);
-        return 1;
+      if (mouse_hook_enabled) {
+        uint8_t buttons = (uint8_t)(mouse_buttons | mouse_buttons_latched);
+        if (buttons & 0x01) {
+          if ((mouse_buttons_latched & 0x01) && !(mouse_buttons & 0x01)) {
+            mouse_buttons_latched &= (uint8_t)~0x01u;
+          }
+          rres = (uint32_t)ps_read(type, addr);
+          *res = (rres ^ 0x40);
+          return 1;
+        }
       }
       if (swap_df0_with_dfx && spoof_df0_id) {
         // DF0 doesn't emit a drive type ID on RDY pin
@@ -2010,11 +2019,18 @@ static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t*
     }
     case POTGOR:
       if (mouse_hook_enabled) {
+        uint8_t buttons = (uint8_t)(mouse_buttons | mouse_buttons_latched);
         unsigned short result = (unsigned short)ps_read(type, addr);
         // bit 1 rmb, bit 2 mmb
-        if (mouse_buttons & 0x06) {
-          *res = (unsigned int)((result ^ ((mouse_buttons & 0x02) << 9))     // move rmb to bit 10
-                                & (result ^ ((mouse_buttons & 0x04) << 6))); // move mmb to bit 8
+        if (buttons & 0x06) {
+          if ((mouse_buttons_latched & 0x02) && !(mouse_buttons & 0x02)) {
+            mouse_buttons_latched &= (uint8_t)~0x02u;
+          }
+          if ((mouse_buttons_latched & 0x04) && !(mouse_buttons & 0x04)) {
+            mouse_buttons_latched &= (uint8_t)~0x04u;
+          }
+          *res = (unsigned int)((result ^ ((buttons & 0x02) << 9))     // move rmb to bit 10
+                                & (result ^ ((buttons & 0x04) << 6))); // move mmb to bit 8
           return 1;
         }
         *res = (unsigned int)(result & 0xfffd);
@@ -2059,6 +2075,10 @@ static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t*
     if (addr >= cfg->custom_low && addr < cfg->custom_high) {
       if (addr >= PISCSI_OFFSET && addr < PISCSI_UPPER) {
         *res = handle_piscsi_read(addr, type);
+        return 1;
+      }
+      if (addr >= PISCSI64_OFFSET && addr < PISCSI64_UPPER) {
+        *res = handle_piscsi64_read(addr, type);
         return 1;
       }
       if (addr >= PINET_OFFSET && addr < PINET_UPPER) {
@@ -2288,6 +2308,10 @@ static inline int32_t platform_write_check(uint8_t type, uint32_t addr, uint32_t
     if (addr >= cfg->custom_low && addr < cfg->custom_high) {
       if (addr >= PISCSI_OFFSET && addr < PISCSI_UPPER) {
         handle_piscsi_write(addr, val, type);
+        return 1;
+      }
+      if (addr >= PISCSI64_OFFSET && addr < PISCSI64_UPPER) {
+        handle_piscsi64_write(addr, val, type);
         return 1;
       }
       if (addr >= PINET_OFFSET && addr < PINET_UPPER) {

@@ -94,6 +94,34 @@ static inline int do_write_value(unsigned char type, unsigned char* p, unsigned 
   }
 }
 
+static inline uint32_t op_type_width(unsigned char type) {
+  switch (type) {
+  case OP_TYPE_BYTE:
+    return 1;
+  case OP_TYPE_WORD:
+    return 2;
+  case OP_TYPE_LONGWORD:
+    return 4;
+  case OP_TYPE_MEM:
+  default:
+    return 0;
+  }
+}
+
+static inline int range_contains_size(uint32_t addr, uint32_t base, uint32_t size, uint32_t width) {
+  if (width == 0 || size < width || addr < base) {
+    return 0;
+  }
+  return (addr - base) <= (size - width);
+}
+
+static inline int range_contains_hi(uint32_t addr, uint32_t lo, uint32_t hi, uint32_t width) {
+  if (hi <= lo) {
+    return 0;
+  }
+  return range_contains_size(addr, lo, hi - lo, width);
+}
+
 const char* memmap_kind_name(mem_map_kind_t kind) {
   switch (kind) {
   case MEM_MAP_KIND_ROM:
@@ -240,19 +268,35 @@ static inline int map_slot_active(const struct emulator_config* cfg, int index) 
 
 static inline int mapped_read_at_index(struct emulator_config* cfg, int i, unsigned int addr,
                                        unsigned int* val, unsigned char type) {
+  uint32_t width = op_type_width(type);
   unsigned char* read_addr = NULL;
+  if (width == 0) {
+    return -1;
+  }
   switch (cfg->map_type[i]) {
   case MAPTYPE_ROM:
     if (!cfg->map_data[i] || cfg->rom_size[i] == 0) {
       return -1;
     }
-    read_addr = cfg->map_data[i] + ((addr - cfg->map_offset[i]) % cfg->rom_size[i]);
+    if (!range_contains_size((uint32_t)addr, (uint32_t)cfg->map_offset[i], (uint32_t)cfg->map_size[i], width)) {
+      return -1;
+    }
+    {
+      uint32_t rel = ((uint32_t)addr - (uint32_t)cfg->map_offset[i]) % (uint32_t)cfg->rom_size[i];
+      if (rel > ((uint32_t)cfg->rom_size[i] - width)) {
+        return -1;
+      }
+      read_addr = cfg->map_data[i] + rel;
+    }
     return do_read_value(type, read_addr, val);
 
   case MAPTYPE_RAM:
   case MAPTYPE_RAM_WTC:
   case MAPTYPE_RAM_NOALLOC:
     if (!cfg->map_data[i]) {
+      return -1;
+    }
+    if (!range_contains_size((uint32_t)addr, (uint32_t)cfg->map_offset[i], (uint32_t)cfg->map_size[i], width)) {
       return -1;
     }
     read_addr = cfg->map_data[i] + (addr - cfg->map_offset[i]);
@@ -275,6 +319,11 @@ static inline int mapped_read_at_index(struct emulator_config* cfg, int i, unsig
 
 int handle_mapped_read(struct emulator_config* cfg, unsigned int addr, unsigned int* val,
                        unsigned char type) {
+  uint32_t width = op_type_width(type);
+  if (width == 0) {
+    return -1;
+  }
+
   // OVL remap must win over base mappings (for example chip RAM at 0x000000).
   if (ovl) {
     int i = read_cache_ovl_idx;
@@ -283,9 +332,12 @@ int handle_mapped_read(struct emulator_config* cfg, unsigned int addr, unsigned 
         cfg->rom_size[i] &&
         (cfg->map_type[i] == MAPTYPE_ROM || cfg->map_type[i] == MAPTYPE_RAM_WTC) &&
         cfg->map_mirror[i] != ((unsigned int)-1) &&
-        CHKRANGE(addr, cfg->map_mirror[i], cfg->map_size[i])) {
-      unsigned char* read_addr = cfg->map_data[i] + ((addr - cfg->map_mirror[i]) % cfg->rom_size[i]);
-      return do_read_value(type, read_addr, val);
+        range_contains_size((uint32_t)addr, (uint32_t)cfg->map_mirror[i], (uint32_t)cfg->map_size[i], width)) {
+      uint32_t rel = ((uint32_t)addr - (uint32_t)cfg->map_mirror[i]) % (uint32_t)cfg->rom_size[i];
+      if (rel <= ((uint32_t)cfg->rom_size[i] - width)) {
+        unsigned char* read_addr = cfg->map_data[i] + rel;
+        return do_read_value(type, read_addr, val);
+      }
     }
     for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
       if (cfg->map_type[i] == MAPTYPE_NONE) {
@@ -297,16 +349,20 @@ int handle_mapped_read(struct emulator_config* cfg, unsigned int addr, unsigned 
       if (cfg->map_mirror[i] != ((unsigned int)-1) &&
           cfg->map_data[i] &&
           cfg->rom_size[i] &&
-          CHKRANGE(addr, cfg->map_mirror[i], cfg->map_size[i])) {
-        unsigned char* read_addr = cfg->map_data[i] + ((addr - cfg->map_mirror[i]) % cfg->rom_size[i]);
-        read_cache_ovl_idx = i;
-        return do_read_value(type, read_addr, val);
+          range_contains_size((uint32_t)addr, (uint32_t)cfg->map_mirror[i], (uint32_t)cfg->map_size[i], width)) {
+        uint32_t rel = ((uint32_t)addr - (uint32_t)cfg->map_mirror[i]) % (uint32_t)cfg->rom_size[i];
+        if (rel <= ((uint32_t)cfg->rom_size[i] - width)) {
+          unsigned char* read_addr = cfg->map_data[i] + rel;
+          read_cache_ovl_idx = i;
+          return do_read_value(type, read_addr, val);
+        }
       }
     }
   }
 
   if (map_slot_active(cfg, read_cache_base_idx) &&
-      CHKRANGE_ABS(addr, cfg->map_offset[read_cache_base_idx], cfg->map_high[read_cache_base_idx])) {
+      range_contains_hi((uint32_t)addr, (uint32_t)cfg->map_offset[read_cache_base_idx],
+                        (uint32_t)cfg->map_high[read_cache_base_idx], width)) {
     int res = mapped_read_at_index(cfg, read_cache_base_idx, addr, val, type);
     if (res != -1) {
       return res;
@@ -317,7 +373,7 @@ int handle_mapped_read(struct emulator_config* cfg, unsigned int addr, unsigned 
     if (cfg->map_type[i] == MAPTYPE_NONE) {
       continue;
     }
-    if (CHKRANGE_ABS(addr, cfg->map_offset[i], cfg->map_high[i])) {
+    if (range_contains_hi((uint32_t)addr, (uint32_t)cfg->map_offset[i], (uint32_t)cfg->map_high[i], width)) {
       int res = mapped_read_at_index(cfg, i, addr, val, type);
       if (res != -1) {
         read_cache_base_idx = i;
@@ -331,11 +387,24 @@ int handle_mapped_read(struct emulator_config* cfg, unsigned int addr, unsigned 
 
 static inline int mapped_write_at_index(struct emulator_config* cfg, int i, unsigned int addr,
                                         unsigned int value, unsigned char type) {
+  uint32_t width = op_type_width(type);
   unsigned char* write_addr = NULL;
+  if (width == 0) {
+    return -1;
+  }
   switch (cfg->map_type[i]) {
   case MAPTYPE_ROM:
     if (rom_write_passthrough_enabled() && cfg->map_data[i] && cfg->rom_size[i] > 0) {
-      write_addr = cfg->map_data[i] + ((addr - cfg->map_offset[i]) % cfg->rom_size[i]);
+      if (!range_contains_size((uint32_t)addr, (uint32_t)cfg->map_offset[i], (uint32_t)cfg->map_size[i], width)) {
+        return -1;
+      }
+      {
+        uint32_t rel = ((uint32_t)addr - (uint32_t)cfg->map_offset[i]) % (uint32_t)cfg->rom_size[i];
+        if (rel > ((uint32_t)cfg->rom_size[i] - width)) {
+          return -1;
+        }
+        write_addr = cfg->map_data[i] + rel;
+      }
       return do_write_value(type, write_addr, value, 1);
     }
 
@@ -359,11 +428,17 @@ static inline int mapped_write_at_index(struct emulator_config* cfg, int i, unsi
     if (!cfg->map_data[i]) {
       return -1;
     }
+    if (!range_contains_size((uint32_t)addr, (uint32_t)cfg->map_offset[i], (uint32_t)cfg->map_size[i], width)) {
+      return -1;
+    }
     write_addr = cfg->map_data[i] + (addr - cfg->map_offset[i]);
     return do_write_value(type, write_addr, value, 1);
 
   case MAPTYPE_RAM_WTC:
     if (!cfg->map_data[i]) {
+      return -1;
+    }
+    if (!range_contains_size((uint32_t)addr, (uint32_t)cfg->map_offset[i], (uint32_t)cfg->map_size[i], width)) {
       return -1;
     }
     write_addr = cfg->map_data[i] + (addr - cfg->map_offset[i]);
@@ -382,7 +457,11 @@ static inline int mapped_write_at_index(struct emulator_config* cfg, int i, unsi
 
 int handle_mapped_write(struct emulator_config* cfg, unsigned int addr, unsigned int value,
                         unsigned char type) {
+  uint32_t width = op_type_width(type);
   int res = -1;
+  if (width == 0) {
+    return -1;
+  }
 
   // OVL write-through remap must win over base mappings.
   if (ovl) {
@@ -392,9 +471,12 @@ int handle_mapped_write(struct emulator_config* cfg, unsigned int addr, unsigned
         cfg->map_data[i] &&
         cfg->rom_size[i] &&
         cfg->map_mirror[i] != ((unsigned int)-1) &&
-        CHKRANGE(addr, cfg->map_mirror[i], cfg->map_size[i])) {
-      unsigned char* write_addr = cfg->map_data[i] + ((addr - cfg->map_mirror[i]) % cfg->rom_size[i]);
-      return do_write_value(type, write_addr, value, -1);
+        range_contains_size((uint32_t)addr, (uint32_t)cfg->map_mirror[i], (uint32_t)cfg->map_size[i], width)) {
+      uint32_t rel = ((uint32_t)addr - (uint32_t)cfg->map_mirror[i]) % (uint32_t)cfg->rom_size[i];
+      if (rel <= ((uint32_t)cfg->rom_size[i] - width)) {
+        unsigned char* write_addr = cfg->map_data[i] + rel;
+        return do_write_value(type, write_addr, value, -1);
+      }
     }
     for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
       if (cfg->map_type[i] == MAPTYPE_NONE) {
@@ -406,16 +488,20 @@ int handle_mapped_write(struct emulator_config* cfg, unsigned int addr, unsigned
       if (cfg->map_mirror[i] != ((unsigned int)-1) &&
           cfg->map_data[i] &&
           cfg->rom_size[i] &&
-          CHKRANGE(addr, cfg->map_mirror[i], cfg->map_size[i])) {
-        unsigned char* write_addr = cfg->map_data[i] + ((addr - cfg->map_mirror[i]) % cfg->rom_size[i]);
-        write_cache_ovl_idx = i;
-        return do_write_value(type, write_addr, value, -1);
+          range_contains_size((uint32_t)addr, (uint32_t)cfg->map_mirror[i], (uint32_t)cfg->map_size[i], width)) {
+        uint32_t rel = ((uint32_t)addr - (uint32_t)cfg->map_mirror[i]) % (uint32_t)cfg->rom_size[i];
+        if (rel <= ((uint32_t)cfg->rom_size[i] - width)) {
+          unsigned char* write_addr = cfg->map_data[i] + rel;
+          write_cache_ovl_idx = i;
+          return do_write_value(type, write_addr, value, -1);
+        }
       }
     }
   }
 
   if (map_slot_active(cfg, write_cache_base_idx) &&
-      CHKRANGE_ABS(addr, cfg->map_offset[write_cache_base_idx], cfg->map_high[write_cache_base_idx])) {
+      range_contains_hi((uint32_t)addr, (uint32_t)cfg->map_offset[write_cache_base_idx],
+                        (uint32_t)cfg->map_high[write_cache_base_idx], width)) {
     int wr = mapped_write_at_index(cfg, write_cache_base_idx, addr, value, type);
     if (wr != -1) {
       return wr;
@@ -426,7 +512,7 @@ int handle_mapped_write(struct emulator_config* cfg, unsigned int addr, unsigned
     if (cfg->map_type[i] == MAPTYPE_NONE) {
       continue;
     }
-    if (CHKRANGE_ABS(addr, cfg->map_offset[i], cfg->map_high[i])) {
+    if (range_contains_hi((uint32_t)addr, (uint32_t)cfg->map_offset[i], (uint32_t)cfg->map_high[i], width)) {
       int wr = mapped_write_at_index(cfg, i, addr, value, type);
       if (wr != -1) {
         write_cache_base_idx = i;
