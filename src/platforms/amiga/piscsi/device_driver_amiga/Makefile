@@ -7,7 +7,7 @@ VBCC ?=
 AMIGA_NDK_C_INCLUDE ?=
 AMIGA_NDK_ASM_INCLUDE ?=
 
-CPU ?= 020
+CPU ?= 040
 
 ifeq ($(CPU),000)
 DEVICE_TARGET = PiSCSI000.device
@@ -69,7 +69,7 @@ ROM_SRC ?= bootrom.s
 
 DEVICE_SRC ?= piscsi-amiga-2.c
 
-DEVICE_CFLAGS ?= $(CPUFLAG) -O2 -Wall -Wextra -Wno-unused-parameter -fomit-frame-pointer -nostdlib -nostartfiles
+DEVICE_CFLAGS ?= $(CPUFLAG) -O3 -Wall -Wextra -Wno-unused-parameter -fomit-frame-pointer -nostdlib -nostartfiles
 ifneq ($(strip $(AMIGA_NDK_C_INCLUDE)),)
 DEVICE_CFLAGS += -I$(AMIGA_NDK_C_INCLUDE)
 endif
@@ -82,7 +82,10 @@ $(ROM_TARGET): $(ROM_SRC)
 $(DEVICE_TARGET): $(DEVICE_SRC)
 	PATH="$(AMIGA_PATH)" $(M68K_GCC) $(DEVICE_CFLAGS) -o $@ $<
 
+install:
+	cp -a PiSCSI$(CPU).device /opt/pistorm64/data/a314-shared/pi-scsi.device
 clean:
 	rm -f $(ROM_TARGET) PiSCSI*.device pi-scsi.device pi-scsi000.device pi-scsi010.device pi-scsi020.device pi-scsi030.device pi-scsi040.device pi-scsi060.device
+
 
 .PHONY: all clean

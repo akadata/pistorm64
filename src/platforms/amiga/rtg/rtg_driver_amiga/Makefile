@@ -53,7 +53,9 @@ clean:
 	rm -f PiGFX*.card
 
 install:
-	cp *.card *.info /opt/pistorm64/data/a314-shared/
+	cp PiGFX$(CPU).card /opt/pistorm64/data/a314-shared/pigfx.card
+	cp PiGFX.info /opt/pistorm64/data/a314-shared/
+
 FORCE:
 
 .PHONY: all clean install FORCE
