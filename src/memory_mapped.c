@@ -4,9 +4,11 @@
 #include "memory_mapped.h"
 #include "m68k.h"
 #include "platforms/amiga/Gayle.h"
+#include "platforms/amiga/amiga-autoconf.h"
 #include "log.h"
 #include <endian.h>
 #include <stdlib.h>
+#include <string.h>
 #include <strings.h>
 
 #define CHKRANGE(a, b, c) a >= (unsigned int)b && a < (unsigned int)(b + c)
@@ -90,6 +92,145 @@ static inline int do_write_value(unsigned char type, unsigned char* p, unsigned 
   default:
     return -1;
   }
+}
+
+const char* memmap_kind_name(mem_map_kind_t kind) {
+  switch (kind) {
+  case MEM_MAP_KIND_ROM:
+    return "rom";
+  case MEM_MAP_KIND_RAM:
+    return "ram";
+  case MEM_MAP_KIND_Z2:
+    return "z2";
+  case MEM_MAP_KIND_Z3:
+    return "z3";
+  case MEM_MAP_KIND_IO:
+    return "io";
+  case MEM_MAP_KIND_RTG:
+    return "rtg";
+  case MEM_MAP_KIND_PISCSI:
+    return "piscsi";
+  case MEM_MAP_KIND_PINET:
+    return "pinet";
+  case MEM_MAP_KIND_AUTOCONFIG:
+    return "autoconfig";
+  case MEM_MAP_KIND_NONE:
+  default:
+    return "none";
+  }
+}
+
+static inline int map_id_contains(const char* id, const char* needle) {
+  return id && needle && strstr(id, needle) != NULL;
+}
+
+static mem_map_kind_t classify_kind(const struct emulator_config* cfg, int index,
+                                    uint32_t addr, uint8_t* is_autoconfig,
+                                    uint8_t* cacheable, uint8_t* executable) {
+  const amiga_zorro_layout_t* layout = amiga_get_zorro_layout();
+  const char* id = cfg->map_id[index];
+  uint8_t map_type = cfg->map_type[index];
+
+  *is_autoconfig = 0;
+  *cacheable = 0;
+  *executable = 0;
+
+  if (layout &&
+      ((addr >= layout->z2_config_base &&
+        addr < (layout->z2_config_base + layout->config_window_size)) ||
+       (addr >= layout->z3_config_base &&
+        addr < (layout->z3_config_base + layout->config_window_size)))) {
+    *is_autoconfig = 1;
+    return MEM_MAP_KIND_AUTOCONFIG;
+  }
+
+  switch (map_type) {
+  case MAPTYPE_REGISTER:
+    return MEM_MAP_KIND_IO;
+  case MAPTYPE_ROM:
+    *cacheable = 1;
+    *executable = 1;
+    break;
+  case MAPTYPE_RAM:
+  case MAPTYPE_RAM_WTC:
+  case MAPTYPE_RAM_NOALLOC:
+    *cacheable = 1;
+    *executable = 1;
+    break;
+  default:
+    break;
+  }
+
+  if (map_id_contains(id, "rtg")) {
+    *cacheable = 0;
+    *executable = 0;
+    return MEM_MAP_KIND_RTG;
+  }
+  if (map_id_contains(id, "piscsi")) {
+    *cacheable = 0;
+    *executable = 0;
+    return MEM_MAP_KIND_PISCSI;
+  }
+  if (map_id_contains(id, "pinet") || map_id_contains(id, "pi-net")) {
+    *cacheable = 0;
+    *executable = 0;
+    return MEM_MAP_KIND_PINET;
+  }
+
+  if (layout) {
+    if (addr >= layout->z2_mem_base && addr < (layout->z2_mem_base + layout->z2_mem_size)) {
+      return MEM_MAP_KIND_Z2;
+    }
+    if (addr >= layout->z3_mem_base && addr < (layout->z3_mem_base + layout->z3_mem_size)) {
+      return MEM_MAP_KIND_Z3;
+    }
+  }
+
+  if (map_type == MAPTYPE_ROM) {
+    return MEM_MAP_KIND_ROM;
+  }
+  if (map_type == MAPTYPE_RAM || map_type == MAPTYPE_RAM_WTC || map_type == MAPTYPE_RAM_NOALLOC) {
+    return MEM_MAP_KIND_RAM;
+  }
+  if (map_type == MAPTYPE_REGISTER) {
+    return MEM_MAP_KIND_IO;
+  }
+  return MEM_MAP_KIND_NONE;
+}
+
+int memmap_lookup(const struct emulator_config* cfg, uint32_t addr, mem_map_entry_info_t* out) {
+  if (!cfg) {
+    return -1;
+  }
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (cfg->map_type[i] == MAPTYPE_NONE || !cfg->map_size[i]) {
+      continue;
+    }
+    uint32_t lo = (uint32_t)cfg->map_offset[i];
+    uint32_t hi = (uint32_t)cfg->map_high[i];
+    if (!(addr >= lo && addr < hi)) {
+      continue;
+    }
+    if (out) {
+      uint32_t host_span = cfg->map_size[i];
+      if (cfg->map_type[i] == MAPTYPE_ROM || cfg->map_type[i] == MAPTYPE_RAM_WTC) {
+        if (cfg->rom_size[i] > host_span) {
+          host_span = cfg->rom_size[i];
+        }
+      }
+      out->index = i;
+      out->map_type = cfg->map_type[i];
+      out->amiga_base = lo;
+      out->size = cfg->map_size[i];
+      out->amiga_end_exclusive = hi;
+      out->host_ptr = cfg->map_data[i];
+      out->host_span = host_span;
+      out->map_id = cfg->map_id[i] ? cfg->map_id[i] : "None";
+      out->kind = classify_kind(cfg, i, addr, &out->is_autoconfig, &out->cacheable, &out->executable);
+    }
+    return i;
+  }
+  return -1;
 }
 
 static inline int map_slot_active(const struct emulator_config* cfg, int index) {

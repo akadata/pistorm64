@@ -38,13 +38,13 @@ map type=rom address=0xF80000 size=0x80000 file=/opt/Amiga/kick/Kickstart-v3.1-r
 # 1200, 3000 and 4000.
 #map type=ram address=0x08000000 size=1G id=cpu_slot_ram
 
-map type=ram address=0x08000000 size=128M id=cpu_slot_ram
+map type=ram address=0x08000000 size=32M id=cpu_slot_ram
 
-map type=ram address=0x44000000 size=256M  id=z3_autoconf_fast
+map type=ram address=0x44000000 size=128M  id=z3_autoconf_fast
 #map type=ram address=0x48000000 size=384M  id=z3_autoconf_fast
 #map type=ram address=0x52000000 size=256M  id=z3_autoconf_fast
 
-map type=ram address=0x00400000 size=6M    id=z2_autoconf_fast
+#map type=ram address=0x00400000 size=6M    id=z2_autoconf_fast
 map type=ram address=0x00100000 size=1M    id=chipram_extra
 
 #map type=ram address=0x08000000 size=512G id=cpu_slot_ram

@@ -21,6 +21,7 @@
 #include "platforms/amiga/pistorm-dev/pistorm-dev-enums.h"
 #include "gpio/ps_protocol.h"
 #include "log.h"
+#include "memory_mapped.h"
 #include "cpu_backend.h"
 #ifdef USE_UAE_JIT
 #ifdef __cplusplus
@@ -419,20 +420,24 @@ static void dump_cpu_state(const char *reason, int opcode) {
   }
 
   if (cfg) {
-    int32_t map_idx = get_mapped_item_by_address(cfg, pc);
-    if (map_idx >= 0) {
-      LOG_ERROR("[CPU] PC map[%d] type=%u range=$%.8lX-$%.8lX id=%s\n",
-                map_idx, (unsigned int)cfg->map_type[map_idx],
-                cfg->map_offset[map_idx], cfg->map_high[map_idx] - 1,
-                cfg->map_id[map_idx] ? cfg->map_id[map_idx] : "None");
-      if (cfg->map_type[map_idx] == MAPTYPE_ROM && cfg->map_data[map_idx]) {
-        uint32_t off = pc - (uint32_t)cfg->map_offset[map_idx];
-        unsigned char *base = cfg->map_data[map_idx];
+    mem_map_entry_info_t map_info;
+    if (memmap_lookup(cfg, pc, &map_info) >= 0) {
+      uint32_t amiga_end = map_info.amiga_end_exclusive ? (map_info.amiga_end_exclusive - 1u)
+                                                        : map_info.amiga_end_exclusive;
+      LOG_ERROR("[CPU] PC map[%d] amiga=$%.8X-$%.8X size=$%.8X host=%p host_span=$%.8X "
+                "type=%u kind=%s cacheable=%u executable=%u id=%s\n",
+                map_info.index, map_info.amiga_base, amiga_end, map_info.size,
+                map_info.host_ptr, map_info.host_span,
+                (unsigned int)map_info.map_type, memmap_kind_name(map_info.kind),
+                (unsigned int)map_info.cacheable, (unsigned int)map_info.executable, map_info.map_id);
+      if (map_info.map_type == MAPTYPE_ROM && map_info.host_ptr) {
+        uint32_t off = pc - map_info.amiga_base;
+        unsigned char *base = (unsigned char*)map_info.host_ptr;
         char line[128];
         int pos = snprintf(line, sizeof(line), "[CPU] ROM bytes:");
         for (int i = -8; i < 10; i++) {
           uint32_t idx = off + (uint32_t)i;
-          unsigned char b = base[idx % (uint32_t)cfg->rom_size[map_idx]];
+          unsigned char b = base[idx % (uint32_t)cfg->rom_size[map_info.index]];
           pos += snprintf(line + pos, sizeof(line) - (size_t)pos, " %.2X", b);
         }
         LOG_ERROR("%s\n", line);
@@ -1656,8 +1661,8 @@ switch_config:
       LOG_ERROR("[CPU] UAE JIT init detail: err=%d reset_sp=$%.8X reset_pc=$%.8X ovl=%d\n",
                 rv_err, rv_sp, rv_pc, rv_ovl);
       if (rv_err == 4) {
-        LOG_WARN("[CPU] UAE JIT requires direct low RAM mapping at $000000 in this build.\n");
-        LOG_WARN("[CPU] Keep Musashi for real-chip lowmem, or remap low RAM to Pi-owned memory.\n");
+        LOG_WARN("[CPU] UAE JIT requires Kickstart ROM at $00F80000 to be Pi-mapped executable memory.\n");
+        LOG_WARN("[CPU] Keep Musashi for bus-only motherboard ROM, or map Kickstart in cfg as type=rom.\n");
       }
     }
   }

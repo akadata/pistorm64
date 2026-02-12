@@ -149,6 +149,27 @@ uint32_t ac_z3_current_pic = 0;
 int ac_z2_done = 0;
 int ac_z3_done = 0;
 
+static amiga_zorro_layout_t g_amiga_zorro_layout = {
+    .z2_config_base = AC_Z2_BASE,
+    .z2_mem_base = 0x00200000u,
+    .z2_mem_size = 0x00800000u,
+    .z3_config_base = AC_Z3_BASE,
+    .z3_mem_base = 0x10000000u,
+    .z3_mem_size = 0x10000000u,
+    .config_window_size = AC_SIZE,
+};
+
+const amiga_zorro_layout_t* amiga_get_zorro_layout(void) {
+  return &g_amiga_zorro_layout;
+}
+
+void amiga_set_zorro_layout(const amiga_zorro_layout_t* layout) {
+  if (!layout) {
+    return;
+  }
+  g_amiga_zorro_layout = *layout;
+}
+
 /* Base addresses for autoconfig devices that need to be visible
  * across modules (PiSCSI, pistorm-dev, platform custom range).
  */
@@ -217,6 +238,24 @@ static unsigned char get_autoconf_size_ext(unsigned int size)
         sizeof autoconf_sizes_ext / sizeof autoconf_sizes_ext[0],
         AC_MEM_SIZE_EXT_64MB  /* old “else” default */
     );
+}
+
+static inline int addr_range_within(uint32_t base, uint32_t size, uint32_t addr, uint32_t span) {
+  if (!size || !span) {
+    return 0;
+  }
+  uint64_t win_lo = (uint64_t)base;
+  uint64_t win_hi = (uint64_t)base + (uint64_t)size;
+  uint64_t map_lo = (uint64_t)addr;
+  uint64_t map_hi = (uint64_t)addr + (uint64_t)span;
+  return map_lo >= win_lo && map_hi <= win_hi;
+}
+
+static inline void log_autoconf_assignment(const char* label, uint32_t amiga_base,
+                                           uint32_t size, const void* host_ptr) {
+  uint32_t amiga_hi = size ? (amiga_base + size - 1u) : amiga_base;
+  LOG_INFO("[AUTOCONF] %s AMIGA=$%.8X-$%.8X host=%p size=$%.8X\n",
+           label, amiga_base, amiga_hi, host_ptr, size);
 }
 
 
@@ -434,6 +473,16 @@ void autoconfig_write_memory_z3_8(struct emulator_config* cfg, unsigned int addr
                ac_base[ac_z3_current_pic]);
       cfg->map_offset[index] = ac_base[ac_z3_current_pic];
       cfg->map_high[index] = cfg->map_offset[index] + cfg->map_size[index];
+      const amiga_zorro_layout_t* layout = amiga_get_zorro_layout();
+      if (layout && !addr_range_within(layout->z3_mem_base, layout->z3_mem_size,
+                                       (uint32_t)cfg->map_offset[index], cfg->map_size[index])) {
+        LOG_WARN("[AUTOCONF] Z3 RAM map assigned outside configured Z3 window: base=$%.8lX size=$%.8X "
+                 "window=$%.8X-$%.8X\n",
+                 cfg->map_offset[index], cfg->map_size[index], layout->z3_mem_base,
+                 layout->z3_mem_base + layout->z3_mem_size - 1u);
+      }
+      log_autoconf_assignment("Z3 RAM", (uint32_t)cfg->map_offset[index], cfg->map_size[index],
+                              cfg->map_data[index]);
       m68k_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
                          cfg->map_data[index]);
     }
@@ -480,6 +529,16 @@ void autoconfig_write_memory_z3_16(struct emulator_config* cfg, unsigned int add
                ac_base[ac_z3_current_pic]);
       cfg->map_offset[index] = ac_base[ac_z3_current_pic];
       cfg->map_high[index] = cfg->map_offset[index] + cfg->map_size[index];
+      const amiga_zorro_layout_t* layout = amiga_get_zorro_layout();
+      if (layout && !addr_range_within(layout->z3_mem_base, layout->z3_mem_size,
+                                       (uint32_t)cfg->map_offset[index], cfg->map_size[index])) {
+        LOG_WARN("[AUTOCONF] Z3 RAM map assigned outside configured Z3 window: base=$%.8lX size=$%.8X "
+                 "window=$%.8X-$%.8X\n",
+                 cfg->map_offset[index], cfg->map_size[index], layout->z3_mem_base,
+                 layout->z3_mem_base + layout->z3_mem_size - 1u);
+      }
+      log_autoconf_assignment("Z3 RAM", (uint32_t)cfg->map_offset[index], cfg->map_size[index],
+                              cfg->map_data[index]);
       m68k_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
                          cfg->map_data[index]);
     }
@@ -679,10 +738,20 @@ void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address
 
       LOG_INFO("[AUTOCONF] Address of Z2 autoconf RAM assigned to $%.8X\n",
                ac_base[ac_z2_current_pic]);
+      const amiga_zorro_layout_t* layout = amiga_get_zorro_layout();
+      if (layout && !addr_range_within(layout->z2_mem_base, layout->z2_mem_size,
+                                       (uint32_t)cfg->map_offset[index], cfg->map_size[index])) {
+        LOG_WARN("[AUTOCONF] Z2 RAM map assigned outside configured Z2 window: base=$%.8lX size=$%.8X "
+                 "window=$%.8X-$%.8X\n",
+                 cfg->map_offset[index], cfg->map_size[index], layout->z2_mem_base,
+                 layout->z2_mem_base + layout->z2_mem_size - 1u);
+      }
 
       m68k_add_ram_range((uint32_t)cfg->map_offset[index],
                          (uint32_t)cfg->map_high[index],
                          cfg->map_data[index]);
+      log_autoconf_assignment("Z2 RAM", (uint32_t)cfg->map_offset[index], cfg->map_size[index],
+                              cfg->map_data[index]);
 
       LOG_INFO("[AUTOCONF] Z2 PIC %d at $%.8lX-%.8lX, Size: %d MB\n",
                ac_z2_current_pic,

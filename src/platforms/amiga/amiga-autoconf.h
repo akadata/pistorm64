@@ -8,6 +8,16 @@
 #define AC_SIZE (64 * 1024)
 #define AC_PIC_LIMIT 16
 
+typedef struct amiga_zorro_layout {
+  uint32_t z2_config_base;
+  uint32_t z2_mem_base;
+  uint32_t z2_mem_size;
+  uint32_t z3_config_base;
+  uint32_t z3_mem_base;
+  uint32_t z3_mem_size;
+  uint32_t config_window_size;
+} amiga_zorro_layout_t;
+
 #define AC_MEM_SIZE_8MB 0
 #define AC_MEM_SIZE_64KB 1
 #define AC_MEM_SIZE_128KB 2
@@ -140,3 +150,6 @@ bool add_z3_pic(uint8_t type, uint8_t index);
 
 void remove_z2_pic(uint8_t type, uint8_t index);
 void remove_z3_pic(uint8_t type, uint8_t index);
+
+const amiga_zorro_layout_t* amiga_get_zorro_layout(void);
+void amiga_set_zorro_layout(const amiga_zorro_layout_t* layout);

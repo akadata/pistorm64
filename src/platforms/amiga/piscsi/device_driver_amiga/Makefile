@@ -4,6 +4,8 @@ AMIGA_PATH := $(AMIGA_TOOLCHAIN)/bin:$(PATH)
 M68K_GCC ?= m68k-amigaos-gcc
 VASM ?= vasmm68k_mot
 VBCC ?=
+AMIGA_NDK_C_INCLUDE ?=
+AMIGA_NDK_ASM_INCLUDE ?=
 
 CPU ?= 020
 
@@ -31,7 +33,30 @@ ifeq ($(CPU),060)
 DEVICE_TARGET = PiSCSI060.device
 CPUFLAG = -m68060
 endif
-VASM_INCLUDES := -I$(AMIGA_TOOLCHAIN)/m68k-amigaos/ndk-include
+ifeq ($(strip $(AMIGA_NDK_C_INCLUDE)),)
+ifneq ($(wildcard $(AMIGA_TOOLCHAIN)/m68k-amigaos/ndk-include),)
+AMIGA_NDK_C_INCLUDE := $(AMIGA_TOOLCHAIN)/m68k-amigaos/ndk-include
+else ifneq ($(wildcard $(AMIGA_TOOLCHAIN)/ndk/Include_H),)
+AMIGA_NDK_C_INCLUDE := $(AMIGA_TOOLCHAIN)/ndk/Include_H
+else ifneq ($(wildcard $(AMIGA_TOOLCHAIN)/ndk/include_h),)
+AMIGA_NDK_C_INCLUDE := $(AMIGA_TOOLCHAIN)/ndk/include_h
+endif
+endif
+
+ifeq ($(strip $(AMIGA_NDK_ASM_INCLUDE)),)
+ifneq ($(wildcard $(AMIGA_TOOLCHAIN)/m68k-amigaos/ndk-include),)
+AMIGA_NDK_ASM_INCLUDE := $(AMIGA_TOOLCHAIN)/m68k-amigaos/ndk-include
+else ifneq ($(wildcard $(AMIGA_TOOLCHAIN)/ndk/Include_I),)
+AMIGA_NDK_ASM_INCLUDE := $(AMIGA_TOOLCHAIN)/ndk/Include_I
+else ifneq ($(wildcard $(AMIGA_TOOLCHAIN)/ndk/include_i),)
+AMIGA_NDK_ASM_INCLUDE := $(AMIGA_TOOLCHAIN)/ndk/include_i
+endif
+endif
+
+VASM_INCLUDES :=
+ifneq ($(strip $(AMIGA_NDK_ASM_INCLUDE)),)
+VASM_INCLUDES += -I$(AMIGA_NDK_ASM_INCLUDE)
+endif
 ifneq ($(VBCC),)
 VASM_INCLUDES += -I$(VBCC)/NDK39/include/include_i
 endif
@@ -45,6 +70,9 @@ ROM_SRC ?= bootrom.s
 DEVICE_SRC ?= piscsi-amiga-2.c
 
 DEVICE_CFLAGS ?= $(CPUFLAG) -O2 -Wall -Wextra -Wno-unused-parameter -fomit-frame-pointer -nostdlib -nostartfiles
+ifneq ($(strip $(AMIGA_NDK_C_INCLUDE)),)
+DEVICE_CFLAGS += -I$(AMIGA_NDK_C_INCLUDE)
+endif
 
 all: $(ROM_TARGET) $(DEVICE_TARGET)
 

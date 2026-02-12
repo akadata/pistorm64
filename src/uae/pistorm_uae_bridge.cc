@@ -191,33 +191,19 @@ static bool uae_pistorm_jit_host_pointers_ok(void) {
   return true;
 }
 
-static bool uae_pistorm_has_low_ram_window(void) {
+static bool uae_pistorm_has_direct_kick_window(void) {
   if (!cfg) {
     return false;
   }
   /*
-   * Once OVL drops, vectors and early exception paths use low RAM at 0x000000.
-   * Current JIT path expects direct host pointers for executable fetch regions.
+   * For JIT startup we need an executable host-backed mapping for Kickstart.
+   * Real motherboard ROM (bus-only) is supported by Musashi, not this JIT path.
    */
-  const uae_u32 low_needed = 0x00001000u; // 4KB vector/boot safety window.
-  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
-    if (!cfg->map_data[i]) {
-      continue;
-    }
-    switch (cfg->map_type[i]) {
-      case MAPTYPE_RAM:
-      case MAPTYPE_RAM_WTC:
-      case MAPTYPE_RAM_NOALLOC:
-        if ((uae_u32)cfg->map_offset[i] <= 0x00000000u &&
-            (uae_u32)cfg->map_high[i] >= low_needed) {
-          return true;
-        }
-        break;
-      default:
-        break;
-    }
+  mem_map_entry_info_t map_info;
+  if (memmap_lookup(cfg, 0x00F80000u, &map_info) < 0) {
+    return false;
   }
-  return false;
+  return map_info.host_ptr != nullptr && map_info.executable;
 }
 
 static void pistorm_init_ovl_holdoff(void) {
@@ -580,6 +566,10 @@ static uae_u8* REGPARAM2 pistorm_xlate(uaecptr addr) {
   if (!cfg) {
     return nullptr;
   }
+  mem_map_entry_info_t map_info;
+  if (memmap_lookup(cfg, (uint32_t)addr, &map_info) >= 0 && !map_info.executable) {
+    return nullptr;
+  }
   for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
     if (cfg->map_type[i] == MAPTYPE_NONE || !cfg->map_data[i]) {
       continue;
@@ -751,6 +741,13 @@ static uae_u32 REGPARAM2 pistorm_lgeti(uaecptr addr) {
     return 0xFFFFFFFFu;
   }
   unsigned int val = 0;
+  mem_map_entry_info_t map_info;
+  if (cfg && memmap_lookup(cfg, (uint32_t)addr, &map_info) >= 0 && !map_info.executable) {
+    cpu_set_fc(pistorm_fc_ifetch());
+    uae_u32 v = (uae_u32)m68k_read_memory_32((unsigned int)addr);
+    uae_jit_trace_access("I32R", addr, v, false, true);
+    return v;
+  }
   if (bridge_mapped_read(addr, OP_TYPE_LONGWORD, &val)) {
     uae_jit_trace_access("I32R", addr, (uae_u32)val, true, true);
     return (uae_u32)val;
@@ -771,6 +768,13 @@ static uae_u32 REGPARAM2 pistorm_wgeti(uaecptr addr) {
     return 0x0000FFFFu;
   }
   unsigned int val = 0;
+  mem_map_entry_info_t map_info;
+  if (cfg && memmap_lookup(cfg, (uint32_t)addr, &map_info) >= 0 && !map_info.executable) {
+    cpu_set_fc(pistorm_fc_ifetch());
+    uae_u32 v = (uae_u32)m68k_read_memory_16((unsigned int)addr);
+    uae_jit_trace_access("I16R", addr, v, false, true);
+    return v;
+  }
   if (bridge_mapped_read(addr, OP_TYPE_WORD, &val)) {
     uae_jit_trace_access("I16R", addr, (uae_u32)val, true, true);
     return (uae_u32)val;
@@ -1037,9 +1041,9 @@ extern "C" int uae_pistorm_init(int cpu_model, int enable_jit, int enable_fpu) {
     return -1;
   }
   if (currprefs.cachesize > 0) {
-    if (!uae_pistorm_has_low_ram_window()) {
-      printf("[UAE] JIT disabled: no direct low RAM map at $000000 after OVL drop\n");
-      printf("[UAE] Hint: map low RAM to Pi memory for JIT, otherwise Musashi is required\n");
+    if (!uae_pistorm_has_direct_kick_window()) {
+      printf("[UAE] JIT disabled: Kickstart ROM at $00F80000 is not Pi-mapped executable memory\n");
+      printf("[UAE] Hint: add a Pi ROM map for Kickstart, or use Musashi for bus-only ROM\n");
       g_last_init_error = 4;
       return -1;
     }
