@@ -3171,7 +3171,7 @@ M68KMAKE_OP(bkpt, 0, ., .)
 // TODO: review this...
 	if(CPU_TYPE_IS_010_PLUS(CPU_TYPE))
 	{
-		m68ki_bkpt_ack(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE) ? REG_IR & 7 : 0);	/* auto-disable (see m68kcpu.h) */
+		m68ki_bkpt_ack(state, CPU_TYPE_IS_EC020_PLUS(CPU_TYPE) ? REG_IR & 7 : 0);	/* auto-disable (see m68kcpu.h) */
 	}
 	m68ki_exception_illegal(state);
 }
@@ -4284,7 +4284,7 @@ M68KMAKE_OP(cmpi, 32, ., d)
 	uint dst = DY;
 	uint res = dst - src;
 
-	m68ki_cmpild_callback(src, REG_IR & 7);		   /* auto-disable (see m68kcpu.h) */
+	m68ki_cmpild_callback(state, src, REG_IR & 7);		   /* auto-disable (see m68kcpu.h) */
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = MASK_OUT_ABOVE_32(res);
 	FLAG_V = VFLAG_SUB_32(src, dst, res);
@@ -8534,7 +8534,7 @@ M68KMAKE_OP(reset, 0, ., .)
 {
 	if(FLAG_S)
 	{
-		m68ki_output_reset();		   /* auto-disable (see m68kcpu.h) */
+		m68ki_output_reset(state);		   /* auto-disable (see m68kcpu.h) */
 		USE_CYCLES(CYC_RESET);
 		return;
 	}
@@ -9339,7 +9339,7 @@ M68KMAKE_OP(rte, 32, ., .)
 		uint new_pc;
 		uint format_word;
 
-		m68ki_rte_callback();		   /* auto-disable (see m68kcpu.h) */
+		m68ki_rte_callback(state);		   /* auto-disable (see m68kcpu.h) */
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
 
 		if(CPU_TYPE_IS_000(CPU_TYPE))
@@ -10394,7 +10394,7 @@ M68KMAKE_OP(tas, 8, ., .)
        disabled in order to function properly.  Some Amiga software may also rely
        on this, but only when accessing specific addresses so additional functionality
        will be needed. */
-	allow_writeback = m68ki_tas_callback();
+	allow_writeback = m68ki_tas_callback(state);
 
 	if (allow_writeback==1) m68ki_write_8(state, ea, dst | 0x80);
 }

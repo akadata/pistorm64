@@ -244,7 +244,7 @@ void m68k_write_memory_32_pd(unsigned int address, unsigned int value);
  * services the interrupt.
  * Default behavior: return M68K_INT_ACK_AUTOVECTOR.
  */
-void m68k_set_int_ack_callback(int  (*callback)(int int_level));
+void m68k_set_int_ack_callback(struct m68ki_cpu_core *state, int  (*callback)(int int_level));
 
 
 /* Set the callback for a breakpoint acknowledge (68010+).
@@ -253,7 +253,7 @@ void m68k_set_int_ack_callback(int  (*callback)(int int_level));
  * BKPT instruction for 68020+, or 0 for 68010.
  * Default behavior: do nothing.
  */
-void m68k_set_bkpt_ack_callback(void (*callback)(unsigned int data));
+void m68k_set_bkpt_ack_callback(struct m68ki_cpu_core *state, void (*callback)(unsigned int data));
 
 
 /* Set the callback for the RESET instruction.
@@ -261,7 +261,21 @@ void m68k_set_bkpt_ack_callback(void (*callback)(unsigned int data));
  * The CPU calls this callback every time it encounters a RESET instruction.
  * Default behavior: do nothing.
  */
-void m68k_set_reset_instr_callback(void  (*callback)(void));
+void m68k_set_reset_instr_callback(struct m68ki_cpu_core *state, void  (*callback)(void));
+
+/* Set the callback for the CMPI.L instruction.
+ * You must enable M68K_CMPILD_HAS_CALLBACK in m68kconf.h.
+ * The CPU calls this callback when it encounters CMPI.L #v,Dn.
+ * Default behavior: do nothing.
+ */
+void m68k_set_cmpild_instr_callback(struct m68ki_cpu_core *state, void  (*callback)(unsigned int, int));
+
+/* Set the callback for the RTE instruction.
+ * You must enable M68K_RTE_HAS_CALLBACK in m68kconf.h.
+ * The CPU calls this callback every time it encounters a RTE instruction.
+ * Default behavior: do nothing.
+ */
+void m68k_set_rte_instr_callback(struct m68ki_cpu_core *state, void  (*callback)(void));
 
 
 /* Set the callback for informing of a large PC change.
@@ -270,14 +284,14 @@ void m68k_set_reset_instr_callback(void  (*callback)(void));
  * by a large value (currently set for changes by longwords).
  * Default behavior: do nothing.
  */
-void m68k_set_pc_changed_callback(void  (*callback)(unsigned int new_pc));
+void m68k_set_pc_changed_callback(struct m68ki_cpu_core *state, void  (*callback)(unsigned int new_pc));
 
 /* Set the callback for the TAS instruction.
  * You must enable M68K_TAS_HAS_CALLBACK in m68kconf.h.
  * The CPU calls this callback every time it encounters a TAS instruction.
  * Default behavior: return 1, allow writeback.
  */
-void m68k_set_tas_instr_callback(int  (*callback)(void));
+void m68k_set_tas_instr_callback(struct m68ki_cpu_core *state, int  (*callback)(void));
 
 /* Set the callback for illegal instructions.
  * You must enable M68K_ILLG_HAS_CALLBACK in m68kconf.h.
@@ -285,7 +299,7 @@ void m68k_set_tas_instr_callback(int  (*callback)(void));
  * which must return 1 if it handles the instruction normally or 0 if it's really an illegal instruction.
  * Default behavior: return 0, exception will occur.
  */
-void m68k_set_illg_instr_callback(int  (*callback)(int));
+void m68k_set_illg_instr_callback(struct m68ki_cpu_core *state, int  (*callback)(int));
 
 /* Set the callback for CPU function code changes.
  * You must enable M68K_EMULATE_FC in m68kconf.h.
@@ -294,7 +308,7 @@ void m68k_set_illg_instr_callback(int  (*callback)(int));
  * access it is (supervisor/user, program/data and such).
  * Default behavior: do nothing.
  */
-void m68k_set_fc_callback(void  (*callback)(unsigned int new_fc));
+void m68k_set_fc_callback(struct m68ki_cpu_core *state, void  (*callback)(unsigned int new_fc));
 
 
 /* Set a callback for the instruction cycle of the CPU.
@@ -303,7 +317,7 @@ void m68k_set_fc_callback(void  (*callback)(unsigned int new_fc));
  * instruction cycle.
  * Default behavior: do nothing.
  */
-void m68k_set_instr_hook_callback(void  (*callback)(unsigned int pc));
+void m68k_set_instr_hook_callback(struct m68ki_cpu_core *state, void  (*callback)(unsigned int pc));
 
 
 

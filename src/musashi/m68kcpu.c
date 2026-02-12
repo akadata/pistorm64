@@ -807,48 +807,48 @@ void m68k_set_reg(void *context, m68k_register_t regnum, unsigned int value) {
 }
 
 /* Set the callbacks */
-void m68k_set_int_ack_callback(int  (*callback)(int int_level)) {
-	CALLBACK_INT_ACK = callback ? callback : default_int_ack_callback;
+void m68k_set_int_ack_callback(m68ki_cpu_core *state, int  (*callback)(int int_level)) {
+	state->int_ack_callback = callback ? callback : default_int_ack_callback;
 }
 
-void m68k_set_bkpt_ack_callback(void  (*callback)(unsigned int data)) {
-	CALLBACK_BKPT_ACK = callback ? callback : default_bkpt_ack_callback;
+void m68k_set_bkpt_ack_callback(m68ki_cpu_core *state, void  (*callback)(unsigned int data)) {
+	state->bkpt_ack_callback = callback ? callback : default_bkpt_ack_callback;
 }
 
-void m68k_set_reset_instr_callback(void  (*callback)(void)) {
-	CALLBACK_RESET_INSTR = callback ? callback : default_reset_instr_callback;
+void m68k_set_reset_instr_callback(m68ki_cpu_core *state, void  (*callback)(void)) {
+	state->reset_instr_callback = callback ? callback : default_reset_instr_callback;
 }
 
-void m68k_set_cmpild_instr_callback(void  (*callback)(unsigned int, int)) {
-	CALLBACK_CMPILD_INSTR = callback ? callback : default_cmpild_instr_callback;
+void m68k_set_cmpild_instr_callback(m68ki_cpu_core *state, void  (*callback)(unsigned int, int)) {
+	state->cmpild_instr_callback = callback ? callback : default_cmpild_instr_callback;
 }
 
-void m68k_set_rte_instr_callback(void  (*callback)(void)) {
-	CALLBACK_RTE_INSTR = callback ? callback : default_rte_instr_callback;
+void m68k_set_rte_instr_callback(m68ki_cpu_core *state, void  (*callback)(void)) {
+	state->rte_instr_callback = callback ? callback : default_rte_instr_callback;
 }
 
-void m68k_set_tas_instr_callback(int  (*callback)(void)) {
-	CALLBACK_TAS_INSTR = callback ? callback : default_tas_instr_callback;
+void m68k_set_tas_instr_callback(m68ki_cpu_core *state, int  (*callback)(void)) {
+	state->tas_instr_callback = callback ? callback : default_tas_instr_callback;
 }
 
-void m68k_set_illg_instr_callback(int  (*callback)(int)) {
-	CALLBACK_ILLG_INSTR = callback ? callback : default_illg_instr_callback;
+void m68k_set_illg_instr_callback(m68ki_cpu_core *state, int  (*callback)(int)) {
+	state->illg_instr_callback = callback ? callback : default_illg_instr_callback;
 }
 
-void m68k_set_pc_changed_callback(void  (*callback)(unsigned int new_pc)) {
-	CALLBACK_PC_CHANGED = callback ? callback : default_pc_changed_callback;
+void m68k_set_pc_changed_callback(m68ki_cpu_core *state, void  (*callback)(unsigned int new_pc)) {
+	state->pc_changed_callback = callback ? callback : default_pc_changed_callback;
 }
 
 //void m68k_set_fc_callback(void  (*callback)(unsigned int new_fc)) {
 //	CALLBACK_SET_FC = callback ? callback : default_set_fc_callback;
 //}
-void m68k_set_fc_callback(void (*callback)(unsigned int new_fc)) {
-    m68ki_cpu.set_fc_callback = callback ? callback : default_set_fc_callback;
+void m68k_set_fc_callback(m68ki_cpu_core *state, void (*callback)(unsigned int new_fc)) {
+    state->set_fc_callback = callback ? callback : default_set_fc_callback;
 }
 
 
-void m68k_set_instr_hook_callback(void  (*callback)(unsigned int pc)) {
-	m68ki_cpu.instr_hook_callback = callback ? callback : default_instr_hook_callback;
+void m68k_set_instr_hook_callback(m68ki_cpu_core *state, void  (*callback)(unsigned int pc)) {
+	state->instr_hook_callback = callback ? callback : default_instr_hook_callback;
 }
 
 /* Set the CPU type. */
@@ -1066,7 +1066,7 @@ int m68k_execute(m68ki_cpu_core *state, int num_cycles) {
 			m68ki_use_data_space(); /* auto-disable (see m68kcpu.h) */
 
 			/* Call external hook to peek at CPU */
-			m68ki_instr_hook(REG_PC); /* auto-disable (see m68kcpu.h) */
+			m68ki_instr_hook(state, REG_PC); /* auto-disable (see m68kcpu.h) */
 
 			/* Record previous program counter */
 			REG_PPC = REG_PC;
@@ -1170,16 +1170,16 @@ void m68k_init(void) {
 		emulation_initialized = 1;
 	}
 
-	m68k_set_int_ack_callback(NULL);
-	m68k_set_bkpt_ack_callback(NULL);
-	m68k_set_reset_instr_callback(NULL);
-	m68k_set_cmpild_instr_callback(NULL);
-	m68k_set_rte_instr_callback(NULL);
-	m68k_set_tas_instr_callback(NULL);
-	m68k_set_illg_instr_callback(NULL);
-	m68k_set_pc_changed_callback(NULL);
-	m68k_set_fc_callback(NULL);
-	m68k_set_instr_hook_callback(NULL);
+	m68k_set_int_ack_callback(&m68ki_cpu, NULL);
+	m68k_set_bkpt_ack_callback(&m68ki_cpu, NULL);
+	m68k_set_reset_instr_callback(&m68ki_cpu, NULL);
+	m68k_set_cmpild_instr_callback(&m68ki_cpu, NULL);
+	m68k_set_rte_instr_callback(&m68ki_cpu, NULL);
+	m68k_set_tas_instr_callback(&m68ki_cpu, NULL);
+	m68k_set_illg_instr_callback(&m68ki_cpu, NULL);
+	m68k_set_pc_changed_callback(&m68ki_cpu, NULL);
+	m68k_set_fc_callback(&m68ki_cpu, NULL);
+	m68k_set_instr_hook_callback(&m68ki_cpu, NULL);
 }
 
 /* Trigger a Bus Error exception */
@@ -1333,7 +1333,7 @@ uint m68ki_read_imm16_addr_slowpath(m68ki_cpu_core *state, uint32_t pc, address_
 		}
 	}
 
-	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
+	m68ki_set_fc(state, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
 	state->mmu_tmp_fc = FLAG_S | FUNCTION_CODE_USER_PROGRAM;
 	state->mmu_tmp_rw = 1;
 	state->mmu_tmp_sz = M68K_SZ_WORD;

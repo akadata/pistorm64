@@ -771,7 +771,7 @@ static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
       m68ki_use_data_space(); /* auto-disable ( see m68kcpu.h ) */
 
       /* Call external hook to peek at CPU */
-      m68ki_instr_hook(REG_PC); /* auto-disable ( see m68kcpu.h ) */
+      m68ki_instr_hook(state, REG_PC); /* auto-disable ( see m68kcpu.h ) */
 
       /* Record previous program counter */
       REG_PPC = REG_PC;
@@ -1556,9 +1556,9 @@ switch_config:
     m68k_init();
     printf("Setting CPU type to %d.\n", cpu_type);
     m68k_set_cpu_type(&m68ki_cpu, cpu_type);
-    m68k_set_instr_hook_callback(instr_hook_callback);
-    m68k_set_fc_callback(fc_callback_wrapper);  // Use wrapper to call cpu_set_fc
-    m68k_set_illg_instr_callback(illg_instr_callback);
+    m68k_set_instr_hook_callback(&m68ki_cpu, instr_hook_callback);
+    m68k_set_fc_callback(&m68ki_cpu, fc_callback_wrapper);  // Use wrapper to call cpu_set_fc
+    m68k_set_illg_instr_callback(&m68ki_cpu, illg_instr_callback);
     cpu_pulse_reset();
   }
 
