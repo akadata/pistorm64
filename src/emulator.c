@@ -74,7 +74,10 @@ static uint32_t fc_shadow_pc = 0;
 static uint32_t fc_shadow_addr = 0;
 static uint8_t fc_shadow_type = 0;
 static uint8_t fc_shadow_is_write = 0;
-static int fc_boot_log_remaining = 0;
+
+static unsigned int fc_boot_log_remaining = 0;
+static int fc_boot_log_inited = 0;
+
 static int use_uae_jit = 0;
 
 #if USE_UAE_JIT
@@ -182,37 +185,6 @@ static int uae_cpu_model_from_musashi(unsigned int type) {
 }
 #endif /* USE_UAE_JIT */
 
-static inline void fc_shadow_touch(uint8_t type, uint32_t addr, uint8_t is_write) {
-  if (fc_get_mode() == FC_MODE_OFF) {
-    return;
-  }
-  if (current_fc == fc_shadow) {
-    return;
-  }
-
-  fc_shadow = current_fc;
-  fc_shadow_pc = cpu_backend_get_pc();
-  fc_shadow_addr = addr;
-  fc_shadow_type = type;
-  fc_shadow_is_write = is_write;
-
-  if (fc_boot_log_remaining > 0) {
-    LOG_INFO("[FC] seen=%u %s type=%u addr=$%.8X PC=$%.8X\n",
-             fc_shadow,
-             is_write ? "W" : "R",
-             type,
-             addr,
-             fc_shadow_pc);
-    fc_boot_log_remaining--;
-  } else if (log_get_level() >= LOG_LEVEL_DEBUG) {
-    LOG_DEBUG("[FC] seen=%u %s type=%u addr=$%.8X PC=$%.8X\n",
-              fc_shadow,
-              is_write ? "W" : "R",
-              type,
-              addr,
-              fc_shadow_pc);
-  }
-}
 
 int kb_hook_enabled = 0;
 int mouse_hook_enabled = 0;
@@ -295,12 +267,10 @@ static void apply_affinity_from_env(const char* role, int default_core);
 static void set_realtime_priority(const char* name, int prio);
 static void apply_realtime_from_env(const char* role, int default_prio);
 static int realtime_allowed(void);
-/*  // not needed apparently. .... 09/02/2026 AKADATA 
+
 static void amiga_reset_and_wait(const char* tag);
-*/
-/*
 static void amiga_warmup_bus(void);
-*/
+
 static void configure_ipl_nops(void);
 static void print_help(const char* prog);
 static void print_about(const char* prog);
@@ -395,6 +365,80 @@ static void crash_signal_handler_siginfo(int sig_num, siginfo_t* info, void* uct
 #endif
 
 
+static void fc_boot_log_init(void)
+{
+  if (fc_boot_log_inited) {
+    return;
+  }
+  fc_boot_log_inited = 1;
+
+  const char *env = getenv("PISTORM_FC_BOOT_LOG");
+  if (env && *env) {
+    fc_boot_log_remaining = (unsigned int)strtoul(env, NULL, 0);
+  } else {
+    // Default: small sample on boot, or set to 0 for totally silent
+    fc_boot_log_remaining = 32;
+  }
+}
+
+static inline const char *fc_space_name(uint8_t fc)
+{
+  switch (fc & 0x7u) {
+  case 0: return "reserved";
+  case 1: return "user-data";
+  case 2: return "user-prog";
+  case 3: return "reserved";
+  case 4: return "reserved";
+  case 5: return "super-data";
+  case 6: return "super-prog";
+  case 7: return "cpu-space";
+  default: return "reserved";
+  }
+}
+
+static inline void fc_shadow_touch(uint8_t type, uint32_t addr, uint8_t is_write)
+{
+  if (fc_get_mode() == FC_MODE_OFF) {
+    return;
+  }
+
+  fc_boot_log_init();
+  if (fc_boot_log_remaining == 0) {
+    // Logging disabled or limit reached
+    return;
+  }
+
+  uint8_t fc_val = (uint8_t)(current_fc & 0x7u);
+
+  // Do not spam identical repeats of {FC, addr, type, RW}
+  if (fc_val == fc_shadow &&
+      addr   == fc_shadow_addr &&
+      type   == fc_shadow_type &&
+      is_write == fc_shadow_is_write) {
+    return;
+  }
+
+  fc_shadow        = fc_val;
+  fc_shadow_pc     = cpu_backend_get_pc();
+  fc_shadow_addr   = addr;
+  fc_shadow_type   = type;
+  fc_shadow_is_write = is_write;
+
+  const char *space = fc_space_name(fc_val);
+
+  LOG_INFO("[FC] seen=%u (%s) %s type=%u addr=$%.8X PC=$%.8X\n",
+           fc_shadow,
+           space,
+           is_write ? "W" : "R",
+           type,
+           addr,
+           fc_shadow_pc);
+
+  fc_boot_log_remaining--;
+}
+
+
+
 #define CLI_MAX_LINES 32
 static char* cli_config_lines[CLI_MAX_LINES];
 static int cli_config_count;
@@ -452,7 +496,7 @@ unsigned int amiga_reset = 0;
 unsigned int amiga_reset_last = 0;
 unsigned int do_reset = 0;
 
-/*
+
 static void amiga_warmup_bus(void) {
   for (int i = 0; i < 64; i++) {
     (void)ps_read_status_reg();
@@ -461,9 +505,9 @@ static void amiga_warmup_bus(void) {
     }
   }
 }
-*/
 
-/*
+
+
 static void amiga_reset_and_wait(const char* tag) {
   for (int attempt = 0; attempt < 3; attempt++) {
     ps_reset_state_machine();
@@ -483,7 +527,7 @@ static void amiga_reset_and_wait(const char* tag) {
   }
   printf("[RST] Warning: TXN_IN_PROGRESS still set after reset (%s)\n", tag);
 }
-*/
+
 
 static void configure_ipl_nops(void) {
   unsigned int value = ipl_nop_count_default;
@@ -1334,7 +1378,7 @@ switch_config:
   srand((unsigned int)(ts_seed.tv_sec ^ ts_seed.tv_nsec));
 #endif
 
- // amiga_reset_and_wait("startup");
+  amiga_reset_and_wait("startup");
 
   if (load_new_config != 0) {
     uint8_t config_action = load_new_config - 1;

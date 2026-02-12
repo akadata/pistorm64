@@ -12,8 +12,7 @@
 // On real silicon this is MOVEC between Dn/An and control registers.
 // First implementation: privileged NOP that consumes the extension word.
 
-static void op_movec2_4e7a(m68ki_cpu_core *state)
-{
+static void op_movec2_4e7a(m68ki_cpu_core *state) {
     if (!FLAG_S) {
         m68ki_exception_privilege_violation(state);
         return;
@@ -39,8 +38,7 @@ static void op_movec2_4e7a(m68ki_cpu_core *state)
  * That prevents illegal-instruction traps while 040.library / MMU tools probe.
  */
 
-static void op_priv_nop_4cy(m68ki_cpu_core *state)
-{
+static void op_priv_nop_4cy(m68ki_cpu_core *state) {
     if (!FLAG_S) {
         m68ki_exception_privilege_violation(state);
         return;
@@ -105,8 +103,7 @@ static const uint16_t pmmu_bases[] = {
     0xF5C8, /* PLPAR  */
 };
 
-static void install_pmmu_misc(void)
-{
+static void install_pmmu_misc(void) {
     for (unsigned bi = 0; bi < ARRAY_LEN(pmmu_bases); bi++) {
         uint16_t base = pmmu_bases[bi];
 
@@ -117,8 +114,7 @@ static void install_pmmu_misc(void)
     }
 }
 
-void m68k_enhanced_install(void)
-{
+void m68k_enhanced_install(void) {
     /* Optional: gate on CPU type being 68040/68060 in your fork. */
     //install_cinv_cpush();
     //install_pmmu_misc();

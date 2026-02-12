@@ -209,11 +209,15 @@ typedef uint32 uint64;
 #define EXCEPTION_MMU_CONFIGURATION       56 // only on 020/030
 
 /* Function codes set by CPU during data/address bus activity */
+/* 0  (Undefined, reserved) */
 #define FUNCTION_CODE_USER_DATA          1
 #define FUNCTION_CODE_USER_PROGRAM       2
-#define FUNCTION_CODE_SUPERVISOR_DATA    5
-#define FUNCTION_CODE_SUPERVISOR_PROGRAM 6
-#define FUNCTION_CODE_CPU_SPACE          7
+/* 3  (Undefined, reserved / user defined) */
+/* 4  (Undefined, reserved) */
+#define FUNCTION_CODE_SUPERVISOR_DATA    5  /* Supervisor Data Space */
+#define FUNCTION_CODE_SUPERVISOR_PROGRAM 6  /* Supervisor Program Space */
+#define FUNCTION_CODE_CPU_SPACE          7  /* CPU Space (IRQ / special cycles) */
+
 
 /* CPU types for deciding what to emulate */
 #define CPU_TYPE_000    (0x00000001)
@@ -441,7 +445,8 @@ typedef uint32 uint64;
 #define CALLBACK_TAS_INSTR    m68ki_cpu.tas_instr_callback
 #define CALLBACK_ILLG_INSTR   m68ki_cpu.illg_instr_callback
 #define CALLBACK_PC_CHANGED   m68ki_cpu.pc_changed_callback
-#define CALLBACK_SET_FC       m68ki_cpu.set_fc_callback
+	
+#define CALLBACK_SET_FC       state->set_fc_callback
 #define CALLBACK_INSTR_HOOK   m68ki_cpu.instr_hook_callback
 
 

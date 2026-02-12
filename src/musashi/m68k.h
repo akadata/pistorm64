@@ -35,7 +35,7 @@ extern "C" {
 #endif
 
 #ifndef ARRAY_LENGTH
-#define ARRAY_LENGTH(x)         (sizeof(x) / sizeof(x[0]))
+#define ARRAY_LENGTH(x) (sizeof(x) / sizeof(x[0]))
 #endif
 
 #ifndef FALSE
@@ -97,8 +97,7 @@ extern "C" {
 struct m68ki_cpu_core;
 
 /* CPU types for use in m68k_set_cpu_type() */
-enum
-{
+enum {
 	M68K_CPU_TYPE_INVALID,
 	M68K_CPU_TYPE_68000,
 	M68K_CPU_TYPE_68010,
@@ -113,8 +112,7 @@ enum
 };
 
 /* Registers used by m68k_get_reg() and m68k_set_reg() */
-typedef enum
-{
+typedef enum {
 	/* Real registers */
 	M68K_REG_D0,		/* Data registers */
 	M68K_REG_D1,
