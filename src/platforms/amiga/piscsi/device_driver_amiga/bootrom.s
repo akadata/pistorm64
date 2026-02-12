@@ -21,8 +21,7 @@
     INCLUDE "libraries/configvars.i"
     INCLUDE "libraries/expansionbase.i"
 
-    ; LVO's resolved by linking with library amiga.lib
-    XREF   _LVOFindResident
+    ; LVO offsets are defined locally via EQU below.
 
 ROMINFO     EQU      0
 ROMOFFS     EQU     $4000

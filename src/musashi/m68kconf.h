@@ -187,7 +187,7 @@
 #define M68K_LOG_FILEHANDLE         some_file_handle
 
 
-#define M68K_EMULATE_PMMU   OPT_OFF 
+#define M68K_EMULATE_PMMU   OPT_OFF
 // was off
 
 

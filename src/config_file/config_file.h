@@ -23,6 +23,13 @@ typedef enum {
 } map_types;
 
 typedef enum {
+  MAPALLOC_NONE = 0,
+  MAPALLOC_HEAP,
+  MAPALLOC_MMAP_LOW4G,
+  MAPALLOC_EXTERNAL,
+} map_alloc_kind_t;
+
+typedef enum {
   MAPCMD_UNKNOWN,
   MAPCMD_TYPE,
   MAPCMD_ADDRESS,
@@ -70,6 +77,8 @@ struct emulator_config {
   unsigned int map_size[MAX_NUM_MAPPED_ITEMS];
   unsigned int rom_size[MAX_NUM_MAPPED_ITEMS];
   unsigned char* map_data[MAX_NUM_MAPPED_ITEMS];
+  size_t map_alloc_size[MAX_NUM_MAPPED_ITEMS];
+  unsigned char map_alloc_kind[MAX_NUM_MAPPED_ITEMS];
   unsigned int map_mirror[MAX_NUM_MAPPED_ITEMS];
   char* map_id[MAX_NUM_MAPPED_ITEMS];
 
@@ -173,6 +182,13 @@ void add_mapping(struct emulator_config* cfg,
   const char* map_id,
   unsigned int autodump);
 unsigned int get_int(const char* str);
+
+unsigned char* cfg_alloc_mapped_data(size_t size, int zero_init, unsigned char* alloc_kind,
+                                     const char* owner);
+void cfg_free_mapped_data(unsigned char* ptr, size_t size, unsigned char alloc_kind);
+void cfg_set_map_data_allocation(struct emulator_config* cfg, int index, unsigned char* ptr,
+                                 size_t alloc_size, unsigned char alloc_kind);
+void cfg_release_map_data(struct emulator_config* cfg, int index);
 
 #ifdef __cplusplus
 }

@@ -13,6 +13,7 @@
 #include "platforms/amiga/hunk-reloc.h"
 #include "platforms/amiga/piscsi/piscsi.h"
 #include "platforms/amiga/piscsi/piscsi-enums.h"
+#include "platforms/amiga/piscsi64/piscsi64-api.h"
 #include "platforms/amiga/net/pi-net.h"
 #include "platforms/amiga/net/pi-net-enums.h"
 #include "platforms/amiga/ahi/pi_ahi.h"
@@ -21,6 +22,7 @@
 #include "platforms/amiga/pistorm-dev/pistorm-dev-enums.h"
 #include "gpio/ps_protocol.h"
 #include "log.h"
+#include "memory_mapped.h"
 #include "cpu_backend.h"
 #ifdef USE_UAE_JIT
 #ifdef __cplusplus
@@ -59,6 +61,7 @@ extern "C" {
 
 #include "m68kops.h"
 #include "emulator_fc.h"
+#include "config_file/rominfo.h"
 
 static void fc_callback_wrapper(unsigned int new_fc) {
   cpu_set_fc((uint32_t)new_fc);
@@ -74,7 +77,10 @@ static uint32_t fc_shadow_pc = 0;
 static uint32_t fc_shadow_addr = 0;
 static uint8_t fc_shadow_type = 0;
 static uint8_t fc_shadow_is_write = 0;
-static int fc_boot_log_remaining = 0;
+
+static unsigned int fc_boot_log_remaining = 0;
+static int fc_boot_log_inited = 0;
+
 static int use_uae_jit = 0;
 
 #if USE_UAE_JIT
@@ -127,6 +133,81 @@ static const char* fc_mode_name(enum fc_mode mode) {
   default:
     return "unknown";
   }
+}
+
+extern unsigned int cpu_type;
+
+static int cpu_type_at_least_68020(unsigned int type) {
+  switch (type) {
+  case M68K_CPU_TYPE_68EC020:
+  case M68K_CPU_TYPE_68020:
+  case M68K_CPU_TYPE_68EC030:
+  case M68K_CPU_TYPE_68030:
+  case M68K_CPU_TYPE_68EC040:
+  case M68K_CPU_TYPE_68LC040:
+  case M68K_CPU_TYPE_68040:
+  case M68K_CPU_TYPE_SCC68070:
+    return 1;
+  default:
+    return 0;
+  }
+}
+
+static const char* cpu_type_name(unsigned int type) {
+  switch (type) {
+  case M68K_CPU_TYPE_68000: return "68000";
+  case M68K_CPU_TYPE_68010: return "68010";
+  case M68K_CPU_TYPE_68EC020: return "68EC020";
+  case M68K_CPU_TYPE_68020: return "68020";
+  case M68K_CPU_TYPE_68EC030: return "68EC030";
+  case M68K_CPU_TYPE_68030: return "68030";
+  case M68K_CPU_TYPE_68EC040: return "68EC040";
+  case M68K_CPU_TYPE_68LC040: return "68LC040";
+  case M68K_CPU_TYPE_68040: return "68040";
+  case M68K_CPU_TYPE_SCC68070: return "SCC68070";
+  default: return "unknown";
+  }
+}
+
+static void enforce_kickstart_cpu_compat(struct emulator_config* cfg_) {
+  if (!cfg_) {
+    return;
+  }
+  if (cpu_type_at_least_68020(cpu_type)) {
+    return;
+  }
+
+  int kick_idx = -1;
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (cfg_->map_type[i] != MAPTYPE_ROM || !cfg_->map_data[i] || !cfg_->map_id[i]) {
+      continue;
+    }
+    if (strcasecmp(cfg_->map_id[i], "kickstart") == 0) {
+      kick_idx = i;
+      break;
+    }
+  }
+  if (kick_idx < 0) {
+    return;
+  }
+
+  struct romInfo info = {0};
+  size_t rom_len = cfg_->rom_size[kick_idx] ? (size_t)cfg_->rom_size[kick_idx]
+                                             : (size_t)cfg_->map_size[kick_idx];
+  if (!queryRomInfo(cfg_->map_data[kick_idx], rom_len, &info)) {
+    return;
+  }
+  if (!romInfoRequires68020(&info)) {
+    return;
+  }
+
+  unsigned int old_cpu = cpu_type;
+  cpu_type = M68K_CPU_TYPE_68020;
+  cfg_->cpu_type = cpu_type;
+  LOG_WARN("[CPU] Kickstart %u.%u (%s) requires at least 68020; overriding CPU %s -> 68020.\n",
+           info.major, info.minor, cfg_->map_id[kick_idx],
+           cpu_type_name(old_cpu));
+  LOG_WARN("[CPU] Use Kickstart 3.1 r40.63 for 68000/68010-class A500 boot.\n");
 }
 
 static int read_kernel_param_bool(const char* name) {
@@ -182,37 +263,6 @@ static int uae_cpu_model_from_musashi(unsigned int type) {
 }
 #endif /* USE_UAE_JIT */
 
-static inline void fc_shadow_touch(uint8_t type, uint32_t addr, uint8_t is_write) {
-  if (fc_get_mode() == FC_MODE_OFF) {
-    return;
-  }
-  if (current_fc == fc_shadow) {
-    return;
-  }
-
-  fc_shadow = current_fc;
-  fc_shadow_pc = cpu_backend_get_pc();
-  fc_shadow_addr = addr;
-  fc_shadow_type = type;
-  fc_shadow_is_write = is_write;
-
-  if (fc_boot_log_remaining > 0) {
-    LOG_INFO("[FC] seen=%u %s type=%u addr=$%.8X PC=$%.8X\n",
-             fc_shadow,
-             is_write ? "W" : "R",
-             type,
-             addr,
-             fc_shadow_pc);
-    fc_boot_log_remaining--;
-  } else if (log_get_level() >= LOG_LEVEL_DEBUG) {
-    LOG_DEBUG("[FC] seen=%u %s type=%u addr=$%.8X PC=$%.8X\n",
-              fc_shadow,
-              is_write ? "W" : "R",
-              type,
-              addr,
-              fc_shadow_pc);
-  }
-}
 
 int kb_hook_enabled = 0;
 int mouse_hook_enabled = 0;
@@ -225,6 +275,7 @@ int force_move_slow_to_chip = 0;
 uint8_t mouse_dx = 0;
 uint8_t mouse_dy = 0;
 uint8_t mouse_buttons = 0;
+uint8_t mouse_buttons_latched = 0;
 uint8_t mouse_extra = 0;
 
 extern uint8_t gayle_int;
@@ -295,12 +346,10 @@ static void apply_affinity_from_env(const char* role, int default_core);
 static void set_realtime_priority(const char* name, int prio);
 static void apply_realtime_from_env(const char* role, int default_prio);
 static int realtime_allowed(void);
-/*  // not needed apparently. .... 09/02/2026 AKADATA 
+
 static void amiga_reset_and_wait(const char* tag);
-*/
-/*
 static void amiga_warmup_bus(void);
-*/
+
 static void configure_ipl_nops(void);
 static void print_help(const char* prog);
 static void print_about(const char* prog);
@@ -321,6 +370,38 @@ static void dump_cpu_state(const char *reason, int opcode) {
   if (crash_signal) {
     LOG_ERROR("[CPU] Signal detail: signo=%d si_code=%d fault_addr=%p\n",
               (int)crash_signal, (int)crash_si_code, (void*)crash_fault_addr);
+    if (cfg && crash_fault_addr) {
+      uintptr_t fa = (uintptr_t)crash_fault_addr;
+      int host_map_found = 0;
+      for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+        if (cfg->map_type[i] == MAPTYPE_NONE || !cfg->map_data[i]) {
+          continue;
+        }
+        uintptr_t base = (uintptr_t)cfg->map_data[i];
+        uintptr_t span = (uintptr_t)cfg->map_size[i];
+        if (cfg->map_type[i] == MAPTYPE_ROM || cfg->map_type[i] == MAPTYPE_RAM_WTC) {
+          if ((uintptr_t)cfg->rom_size[i] > span) {
+            span = (uintptr_t)cfg->rom_size[i];
+          }
+        }
+        if (!span) {
+          continue;
+        }
+        if (fa >= base && fa < (base + span)) {
+          uint32_t off = (uint32_t)(fa - base);
+          uint32_t guest = (uint32_t)cfg->map_offset[i] + off;
+          LOG_ERROR("[CPU] Fault host map[%d]: type=%u id=%s host_base=%p off=0x%X guest=$%.8X\n",
+                    i, (unsigned int)cfg->map_type[i],
+                    cfg->map_id[i] ? cfg->map_id[i] : "None",
+                    (void*)base, off, guest);
+          host_map_found = 1;
+          break;
+        }
+      }
+      if (!host_map_found) {
+        LOG_ERROR("[CPU] Fault host addr not in cfg map_data ranges\n");
+      }
+    }
   }
 
   m68k_disassemble(disasm_buf, pc, cpu_type);
@@ -341,20 +422,24 @@ static void dump_cpu_state(const char *reason, int opcode) {
   }
 
   if (cfg) {
-    int32_t map_idx = get_mapped_item_by_address(cfg, pc);
-    if (map_idx >= 0) {
-      LOG_ERROR("[CPU] PC map[%d] type=%u range=$%.8lX-$%.8lX id=%s\n",
-                map_idx, (unsigned int)cfg->map_type[map_idx],
-                cfg->map_offset[map_idx], cfg->map_high[map_idx] - 1,
-                cfg->map_id[map_idx] ? cfg->map_id[map_idx] : "None");
-      if (cfg->map_type[map_idx] == MAPTYPE_ROM && cfg->map_data[map_idx]) {
-        uint32_t off = pc - (uint32_t)cfg->map_offset[map_idx];
-        unsigned char *base = cfg->map_data[map_idx];
+    mem_map_entry_info_t map_info;
+    if (memmap_lookup(cfg, pc, &map_info) >= 0) {
+      uint32_t amiga_end = map_info.amiga_end_exclusive ? (map_info.amiga_end_exclusive - 1u)
+                                                        : map_info.amiga_end_exclusive;
+      LOG_ERROR("[CPU] PC map[%d] amiga=$%.8X-$%.8X size=$%.8X host=%p host_span=$%.8X "
+                "type=%u kind=%s cacheable=%u executable=%u id=%s\n",
+                map_info.index, map_info.amiga_base, amiga_end, map_info.size,
+                map_info.host_ptr, map_info.host_span,
+                (unsigned int)map_info.map_type, memmap_kind_name(map_info.kind),
+                (unsigned int)map_info.cacheable, (unsigned int)map_info.executable, map_info.map_id);
+      if (map_info.map_type == MAPTYPE_ROM && map_info.host_ptr) {
+        uint32_t off = pc - map_info.amiga_base;
+        unsigned char *base = (unsigned char*)map_info.host_ptr;
         char line[128];
         int pos = snprintf(line, sizeof(line), "[CPU] ROM bytes:");
         for (int i = -8; i < 10; i++) {
           uint32_t idx = off + (uint32_t)i;
-          unsigned char b = base[idx % (uint32_t)cfg->rom_size[map_idx]];
+          unsigned char b = base[idx % (uint32_t)cfg->rom_size[map_info.index]];
           pos += snprintf(line + pos, sizeof(line) - (size_t)pos, " %.2X", b);
         }
         LOG_ERROR("%s\n", line);
@@ -375,15 +460,7 @@ static int illg_instr_callback(int opcode) {
 }
 
 
-#if UAE_UAE_JIT
-static void crash_signal_handler(int sig_num) {
-  crash_signal = sig_num;
-  crash_fault_addr = 0;
-  crash_si_code = 0;
-  dump_cpu_state("Signal", -1);
-  _exit(128 + sig_num);
-}
-
+#if USE_UAE_JIT
 static void crash_signal_handler_siginfo(int sig_num, siginfo_t* info, void* uctx) {
   (void)uctx;
   crash_signal = sig_num;
@@ -393,6 +470,80 @@ static void crash_signal_handler_siginfo(int sig_num, siginfo_t* info, void* uct
   _exit(128 + sig_num);
 }
 #endif
+
+
+static void fc_boot_log_init(void)
+{
+  if (fc_boot_log_inited) {
+    return;
+  }
+  fc_boot_log_inited = 1;
+
+  const char *env = getenv("PISTORM_FC_BOOT_LOG");
+  if (env && *env) {
+    fc_boot_log_remaining = (unsigned int)strtoul(env, NULL, 0);
+  } else {
+    // Default silent; set PISTORM_FC_BOOT_LOG to enable.
+    fc_boot_log_remaining = 0;
+  }
+}
+
+static inline const char *fc_space_name(uint8_t fc)
+{
+  switch (fc & 0x7u) {
+  case 0: return "reserved";
+  case 1: return "user-data";
+  case 2: return "user-prog";
+  case 3: return "reserved";
+  case 4: return "reserved";
+  case 5: return "super-data";
+  case 6: return "super-prog";
+  case 7: return "cpu-space";
+  default: return "reserved";
+  }
+}
+
+static inline void fc_shadow_touch(uint8_t type, uint32_t addr, uint8_t is_write)
+{
+  if (fc_get_mode() == FC_MODE_OFF) {
+    return;
+  }
+
+  fc_boot_log_init();
+  if (fc_boot_log_remaining == 0) {
+    // Logging disabled or limit reached
+    return;
+  }
+
+  uint8_t fc_val = (uint8_t)(current_fc & 0x7u);
+
+  // Do not spam identical repeats of {FC, addr, type, RW}
+  if (fc_val == fc_shadow &&
+      addr   == fc_shadow_addr &&
+      type   == fc_shadow_type &&
+      is_write == fc_shadow_is_write) {
+    return;
+  }
+
+  fc_shadow        = fc_val;
+  fc_shadow_pc     = cpu_backend_get_pc();
+  fc_shadow_addr   = addr;
+  fc_shadow_type   = type;
+  fc_shadow_is_write = is_write;
+
+  const char *space = fc_space_name(fc_val);
+
+  LOG_INFO("[FC] seen=%u (%s) %s type=%u addr=$%.8X PC=$%.8X\n",
+           fc_shadow,
+           space,
+           is_write ? "W" : "R",
+           type,
+           addr,
+           fc_shadow_pc);
+
+  fc_boot_log_remaining--;
+}
+
 
 
 #define CLI_MAX_LINES 32
@@ -408,17 +559,9 @@ static int cli_collect_tokens(int argc, char* argv[], int* index, char* out, siz
 #ifdef MUSASHI_HAX
 #include "m68kcpu.h"
 extern m68ki_cpu_core m68ki_cpu;
-extern int m68ki_initial_cycles;
-extern int m68ki_remaining_cycles;
 
-#define M68K_SET_IRQ(i)                                                                            \
-  old_level = CPU_INT_LEVEL;                                                                       \
-  CPU_INT_LEVEL = ((unsigned int)(i) << 8);                                                        \
-  if (old_level != 0x0700 && CPU_INT_LEVEL == 0x0700)                                              \
-    m68ki_cpu.nmi_pending = TRUE;
-#define M68K_END_TIMESLICE                                                                         \
-  m68ki_initial_cycles = GET_CYCLES();                                                             \
-  SET_CYCLES(0);
+#define M68K_SET_IRQ(i) m68k_set_irq_state(&m68ki_cpu, (i))
+#define M68K_END_TIMESLICE m68k_end_timeslice_state(&m68ki_cpu)
 #else
 #define M68K_SET_IRQ m68k_set_irq
 #define M68K_END_TIMESLICE m68k_end_timeslice()
@@ -452,7 +595,7 @@ unsigned int amiga_reset = 0;
 unsigned int amiga_reset_last = 0;
 unsigned int do_reset = 0;
 
-/*
+
 static void amiga_warmup_bus(void) {
   for (int i = 0; i < 64; i++) {
     (void)ps_read_status_reg();
@@ -461,9 +604,9 @@ static void amiga_warmup_bus(void) {
     }
   }
 }
-*/
 
-/*
+
+
 static void amiga_reset_and_wait(const char* tag) {
   for (int attempt = 0; attempt < 3; attempt++) {
     ps_reset_state_machine();
@@ -483,7 +626,7 @@ static void amiga_reset_and_wait(const char* tag) {
   }
   printf("[RST] Warning: TXN_IN_PROGRESS still set after reset (%s)\n", tag);
 }
-*/
+
 
 static void configure_ipl_nops(void) {
   unsigned int value = ipl_nop_count_default;
@@ -699,7 +842,7 @@ static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
 
   /* Set our pool of clock cycles available */
   SET_CYCLES(num_cycles);
-  m68ki_initial_cycles = num_cycles;
+  CPU_INITIAL_CYCLES = num_cycles;
 
   /* See if interrupts came in */
   m68ki_check_interrupts(state);
@@ -715,7 +858,7 @@ static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
 
 
 #ifdef M68K_BUSERR_THING
-    m68ki_check_bus_error_trap();
+    m68ki_check_bus_error_trap(state);
 #endif
 
     /* Main loop.  Keep going until we run out of clock cycles */
@@ -727,7 +870,7 @@ static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
       m68ki_use_data_space(); /* auto-disable ( see m68kcpu.h ) */
 
       /* Call external hook to peek at CPU */
-      m68ki_instr_hook(REG_PC); /* auto-disable ( see m68kcpu.h ) */
+      m68ki_instr_hook(state, REG_PC); /* auto-disable ( see m68kcpu.h ) */
 
       /* Record previous program counter */
       REG_PPC = REG_PC;
@@ -1031,7 +1174,7 @@ key_loop:
       if (c && c == cfg->mouse_toggle_key) {
         mouse_hook_enabled ^= 1;
         printf("Mouse hook %s.\n", mouse_hook_enabled ? "enabled" : "disabled");
-        mouse_dx = mouse_dy = mouse_buttons = mouse_extra = 0;
+        mouse_dx = mouse_dy = mouse_buttons = mouse_buttons_latched = mouse_extra = 0;
       }
       if (c == 'r') {
         cpu_emulation_running ^= 1;
@@ -1107,6 +1250,7 @@ mouse_loop:
     uint8_t x, y, b, e;
     while (get_mouse_status(&x, &y, &b, &e)) {
       mouse_buttons = b;
+      mouse_buttons_latched |= (uint8_t)(b & 0x07u);
       mouse_extra = e;
       mouse_dx = x;
       mouse_dy = y;
@@ -1334,7 +1478,7 @@ switch_config:
   srand((unsigned int)(ts_seed.tv_sec ^ ts_seed.tv_nsec));
 #endif
 
- // amiga_reset_and_wait("startup");
+  amiga_reset_and_wait("startup");
 
   if (load_new_config != 0) {
     uint8_t config_action = load_new_config - 1;
@@ -1400,10 +1544,11 @@ switch_config:
       cfg->platform = make_platform_config("none", "generic");
     }
     cfg->platform->platform_initial_setup(cfg);
+    enforce_kickstart_cpu_compat(cfg);
   }
 
   if (fc_get_mode() != FC_MODE_OFF) {
-    fc_boot_log_remaining = 5;
+    fc_boot_log_init();
     LOG_INFO("[CPU] FC enabled and in use (mode=%s)\n", fc_mode_name(fc_get_mode()));
   } else {
     LOG_INFO("[CPU] FC disabled\n");
@@ -1502,19 +1647,39 @@ switch_config:
 
 #ifdef USE_UAE_JIT
   if (enable_jit_backend) {
-    use_uae_jit = 1;
-    printf("[CPU] UAE JIT backend enabled\n");
-    uae_pistorm_init(uae_cpu_model_from_musashi(cpu_type), 1, enable_fpu_jit_backend ? 1 : 0);
+    int rc = uae_pistorm_init(uae_cpu_model_from_musashi(cpu_type), 1, enable_fpu_jit_backend ? 1 : 0);
+    if (rc == 0) {
+      use_uae_jit = 1;
+      enable_jit_backend = 1;
+      LOG_INFO("[CPU] UAE JIT backend enabled\n");
+    } else {
+      uint32_t rv_sp = 0;
+      uint32_t rv_pc = 0;
+      int rv_ovl = -1;
+      int rv_err = uae_pistorm_get_last_init_error();
+      uae_pistorm_get_last_reset_vectors(&rv_sp, &rv_pc, &rv_ovl);
+      use_uae_jit = 0;
+      enable_jit_backend = 0;
+      LOG_ERROR("[CPU] UAE JIT init failed (rc=%d), falling back to Musashi\n", rc);
+      LOG_ERROR("[CPU] UAE JIT init detail: err=%d reset_sp=$%.8X reset_pc=$%.8X ovl=%d\n",
+                rv_err, rv_sp, rv_pc, rv_ovl);
+      if (rv_err == 4) {
+        LOG_WARN("[CPU] UAE JIT requires Kickstart ROM at $00F80000 to be Pi-mapped executable memory.\n");
+        LOG_WARN("[CPU] Keep Musashi for bus-only motherboard ROM, or map Kickstart in cfg as type=rom.\n");
+      }
+    }
   }
 #endif
+
+  LOG_INFO("[CPU] Active backend: %s\n", use_uae_jit ? "UAE JIT" : "Musashi");
 
   if (!use_uae_jit) {
     m68k_init();
     printf("Setting CPU type to %d.\n", cpu_type);
     m68k_set_cpu_type(&m68ki_cpu, cpu_type);
-    m68k_set_instr_hook_callback(instr_hook_callback);
-    m68k_set_fc_callback(fc_callback_wrapper);  // Use wrapper to call cpu_set_fc
-    m68k_set_illg_instr_callback(illg_instr_callback);
+    m68k_set_instr_hook_callback(&m68ki_cpu, instr_hook_callback);
+    m68k_set_fc_callback(&m68ki_cpu, fc_callback_wrapper);  // Use wrapper to call cpu_set_fc
+    m68k_set_illg_instr_callback(&m68ki_cpu, illg_instr_callback);
     cpu_pulse_reset();
   }
 
@@ -1774,10 +1939,16 @@ static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t*
       return amiga_handle_intrqr_read(res);
       break;
     case CIAAPRA:
-      if (mouse_hook_enabled && (mouse_buttons & 0x01)) {
-        rres = (uint32_t)ps_read(type, addr);
-        *res = (rres ^ 0x40);
-        return 1;
+      if (mouse_hook_enabled) {
+        uint8_t buttons = (uint8_t)(mouse_buttons | mouse_buttons_latched);
+        if (buttons & 0x01) {
+          if ((mouse_buttons_latched & 0x01) && !(mouse_buttons & 0x01)) {
+            mouse_buttons_latched &= (uint8_t)~0x01u;
+          }
+          rres = (uint32_t)ps_read(type, addr);
+          *res = (rres ^ 0x40);
+          return 1;
+        }
       }
       if (swap_df0_with_dfx && spoof_df0_id) {
         // DF0 doesn't emit a drive type ID on RDY pin
@@ -1848,11 +2019,18 @@ static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t*
     }
     case POTGOR:
       if (mouse_hook_enabled) {
+        uint8_t buttons = (uint8_t)(mouse_buttons | mouse_buttons_latched);
         unsigned short result = (unsigned short)ps_read(type, addr);
         // bit 1 rmb, bit 2 mmb
-        if (mouse_buttons & 0x06) {
-          *res = (unsigned int)((result ^ ((mouse_buttons & 0x02) << 9))     // move rmb to bit 10
-                                & (result ^ ((mouse_buttons & 0x04) << 6))); // move mmb to bit 8
+        if (buttons & 0x06) {
+          if ((mouse_buttons_latched & 0x02) && !(mouse_buttons & 0x02)) {
+            mouse_buttons_latched &= (uint8_t)~0x02u;
+          }
+          if ((mouse_buttons_latched & 0x04) && !(mouse_buttons & 0x04)) {
+            mouse_buttons_latched &= (uint8_t)~0x04u;
+          }
+          *res = (unsigned int)((result ^ ((buttons & 0x02) << 9))     // move rmb to bit 10
+                                & (result ^ ((buttons & 0x04) << 6))); // move mmb to bit 8
           return 1;
         }
         *res = (unsigned int)(result & 0xfffd);
@@ -1897,6 +2075,10 @@ static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t*
     if (addr >= cfg->custom_low && addr < cfg->custom_high) {
       if (addr >= PISCSI_OFFSET && addr < PISCSI_UPPER) {
         *res = handle_piscsi_read(addr, type);
+        return 1;
+      }
+      if (addr >= PISCSI64_OFFSET && addr < PISCSI64_UPPER) {
+        *res = handle_piscsi64_read(addr, type);
         return 1;
       }
       if (addr >= PINET_OFFSET && addr < PINET_UPPER) {
@@ -2126,6 +2308,10 @@ static inline int32_t platform_write_check(uint8_t type, uint32_t addr, uint32_t
     if (addr >= cfg->custom_low && addr < cfg->custom_high) {
       if (addr >= PISCSI_OFFSET && addr < PISCSI_UPPER) {
         handle_piscsi_write(addr, val, type);
+        return 1;
+      }
+      if (addr >= PISCSI64_OFFSET && addr < PISCSI64_UPPER) {
+        handle_piscsi64_write(addr, val, type);
         return 1;
       }
       if (addr >= PINET_OFFSET && addr < PINET_UPPER) {

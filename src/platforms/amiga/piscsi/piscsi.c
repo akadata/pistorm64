@@ -634,12 +634,19 @@ void piscsi_map_drive(const char *filename, uint8_t index) {
         return;
     }
 
-    char hdfID[512];
-    memset(hdfID, 0x00, 512);
-    read(tmp_fd, hdfID, 512);
-    hdfID[4] = '\0';
-    if (strcmp(hdfID, "DOS") == 0 || strcmp(hdfID, "PFS") == 0 || strcmp(hdfID, "PDS") == 0 || strcmp(hdfID, "SFS") == 0) {
+    uint8_t hdfID[4] = {0};
+    ssize_t id_read = pread(tmp_fd, hdfID, sizeof(hdfID), 0);
+    if (id_read == (ssize_t)sizeof(hdfID) &&
+        (memcmp(hdfID, "DOS", 3) == 0 ||
+         memcmp(hdfID, "PFS", 3) == 0 ||
+         memcmp(hdfID, "PDS", 3) == 0 ||
+         memcmp(hdfID, "SFS", 3) == 0 ||
+         memcmp(hdfID, "MSH", 3) == 0 ||
+         memcmp(hdfID, "MSD", 3) == 0 ||
+         memcmp(hdfID, "UNI", 3) == 0)) {
         printf("[!!!PISCSI] The disk image %s is a UAE Single Partition Hardfile!\n", filename);
+        printf("[!!!PISCSI] Detected DOSType signature: %c%c%c\\x%02X (0x%02X%02X%02X%02X)\n",
+               hdfID[0], hdfID[1], hdfID[2], hdfID[3], hdfID[0], hdfID[1], hdfID[2], hdfID[3]);
         printf("[!!!PISCSI] WARNING: PiSCSI does NOT support UAE Single Partition Hardfiles!\n");
         printf("[!!!PISCSI] PLEASE check the PiSCSI readme file in the GitHub repo for more information.\n");
         printf("[!!!PISCSI] If this is merely an empty or placeholder file you've created to partition and format on the Amiga, please disregard this warning message.\n");

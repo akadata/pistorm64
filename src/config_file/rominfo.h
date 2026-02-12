@@ -22,5 +22,7 @@ struct romInfo {
 
 enum romErrCode { ERR_NO_ERR, ERR_NOT_ROM, ERR_ROM_UNKNOWN };
 
+int queryRomInfo(uint8_t* address, size_t length, struct romInfo* info);
+int romInfoRequires68020(const struct romInfo* info);
 void displayRomInfo(uint8_t* address, size_t length);
 #endif /* __ROMINFO */

@@ -36,13 +36,13 @@
 
 #ifndef CARD_MEMSIZE
 #ifndef RTG_GFX_MEM
-#define RTG_GFX_MEM 64u
+#define RTG_GFX_MEM 128u
 #endif
 #define CARD_MEMSIZE    ((RTG_GFX_MEM) * 0x00100000u)  /* default: 64MB VRAM */
 #endif
 
 #ifndef CHIP_RAM_SIZE
-#define CHIP_RAM_SIZE   0x00100000u  /* default: 1MB chip RAM offset */
+#define CHIP_RAM_SIZE   0x00200000u  /* default: 1MB chip RAM offset */
 #endif
 
 #define IRTGCMD_OFFSET  (CARD_OFFSET + 0x60)

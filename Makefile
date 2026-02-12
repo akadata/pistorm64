@@ -43,9 +43,9 @@
 # USE_PIPE   : set to 1 to add -pipe to compile steps.
 # M68K_WARN_SUPPRESS : extra warning suppressions for the generated Musashi core.
 #
-
+M68K_ENHANCE ?= 0 
 # Set USE_GOLD=1 to link with gold if available.
-USE_GOLD   ?= 1
+USE_GOLD   ?= 0
 
 # Toggle RTG output backends: 1=raylib (default), 0=null stub.
 USE_RAYLIB ?= 1
@@ -58,7 +58,7 @@ USE_PMMU   ?= 1
 # Optional: build UAE/JIT objects (AArch64 JIT backend from Amiberry).
 # This does not replace Musashi in the main emulator yet; it builds a standalone
 # libuae.a for bring-up and integration work.
-USE_UAE_JIT ?= 1
+USE_UAE_JIT ?= 0
 
 # Force FPU on EC/020/EC040/LC040 for 68881/68882 emulation (optional).
 USE_EC_FPU ?= 0
@@ -184,7 +184,7 @@ AMIGA_SUBMAKE = $(MAKE) AMIGA_TOOLCHAIN=$(AMIGA_TOOLCHAIN) VBCC=$(AMIGA_VBCC) P9
 
 PISTORM_GPCLK_SRC ?= 5
 PISTORM_GPCLK_DIV ?= 6
-PISTORM_KMOD_PARAMS ?= run_batch_enable=0 berr_reset_input=0 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV)
+PISTORM_KMOD_PARAMS ?= run_batch_enable=1 berr_reset_input=1 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV)
 
 PS_PROTOCOL_SRC := src/gpio/ps_protocol_kmod.c
 
@@ -209,6 +209,7 @@ MAINFILES += src/platforms/platforms.c
 MAINFILES += src/z3bus_iface.c
 MAINFILES += src/platforms/amiga/amiga_zorro.c
 MAINFILES += src/platforms/amiga/zorro/z3bus_demo/z3bus_demo.c
+MAINFILES += src/platforms/amiga/zorro/z3_piscsi64/z3_piscsi64.c
 MAINFILES += src/platforms/amiga/zorro/serial_echo/serial_echo.c
 MAINFILES += src/platforms/amiga/zorro/z2_rng/z2_rng.c
 MAINFILES += src/platforms/amiga/zorro/z2_pissa/z2_pissa.c
@@ -233,6 +234,7 @@ MAINFILES += src/platforms/amiga/rtg/rtg-output-raylib.c
 MAINFILES += src/platforms/amiga/rtg/rtg-gfx.c
 
 MAINFILES += src/platforms/amiga/piscsi/piscsi.c
+MAINFILES += src/platforms/amiga/piscsi64/piscsi64.c
 MAINFILES += src/platforms/amiga/net/pi-net.c
 
 MAINFILES += src/platforms/shared/rtc.c
@@ -275,7 +277,14 @@ ifeq ($(USE_EC_FPU),1)
 DEFINES += -DPISTORM_ENABLE_020_FPU -DPISTORM_ENABLE_EC040_FPU
 endif
 
-MUSASHIFILES     = src/musashi/m68kcpu.c src/musashi/m68kdasm.c src/musashi/softfloat/softfloat.c src/musashi/softfloat/softfloat_fpsp.c
+MUSASHIFILES     =  src/musashi/m68kcpu.c 
+MUSASHIFILES     += src/musashi/m68kdasm.c 
+ifeq ($(M68K_ENHANCE),1)
+#MUSASHIFILES     += src/musashi/m68k_enhanced.c 
+endif
+MUSASHIFILES     += src/musashi/softfloat/softfloat.c 
+MUSASHIFILES     += src/musashi/softfloat/softfloat_fpsp.c
+
 MUSASHIGENCFILES = src/musashi/m68kops.c
 MUSASHIGENHFILES = src/musashi/m68kops.h
 MUSASHIGENERATOR = m68kmake
@@ -287,6 +296,10 @@ EXEPATH = ./
 M68KFILES = $(MUSASHIFILES) $(MUSASHIGENCFILES)
 .CFILES   = $(MAINFILES) $(M68KFILES)
 .OFILES   = $(.CFILES:%.c=%.o) src/a314/a314.o
+
+EXTRA_CXX_OBJS :=
+EXTRA_CXX_STUB_OBJS :=
+EXTRA_LINK_DEPS :=
 
 ifeq ($(USE_UAE_JIT),1) 
 # UAE/JIT build (optional, AArch64 only)
@@ -349,10 +362,6 @@ EXTRA_LINK_DEPS += $(UAE_TARGET)
 UAE_LINK_FLAGS := -Wl,--whole-archive $(UAE_TARGET) -Wl,--no-whole-archive
 DEFINES += -DUSE_UAE_JIT
 endif
-
-
-EXTRA_CXX_OBJS :=
-EXTRA_LINK_DEPS :=
 
 
 CC  ?= gcc
@@ -485,13 +494,14 @@ HELP_TARGETS = \
 	"make clean"                      "Remove build artifacts" \
 	"make amiga-net"                  "Build Amiga net driver (.device)" \
 	"make amiga-piscsi"               "Build Amiga PiSCSI driver + bootrom" \
+	"make amiga-piscsi64"             "Build Amiga PiSCSI64 Z3 driver + bootrom" \
 	"make amiga-rtg"                  "Build Amiga RTG driver (.card)" \
 	"make amiga-ahi"                  "Build Amiga AHI driver (.audio)" \
 	"make amiga-pissa"                "Build Amiga PISSA crypto tools" \
 	"make amiga-pissl"                "Build Amiga PISSL TLS tools" \
 	"make amiga-all"                  "Build all Amiga-side drivers" \
 	"make amiga-clean"                "Clean Amiga-side driver build artifacts" \
-	"make install [PREFIX=… DESTDIR=…]" "Install emulator, data/, configs, piscsi.rom, a314 files" \
+	"make install [PREFIX=… DESTDIR=…]" "Install emulator, data/, configs, piscsi.rom + piscsi64.rom, a314 files" \
 	"make uninstall [PREFIX=… DESTDIR=…]" "Remove installed tree" \
 	"make kernel_module"              "Build pistorm.ko + z3bus.ko (out-of-tree)" \
 	"make kernel_module_pistorm"      "Build pistorm.ko only (out-of-tree)" \
@@ -639,6 +649,8 @@ install: all
 	done
 	$(INSTALL) -d $(INSTALL_DIR)/src/platforms/amiga/piscsi
 	$(INSTALL) -m 644 src/platforms/amiga/piscsi/piscsi.rom $(INSTALL_DIR)/src/platforms/amiga/piscsi/piscsi.rom
+	$(INSTALL) -d $(INSTALL_DIR)/src/platforms/amiga/piscsi64
+	$(INSTALL) -m 644 src/platforms/amiga/piscsi64/piscsi64.rom $(INSTALL_DIR)/src/platforms/amiga/piscsi64/piscsi64.rom
 	$(INSTALL) -d $(INSTALL_DIR)/a314
 	cp -a src/a314/files_pi/. $(INSTALL_DIR)/a314/
 	cp -a data $(INSTALL_DIR)/
@@ -716,6 +728,9 @@ amiga-net:
 amiga-piscsi:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi/device_driver_amiga
 
+amiga-piscsi64:
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi64/device_driver_amiga
+
 amiga-rtg:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/rtg/rtg_driver_amiga
 
@@ -728,11 +743,12 @@ amiga-pissa:
 amiga-pissl:
 	$(AMIGA_SUBMAKE) -C amiga/pissl
 
-amiga-all: amiga-net amiga-piscsi amiga-rtg amiga-pissa amiga-pissl
+amiga-all: amiga-net amiga-piscsi amiga-piscsi64 amiga-rtg amiga-pissa amiga-pissl
 
 amiga-clean:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/net/net_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi/device_driver_amiga clean
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi64/device_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/rtg/rtg_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/ahi/ahi_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C amiga/pissa clean
@@ -746,7 +762,11 @@ full:
 	-pkill -x emulator 2>/dev/null || true
 	-sudo rmmod pistorm 2>/dev/null || true
 	$(MAKE) clean
+ifeq ($(USE_UAE_JIT),1)
 	$(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) uae-jit
+else
+	$(MAKE) 
+endif
 	$(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD)
 	$(MAKE) kernel_module
 	sudo $(MAKE) kernel_install
@@ -768,7 +788,7 @@ full:
 	# Apply sysctl settings (continue even if hugepages not supported)
 	sudo sysctl -p /etc/sysctl.d/10-hugepages.conf || echo "Note: Some hugepage settings may not be supported on this system"
 	# Enable and start the emulator service
-	sudo systemctl enable kernelpistorm64.service
+	# sudo systemctl enable kernelpistorm64.service
 	echo "Loading Kernel PiStorm64"
 #	sudo modprobe pistorm run_batch_enable=1 berr_reset_input=1 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV) 2>/dev/null || true
 	sudo modprobe pistorm $(PISTORM_KMOD_PARAMS) 2>/dev/null || true
@@ -779,4 +799,4 @@ help:
 
 -include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d $(UAE_OBJS:%.o=%.d)
 
-.PHONY: all clean buptest pistorm_truth_test  install uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-piscsi amiga-rtg amiga-ahi amiga-all amiga-clean
+.PHONY: all clean buptest pistorm_truth_test  install uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-piscsi amiga-piscsi64 amiga-rtg amiga-ahi amiga-all amiga-clean

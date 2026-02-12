@@ -78,6 +78,38 @@ static inline void ps_store_u32(void *p, uint32_t v)
     memcpy(p, &v, sizeof(v));
 }
 
+/* Returns true when [address, address + width - 1] is fully inside [lower, upper). */
+static inline int m68ki_range_contains_access(uint32_t address, uint32_t lower, uint32_t upper, uint32_t width)
+{
+    uint32_t span;
+
+    if (address < lower || upper <= lower) {
+        return 0;
+    }
+
+    span = upper - lower;
+    if (span < width) {
+        return 0;
+    }
+
+    return (address - lower) <= (span - width);
+}
+
+static inline int m68ki_range_contains_8(uint32_t address, uint32_t lower, uint32_t upper)
+{
+    return m68ki_range_contains_access(address, lower, upper, 1u);
+}
+
+static inline int m68ki_range_contains_16(uint32_t address, uint32_t lower, uint32_t upper)
+{
+    return m68ki_range_contains_access(address, lower, upper, 2u);
+}
+
+static inline int m68ki_range_contains_32(uint32_t address, uint32_t lower, uint32_t upper)
+{
+    return m68ki_range_contains_access(address, lower, upper, 4u);
+}
+
 
 /* ======================================================================== */
 /* ==================== ARCHITECTURE-DEPENDANT DEFINES ==================== */
@@ -209,11 +241,15 @@ typedef uint32 uint64;
 #define EXCEPTION_MMU_CONFIGURATION       56 // only on 020/030
 
 /* Function codes set by CPU during data/address bus activity */
+/* 0  (Undefined, reserved) */
 #define FUNCTION_CODE_USER_DATA          1
 #define FUNCTION_CODE_USER_PROGRAM       2
-#define FUNCTION_CODE_SUPERVISOR_DATA    5
-#define FUNCTION_CODE_SUPERVISOR_PROGRAM 6
-#define FUNCTION_CODE_CPU_SPACE          7
+/* 3  (Undefined, reserved / user defined) */
+/* 4  (Undefined, reserved) */
+#define FUNCTION_CODE_SUPERVISOR_DATA    5  /* Supervisor Data Space */
+#define FUNCTION_CODE_SUPERVISOR_PROGRAM 6  /* Supervisor Program Space */
+#define FUNCTION_CODE_CPU_SPACE          7  /* CPU Space (IRQ / special cycles) */
+
 
 /* CPU types for deciding what to emulate */
 #define CPU_TYPE_000    (0x00000001)
@@ -407,14 +443,21 @@ typedef uint32 uint64;
 #define FLAG_C           state->c_flag
 #define FLAG_INT_MASK    state->int_mask
 
-#define CPU_INT_LEVEL    m68ki_cpu.int_level /* ASG: changed from CPU_INTS_PENDING */
-#define CPU_STOPPED      m68ki_cpu.stopped
+#define CPU_INT_LEVEL    state->int_level
+#define CPU_STOPPED      state->stopped
 #define CPU_PREF_ADDR    state->pref_addr
 #define CPU_PREF_DATA    state->pref_data
 #define CPU_ADDRESS_MASK state->address_mask
 #define CPU_SR_MASK      state->sr_mask
 #define CPU_INSTR_MODE   state->instr_mode
 #define CPU_RUN_MODE     state->run_mode
+#define CPU_INITIAL_CYCLES state->initial_cycles
+#define CPU_REMAINING_CYCLES state->remaining_cycles
+#define CPU_TRACING      state->tracing
+#define CPU_ADDRESS_SPACE state->address_space
+#define CPU_AERR_ADDRESS state->aerr_address
+#define CPU_AERR_WRITE_MODE state->aerr_write_mode
+#define CPU_AERR_FC state->aerr_fc
 
 #define CYC_INSTRUCTION  state->cyc_instruction
 #define CYC_EXCEPTION    state->cyc_exception
@@ -433,16 +476,17 @@ typedef uint32 uint64;
 #define RESET_CYCLES     state->reset_cycles
 
 
-#define CALLBACK_INT_ACK      m68ki_cpu.int_ack_callback
-#define CALLBACK_BKPT_ACK     m68ki_cpu.bkpt_ack_callback
-#define CALLBACK_RESET_INSTR  m68ki_cpu.reset_instr_callback
-#define CALLBACK_CMPILD_INSTR m68ki_cpu.cmpild_instr_callback
-#define CALLBACK_RTE_INSTR    m68ki_cpu.rte_instr_callback
-#define CALLBACK_TAS_INSTR    m68ki_cpu.tas_instr_callback
-#define CALLBACK_ILLG_INSTR   m68ki_cpu.illg_instr_callback
-#define CALLBACK_PC_CHANGED   m68ki_cpu.pc_changed_callback
-#define CALLBACK_SET_FC       m68ki_cpu.set_fc_callback
-#define CALLBACK_INSTR_HOOK   m68ki_cpu.instr_hook_callback
+#define CALLBACK_INT_ACK      state->int_ack_callback
+#define CALLBACK_BKPT_ACK     state->bkpt_ack_callback
+#define CALLBACK_RESET_INSTR  state->reset_instr_callback
+#define CALLBACK_CMPILD_INSTR state->cmpild_instr_callback
+#define CALLBACK_RTE_INSTR    state->rte_instr_callback
+#define CALLBACK_TAS_INSTR    state->tas_instr_callback
+#define CALLBACK_ILLG_INSTR   state->illg_instr_callback
+#define CALLBACK_PC_CHANGED   state->pc_changed_callback
+	
+#define CALLBACK_SET_FC       state->set_fc_callback
+#define CALLBACK_INSTR_HOOK   state->instr_hook_callback
 
 
 
@@ -519,108 +563,108 @@ typedef uint32 uint64;
 /* Enable or disable callback functions */
 #if M68K_EMULATE_INT_ACK
 	#if M68K_EMULATE_INT_ACK == OPT_SPECIFY_HANDLER
-		#define m68ki_int_ack(A) M68K_INT_ACK_CALLBACK(A)
+		#define m68ki_int_ack(state, A) M68K_INT_ACK_CALLBACK(A)
 	#else
-		#define m68ki_int_ack(A) CALLBACK_INT_ACK(A)
+		#define m68ki_int_ack(state, A) (CALLBACK_INT_ACK ? CALLBACK_INT_ACK(A) : ((state)->int_level = 0, M68K_INT_ACK_AUTOVECTOR))
 	#endif
 #else
 	/* Default action is to used autovector mode, which is most common */
-	#define m68ki_int_ack(A) M68K_INT_ACK_AUTOVECTOR
+	#define m68ki_int_ack(state, A) M68K_INT_ACK_AUTOVECTOR
 #endif /* M68K_EMULATE_INT_ACK */
 
 #if M68K_EMULATE_BKPT_ACK
 	#if M68K_EMULATE_BKPT_ACK == OPT_SPECIFY_HANDLER
-		#define m68ki_bkpt_ack(A) M68K_BKPT_ACK_CALLBACK(A)
+		#define m68ki_bkpt_ack(state, A) M68K_BKPT_ACK_CALLBACK(A)
 	#else
-		#define m68ki_bkpt_ack(A) CALLBACK_BKPT_ACK(A)
+		#define m68ki_bkpt_ack(state, A) CALLBACK_BKPT_ACK(A)
 	#endif
 #else
-	#define m68ki_bkpt_ack(A)
+	#define m68ki_bkpt_ack(state, A)
 #endif /* M68K_EMULATE_BKPT_ACK */
 
 #if M68K_EMULATE_RESET
 	#if M68K_EMULATE_RESET == OPT_SPECIFY_HANDLER
-		#define m68ki_output_reset() M68K_RESET_CALLBACK()
+		#define m68ki_output_reset(state) M68K_RESET_CALLBACK()
 	#else
-		#define m68ki_output_reset() CALLBACK_RESET_INSTR()
+		#define m68ki_output_reset(state) CALLBACK_RESET_INSTR()
 	#endif
 #else
-	#define m68ki_output_reset()
+	#define m68ki_output_reset(state)
 #endif /* M68K_EMULATE_RESET */
 
 #if M68K_CMPILD_HAS_CALLBACK
 	#if M68K_CMPILD_HAS_CALLBACK == OPT_SPECIFY_HANDLER
-		#define m68ki_cmpild_callback(v,r) M68K_CMPILD_CALLBACK(v,r)
+		#define m68ki_cmpild_callback(state, v, r) M68K_CMPILD_CALLBACK(v,r)
 	#else
-		#define m68ki_cmpild_callback(v,r) CALLBACK_CMPILD_INSTR(v,r)
+		#define m68ki_cmpild_callback(state, v, r) CALLBACK_CMPILD_INSTR(v,r)
 	#endif
 #else
-	#define m68ki_cmpild_callback(v,r)
+	#define m68ki_cmpild_callback(state, v, r)
 #endif /* M68K_CMPILD_HAS_CALLBACK */
 
 #if M68K_RTE_HAS_CALLBACK
 	#if M68K_RTE_HAS_CALLBACK == OPT_SPECIFY_HANDLER
-		#define m68ki_rte_callback() M68K_RTE_CALLBACK()
+		#define m68ki_rte_callback(state) M68K_RTE_CALLBACK()
 	#else
-		#define m68ki_rte_callback() CALLBACK_RTE_INSTR()
+		#define m68ki_rte_callback(state) CALLBACK_RTE_INSTR()
 	#endif
 #else
-	#define m68ki_rte_callback()
+	#define m68ki_rte_callback(state)
 #endif /* M68K_RTE_HAS_CALLBACK */
 
 #if M68K_TAS_HAS_CALLBACK
 	#if M68K_TAS_HAS_CALLBACK == OPT_SPECIFY_HANDLER
-		#define m68ki_tas_callback() M68K_TAS_CALLBACK()
+		#define m68ki_tas_callback(state) M68K_TAS_CALLBACK()
 	#else
-		#define m68ki_tas_callback() CALLBACK_TAS_INSTR()
+		#define m68ki_tas_callback(state) CALLBACK_TAS_INSTR()
 	#endif
 #else
-	#define m68ki_tas_callback() 1
+	#define m68ki_tas_callback(state) 1
 #endif /* M68K_TAS_HAS_CALLBACK */
 
 #if M68K_ILLG_HAS_CALLBACK
 	#if M68K_ILLG_HAS_CALLBACK == OPT_SPECIFY_HANDLER
-		#define m68ki_illg_callback(opcode) M68K_ILLG_CALLBACK(opcode)
+		#define m68ki_illg_callback(state, opcode) M68K_ILLG_CALLBACK(opcode)
 	#else
-		#define m68ki_illg_callback(opcode) CALLBACK_ILLG_INSTR(opcode)
+		#define m68ki_illg_callback(state, opcode) CALLBACK_ILLG_INSTR(opcode)
 	#endif
 #else
-	#define m68ki_illg_callback(opcode) 0 // Default is 0 = not handled, exception will occur
+	#define m68ki_illg_callback(state, opcode) 0 // Default is 0 = not handled, exception will occur
 #endif /* M68K_ILLG_HAS_CALLBACK */
 
 #if M68K_INSTRUCTION_HOOK
 	#if M68K_INSTRUCTION_HOOK == OPT_SPECIFY_HANDLER
-		#define m68ki_instr_hook(pc) M68K_INSTRUCTION_CALLBACK(pc)
+		#define m68ki_instr_hook(state, pc) M68K_INSTRUCTION_CALLBACK(pc)
 	#else
-		#define m68ki_instr_hook(pc) CALLBACK_INSTR_HOOK(pc)
+		#define m68ki_instr_hook(state, pc) CALLBACK_INSTR_HOOK(pc)
 	#endif
 #else
-	#define m68ki_instr_hook(pc)
+	#define m68ki_instr_hook(state, pc)
 #endif /* M68K_INSTRUCTION_HOOK */
 
 #if M68K_MONITOR_PC
 	#if M68K_MONITOR_PC == OPT_SPECIFY_HANDLER
-		#define m68ki_pc_changed(A) M68K_SET_PC_CALLBACK(ADDRESS_68K(A))
+		#define m68ki_pc_changed(state, A) M68K_SET_PC_CALLBACK(ADDRESS_68K(A))
 	#else
-		#define m68ki_pc_changed(A) CALLBACK_PC_CHANGED(ADDRESS_68K(A))
+		#define m68ki_pc_changed(state, A) CALLBACK_PC_CHANGED(ADDRESS_68K(A))
 	#endif
 #else
-	#define m68ki_pc_changed(A)
+	#define m68ki_pc_changed(state, A)
 #endif /* M68K_MONITOR_PC */
 
 
 /* Enable or disable function code emulation */
 #if M68K_EMULATE_FC
 	#if M68K_EMULATE_FC == OPT_SPECIFY_HANDLER
-		#define m68ki_set_fc(A) M68K_SET_FC_CALLBACK(A)
+		#define m68ki_set_fc(state, A) M68K_SET_FC_CALLBACK(A)
 	#else
-		#define m68ki_set_fc(A) CALLBACK_SET_FC(A)
+		#define m68ki_set_fc(state, A) CALLBACK_SET_FC(A)
 	#endif
-	#define m68ki_use_data_space() m68ki_address_space = FUNCTION_CODE_USER_DATA
-	#define m68ki_use_program_space() m68ki_address_space = FUNCTION_CODE_USER_PROGRAM
-	#define m68ki_get_address_space() m68ki_address_space
+	#define m68ki_use_data_space() CPU_ADDRESS_SPACE = FUNCTION_CODE_USER_DATA
+	#define m68ki_use_program_space() CPU_ADDRESS_SPACE = FUNCTION_CODE_USER_PROGRAM
+	#define m68ki_get_address_space() CPU_ADDRESS_SPACE
 #else
-	#define m68ki_set_fc(A)
+	#define m68ki_set_fc(state, A)
 	#define m68ki_use_data_space()
 	#define m68ki_use_program_space()
 	#define m68ki_get_address_space() FUNCTION_CODE_USER_DATA
@@ -630,13 +674,13 @@ typedef uint32 uint64;
 /* Enable or disable trace emulation */
 #if M68K_EMULATE_TRACE
 	/* Initiates trace checking before each instruction (t1) */
-	#define m68ki_trace_t1() m68ki_tracing = FLAG_T1
+	#define m68ki_trace_t1() CPU_TRACING = FLAG_T1
 	/* adds t0 to trace checking if we encounter change of flow */
-	#define m68ki_trace_t0() m68ki_tracing |= FLAG_T0
+	#define m68ki_trace_t0() CPU_TRACING |= FLAG_T0
 	/* Clear all tracing */
-	#define m68ki_clear_trace() m68ki_tracing = 0
+	#define m68ki_clear_trace() CPU_TRACING = 0
 	/* Cause a trace exception if we are tracing */
-	#define m68ki_exception_if_trace(a) if(m68ki_tracing) m68ki_exception_trace(a)
+	#define m68ki_exception_if_trace(a) if(CPU_TRACING) m68ki_exception_trace(a)
 #else
 	#define m68ki_trace_t1()
 	#define m68ki_trace_t0()
@@ -652,33 +696,30 @@ typedef uint32 uint64;
 
 /* sigjmp() on Mac OS X and *BSD in general saves signal contexts and is super-slow, use sigsetjmp() to tell it not to */
 #ifdef _BSD_SETJMP_H
-extern sigjmp_buf m68ki_aerr_trap;
 #define m68ki_set_address_error_trap(state) \
-	if(sigsetjmp(m68ki_aerr_trap, 0) != 0) \
+	if(sigsetjmp((state)->aerr_trap, 0) != 0) \
 	{ \
 		m68ki_exception_address_error(state); \
 		if(CPU_STOPPED) \
 		{ \
-			if (m68ki_remaining_cycles > 0) \
-				m68ki_remaining_cycles = 0; \
-			return m68ki_initial_cycles; \
+			if (CPU_REMAINING_CYCLES > 0) \
+				CPU_REMAINING_CYCLES = 0; \
+			return CPU_INITIAL_CYCLES; \
 		} \
 	}
 
 #define m68ki_check_address_error(state, ADDR, WRITE_MODE, FC) \
 	if((ADDR)&1) \
 	{ \
-		m68ki_aerr_address = ADDR; \
-		m68ki_aerr_write_mode = WRITE_MODE; \
-		m68ki_aerr_fc = FC; \
-		siglongjmp(m68ki_aerr_trap, 1); \
+		CPU_AERR_ADDRESS = ADDR; \
+		CPU_AERR_WRITE_MODE = WRITE_MODE; \
+		CPU_AERR_FC = FC; \
+		siglongjmp((state)->aerr_trap, 1); \
 	}
 #else
-extern jmp_buf m68ki_aerr_trap;
-
 #define m68ki_set_address_error_trap(state)                            \
     do {                                                               \
-        if (setjmp(m68ki_aerr_trap) != 0) {                            \
+        if (setjmp((state)->aerr_trap) != 0) {                         \
             /* We jumped back here from m68ki_check_address_error */   \
             m68ki_exception_address_error(state);                      \
             if (CPU_STOPPED) {                                         \
@@ -691,19 +732,19 @@ extern jmp_buf m68ki_aerr_trap;
     } while (0)
 
 
-	#define m68ki_check_address_error(state, ADDR, WRITE_MODE, FC) \
-		if((ADDR)&1) \
-		{ \
-			m68ki_aerr_address = ADDR; \
-			m68ki_aerr_write_mode = WRITE_MODE; \
-			m68ki_aerr_fc = FC; \
-			longjmp(m68ki_aerr_trap, 1); \
-		}
+		#define m68ki_check_address_error(state, ADDR, WRITE_MODE, FC) \
+			if((ADDR)&1) \
+			{ \
+				CPU_AERR_ADDRESS = ADDR; \
+				CPU_AERR_WRITE_MODE = WRITE_MODE; \
+				CPU_AERR_FC = FC; \
+				longjmp((state)->aerr_trap, 1); \
+			}
 #endif
-	#define m68ki_bus_error(ADDR,WRITE_MODE) \
-		m68ki_aerr_address=ADDR; \
-		m68ki_aerr_write_mode=WRITE_MODE; \
-		m68ki_exception_bus_error()
+	#define m68ki_bus_error(state, ADDR,WRITE_MODE) \
+		CPU_AERR_ADDRESS = ADDR; \
+		CPU_AERR_WRITE_MODE = WRITE_MODE; \
+		m68ki_exception_bus_error(state)
 
 	#define m68ki_check_address_error_010_less(state, ADDR, WRITE_MODE, FC) \
 		if (CPU_TYPE_IS_010_LESS(CPU_TYPE)) \
@@ -919,11 +960,11 @@ extern jmp_buf m68ki_aerr_trap;
 
 /* ---------------------------- Cycle Counting ---------------------------- */
 
-#define ADD_CYCLES(A)    m68ki_remaining_cycles += (A)
-#define USE_CYCLES(A)    m68ki_remaining_cycles -= (A)
-#define SET_CYCLES(A)    m68ki_remaining_cycles = A
-#define GET_CYCLES()     m68ki_remaining_cycles
-#define USE_ALL_CYCLES() m68ki_remaining_cycles %= CYC_INSTRUCTION[REG_IR]
+#define ADD_CYCLES(A)    CPU_REMAINING_CYCLES += (A)
+#define USE_CYCLES(A)    CPU_REMAINING_CYCLES -= (A)
+#define SET_CYCLES(A)    CPU_REMAINING_CYCLES = A
+#define GET_CYCLES()     CPU_REMAINING_CYCLES
+#define USE_ALL_CYCLES() CPU_REMAINING_CYCLES %= CYC_INSTRUCTION[REG_IR]
 
 
 
@@ -940,7 +981,7 @@ extern jmp_buf m68ki_aerr_trap;
 #define m68ki_write_32(state, A, V) m68ki_write_32_fc(state, A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
 
 #if M68K_SIMULATE_PD_WRITES
-#define m68ki_write_32_pd(A, V) m68ki_write_32_pd_fc(A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
+#define m68ki_write_32_pd(state, A, V) m68ki_write_32_pd_fc(state, A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
 #else
 #define m68ki_write_32_pd(state, A, V) m68ki_write_32_fc(state, A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
 #endif
@@ -1021,6 +1062,21 @@ typedef struct __attribute__((aligned(16))) m68ki_cpu_core
 	uint sr_mask;      /* Implemented status register bits */
 	uint instr_mode;   /* Stores whether we are in instruction mode or group 0/1 exception mode */
 	uint run_mode;     /* Stores whether we are processing a reset, bus error, address error, or something else */
+	int initial_cycles; /* Number of cycles at start of current timeslice */
+	sint remaining_cycles; /* Number of cycles remaining in current timeslice */
+	uint tracing;      /* Internal tracing flags */
+	uint address_space; /* Current function code space */
+	#if M68K_EMULATE_ADDRESS_ERROR
+	#ifdef _BSD_SETJMP_H
+	sigjmp_buf aerr_trap;
+	#else
+	jmp_buf aerr_trap;
+	#endif
+	#endif
+	uint aerr_address;
+	uint aerr_write_mode;
+	uint aerr_fc;
+	jmp_buf bus_error_jmp_buf;
 	int    has_pmmu;   /* Indicates if a PMMU available (yes on 030, 040, no on EC030) */
 	int    has_fpu;    /* Indicates if a FPU available */
 	int    pmmu_enabled; /* Indicates if the PMMU is enabled */
@@ -1122,18 +1178,11 @@ _Static_assert(offsetof(m68ki_cpu_core, fpr) % 16 == 0, "fpr offset must be 16-b
 
 
 extern m68ki_cpu_core m68ki_cpu;
-extern sint           m68ki_remaining_cycles;
-extern uint           m68ki_tracing;
 extern const uint8    m68ki_shift_8_table[];
 extern const uint16   m68ki_shift_16_table[];
 extern const uint     m68ki_shift_32_table[];
 extern const uint8    m68ki_exception_cycle_table[][256];
-extern uint           m68ki_address_space;
 extern const uint8    m68ki_ea_idx_cycle_table[];
-
-extern uint           m68ki_aerr_address;
-extern uint           m68ki_aerr_write_mode;
-extern uint           m68ki_aerr_fc;
 
 /* Forward declarations to keep some of the macros happy */
 static inline uint m68ki_read_16_fc(m68ki_cpu_core *state, uint address, uint fc);
@@ -1227,7 +1276,7 @@ static inline uint m68ki_read_imm_16(m68ki_cpu_core *state)
 	uint32_t pc = REG_PC;
 
 	address_translation_cache *cache = &state->code_translation_cache;
-	if(pc >= cache->lower && pc < cache->upper)
+	if(cache->offset && m68ki_range_contains_16(pc, cache->lower, cache->upper))
 	{
 		REG_PC += 2;
 		return be16toh(ps_load_u16(cache->offset + pc));
@@ -1253,7 +1302,7 @@ static inline uint m68ki_read_imm_32(m68ki_cpu_core *state)
 #endif
 	uint32_t address = ADDRESS_68K(REG_PC);
 	for (int i = 0; i < state->read_ranges; i++) {
-		if(address >= state->read_addr[i] && address < state->read_upper[i]) {
+		if(m68ki_range_contains_32(address, state->read_addr[i], state->read_upper[i])) {
 			REG_PC += 4;
 			return be32toh(ps_load_u32(state->read_data[i] + (address - state->read_addr[i])));
 		}
@@ -1262,7 +1311,7 @@ static inline uint m68ki_read_imm_32(m68ki_cpu_core *state)
 #if M68K_EMULATE_PREFETCH
 	uint temp_val;
 
-	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
+	m68ki_set_fc(state, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
 	state->mmu_tmp_fc = (uint16)(FLAG_S | FUNCTION_CODE_USER_PROGRAM);
 	state->mmu_tmp_rw = 1;
 	state->mmu_tmp_sz = M68K_SZ_LONG;
@@ -1314,7 +1363,7 @@ static inline uint m68ki_read_imm_32(m68ki_cpu_core *state)
 static inline uint m68ki_read_8_fc(m68ki_cpu_core *state, uint address, uint fc)
 {
 	(void)fc;
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+	m68ki_set_fc(state, fc); /* auto-disable (see m68kcpu.h) */
 	state->mmu_tmp_fc = (uint16)fc;
 	state->mmu_tmp_rw = 1;
 	state->mmu_tmp_sz = M68K_SZ_BYTE;
@@ -1325,13 +1374,13 @@ static inline uint m68ki_read_8_fc(m68ki_cpu_core *state, uint address, uint fc)
 #endif
 
 	address_translation_cache *cache = &state->fc_read_translation_cache;
-	if(cache->offset && address >= cache->lower && address < cache->upper)
+	if(cache->offset && m68ki_range_contains_8(address, cache->lower, cache->upper))
 	{
 		return cache->offset[address - cache->lower];
 	}
 
 	for (int i = 0; i < state->read_ranges; i++) {
-		if(address >= state->read_addr[i] && address < state->read_upper[i]) {
+		if(m68ki_range_contains_8(address, state->read_addr[i], state->read_upper[i])) {
 			SET_FC_TRANSLATION_CACHE_VALUES
 			return state->read_data[i][address - state->read_addr[i]];
 		}
@@ -1349,7 +1398,7 @@ static inline uint m68ki_read_8_fc(m68ki_cpu_core *state, uint address, uint fc)
 // M68KI_READ_16_FC
 static inline uint m68ki_read_16_fc(m68ki_cpu_core *state, uint address, uint fc)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+	m68ki_set_fc(state, fc); /* auto-disable (see m68kcpu.h) */
 	state->mmu_tmp_fc = (uint16)fc;
 	state->mmu_tmp_rw = 1;
 	state->mmu_tmp_sz = M68K_SZ_WORD;
@@ -1361,13 +1410,13 @@ static inline uint m68ki_read_16_fc(m68ki_cpu_core *state, uint address, uint fc
 #endif
 
 	address_translation_cache *cache = &state->fc_read_translation_cache;
-	if(cache->offset && address >= cache->lower && address < cache->upper)
+	if(cache->offset && m68ki_range_contains_16(address, cache->lower, cache->upper))
 	{
 		return be16toh(ps_load_u16(cache->offset + (address - cache->lower)));
 	}
 
 	for (int i = 0; i < state->read_ranges; i++) {
-		if(address >= state->read_addr[i] && address < state->read_upper[i]) {
+		if(m68ki_range_contains_16(address, state->read_addr[i], state->read_upper[i])) {
 			SET_FC_TRANSLATION_CACHE_VALUES
 			return be16toh(ps_load_u16(state->read_data[i] + (address - state->read_addr[i])));
 		}
@@ -1388,7 +1437,7 @@ static inline uint m68ki_read_16_fc(m68ki_cpu_core *state, uint address, uint fc
 // M68KI_READ_32_FC
 static inline uint m68ki_read_32_fc(m68ki_cpu_core *state, uint address, uint fc)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+	m68ki_set_fc(state, fc); /* auto-disable (see m68kcpu.h) */
 	state->mmu_tmp_fc = (uint16)fc;
 	state->mmu_tmp_rw = 1;
 	state->mmu_tmp_sz = M68K_SZ_LONG;
@@ -1400,13 +1449,13 @@ static inline uint m68ki_read_32_fc(m68ki_cpu_core *state, uint address, uint fc
 #endif
 
 	address_translation_cache *cache = &state->fc_read_translation_cache;
-	if(cache->offset && address >= cache->lower && address < cache->upper)
+	if(cache->offset && m68ki_range_contains_32(address, cache->lower, cache->upper))
 	{
 		return be32toh(ps_load_u32(cache->offset + (address - cache->lower)));
 	}
 
 	for (int i = 0; i < state->read_ranges; i++) {
-		if(address >= state->read_addr[i] && address < state->read_upper[i]) {
+		if(m68ki_range_contains_32(address, state->read_addr[i], state->read_upper[i])) {
 			SET_FC_TRANSLATION_CACHE_VALUES
 			return be32toh(ps_load_u32(state->read_data[i] + (address - state->read_addr[i])));
 		}
@@ -1430,7 +1479,7 @@ static inline uint m68ki_read_32_fc(m68ki_cpu_core *state, uint address, uint fc
 // M68KI_WRITE_8_FC
 static inline void m68ki_write_8_fc(m68ki_cpu_core *state, uint address, uint fc, uint value)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+	m68ki_set_fc(state, fc); /* auto-disable (see m68kcpu.h) */
 	state->mmu_tmp_fc = (uint16)fc;
 	state->mmu_tmp_rw = 0;
 	state->mmu_tmp_sz = M68K_SZ_BYTE;
@@ -1441,14 +1490,14 @@ static inline void m68ki_write_8_fc(m68ki_cpu_core *state, uint address, uint fc
 #endif
 
 	address_translation_cache *cache = &state->fc_write_translation_cache;
-	if(cache->offset && address >= cache->lower && address < cache->upper)
+	if(cache->offset && m68ki_range_contains_8(address, cache->lower, cache->upper))
 	{
 		cache->offset[address - cache->lower] = (unsigned char)value;
 		return;
 	}
 
 	for (int i = 0; i < state->write_ranges; i++) {
-		if(address >= state->write_addr[i] && address < state->write_upper[i]) {
+		if(m68ki_range_contains_8(address, state->write_addr[i], state->write_upper[i])) {
 			SET_FC_WRITE_TRANSLATION_CACHE_VALUES
 			state->write_data[i][address - state->write_addr[i]] = (unsigned char)value;
 			return;
@@ -1468,7 +1517,7 @@ static inline void m68ki_write_8_fc(m68ki_cpu_core *state, uint address, uint fc
 // M68KI_WRITE_16_FC
 static inline void m68ki_write_16_fc(m68ki_cpu_core *state, uint address, uint fc, uint value)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+	m68ki_set_fc(state, fc); /* auto-disable (see m68kcpu.h) */
 	state->mmu_tmp_fc = (uint16)fc;
 	state->mmu_tmp_rw = 0;
 	state->mmu_tmp_sz = M68K_SZ_WORD;
@@ -1480,14 +1529,14 @@ static inline void m68ki_write_16_fc(m68ki_cpu_core *state, uint address, uint f
 #endif
 
 	address_translation_cache *cache = &state->fc_write_translation_cache;
-	if(cache->offset && address >= cache->lower && address < cache->upper)
+	if(cache->offset && m68ki_range_contains_16(address, cache->lower, cache->upper))
 	{
 		ps_store_u16(cache->offset + (address - cache->lower), htobe16(value));
 		return;
 	}
 
 	for (int i = 0; i < state->write_ranges; i++) {
-		if(address >= state->write_addr[i] && address < state->write_upper[i]) {
+		if(m68ki_range_contains_16(address, state->write_addr[i], state->write_upper[i])) {
 			SET_FC_WRITE_TRANSLATION_CACHE_VALUES
 			ps_store_u16(state->write_data[i] + (address - state->write_addr[i]), htobe16(value));
 			return;
@@ -1512,7 +1561,7 @@ static inline void m68ki_write_16_fc(m68ki_cpu_core *state, uint address, uint f
 // M68KI_WRITE_32_FC
 static inline void m68ki_write_32_fc(m68ki_cpu_core *state, uint address, uint fc, uint value)
 {
-	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+	m68ki_set_fc(state, fc); /* auto-disable (see m68kcpu.h) */
 	state->mmu_tmp_fc = (uint16)fc;
 	state->mmu_tmp_rw = 0;
 	state->mmu_tmp_sz = M68K_SZ_LONG;
@@ -1524,14 +1573,14 @@ static inline void m68ki_write_32_fc(m68ki_cpu_core *state, uint address, uint f
 #endif
 
 	address_translation_cache *cache = &state->fc_write_translation_cache;
-	if(cache->offset && address >= cache->lower && address < cache->upper)
+	if(cache->offset && m68ki_range_contains_32(address, cache->lower, cache->upper))
 	{
 		ps_store_u32(cache->offset + (address - cache->lower), htobe32(value));
 		return;
 	}
 
 	for (int i = 0; i < state->write_ranges; i++) {
-		if(address >= state->write_addr[i] && address < state->write_upper[i]) {
+		if(m68ki_range_contains_32(address, state->write_addr[i], state->write_upper[i])) {
 			SET_FC_WRITE_TRANSLATION_CACHE_VALUES
 			ps_store_u32(state->write_data[i] + (address - state->write_addr[i]), htobe32(value));
 			return;
@@ -1560,12 +1609,9 @@ static inline void m68ki_write_32_fc(m68ki_cpu_core *state, uint address, uint f
  * A real 68k first writes the high word to [address+2], and then writes the
  * low word to [address].
  */
-static inline void m68ki_write_32_pd_fc(uint address, uint fc, uint value)
+static inline void m68ki_write_32_pd_fc(m68ki_cpu_core *state, uint address, uint fc, uint value)
 {
-    /* Bind the CPU core so all the state->... uses and ADDRESS_68K() work */
-    m68ki_cpu_core *state = &m68ki_cpu;
-
-    m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
+    m68ki_set_fc(state, fc); /* auto-disable (see m68kcpu.h) */
     state->mmu_tmp_fc = (uint16)fc;
     state->mmu_tmp_rw = 0;
     state->mmu_tmp_sz = M68K_SZ_LONG;
@@ -1828,14 +1874,14 @@ static inline void m68ki_fake_pull_32(m68ki_cpu_core *state)
 static inline void m68ki_jump(m68ki_cpu_core *state, uint new_pc)
 {
 	REG_PC = new_pc;
-	m68ki_pc_changed(REG_PC);
+	m68ki_pc_changed(state, REG_PC);
 }
 
 static inline void m68ki_jump_vector(m68ki_cpu_core *state, uint vector)
 {
 	REG_PC = (vector<<2) + REG_VBR;
 	REG_PC = m68ki_read_data_32(state, REG_PC);
-	m68ki_pc_changed(REG_PC);
+	m68ki_pc_changed(state, REG_PC);
 }
 
 
@@ -1857,7 +1903,7 @@ static inline void m68ki_branch_16(m68ki_cpu_core *state, uint offset)
 static inline void m68ki_branch_32(m68ki_cpu_core *state, uint offset)
 {
 	REG_PC += offset;
-	m68ki_pc_changed(REG_PC);
+	m68ki_pc_changed(state, REG_PC);
 }
 
 /* ---------------------------- Status Register --------------------------- */
@@ -2015,13 +2061,13 @@ static inline void m68ki_stack_frame_buserr(m68ki_cpu_core *state, uint sr)
 	m68ki_push_32(state, REG_PC);
 	m68ki_push_16(state, sr);
 	m68ki_push_16(state, REG_IR);
-	m68ki_push_32(state, m68ki_aerr_address);	/* access address */
+	m68ki_push_32(state, CPU_AERR_ADDRESS);	/* access address */
 	/* 0 0 0 0 0 0 0 0 0 0 0 R/W I/N FC
 	 * R/W  0 = write, 1 = read
 	 * I/N  0 = instruction, 1 = not
 	 * FC   3-bit function code
 	 */
-	m68ki_push_16(state, m68ki_aerr_write_mode | CPU_INSTR_MODE | m68ki_aerr_fc);
+	m68ki_push_16(state, CPU_AERR_WRITE_MODE | CPU_INSTR_MODE | CPU_AERR_FC);
 }
 
 /* Format 8 stack frame (68010).
@@ -2323,9 +2369,7 @@ static inline void m68ki_exception_privilege_violation(m68ki_cpu_core *state)
 	USE_CYCLES(CYC_EXCEPTION[EXCEPTION_PRIVILEGE_VIOLATION] - CYC_INSTRUCTION[REG_IR]);
 }
 
-extern jmp_buf m68ki_bus_error_jmp_buf;
-
-#define m68ki_check_bus_error_trap() setjmp(m68ki_bus_error_jmp_buf)
+#define m68ki_check_bus_error_trap(state) setjmp((state)->bus_error_jmp_buf)
 
 /* Exception for bus error */
 static inline void m68ki_exception_bus_error(m68ki_cpu_core *state)
@@ -2355,7 +2399,7 @@ static inline void m68ki_exception_bus_error(m68ki_cpu_core *state)
 	m68ki_stack_frame_1000(state, REG_PPC, sr, EXCEPTION_BUS_ERROR);
 
 	m68ki_jump_vector(state, EXCEPTION_BUS_ERROR);
-	longjmp(m68ki_bus_error_jmp_buf, 1);
+	longjmp(state->bus_error_jmp_buf, 1);
 }
 
 extern int cpu_log_enabled;
@@ -2409,7 +2453,7 @@ static inline void m68ki_exception_illegal(m68ki_cpu_core *state)
 	M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: illegal instruction %04x (%s)\n",
 				 m68ki_cpu_names[CPU_TYPE], ADDRESS_68K(REG_PPC), REG_IR,
 				 m68ki_disassemble_quick(ADDRESS_68K(REG_PPC),CPU_TYPE)));
-	if (m68ki_illg_callback(REG_IR))
+	if (m68ki_illg_callback(state, REG_IR))
 	    return;
 
 	sr = m68ki_init_exception(state);
@@ -2510,7 +2554,7 @@ static inline void m68ki_exception_interrupt(m68ki_cpu_core *state, uint int_lev
 		return;
 
 	/* Acknowledge the interrupt */
-	vector = m68ki_int_ack(int_level);
+	vector = m68ki_int_ack(state, int_level);
 
 	/* Get the interrupt vector */
 	if(vector == M68K_INT_ACK_AUTOVECTOR)

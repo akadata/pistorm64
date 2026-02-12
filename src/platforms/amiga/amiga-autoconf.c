@@ -68,6 +68,20 @@ unsigned char ac_piscsi_rom[] = {
     0x0, // Optional BOOT ROM vector
 };
 
+// PiSCSI64 AutoConfig Device ROM (placeholder vector storage)
+unsigned char ac_piscsi64_rom[] = {
+    0x0, 0x0, // 00/02
+    0x0, 0x0, // 04/06
+    0x0, 0x0, // 08/0a
+    0x0, 0x0, // 0c/0e
+    0x0, 0x0, // 10/12
+    0x0, 0x0, // 14/16
+    0x0, 0x0, // 18/1a
+    0x0, 0x0, // 1c/1e
+    0x0, 0x0, // 20/22
+    0x0, 0x0, // 24/26
+};
+
 // PiStorm Device Interaction ROM
 unsigned char ac_pistorm_rom[] = {
     Z2_Z2,
@@ -149,15 +163,54 @@ uint32_t ac_z3_current_pic = 0;
 int ac_z2_done = 0;
 int ac_z3_done = 0;
 
+static amiga_zorro_layout_t g_amiga_zorro_layout = {
+    .z2_config_base = AC_Z2_BASE,
+    .z2_mem_base = 0x00200000u,
+    .z2_mem_size = 0x00800000u,
+    .z3_config_base = AC_Z3_BASE,
+    /* Match the common Z3 assignment region used by expansion.library. */
+    .z3_mem_base = 0x40000000u,
+    .z3_mem_size = 0x20000000u,
+    .config_window_size = AC_SIZE,
+};
+
+const amiga_zorro_layout_t* amiga_get_zorro_layout(void) {
+  return &g_amiga_zorro_layout;
+}
+
+void amiga_set_zorro_layout(const amiga_zorro_layout_t* layout) {
+  if (!layout) {
+    return;
+  }
+  g_amiga_zorro_layout = *layout;
+}
+
 /* Base addresses for autoconfig devices that need to be visible
  * across modules (PiSCSI, pistorm-dev, platform custom range).
  */
 uint32_t piscsi_base = 0;
+uint32_t piscsi64_base = 0;
 uint32_t pistorm_dev_base = 0;
 
 extern uint8_t* piscsi_rom_ptr;
 extern uint32_t piscsi_base;
+extern uint32_t piscsi64_base;
 extern uint32_t pistorm_dev_base;
+
+static int zorro_dev_is_piscsi64(const zorro_device_t *dev) {
+  if (!dev) {
+    return 0;
+  }
+  if (dev->product == PISTORM_PROD_PISCSI64_Z2 ||
+      dev->product == PISTORM_PROD_PISCSI64_Z3) {
+    return 1;
+  }
+  if (dev->name &&
+      (strcmp(dev->name, "z2-piscsi64") == 0 || strcmp(dev->name, "z3-piscsi64") == 0)) {
+    return 1;
+  }
+  return 0;
+}
 
 typedef struct {
     unsigned int mbytes;     /* size in megabytes */
@@ -219,8 +272,27 @@ static unsigned char get_autoconf_size_ext(unsigned int size)
     );
 }
 
+static inline int addr_range_within(uint32_t base, uint32_t size, uint32_t addr, uint32_t span) {
+  if (!size || !span) {
+    return 0;
+  }
+  uint64_t win_lo = (uint64_t)base;
+  uint64_t win_hi = (uint64_t)base + (uint64_t)size;
+  uint64_t map_lo = (uint64_t)addr;
+  uint64_t map_hi = (uint64_t)addr + (uint64_t)span;
+  return map_lo >= win_lo && map_hi <= win_hi;
+}
+
+static inline void log_autoconf_assignment(const char* label, uint32_t amiga_base,
+                                           uint32_t size, const void* host_ptr) {
+  uint32_t amiga_hi = size ? (amiga_base + size - 1u) : amiga_base;
+  LOG_INFO("[AUTOCONF] %s AMIGA=$%.8X-$%.8X host=%p size=$%.8X\n",
+           label, amiga_base, amiga_hi, host_ptr, size);
+}
+
 
 extern void adjust_ranges_amiga(struct emulator_config* cfg);
+extern int nib_latch;
 
 void autoconfig_reset_all(void) {
   LOG_INFO("[AUTOCONF] Resetting all autoconf data.\n");
@@ -229,6 +301,7 @@ void autoconfig_reset_all(void) {
     ac_z3_type[i]   = ACTYPE_NONE;
     ac_z2_index[i]  = 0;
     ac_z3_index[i]  = 0;
+    ac_base[i]      = 0;
   }
 
   ac_z2_pic_count    = 0;
@@ -237,14 +310,60 @@ void autoconfig_reset_all(void) {
   ac_z3_current_pic  = 0;
   ac_z2_done         = 0;
   ac_z3_done         = 0;
+  nib_latch          = 0;
+  piscsi_base        = 0;
+  piscsi64_base      = 0;
+  pistorm_dev_base   = 0;
 }
 
 
 unsigned int autoconfig_read_memory_z3_8(struct emulator_config* cfg, unsigned int address) {
   int index = ac_z3_index[ac_z3_current_pic];
+  int z3_type = ac_z3_type[ac_z3_current_pic];
   unsigned char val = 0;
 
-  if (ac_z3_type[ac_z3_current_pic] == ACTYPE_ZORRO_GENERIC) {
+  if (z3_type == ACTYPE_PISCSI64) {
+    if ((address & 0xFF) >= AC_Z3_REG_RES50 && (address & 0xFF) <= AC_Z3_REG_RES7C) {
+      val = 0;
+    } else {
+      switch (address & 0xFF) {
+      case AC_Z3_REG_ER_TYPE:
+        val |= BOARDTYPE_Z3;
+        val |= BOARDTYPE_BOOTROM;
+        val |= get_autoconf_size(64 * SIZE_KILO);
+        if (ac_z3_current_pic + 1 < ac_z3_pic_count)
+          val |= BOARDTYPE_LINKED;
+        val ^= 0xFF;
+        break;
+      case AC_Z3_REG_ER_PRODUCT:
+        val = (unsigned char)(PISTORM_PROD_PISCSI64_Z3 & 0xFF);
+        break;
+      case AC_Z3_REG_ER_FLAGS:
+        val |= Z3_FLAGS_RESERVED;
+        break;
+      case AC_Z3_REG_MAN_LO:
+        val = PISTORM_MANUF_ID & 0x00FF;
+        break;
+      case AC_Z3_REG_MAN_HI:
+        val = (PISTORM_MANUF_ID >> 8);
+        break;
+      case AC_Z3_REG_INIT_DIAG_VEC_HI:
+        /* Diag/boot entry lives at offset $4000 in the 64K board space. */
+        val = 0x40;
+        break;
+      case AC_Z3_REG_INIT_DIAG_VEC_LO:
+        val = 0x00;
+        break;
+      default:
+        val = 0;
+        break;
+      }
+    }
+    return (address & 0x100) ? (unsigned int)((val << 4) ^ 0xFF)
+                             : (unsigned int)((val & 0xF0) ^ 0xFF);
+  }
+
+  if (z3_type == ACTYPE_ZORRO_GENERIC) {
     zorro_device_t *dev = zorro_get_device_by_index((uint8_t)index);
     if (!dev) {
       return 0;
@@ -257,6 +376,8 @@ unsigned int autoconfig_read_memory_z3_8(struct emulator_config* cfg, unsigned i
         val |= BOARDTYPE_Z3;
         if (dev->flags & Z3_FLAGS_MEMORY)
           val |= BOARDTYPE_FREEMEM;
+        if (dev->flags & ZORRO_DEV_FLAG_BOOTROM)
+          val |= BOARDTYPE_BOOTROM;
         if (dev->size > 8 * SIZE_MEGA)
           val |= get_autoconf_size_ext(dev->size);
         else
@@ -287,9 +408,21 @@ unsigned int autoconfig_read_memory_z3_8(struct emulator_config* cfg, unsigned i
         val = 0;
         break;
       case AC_Z3_REG_INIT_DIAG_VEC_LO:
-      case AC_Z3_REG_INIT_DIAG_VEC_HI:
-        val = 0;
+      case AC_Z3_REG_INIT_DIAG_VEC_HI: {
+        /* Boot ROM devices default to $4000 unless an explicit non-zero vector is provided. */
+        uint16_t diag_vec = (dev->flags & ZORRO_DEV_FLAG_BOOTROM) ? 0x4000u : 0u;
+        if (dev->ac_rom && dev->ac_rom_size >= 22) {
+          uint16_t ac_diag_vec =
+              (uint16_t)(((uint16_t)dev->ac_rom[20] << 8) | (uint16_t)dev->ac_rom[21]);
+          if (ac_diag_vec != 0) {
+            diag_vec = ac_diag_vec;
+          }
+        }
+        val = ((address & 0xFF) == AC_Z3_REG_INIT_DIAG_VEC_HI)
+                  ? (unsigned char)((diag_vec >> 8) & 0xFF)
+                  : (unsigned char)(diag_vec & 0xFF);
         break;
+      }
       case AC_Z3_REG_ER_RES03:
       case AC_Z3_REG_ER_RES0D:
       case AC_Z3_REG_ER_RES0E:
@@ -381,6 +514,7 @@ void autoconfig_write_memory_z3_8(struct emulator_config* cfg, unsigned int addr
   unsigned char val = (unsigned char)value;
   int done = 0;
   int is_zorro = (ac_z3_type[ac_z3_current_pic] == ACTYPE_ZORRO_GENERIC);
+  int is_piscsi64 = (ac_z3_type[ac_z3_current_pic] == ACTYPE_PISCSI64);
 
   switch (address & 0xFF) {
   case AC_Z3_REG_WR_ADDR_LO:
@@ -426,14 +560,42 @@ void autoconfig_write_memory_z3_8(struct emulator_config* cfg, unsigned int addr
       zorro_device_t *dev = zorro_get_device_by_index((uint8_t)index);
       if (dev) {
         dev->base = ac_base[ac_z3_current_pic];
+        int dev_is_piscsi64 = 0;
+        if (zorro_dev_is_piscsi64(dev)) {
+          piscsi64_base = dev->base;
+          dev_is_piscsi64 = 1;
+        }
+        LOG_INFO("[AUTOCONF] Z3 device %s assigned to $%.8x (manuf=$%04X product=$%04X)\n",
+                 dev->name ? dev->name : "unnamed", dev->base, dev->manufacturer, dev->product);
+        /* Make freshly assigned MMIO windows visible immediately during config-time
+         * (DiagEntry/BootEntry can touch them before Z3 enumeration is fully done). */
+        if (dev_is_piscsi64) {
+          adjust_ranges_amiga(cfg);
+        }
+      } else {
+        LOG_INFO("[AUTOCONF] Address of Z3 autoconf device assigned to $%.8x\n",
+                 ac_base[ac_z3_current_pic]);
       }
-      LOG_INFO("[AUTOCONF] Address of Z3 autoconf device assigned to $%.8x\n",
-               ac_base[ac_z3_current_pic]);
+    } else if (is_piscsi64) {
+      piscsi64_base = ac_base[ac_z3_current_pic];
+      LOG_INFO("[AUTOCONF] PiSCSI64 Z3 device assigned to $%.8x (manuf=$%04X product=$%04X)\n",
+               piscsi64_base, PISTORM_MANUF_ID, PISTORM_PROD_PISCSI64_Z3);
+      adjust_ranges_amiga(cfg);
     } else {
       LOG_INFO("[AUTOCONF] Address of Z3 autoconf RAM assigned to $%.8x [B]\n",
                ac_base[ac_z3_current_pic]);
       cfg->map_offset[index] = ac_base[ac_z3_current_pic];
       cfg->map_high[index] = cfg->map_offset[index] + cfg->map_size[index];
+      const amiga_zorro_layout_t* layout = amiga_get_zorro_layout();
+      if (layout && !addr_range_within(layout->z3_mem_base, layout->z3_mem_size,
+                                       (uint32_t)cfg->map_offset[index], cfg->map_size[index])) {
+        LOG_WARN("[AUTOCONF] Z3 RAM map assigned outside configured Z3 window: base=$%.8lX size=$%.8X "
+                 "window=$%.8X-$%.8X\n",
+                 cfg->map_offset[index], cfg->map_size[index], layout->z3_mem_base,
+                 layout->z3_mem_base + layout->z3_mem_size - 1u);
+      }
+      log_autoconf_assignment("Z3 RAM", (uint32_t)cfg->map_offset[index], cfg->map_size[index],
+                              cfg->map_data[index]);
       m68k_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
                          cfg->map_data[index]);
     }
@@ -453,6 +615,7 @@ void autoconfig_write_memory_z3_16(struct emulator_config* cfg, unsigned int add
   unsigned short val = (unsigned short)value;
   int done = 0;
   int is_zorro = (ac_z3_type[ac_z3_current_pic] == ACTYPE_ZORRO_GENERIC);
+  int is_piscsi64 = (ac_z3_type[ac_z3_current_pic] == ACTYPE_PISCSI64);
 
   switch (address & 0xFF) {
   case AC_Z3_REG_WR_ADDR_HI:
@@ -472,14 +635,42 @@ void autoconfig_write_memory_z3_16(struct emulator_config* cfg, unsigned int add
       zorro_device_t *dev = zorro_get_device_by_index((uint8_t)index);
       if (dev) {
         dev->base = ac_base[ac_z3_current_pic];
+        int dev_is_piscsi64 = 0;
+        if (zorro_dev_is_piscsi64(dev)) {
+          piscsi64_base = dev->base;
+          dev_is_piscsi64 = 1;
+        }
+        LOG_INFO("[AUTOCONF] Z3 device %s assigned to $%.8x (manuf=$%04X product=$%04X)\n",
+                 dev->name ? dev->name : "unnamed", dev->base, dev->manufacturer, dev->product);
+        /* Make freshly assigned MMIO windows visible immediately during config-time
+         * (DiagEntry/BootEntry can touch them before Z3 enumeration is fully done). */
+        if (dev_is_piscsi64) {
+          adjust_ranges_amiga(cfg);
+        }
+      } else {
+        LOG_INFO("[AUTOCONF] Address of Z3 autoconf device assigned to $%.8x\n",
+                 ac_base[ac_z3_current_pic]);
       }
-      LOG_INFO("[AUTOCONF] Address of Z3 autoconf device assigned to $%.8x\n",
-               ac_base[ac_z3_current_pic]);
+    } else if (is_piscsi64) {
+      piscsi64_base = ac_base[ac_z3_current_pic];
+      LOG_INFO("[AUTOCONF] PiSCSI64 Z3 device assigned to $%.8x (manuf=$%04X product=$%04X)\n",
+               piscsi64_base, PISTORM_MANUF_ID, PISTORM_PROD_PISCSI64_Z3);
+      adjust_ranges_amiga(cfg);
     } else {
       LOG_INFO("[AUTOCONF] Address of Z3 autoconf RAM assigned to $%.8x [W]\n",
                ac_base[ac_z3_current_pic]);
       cfg->map_offset[index] = ac_base[ac_z3_current_pic];
       cfg->map_high[index] = cfg->map_offset[index] + cfg->map_size[index];
+      const amiga_zorro_layout_t* layout = amiga_get_zorro_layout();
+      if (layout && !addr_range_within(layout->z3_mem_base, layout->z3_mem_size,
+                                       (uint32_t)cfg->map_offset[index], cfg->map_size[index])) {
+        LOG_WARN("[AUTOCONF] Z3 RAM map assigned outside configured Z3 window: base=$%.8lX size=$%.8X "
+                 "window=$%.8X-$%.8X\n",
+                 cfg->map_offset[index], cfg->map_size[index], layout->z3_mem_base,
+                 layout->z3_mem_base + layout->z3_mem_size - 1u);
+      }
+      log_autoconf_assignment("Z3 RAM", (uint32_t)cfg->map_offset[index], cfg->map_size[index],
+                              cfg->map_data[index]);
       m68k_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
                          cfg->map_data[index]);
     }
@@ -679,10 +870,20 @@ void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address
 
       LOG_INFO("[AUTOCONF] Address of Z2 autoconf RAM assigned to $%.8X\n",
                ac_base[ac_z2_current_pic]);
+      const amiga_zorro_layout_t* layout = amiga_get_zorro_layout();
+      if (layout && !addr_range_within(layout->z2_mem_base, layout->z2_mem_size,
+                                       (uint32_t)cfg->map_offset[index], cfg->map_size[index])) {
+        LOG_WARN("[AUTOCONF] Z2 RAM map assigned outside configured Z2 window: base=$%.8lX size=$%.8X "
+                 "window=$%.8X-$%.8X\n",
+                 cfg->map_offset[index], cfg->map_size[index], layout->z2_mem_base,
+                 layout->z2_mem_base + layout->z2_mem_size - 1u);
+      }
 
       m68k_add_ram_range((uint32_t)cfg->map_offset[index],
                          (uint32_t)cfg->map_high[index],
                          cfg->map_data[index]);
+      log_autoconf_assignment("Z2 RAM", (uint32_t)cfg->map_offset[index], cfg->map_size[index],
+                              cfg->map_data[index]);
 
       LOG_INFO("[AUTOCONF] Z2 PIC %d at $%.8lX-%.8lX, Size: %d MB\n",
                ac_z2_current_pic,
@@ -791,13 +992,11 @@ void autoconfig_write_memory_8(struct emulator_config* cfg,
     // 0x4A: base[19:16]  (value[7:4])
     // 0x48: base[23:20]  (value[7:4])  -> typically the "commit" write
     if (address == 0x4a) {
-      // update only bits 19:16
-      *base &= 0xfff0ffff;
-      *base |= (uint32_t)((value & 0xf0) << (16 - 4));
+      // Keep only existing [23:20], clear everything else, then set [19:16].
+      *base = (*base & 0x00F00000u) | (uint32_t)((value & 0xF0u) << 12);
     } else if (address == 0x48) {
-      // update only bits 23:20
-      *base &= 0xff0fffff;
-      *base |= (uint32_t)((value & 0xf0) << (20 - 4));
+      // Keep only existing [19:16], clear everything else, then set [23:20].
+      *base = (*base & 0x000F0000u) | (uint32_t)((value & 0xF0u) << 16);
 
       // optional device-side callback could go here (A314 etc.)
       done = 1;
@@ -849,6 +1048,11 @@ void autoconfig_write_memory_8(struct emulator_config* cfg,
         LOG_INFO("[AUTOCONF] Zorro device %s assigned to $%.8X\n",
                  zorro_dev->name ? zorro_dev->name : "unnamed",
                  zorro_dev->base);
+        if (zorro_dev_is_piscsi64(zorro_dev)) {
+          piscsi64_base = zorro_dev->base;
+          LOG_INFO("[AUTOCONF] PiSCSI64 Z2 device assigned to $%.8X (manuf=$%04X product=$%04X)\n",
+                   piscsi64_base, zorro_dev->manufacturer, zorro_dev->product);
+        }
       } else {
         LOG_WARN("[AUTOCONF] Zorro generic device index=%d missing during assignment. base=$%.8X\n",
                  (int)ac_z2_index[ac_z2_current_pic], base ? *base : 0);

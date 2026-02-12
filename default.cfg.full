@@ -4,7 +4,7 @@
 # Sets CPU type. Valid types are (probably) 68000, 68010, 68020, 68EC020, 68030,
 # 68EC030, 68040, 68EC040, 68LC040 and some STTTT thing.
 
-cpu 68060
+cpu 68040
 #setvar no-pistorm-dev
 
 # Set the platform to Amiga to enable all the registers and stuff.
@@ -36,7 +36,35 @@ map type=rom address=0xF80000 size=0x80000 file=/opt/Amiga/kick/Kickstart-v3.1-r
 # Map 128MB of Fast RAM at 0x8000000, also known as 32-bit Fast RAM or CPU local
 # Fast RAM. Only supported properly on select Kickstarts, such as 3.1+ for Amiga
 # 1200, 3000 and 4000.
-map type=ram address=0x08000000 size=128M id=cpu_slot_ram
+#map type=ram address=0x08000000 size=1G id=cpu_slot_ram
+
+map type=ram address=0x08000000 size=32M id=cpu_slot_ram
+
+map type=ram address=0x44000000 size=128M  id=z3_autoconf_fast
+#map type=ram address=0x48000000 size=384M  id=z3_autoconf_fast
+#map type=ram address=0x52000000 size=256M  id=z3_autoconf_fast
+
+#map type=ram address=0x00400000 size=6M    id=z2_autoconf_fast
+map type=ram address=0x00100000 size=1M    id=chipram_extra
+
+#map type=ram address=0x08000000 size=512G id=cpu_slot_ram
+#map type=ram address=0x00400000 size=6M   id=z2_autoconf_fast
+#map type=ram address=0x00100000 size=1M   id=chipram_extra
+#---
+#map type=ram address=0x08000000 size=1G id=cpu_slot_ram
+
+# Z3 fast, below RTG
+#map type=ram address=0xF0000000 size=256M id=z3_autoconf_fast
+
+#map type=ram address=0xFF000000 size=256M id=z3_autoconf_fast
+
+#
+#map type=ram address=0x00400000 size=6M   id=z2_autoconf_fast
+#map type=ram address=0x00100000 size=1M   id=chipram_extra
+# ---
+# RTG VRAM (in code, not cfg, but conceptually)
+# RTG_GFX_MEM = 128M at 0x70000000–0x77FFFFFF
+
 
 # Fake 512K slow RAM at 0x00C00000
 #map type=ram address=0x00C00000 size=0x80000 id=slow0
@@ -52,14 +80,17 @@ map type=ram address=0x08000000 size=128M id=cpu_slot_ram
 # Enabling Z3 fast requires at least Kickstart 2.0.
 # If for some reason you need more than 128MB, you can change the size=128M to a
 # valid supported Z3 PIC size, like 256M, 512M, 1024M, or add additional map lines.
-map type=ram address=0x10000000 size=256M id=z3_autoconf_fast
-#map type=ram address=0x10000000 size=1024M id=z3_autoconf_fast
-#map type=ram address=0x50000000 size=256M id=z3_autoconf_fast
+#map type=ram address=0xFF000000 size=512G id=z3_autoconf_fast
+#map type=ram address=0xFF000000 size=512M id=z3_autoconf_fast
+#map type=ram address=0xC0000000 size=128M id=z3_autoconf_fast
+#map type=ram address=0x30000000 size=256M id=z3_autoconf_fast
+
+#map type=ram size=128M id=z3_autoconf_fast
 
 # Dedicated Z3 DMA window for PiSCSI (keeps Z2 at 8 MB)
 #
 # this overlaps with Z3 ram
-# map type=ram address=0x60000000 size=16M id=piscsi_dma
+#map type=ram address=0x60000000 size=16M id=piscsi_dma
 
 #map type=ram address=0x90000000 size=256M id=z3_autoconf_fast
 #map type=ram address=0xD0000000 size=256M id=z3_autoconf_fast
@@ -69,8 +100,8 @@ map type=ram address=0x10000000 size=256M id=z3_autoconf_fast
 # Do not map Zorro II Fast RAM unless you absolutely need it, as Z2 address space
 # is very limited. Cases where you may need Zorro II Fast may include emulating a
 # 68000, 68010 or 68EC020, and/or if you are using Kickstart 1.3.
-#map type=ram address=0x200000 size=1M id=z2_autoconf_fast
-map type=ram address=0x200000 size=2M id=z2_autoconf_fast
+#map type=ram address=0x200000 size=8M id=z2_autoconf_fast
+#map type=ram address=0x200000 size=2M id=z2_autoconf_fast
 #map type=ram address=0x400000 size=4M id=z2_autoconf_fast
 
 # Chip RAM lives on the Amiga side (Agnus), not Pi RAM. Do not map it unless
@@ -78,7 +109,7 @@ map type=ram address=0x200000 size=2M id=z2_autoconf_fast
 #
 # For A500 tests, an extra 1MB can be faked at 0x00100000; with a 8371A/8372A
 # Fat Agnus and RTG enabled, this has been observed to work 100%.
-map type=ram address=0x00100000 size=1M id=chipram_extra
+#map type=ram address=0x00100000 size=1M id=chipram_extra
 
 # Map Gayle as a register range.
 # NOTE: Gayle emulation is currently non-functional. Do not enable this.
@@ -98,21 +129,21 @@ map type=register address=0xDC0000 size=0x10000
 # Threads / Timing
 # -----------------------------------------------------------------------------
 # Number of instructions to run every main loop.
-loopcycles 400
+loopcycles 300
 # Thread affinity/priority hints (host-side scheduling).
 affinity cpu=2,ipl=3,keyboard=1,mouse=1
-rtprio cpu=90,ipl=90,keyboard=50,mouse=50
+rtprio cpu=80,ipl=80,keyboard=50,mouse=70
 
 
 # -----------------------------------------------------------------------------
 # FC Lines
 # -----------------------------------------------------------------------------
 # Optional: enable FC line shadow logging (stub or cpld).
-setvar enable_fc cpld
-setvar z3bus-demo 1
-setvar zorro-serial 1
-setvar zorro-rng 1
-setvar zorro-pissa 1
+setvar enable_fc stub
+#setvar z3bus-demo 1
+#setvar zorro-serial 1
+#setvar zorro-rng 1
+#setvar zorro-pissa 1
 # -----------------------------------------------------------------------------
 # Platform Features
 # -----------------------------------------------------------------------------
@@ -155,19 +186,23 @@ setvar rtg-height 720
 #setvar cdtv
 
 # Uncomment this line to enable the PiSCSI interface
-setvar piscsi
+#setvar piscsi
 # Use setvar piscsi0 through piscsi6 to add up to seven mapped drives to the
 # interface.
-setvar piscsi0  /opt/Amiga/hdf/KernelPiStormBench.hdf 
-
-setvar piscsi1 /opt/Amiga/hdf/netbsd_root.hdf
-
-
+#setvar piscsi0  /opt/Amiga/hdf/KernelPiStormBench.hdf
+#setvar piscsi1 /opt/Amiga/hdf/netbsd_root.hdf
 #setvar piscsi1 PI1.hdf
-
 # A special disk that includes PiStorm drivers and utilities, comment out if
 # not needed
-setvar piscsi6 ./src/platforms/amiga/pistorm.hdf
+#setvar piscsi6 ./src/platforms/amiga/pistorm.hdf
+
+# Enable the PiSCSI64 Z3 interface.
+# Unit 0 is reserved for controller identity, use 1..15 for targets.
+setvar piscsi64
+setvar piscsi64_1 /opt/Amiga/hdf/KernelPiStormBench.hdf
+
+#setvar piscsi64_2 /opt/Amiga/hdf/netbsd_root.hdf
+#setvar piscsi64_7 ./src/platforms/amiga/pistorm.hdf
 # Uncomment this line to enable the (currently non-working) Pi-Net interface.
 setvar pi-net
 

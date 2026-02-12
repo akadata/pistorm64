@@ -392,8 +392,8 @@ int maxvpos = 262; /* typical to avoid division by zero */
 int maxvpos_nom = 262;
 int maxvpos_display = 262;
 
-uint32_t piscsi_base = 0;
-uint32_t pistorm_dev_base = 0;
+extern "C" uint32_t piscsi_base;
+extern "C" uint32_t pistorm_dev_base;
 
 int current_maxvpos(void) {
     return maxvpos;

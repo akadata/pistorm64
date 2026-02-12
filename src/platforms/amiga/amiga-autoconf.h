@@ -8,6 +8,16 @@
 #define AC_SIZE (64 * 1024)
 #define AC_PIC_LIMIT 16
 
+typedef struct amiga_zorro_layout {
+  uint32_t z2_config_base;
+  uint32_t z2_mem_base;
+  uint32_t z2_mem_size;
+  uint32_t z3_config_base;
+  uint32_t z3_mem_base;
+  uint32_t z3_mem_size;
+  uint32_t config_window_size;
+} amiga_zorro_layout_t;
+
 #define AC_MEM_SIZE_8MB 0
 #define AC_MEM_SIZE_64KB 1
 #define AC_MEM_SIZE_128KB 2
@@ -37,6 +47,7 @@ enum autoconf_types {
   ACTYPE_MAPFAST_Z3,
   ACTYPE_A314,
   ACTYPE_PISCSI,
+  ACTYPE_PISCSI64,
   ACTYPE_PISTORM_DEV,
   ACTYPE_Z3BUS_DEMO,
   ACTYPE_ZORRO_GENERIC,
@@ -103,6 +114,8 @@ typedef enum pistorm_product_id {
   PISTORM_PROD_Z3_FAST       = 0x0002,
 
   PISTORM_PROD_PISCSI_Z2     = 0x0010,
+  PISTORM_PROD_PISCSI64_Z2   = 0x0012,
+  PISTORM_PROD_PISCSI64_Z3   = 0x0012,
   PISTORM_PROD_PISTORM_DEV   = 0x0011,
 
   PISTORM_PROD_Z2_SERIAL     = 0x0020,
@@ -140,3 +153,6 @@ bool add_z3_pic(uint8_t type, uint8_t index);
 
 void remove_z2_pic(uint8_t type, uint8_t index);
 void remove_z3_pic(uint8_t type, uint8_t index);
+
+const amiga_zorro_layout_t* amiga_get_zorro_layout(void);
+void amiga_set_zorro_layout(const amiga_zorro_layout_t* layout);

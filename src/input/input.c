@@ -178,14 +178,19 @@ int get_mouse_status(uint8_t* x, uint8_t* y, uint8_t* b, uint8_t* e) {
   uint8_t mouse_ev[4];
   int read_any = 0;
 
-  // Drain all available mouse packets to avoid backlog during busy host activity.
-  while (read(mouse_fd, &mouse_ev, 4) == 4) {
-    *b = ((uint8_t*)&mouse_ev)[0];
-    *e = ((uint8_t*)&mouse_ev)[3];
+  // Drain all available packets. /dev/input/mice can deliver either 3-byte or 4-byte packets.
+  while (1) {
+    ssize_t n = read(mouse_fd, mouse_ev, sizeof(mouse_ev));
+    if (n < 3) {
+      break;
+    }
 
-    mouse_x += ((uint8_t*)&mouse_ev)[1];
+    *b = (uint8_t)(mouse_ev[0] & 0x07u);
+    *e = (n >= 4) ? mouse_ev[3] : 0;
+
+    mouse_x = (uint8_t)(mouse_x + (int8_t)mouse_ev[1]);
     *x = mouse_x;
-    mouse_y += (-((uint8_t*)&mouse_ev)[2]);
+    mouse_y = (uint8_t)(mouse_y - (int8_t)mouse_ev[2]);
     *y = mouse_y;
     read_any = 1;
   }

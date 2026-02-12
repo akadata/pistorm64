@@ -14,6 +14,7 @@ Start here:
 
 Feature how-tos:
 - PiSCSI.md
+- piscsi64.md
 - A314.md
 - RemoteWB.md
 - RTG.md

@@ -2,6 +2,8 @@
 
 PiSCSI provides an Amiga-side SCSI-like block device backed by host files.
 
+For the newer backend and current CD-ROM workflow, see `piscsi64.md`.
+
 Key files:
 - `platforms/amiga/piscsi/`
 - `platforms/amiga/piscsi/readme.md`

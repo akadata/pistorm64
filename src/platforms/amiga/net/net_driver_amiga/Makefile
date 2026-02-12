@@ -31,7 +31,7 @@ CPUFLAG = -m68060
 endif
 SRC ?= pi-net-amiga-2.c
 
-CFLAGS ?= $(CPUFLAG) -O2 -Wall -Wextra -Wno-unused-parameter -fomit-frame-pointer -nostartfiles
+CFLAGS ?= $(CPUFLAG) -O3 -Wall -Wextra -Wno-unused-parameter -fomit-frame-pointer -nostartfiles
 LDFLAGS ?= -lm -ldebug
 
 all: $(TARGET)
@@ -39,7 +39,9 @@ all: $(TARGET)
 $(TARGET): $(SRC)
 	PATH="$(AMIGA_PATH)" $(M68K_GCC) $(CFLAGS) -o $@ $< $(LDFLAGS)
 
+install:
+	cp PiNet$(CPU).device /opt/pistorm64/data/a314-shared/pi-net.device
 clean:
 	rm -f PiNet*.device pi-net.device pi-net000.device pi-net010.device pi-net020.device pi-net030.device pi-net040.device pi-net060.device
 
-.PHONY: all clean
+.PHONY: all install clean

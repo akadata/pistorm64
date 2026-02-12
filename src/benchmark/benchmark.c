@@ -9,12 +9,10 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "gpio/ps_protocol.h"
+#include "../gpio/ps_protocol.h"
 
 #define SIZE_KILO 1024u
 #define SIZE_MEGA (1024u * 1024u)
-
-extern volatile unsigned int *gpio;
 
 struct wait_stats {
   uint64_t count;
@@ -86,26 +84,6 @@ static int check_emulator(void) {
   return 0;
 }
 
-static uint32_t wait_txn_timed_us(void) {
-  struct timespec t0, t1;
-  clock_gettime(CLOCK_MONOTONIC, &t0);
-  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS)) {
-  }
-  clock_gettime(CLOCK_MONOTONIC, &t1);
-  uint64_t us = (uint64_t)(t1.tv_sec - t0.tv_sec) * 1000000ull;
-  if (t1.tv_nsec >= t0.tv_nsec) {
-    us += (uint64_t)(t1.tv_nsec - t0.tv_nsec) / 1000ull;
-  } else {
-    us -= 1000000ull;
-    us += (uint64_t)(1000000000ull + t1.tv_nsec - t0.tv_nsec) / 1000ull;
-  }
-  return (uint32_t)us;
-}
-
-static void wait_txn_spin(void) {
-  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS)) {
-  }
-}
 
 static void pacing_delay_us(int pacing_us) {
   if (pacing_us <= 0) return;
@@ -163,23 +141,6 @@ static void stats_update(struct wait_stats *st, uint32_t wait_us) {
   }
 }
 
-static void stats_wait(struct wait_stats *st) {
-  if (st->timing_stride <= 1) {
-    uint32_t wait_us = wait_txn_timed_us();
-    stats_update(st, wait_us);
-    return;
-  }
-
-  if (st->timing_next == 0) {
-    uint32_t wait_us = wait_txn_timed_us();
-    stats_update(st, wait_us);
-    st->timing_next = st->timing_stride - 1;
-    return;
-  }
-
-  wait_txn_spin();
-  st->timing_next--;
-}
 
 static int cmp_u32(const void *a, const void *b) {
   uint32_t va = *(const uint32_t *)a;
@@ -212,18 +173,16 @@ static void stats_report(const struct wait_stats *st, char *out, size_t outlen) 
 }
 
 static int wait_txn_idle(const char *tag, int timeout_us) {
-  while (timeout_us > 0) {
-    if (!(*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS))) {
-      return 0;
-    }
-    usleep(10);
-    timeout_us -= 10;
-  }
-  printf("[RST] Warning: TXN_IN_PROGRESS still set after reset (%s)\n", tag);
-  return -1;
+  // With the new kernel module interface, transactions are synchronous
+  // so there's no need to wait for transaction idle state.
+  // This function is now a no-op.
+  (void)tag;
+  (void)timeout_us;
+  return 0;
 }
 
 static void warmup_bus(void) {
+  // Perform a few dummy operations to warm up the bus
   for (int i = 0; i < 64; i++) {
     (void)ps_read_status_reg();
     if ((i & 0x0f) == 0) {
@@ -250,85 +209,100 @@ static double elapsed_sec(const struct timespec *a, const struct timespec *b) {
          (double)(b->tv_nsec - a->tv_nsec) / 1000000000.0;
 }
 
-static uint32_t gpfsel0_data_in;
-static uint32_t gpfsel1_data_in;
-static uint32_t gpfsel2_data_in;
-static int gpfsel_data_in_ready = 0;
-
-static void init_gpfsel_data_in(void) {
-  if (gpfsel_data_in_ready) return;
-
-  gpfsel0_data_in = GPFSEL0_OUTPUT;
-  gpfsel1_data_in = GPFSEL1_OUTPUT;
-  gpfsel2_data_in = GPFSEL2_OUTPUT;
-
-  // Clear FSEL bits for data pins 8..23 to make them inputs.
-  for (int pin = 8; pin <= 23; pin++) {
-    uint32_t mask = 0x7u << ((pin % 10) * 3);
-    if (pin <= 9) {
-      gpfsel0_data_in &= ~mask;
-    } else if (pin <= 19) {
-      gpfsel1_data_in &= ~mask;
-    } else {
-      gpfsel2_data_in &= ~mask;
-    }
-  }
-
-  gpfsel_data_in_ready = 1;
-}
-
-static inline void set_gpfsel_data_in(void) {
-  init_gpfsel_data_in();
-  *(gpio + 0) = gpfsel0_data_in;
-  *(gpio + 1) = gpfsel1_data_in;
-  *(gpio + 2) = gpfsel2_data_in;
-}
+// With the new kernel module interface, GPIO pin direction setup is handled internally
+// so these functions are no longer needed.
 
 static inline void write8_raw(uint32_t address, uint8_t data, struct wait_stats *st) {
-  uint32_t v = (address & 0x01) ? (data & 0xFFu) : ((uint32_t)data | ((uint32_t)data << 8));
-  GPIO_WRITEREG(REG_DATA, (v & 0xFFFFu));
-  GPIO_WRITEREG(REG_ADDR_LO, (address & 0xFFFFu));
-  GPIO_WRITEREG(REG_ADDR_HI, (0x0100u | (address >> 16)));
-  stats_wait(st);
+  struct timespec t0, t1;
+  clock_gettime(CLOCK_MONOTONIC, &t0);
+  ps_write_8(address, data);
+  clock_gettime(CLOCK_MONOTONIC, &t1);
+  uint64_t us = (uint64_t)(t1.tv_sec - t0.tv_sec) * 1000000ull;
+  if (t1.tv_nsec >= t0.tv_nsec) {
+    us += (uint64_t)(t1.tv_nsec - t0.tv_nsec) / 1000ull;
+  } else {
+    us -= 1000000ull;
+    us += (uint64_t)(1000000000ull + t1.tv_nsec - t0.tv_nsec) / 1000ull;
+  }
+  stats_update(st, (uint32_t)us);
 }
 
 static inline uint8_t read8_raw(uint32_t address, struct wait_stats *st) {
-  GPIO_WRITEREG(REG_ADDR_LO, (address & 0xFFFFu));
-  GPIO_WRITEREG(REG_ADDR_HI, (0x0300u | (address >> 16)));
-  GPIO_PIN_RD;
-  stats_wait(st);
-  uint32_t value = ((*(gpio + 13) >> 8) & 0xFFFFu);
-  END_TXN;
-  if (address & 0x01) return value & 0xFFu;
-  return (value >> 8) & 0xFFu;
+  struct timespec t0, t1;
+  clock_gettime(CLOCK_MONOTONIC, &t0);
+  uint8_t value = ps_read_8(address);
+  clock_gettime(CLOCK_MONOTONIC, &t1);
+  uint64_t us = (uint64_t)(t1.tv_sec - t0.tv_sec) * 1000000ull;
+  if (t1.tv_nsec >= t0.tv_nsec) {
+    us += (uint64_t)(t1.tv_nsec - t0.tv_nsec) / 1000ull;
+  } else {
+    us -= 1000000ull;
+    us += (uint64_t)(1000000000ull + t1.tv_nsec - t0.tv_nsec) / 1000ull;
+  }
+  stats_update(st, (uint32_t)us);
+  return value;
 }
 
 static inline void write16_raw(uint32_t address, uint16_t data, struct wait_stats *st) {
-  GPIO_WRITEREG(REG_DATA, (data & 0xFFFFu));
-  GPIO_WRITEREG(REG_ADDR_LO, (address & 0xFFFFu));
-  GPIO_WRITEREG(REG_ADDR_HI, (0x0000u | (address >> 16)));
-  stats_wait(st);
+  struct timespec t0, t1;
+  clock_gettime(CLOCK_MONOTONIC, &t0);
+  ps_write_16(address, data);
+  clock_gettime(CLOCK_MONOTONIC, &t1);
+  uint64_t us = (uint64_t)(t1.tv_sec - t0.tv_sec) * 1000000ull;
+  if (t1.tv_nsec >= t0.tv_nsec) {
+    us += (uint64_t)(t1.tv_nsec - t0.tv_nsec) / 1000ull;
+  } else {
+    us -= 1000000ull;
+    us += (uint64_t)(1000000000ull + t1.tv_nsec - t0.tv_nsec) / 1000ull;
+  }
+  stats_update(st, (uint32_t)us);
 }
 
 static inline uint16_t read16_raw(uint32_t address, struct wait_stats *st) {
-  GPIO_WRITEREG(REG_ADDR_LO, (address & 0xFFFFu));
-  GPIO_WRITEREG(REG_ADDR_HI, (0x0200u | (address >> 16)));
-  GPIO_PIN_RD;
-  stats_wait(st);
-  uint16_t value = (uint16_t)(((*(gpio + 13) >> 8) & 0xFFFFu));
-  END_TXN;
+  struct timespec t0, t1;
+  clock_gettime(CLOCK_MONOTONIC, &t0);
+  uint16_t value = ps_read_16(address);
+  clock_gettime(CLOCK_MONOTONIC, &t1);
+  uint64_t us = (uint64_t)(t1.tv_sec - t0.tv_sec) * 1000000ull;
+  if (t1.tv_nsec >= t0.tv_nsec) {
+    us += (uint64_t)(t1.tv_nsec - t0.tv_nsec) / 1000ull;
+  } else {
+    us -= 1000000ull;
+    us += (uint64_t)(1000000000ull + t1.tv_nsec - t0.tv_nsec) / 1000ull;
+  }
+  stats_update(st, (uint32_t)us);
   return value;
 }
 
 static inline void write32_raw(uint32_t address, uint32_t data, struct wait_stats *st) {
-  write16_raw(address, (uint16_t)(data >> 16), st);
-  write16_raw(address + 2u, (uint16_t)data, st);
+  struct timespec t0, t1;
+  clock_gettime(CLOCK_MONOTONIC, &t0);
+  ps_write_32(address, data);
+  clock_gettime(CLOCK_MONOTONIC, &t1);
+  uint64_t us = (uint64_t)(t1.tv_sec - t0.tv_sec) * 1000000ull;
+  if (t1.tv_nsec >= t0.tv_nsec) {
+    us += (uint64_t)(t1.tv_nsec - t0.tv_nsec) / 1000ull;
+  } else {
+    us -= 1000000ull;
+    us += (uint64_t)(1000000000ull + t1.tv_nsec - t0.tv_nsec) / 1000ull;
+  }
+  stats_update(st, (uint32_t)us);
 }
 
 static inline uint32_t read32_raw(uint32_t address, struct wait_stats *st) {
-  uint32_t hi = read16_raw(address, st);
-  uint32_t lo = read16_raw(address + 2u, st);
-  return (hi << 16) | lo;
+  struct timespec t0, t1;
+  clock_gettime(CLOCK_MONOTONIC, &t0);
+  uint32_t value = ps_read_32(address);
+  clock_gettime(CLOCK_MONOTONIC, &t1);
+  uint64_t us = (uint64_t)(t1.tv_sec - t0.tv_sec) * 1000000ull;
+  if (t1.tv_nsec >= t0.tv_nsec) {
+    us += (uint64_t)(t1.tv_nsec - t0.tv_nsec) / 1000ull;
+  } else {
+    us -= 1000000ull;
+    us += (uint64_t)(1000000000ull + t1.tv_nsec - t0.tv_nsec) / 1000ull;
+  }
+  stats_update(st, (uint32_t)us);
+  return value;
 }
 
 static double bench_write8(uint32_t base, uint32_t size, int burst, int pacing_us, int pacing_mode, struct wait_stats *st) {
@@ -338,13 +312,11 @@ static double bench_write8(uint32_t base, uint32_t size, int burst, int pacing_u
   for (uint32_t i = 0; i < bytes;) {
     uint32_t todo = (uint32_t)burst;
     if (todo > bytes - i) todo = bytes - i;
-    GPFSEL_OUTPUT;
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + i + j;
       write8_raw(addr, (uint8_t)(addr ^ 0xA5u), st);
       if (pacing_mode == PACING_TXN) pacing_delay_us(pacing_us);
     }
-    GPFSEL_INPUT;
     if (pacing_mode == PACING_BURST) pacing_delay_us(pacing_us);
     i += todo;
   }
@@ -360,15 +332,12 @@ static double bench_read8(uint32_t base, uint32_t size, int burst, int pacing_us
   for (uint32_t i = 0; i < bytes;) {
     uint32_t todo = (uint32_t)burst;
     if (todo > bytes - i) todo = bytes - i;
-    GPFSEL_OUTPUT;
-    set_gpfsel_data_in();
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + i + j;
       uint8_t v = read8_raw(addr, st);
       acc ^= v;
       if (pacing_mode == PACING_TXN) pacing_delay_us(pacing_us);
     }
-    GPFSEL_INPUT;
     if (pacing_mode == PACING_BURST) pacing_delay_us(pacing_us);
     i += todo;
   }
@@ -384,13 +353,11 @@ static double bench_write16(uint32_t base, uint32_t size, int burst, int pacing_
   for (uint32_t i = 0; i < words;) {
     uint32_t todo = (uint32_t)burst;
     if (todo > words - i) todo = words - i;
-    GPFSEL_OUTPUT;
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 2u);
       write16_raw(addr, (uint16_t)(addr ^ 0xA5A5u), st);
       if (pacing_mode == PACING_TXN) pacing_delay_us(pacing_us);
     }
-    GPFSEL_INPUT;
     if (pacing_mode == PACING_BURST) pacing_delay_us(pacing_us);
     i += todo;
   }
@@ -406,15 +373,12 @@ static double bench_read16(uint32_t base, uint32_t size, int burst, int pacing_u
   for (uint32_t i = 0; i < words;) {
     uint32_t todo = (uint32_t)burst;
     if (todo > words - i) todo = words - i;
-    GPFSEL_OUTPUT;
-    set_gpfsel_data_in();
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 2u);
       uint16_t v = read16_raw(addr, st);
       acc ^= v;
       if (pacing_mode == PACING_TXN) pacing_delay_us(pacing_us);
     }
-    GPFSEL_INPUT;
     if (pacing_mode == PACING_BURST) pacing_delay_us(pacing_us);
     i += todo;
   }
@@ -430,13 +394,11 @@ static double bench_write32(uint32_t base, uint32_t size, int burst, int pacing_
   for (uint32_t i = 0; i < words;) {
     uint32_t todo = (uint32_t)burst;
     if (todo > words - i) todo = words - i;
-    GPFSEL_OUTPUT;
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 4u);
       write32_raw(addr, addr ^ 0xA5A5A5A5u, st);
       if (pacing_mode == PACING_TXN) pacing_delay_us(pacing_us);
     }
-    GPFSEL_INPUT;
     if (pacing_mode == PACING_BURST) pacing_delay_us(pacing_us);
     i += todo;
   }
@@ -452,15 +414,12 @@ static double bench_read32(uint32_t base, uint32_t size, int burst, int pacing_u
   for (uint32_t i = 0; i < words;) {
     uint32_t todo = (uint32_t)burst;
     if (todo > words - i) todo = words - i;
-    GPFSEL_OUTPUT;
-    set_gpfsel_data_in();
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 4u);
       uint32_t v = read32_raw(addr, st);
       acc ^= v;
       if (pacing_mode == PACING_TXN && pacing_us > 0) usleep((useconds_t)pacing_us);
     }
-    GPFSEL_INPUT;
     if (pacing_mode == PACING_BURST && pacing_us > 0) usleep((useconds_t)pacing_us);
     i += todo;
   }
@@ -575,11 +534,11 @@ static int memtest_region(const struct region *r) {
   printf("  Address test...\n");
   for (uint32_t off = 0; off < size; off += 2) {
     uint16_t v = (uint16_t)((r->base + off) >> 1);
-    write16(r->base + off, v);
+    ps_write_16(r->base + off, v);
   }
   for (uint32_t off = 0; off < size; off += 2) {
     uint16_t exp = (uint16_t)((r->base + off) >> 1);
-    uint16_t got = read16(r->base + off);
+    uint16_t got = ps_read_16(r->base + off);
     if (got != exp) {
       total_errors += report_error(r->base + off, exp, got, &printed, 16);
     }
@@ -589,15 +548,15 @@ static int memtest_region(const struct region *r) {
   printf("  Walking bits...\n");
   for (int bit = 0; bit < 16; bit++) {
     uint16_t pat = (uint16_t)(1u << bit);
-    for (uint32_t off = 0; off < size; off += 2) write16(r->base + off, pat);
+    for (uint32_t off = 0; off < size; off += 2) ps_write_16(r->base + off, pat);
     for (uint32_t off = 0; off < size; off += 2) {
-      uint16_t got = read16(r->base + off);
+      uint16_t got = ps_read_16(r->base + off);
       if (got != pat) total_errors += report_error(r->base + off, pat, got, &printed, 16);
     }
     pat = (uint16_t)~pat;
-    for (uint32_t off = 0; off < size; off += 2) write16(r->base + off, pat);
+    for (uint32_t off = 0; off < size; off += 2) ps_write_16(r->base + off, pat);
     for (uint32_t off = 0; off < size; off += 2) {
-      uint16_t got = read16(r->base + off);
+      uint16_t got = ps_read_16(r->base + off);
       if (got != pat) total_errors += report_error(r->base + off, pat, got, &printed, 16);
     }
   }
@@ -607,9 +566,9 @@ static int memtest_region(const struct region *r) {
   printf("  Fixed patterns...\n");
   for (size_t p = 0; p < sizeof(patterns) / sizeof(patterns[0]); p++) {
     uint16_t pat = patterns[p];
-    for (uint32_t off = 0; off < size; off += 2) write16(r->base + off, pat);
+    for (uint32_t off = 0; off < size; off += 2) ps_write_16(r->base + off, pat);
     for (uint32_t off = 0; off < size; off += 2) {
-      uint16_t got = read16(r->base + off);
+      uint16_t got = ps_read_16(r->base + off);
       if (got != pat) total_errors += report_error(r->base + off, pat, got, &printed, 16);
     }
   }
@@ -620,12 +579,12 @@ static int memtest_region(const struct region *r) {
   srand(seed);
   for (uint32_t off = 0; off < size; off += 2) {
     uint16_t pat = (uint16_t)rand();
-    write16(r->base + off, pat);
+    ps_write_16(r->base + off, pat);
   }
   srand(seed);
   for (uint32_t off = 0; off < size; off += 2) {
     uint16_t pat = (uint16_t)rand();
-    uint16_t got = read16(r->base + off);
+    uint16_t got = ps_read_16(r->base + off);
     if (got != pat) total_errors += report_error(r->base + off, pat, got, &printed, 16);
   }
 
@@ -754,7 +713,7 @@ int main(int argc, char *argv[]) {
 
   ps_setup_protocol();
   reset_amiga("startup");
-  write8(0xbfe201, 0x0101); // CIA OVL
+  write8(0xbfe201, 0x01); // CIA OVL
   write8(0xbfe001, 0x0000); // CIA OVL LOW
 
   if (region_count == 0) {

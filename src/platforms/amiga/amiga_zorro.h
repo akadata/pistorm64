@@ -52,6 +52,12 @@ typedef struct zorro_device {
   void            *priv;
 } zorro_device_t;
 
+/* Internal device flags.
+ * High nibble (0xF0) is forwarded to Z3 ER_FLAGS.
+ * Low nibble is reserved for emulator-local behavior.
+ */
+#define ZORRO_DEV_FLAG_BOOTROM 0x01u
+
 
 
 void zorro_bus_init(void);

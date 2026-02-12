@@ -16,6 +16,7 @@
 #include "net/pi-net.h"
 #include "piscsi/piscsi-enums.h"
 #include "piscsi/piscsi.h"
+#include "piscsi64/piscsi64-api.h"
 #include "ahi/pi_ahi.h"
 #include "ahi/pi-ahi-enums.h"
 #include "pistorm-dev/pistorm-dev-enums.h"
@@ -27,6 +28,8 @@
 #include "a314/a314.h"
 #include "emulator_fc.h"
 #include "amiga_zorro.h"
+#include "zorro/z3_piscsi64/z3_piscsi64.h"
+#include "memory_mapped.h"
 
 #define DEBUG_AMIGA_PLATFORM
 
@@ -55,7 +58,7 @@
   int mapped = ((uint32_t)cfg->custom_low  != _old_lo) ||                      \
                ((uint32_t)cfg->custom_high != _old_hi);                        \
                                                                                \
-  LOG_INFO("[AMIGA][CUSTOM] %-12s mapped=%d now=%08X-%08X (was %08X-%08X) "    \
+  LOG_INFO("[AMIGA][CUSTOM] %-12s changed=%d now=%08X-%08X (was %08X-%08X) "   \
            "add=%08X-%08X\n",                                                  \
            (TAG), mapped,                                                      \
            (uint32_t)cfg->custom_low,  RANGE_END_INCL((uint32_t)cfg->custom_low,  (uint32_t)cfg->custom_high), \
@@ -81,6 +84,8 @@ extern uint32_t ac_z3_pic_count;
 extern int ac_z3_done;
 extern int ac_z3_type[AC_PIC_LIMIT];
 extern int ac_z3_index[AC_PIC_LIMIT];
+extern unsigned int ac_base[AC_PIC_LIMIT];
+extern int nib_latch;
 
 extern uint8_t gayle_emulation_enabled;
 
@@ -108,6 +113,7 @@ extern int force_move_slow_to_chip;
 
 uint8_t rtg_enabled = 0;
 uint8_t piscsi_enabled = 0;
+uint8_t piscsi64_enabled = 0;
 uint8_t pinet_enabled = 0;
 uint8_t kick13_mode = 0;
 uint8_t pistorm_dev_enabled = 1;
@@ -117,6 +123,7 @@ uint8_t a314_emulation_enabled = 0;
 uint8_t a314_initialized = 0;
 
 extern uint32_t piscsi_base;
+extern uint32_t piscsi64_base;
 extern uint32_t pistorm_dev_base;
 extern uint8_t rtg_dpms;
 
@@ -238,13 +245,17 @@ static inline unsigned char normalize_autoconf_width(unsigned char type) {
 
 int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned int* val,
                              unsigned char type) {
+  const amiga_zorro_layout_t* zlayout = amiga_get_zorro_layout();
+  const uint32_t z2_cfg_base = zlayout ? zlayout->z2_config_base : AC_Z2_BASE;
+  const uint32_t z3_cfg_base = zlayout ? zlayout->z3_config_base : AC_Z3_BASE;
+  const uint32_t cfg_win_size = zlayout ? zlayout->config_window_size : AC_SIZE;
   unsigned char width = normalize_autoconf_width(type);
   if (kick13_mode) {
     ac_z3_done = 1;
   }
-  if ((!ac_z2_done || !ac_z3_done) && addr >= AC_Z2_BASE && addr < AC_Z2_BASE + AC_SIZE) {
+  if ((!ac_z2_done || !ac_z3_done) && addr >= z2_cfg_base && addr < z2_cfg_base + cfg_win_size) {
     if (physical_z2_first) {
-      if (addr == AC_Z2_BASE) {
+      if (addr == z2_cfg_base) {
         uint8_t zchk = (uint8_t)ps_read_8(addr);
         DEBUG("[AUTOCONF] Read from AC_Z2_BASE: %.2X\n", zchk);
         if (((zchk & BOARDTYPE_Z2) == BOARDTYPE_Z2) || ((zchk & BOARDTYPE_Z3) == BOARDTYPE_Z3)) {
@@ -266,26 +277,26 @@ int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned i
       }
     }
     if (!ac_z2_done && ac_z2_current_pic < ac_z2_pic_count) {
-      *val = autoconf_z2_read_width(cfg, addr - AC_Z2_BASE, width);
+      *val = autoconf_z2_read_width(cfg, addr - z2_cfg_base, width);
       return 1;
     }
     if (!ac_z3_done && ac_z3_current_pic < ac_z3_pic_count) {
-      uint32_t addr_ = autoconf_z3_remap_offset(addr - AC_Z2_BASE);
+      uint32_t addr_ = autoconf_z3_remap_offset(addr - z2_cfg_base);
       *val = autoconf_z3_read_width(cfg, addr_, width);
       return 1;
     }
   }
-  if (!ac_z3_done && addr >= AC_Z3_BASE && addr < AC_Z3_BASE + AC_SIZE) {
+  if (!ac_z3_done && addr >= z3_cfg_base && addr < z3_cfg_base + cfg_win_size) {
     if (ac_z3_pic_count == 0) {
       ac_z3_done = 1;
       return -1;
     }
 
     if (width == OP_TYPE_BYTE || width == OP_TYPE_WORD || width == OP_TYPE_LONGWORD) {
-      *val = autoconf_z3_read_width(cfg, addr - AC_Z3_BASE, width);
+      *val = autoconf_z3_read_width(cfg, addr - z3_cfg_base, width);
       return 1;
     }
-    autoconf_warn_once("read", "Z3", addr, AC_Z3_BASE, type, width);
+    autoconf_warn_once("read", "Z3", addr, z3_cfg_base, type, width);
     return -1;
   }
 
@@ -299,6 +310,12 @@ int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned i
     // printf("[Amiga-Custom] %s read from PISCSI base @$%.8X.\n", op_type_names[type], addr);
     // stop_cpu_emulation(1);
     *val = handle_piscsi_read(addr, type);
+    return 1;
+  }
+
+  if (piscsi64_enabled && piscsi64_base &&
+      addr >= piscsi64_base && addr < piscsi64_base + (64 * SIZE_KILO)) {
+    *val = handle_piscsi64_read(addr, type);
     return 1;
   }
 
@@ -332,35 +349,39 @@ int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned i
 
 int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned int val,
                               unsigned char type) {
+  const amiga_zorro_layout_t* zlayout = amiga_get_zorro_layout();
+  const uint32_t z2_cfg_base = zlayout ? zlayout->z2_config_base : AC_Z2_BASE;
+  const uint32_t z3_cfg_base = zlayout ? zlayout->z3_config_base : AC_Z3_BASE;
+  const uint32_t cfg_win_size = zlayout ? zlayout->config_window_size : AC_SIZE;
   unsigned char width = normalize_autoconf_width(type);
   if (kick13_mode) {
     ac_z3_done = 1;
   }
-  if ((!ac_z2_done || !ac_z3_done) && addr >= AC_Z2_BASE && addr < AC_Z2_BASE + AC_SIZE) {
+  if ((!ac_z2_done || !ac_z3_done) && addr >= z2_cfg_base && addr < z2_cfg_base + cfg_win_size) {
     if (physical_z2_first && ac_waiting_for_physical_pic) {
       return -1;
     }
     if (!ac_z2_done && ac_z2_current_pic < ac_z2_pic_count) {
-      autoconf_z2_write_width(cfg, addr - AC_Z2_BASE, val, width);
+      autoconf_z2_write_width(cfg, addr - z2_cfg_base, val, width);
       return 1;
     }
     if (!ac_z3_done && ac_z3_current_pic < ac_z3_pic_count) {
-      uint32_t addr_ = autoconf_z3_remap_offset(addr - AC_Z2_BASE);
+      uint32_t addr_ = autoconf_z3_remap_offset(addr - z2_cfg_base);
       autoconf_z3_write_width(cfg, addr_, val, width);
       return 1;
     }
   }
 
-  if (!ac_z3_done && addr >= AC_Z3_BASE && addr < AC_Z3_BASE + AC_SIZE) {
+  if (!ac_z3_done && addr >= z3_cfg_base && addr < z3_cfg_base + cfg_win_size) {
     if (width == OP_TYPE_BYTE || width == OP_TYPE_WORD || width == OP_TYPE_LONGWORD) {
       if (ac_z3_pic_count == 0) {
         ac_z3_done = 1;
         return -1;
       }
-      autoconf_z3_write_width(cfg, addr - AC_Z3_BASE, val, width);
+      autoconf_z3_write_width(cfg, addr - z3_cfg_base, val, width);
       return 1;
     }
-    autoconf_warn_once("write", "Z3", addr, AC_Z3_BASE, type, width);
+    autoconf_warn_once("write", "Z3", addr, z3_cfg_base, type, width);
   }
 
   if (pistorm_dev_enabled && addr >= pistorm_dev_base &&
@@ -372,6 +393,12 @@ int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned 
   if (piscsi_enabled && addr >= piscsi_base && addr < piscsi_base + (64 * SIZE_KILO)) {
     printf("[Amiga-Custom] %s write to PISCSI base @$%.8x: %.8X\n", op_type_names[type], addr, val);
     handle_piscsi_write(addr, val, type);
+    return 1;
+  }
+
+  if (piscsi64_enabled && piscsi64_base &&
+      addr >= piscsi64_base && addr < piscsi64_base + (64 * SIZE_KILO)) {
+    handle_piscsi64_write(addr, val, type);
     return 1;
   }
 
@@ -412,6 +439,10 @@ int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned 
 
 
 void adjust_ranges_amiga(struct emulator_config* cfg) {
+  const amiga_zorro_layout_t* zlayout = amiga_get_zorro_layout();
+  const uint32_t z2_cfg_base = zlayout ? zlayout->z2_config_base : AC_Z2_BASE;
+  const uint32_t z3_cfg_base = zlayout ? zlayout->z3_config_base : AC_Z3_BASE;
+  const uint32_t cfg_win_size = zlayout ? zlayout->config_window_size : AC_SIZE;
 
   cfg->mapped_high = 0;
   cfg->mapped_low = 0;
@@ -449,11 +480,17 @@ void adjust_ranges_amiga(struct emulator_config* cfg) {
     uint32_t now_hi_incl = (cfg->mapped_high ? (cfg->mapped_high - 1) : 0);
     int mapped = lo_changed || hi_changed;
 
+    mem_map_entry_info_t map_info;
+    int have_info = (memmap_lookup(cfg, off, &map_info) >= 0);
     LOG_INFO(
-      "[AMIGA][MAP] i=%02d type=%d off=%08X sz=%08X end=%08X mapped=%d lochg=%d hichg=%d "
+      "[AMIGA][MAP] i=%02d type=%d amiga_base=%08X size=%08X amiga_end=%08X host=%p "
+      "kind=%s cacheable=%u executable=%u mapped=%d lochg=%d hichg=%d "
       "now=%08X-%08X (was %08X-%08X)\n",
       i, cfg->map_type[i],
-      off, sz, end_incl,
+      off, sz, end_incl, cfg->map_data[i],
+      have_info ? memmap_kind_name(map_info.kind) : "none",
+      have_info ? (unsigned int)map_info.cacheable : 0u,
+      have_info ? (unsigned int)map_info.executable : 0u,
       mapped, lo_changed, hi_changed,
       cfg->mapped_low, now_hi_incl,
       old_lo, old_hi_incl
@@ -461,14 +498,20 @@ void adjust_ranges_amiga(struct emulator_config* cfg) {
   }
 
   if (rtg_enabled)    CUSTOM_RANGE_STEP("rtg",   PIGFX_RTG_BASE, PIGFX_UPPER);
-  if (piscsi_enabled) CUSTOM_RANGE_STEP("piscsi", min(PISCSI_OFFSET, piscsi_base ? piscsi_base : PISCSI_OFFSET), PISCSI_UPPER);
+  if (piscsi_enabled) {
+    uint32_t pbase = piscsi_base ? piscsi_base : PISCSI_OFFSET;
+    CUSTOM_RANGE_STEP("piscsi", pbase, pbase + PISCSI_REGSIZE);
+  }
+  if (piscsi64_enabled && piscsi64_base) {
+    CUSTOM_RANGE_STEP("piscsi64", piscsi64_base, piscsi64_base + PISCSI64_REGSIZE);
+  }
   if (pinet_enabled)  CUSTOM_RANGE_STEP("pinet", PINET_OFFSET, PINET_UPPER);
   if (pi_ahi_enabled) CUSTOM_RANGE_STEP("ahi",   PI_AHI_OFFSET, PI_AHI_UPPER);
 
-  if (zorro_get_device_count() > 0) CUSTOM_RANGE_STEP("zorro", AC_Z2_BASE, AC_Z2_BASE + AC_SIZE);
+  if (zorro_get_device_count() > 0) CUSTOM_RANGE_STEP("zorro", z2_cfg_base, z2_cfg_base + cfg_win_size);
 
-  if (ac_z2_pic_count && !ac_z2_done) CUSTOM_RANGE_STEP("ac_z2", AC_Z2_BASE, AC_Z2_BASE + AC_SIZE);
-  if (ac_z3_pic_count && !ac_z3_done) CUSTOM_RANGE_STEP("ac_z3", AC_Z3_BASE, AC_Z3_BASE + AC_SIZE);
+  if (ac_z2_pic_count && !ac_z2_done) CUSTOM_RANGE_STEP("ac_z2", z2_cfg_base, z2_cfg_base + cfg_win_size);
+  if (ac_z3_pic_count && !ac_z3_done) CUSTOM_RANGE_STEP("ac_z3", z3_cfg_base, z3_cfg_base + cfg_win_size);
 
 }
 
@@ -476,6 +519,17 @@ void adjust_ranges_amiga(struct emulator_config* cfg) {
 
 int setup_platform_amiga(struct emulator_config* cfg) {
   LOG_INFO("[AMIGA] Performing setup for Amiga platform.\n");
+  {
+    const amiga_zorro_layout_t* zlayout = amiga_get_zorro_layout();
+    if (zlayout) {
+      LOG_INFO("[AMIGA][ZORRO] Z2 config=$%.8X size=$%.8X Z2 mem=$%.8X-$%.8X\n",
+               zlayout->z2_config_base, zlayout->config_window_size,
+               zlayout->z2_mem_base, zlayout->z2_mem_base + zlayout->z2_mem_size - 1u);
+      LOG_INFO("[AMIGA][ZORRO] Z3 config=$%.8X size=$%.8X Z3 mem=$%.8X-$%.8X\n",
+               zlayout->z3_config_base, zlayout->config_window_size,
+               zlayout->z3_mem_base, zlayout->z3_mem_base + zlayout->z3_mem_size - 1u);
+    }
+  }
 
   /* --------------------------------------------------------------------
    * Subsystem handling (board “personality”)
@@ -541,9 +595,15 @@ int setup_platform_amiga(struct emulator_config* cfg) {
     }
 
     if (resize_data) {
-      free(cfg->map_data[index]);
+      cfg_release_map_data(cfg, index);
       cfg->map_size[index] = (unsigned int)resize_data;
-      cfg->map_data[index] = (unsigned char *)malloc(cfg->map_size[index]);
+      unsigned char alloc_kind = MAPALLOC_NONE;
+      unsigned char* map_ptr = cfg_alloc_mapped_data(cfg->map_size[index], 1, &alloc_kind, z2_autoconf_id);
+      cfg_set_map_data_allocation(cfg, index, map_ptr, cfg->map_size[index], alloc_kind);
+      if (!cfg->map_data[index]) {
+        LOG_ERROR("[AMIGA] Failed to reallocate Z2 Fast RAM map[%d].\n", index);
+        return -1;
+      }
     }
 
     LOG_INFO("[AMIGA] %dMB of Z2 Fast RAM configured at $%lx\n",
@@ -841,6 +901,50 @@ void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val)
     }
   }
 
+  // PiSCSI64 stuff (Z2 virtual HBA)
+  if (CHKVAR("piscsi64") && !piscsi64_enabled) {
+    LOG_INFO("[AMIGA] PISCSI64 Interface Enabled (manuf=$%04X product=$%04X).\n",
+             PISTORM_MANUF_ID, PISTORM_PROD_PISCSI64_Z2);
+    piscsi64_enabled = 1;
+    piscsi64_init();
+    z3_piscsi64_register();
+    adjust_ranges_amiga(cfg);
+  }
+  if (piscsi64_enabled && strncmp(var, "piscsi64_", 9) == 0) {
+    if (strcmp(var, "piscsi64_cdrom") == 0) {
+      if (val && strlen(val) != 0) {
+        int idx = piscsi64_find_free_unit();
+        if (idx < 0) {
+          LOG_WARN("[AMIGA] No free PiSCSI64 unit available for %s\n", val);
+        } else {
+          char spec[PATH_MAX + 8];
+          if (strncmp(val, "disk:", 5) == 0 ||
+              strncmp(val, "cdrom:", 6) == 0 ||
+              strncmp(val, "file:", 5) == 0) {
+            snprintf(spec, sizeof(spec), "%s", val);
+          } else {
+            snprintf(spec, sizeof(spec), "cdrom:%s", val);
+          }
+          piscsi64_map_drive(spec, (uint8_t)idx);
+          LOG_INFO("[AMIGA] PiSCSI64 CD-ROM mapped to unit %d: %s\n", idx, val);
+        }
+      }
+      return;
+    }
+
+    char *end = NULL;
+    long idx = strtol(var + 9, &end, 10);
+    if (end && *end == '\0' && idx > 0 && idx < PISCSI64_NUM_UNITS) {
+      if (val && strlen(val) != 0) {
+        piscsi64_map_drive(val, (uint8_t)idx);
+      }
+    } else if (end && *end == '\0' && idx == 0) {
+      LOG_INFO("[AMIGA] PiSCSI64 unit 0 is reserved for controller identity.\n");
+    } else {
+      LOG_WARN("[AMIGA] Invalid PiSCSI64 unit selector '%s' (expected piscsi64_0..piscsi64_15)\n", var);
+    }
+  }
+
   // Pi-Net stuff
   if (CHKVAR("pi-net") && !pinet_enabled) {
     LOG_INFO("[AMIGA] PI-NET Interface Enabled.\n");
@@ -927,6 +1031,13 @@ void handle_reset_amiga(struct emulator_config* cfg) {
   ac_z2_current_pic = 0;
   ac_z3_current_pic = 0;
   ac_waiting_for_physical_pic = 0;
+  nib_latch = 0;
+  for (int i = 0; i < AC_PIC_LIMIT; i++) {
+    ac_base[i] = 0;
+  }
+  piscsi_base = 0;
+  piscsi64_base = 0;
+  pistorm_dev_base = 0;
 
   spoof_df0_id = 0;
 
@@ -935,6 +1046,9 @@ void handle_reset_amiga(struct emulator_config* cfg) {
 
   if (piscsi_enabled) {
     piscsi_refresh_drives();
+  }
+  if (piscsi64_enabled) {
+    piscsi64_refresh_drives();
   }
 
   if (move_slow_to_chip && !force_move_slow_to_chip) {
@@ -972,6 +1086,10 @@ void shutdown_platform_amiga(struct emulator_config* cfg) {
   if (piscsi_enabled) {
     piscsi_shutdown();
     piscsi_enabled = 0;
+  }
+  if (piscsi64_enabled) {
+    piscsi64_shutdown();
+    piscsi64_enabled = 0;
   }
   if (rtg_enabled) {
     shutdown_rtg();
