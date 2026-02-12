@@ -72,12 +72,13 @@ AddMemList      EQU -$26A
 MakeDosNode     EQU -144
 AddDosNode      EQU -150
 AddBootNode     EQU -36
+FindConfigDev   EQU -72
 
 ; PiSCSI64 MMIO window:
 ;   board base is provided in A0 / cd_BoardAddr(a3)
 ;   register block lives at board_base + PISCSI64_REG_BASE
 PISCSI64_REG_BASE EQU $00000000
-PISCSI64_MMIO_BASE EQU $40000000
+PISCSI64_MMIO_BASE EQU $00E90000
 PiSCSI64Addr1     EQU $0010
 PiSCSI64Addr2     EQU $0014
 PiSCSI64Addr3     EQU $0018
@@ -270,10 +271,42 @@ Init:       ; After Diag patching, our romtag will point to this
             ; BootNode, and Enqueue() on eb_MountList.
             ;
             align 2
-            move.l a6,-(a7)             ; Push A6 to stack
+            movem.l d1-d7/a0-a6,-(sp)
             ;move.w #$00B8,$dff09a       ; Disable interrupts during init
-            ; InitResident does not guarantee A3. Use the known assigned Z3 base.
+            ; InitResident does not guarantee A3. Resolve board base via FindConfigDev.
+            movea.l 4,a6
+            lea ExpansionName(pc),a1
+            moveq #0,d0
+            jsr OpenLibrary(a6)
+            move.l d0,a4
+            beq.s UseDefaultMMIOBase
+
+            movea.l d0,a6
+            suba.l a0,a0
+            move.l #MANUF_ID,d0
+            move.l #PRODUCT_ID,d1
+            jsr FindConfigDev(a6)
+            tst.l d0
+            beq.s UseDefaultMMIOBaseClose
+            movea.l d0,a0
+            movea.l cd_BoardAddr(a0),a5
+            move.l a5,d2
+            tst.l d2
+            bne.s CloseMMIOProbeLib
+
+UseDefaultMMIOBaseClose:
             movea.l #PISCSI64_MMIO_BASE,a5
+
+CloseMMIOProbeLib:
+            movea.l 4,a6
+            movea.l a4,a1
+            jsr CloseLibrary(a6)
+            bra.s HaveMMIOBase
+
+UseDefaultMMIOBase:
+            movea.l #PISCSI64_MMIO_BASE,a5
+
+HaveMMIOBase:
             adda.l #PISCSI64_REG_BASE,a5
             move.l  #3,PiSCSI64DebugMe(a5)
             move.l a3,PiSCSI64Addr4(a5)
@@ -365,13 +398,13 @@ EndPartitions:
             jsr CloseLibrary(a6)
             move.l #802,PiSCSI64DebugMe(a5)
 
-            move.l (a7)+,a6             ; Pop A6 from stack
             move.l #803,PiSCSI64DebugMe(a5)
 
             ;move.w #$80B8,$dff09a       ; Re-enable interrupts
             move.l #804,PiSCSI64DebugMe(a5)
             moveq.l #1,d0               ; indicate "success"
             move.l #805,PiSCSI64DebugMe(a5)
+            movem.l (sp)+,d1-d7/a0-a6
             rts
 
             align 4
@@ -386,87 +419,32 @@ LoadFileSystems:
             movem.l d0-d7/a0-a6,-(sp)       ; Push registers to stack
             move.l #30,PiSCSI64DebugMe(a5)
             movea.l 4,a6
-ReloadResource:
-            lea FileSysName(pc),a1
-            jsr OpenResource(a6)
-            tst.l d0
-            bne FSRExists
 
-            move.l #33,PiSCSI64DebugMe(a5)        ; FileSystem.resource isn't open, create it
-                                            ; Code based on WinUAE filesys.asm
-
-            moveq #32,d0                    ; sizeof(FileSysResource)
-            move.l #$10001,d1
-            jsr AllocMem(a6)
-            move.l d0,a2
-            move.b #8,8(a2)                 ; NT_RESOURCE
-            lea FileSysName(pc),a0
-            move.l a0,10(a2)                ; node name
-            lea FileSysCreator(pc),a0
-            move.l a0,14(a2)                ; fsr_Creator
-            lea 18(a2),a0
-            move.l a0,(a0)                  ; NewList() fsr_FileSysEntries
-            addq.l #4,(a0)
-            move.l a0,8(a0)
-            lea $150(a6),a0                 ; ResourceList
-            move.l a2,a1
-            jsr -$f6(a6)                    ; AddTail
-            move.l a2,a0
-            move.l a0,d0
-
-FSRExists:  
-            move.l d0,PiSCSI64Addr2(a5)             ; PiSCSI64Addr2 is now FileSystem.resource
-            move.l #31,PiSCSI64DebugMe(a5)
-            move.l PiSCSI64Addr2(a5),a0
+FSNext:
             move.l PiSCSI64GetFS(a5),d0
-            move.l d0,d7
             cmp.l #0,d0
-            beq.w FSDone
+            beq.s FSDone
 
-FSNext:     
-            move.l #45,PiSCSI64DebugMe(a5)
-            lea fsr_FileSysEntries(a0),a0
-            move.l a0,d2
-            move.l LH_HEAD(a0),d0
-            beq.w NoEntries
-
-FSLoop:     
-            move.l #34,PiSCSI64DebugMe(a5)
-            move.l d0,a1
-            move.l #35,PiSCSI64DebugMe(a5)
-            cmp.l fse_DosType(a1),d7
-            move.l #36,PiSCSI64DebugMe(a5)
-            beq.w AlreadyLoaded
-            move.l #37,PiSCSI64DebugMe(a5)
-            move.l LN_SUCC(a1),d0
-            bne.w FSLoop
-            move.l #390,PiSCSI64DebugMe(a5)
-            bra.w NoEntries
-
-            align 2
-NoEntries:  
             move.l #39,PiSCSI64DebugMe(a5)
             move.l PiSCSI64FSSize(a5),d0
             move.l #40,PiSCSI64DebugMe(a5)
             move.l #$10001,d1
             move.l #41,PiSCSI64DebugMe(a5)
             jsr AllocMem(a6)
+            tst.l d0
+            beq.s FSAdvance
+
             move.l d0,PiSCSI64Addr3(a5)
             move.l d0,a0
             move.l #1,PiSCSI64CopyFS(a5)
-            move.b #NT_RESOURCE,LN_TYPE(a0)
 
-AlreadyLoaded:
+FSAdvance:
             move.l #480,PiSCSI64DebugMe(a5)
-            move.l PiSCSI64Addr2(a5),a0
             move.l #1,PiSCSI64NextFS(a5)
-            move.l PiSCSI64GetFS(a5),d0
-            cmp.l #0,d0
-            bne.w FSNext
+            bra.s FSNext
 
-FSDone:     move.l #37,PiSCSI64DebugMe(a5)
-            move.l #32,PiSCSI64DebugMe(a5)    ; Couldn't open FileSystem.resource, Kick 1.2/1.3?
-
+FSDone:
+            move.l #32,PiSCSI64DebugMe(a5)
             movem.l (sp)+,d0-d7/a0-a6   ; Pop registers from stack
             rts
 

@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <limits.h>
@@ -280,6 +281,7 @@ static int rom_read_logged = 0;
 static int mmio_init_write_logged = 0;
 static uint32_t mmio_init_write_count = 0;
 static int rom_read_dot_trace = 0;
+static int rom_read_progress_trace = 0;
 static uint32_t rom_read_total_bytes = 0;
 static uint32_t rom_read_bytes_since_log = 0;
 static uint32_t rom_read_total_ops = 0;
@@ -334,12 +336,97 @@ static FILE *open_piscsi64_rom(char *chosen_path, size_t chosen_path_len) {
     return NULL;
 }
 
+static int str_ends_with_ci(const char *value, const char *suffix) {
+    size_t value_len = strlen(value);
+    size_t suffix_len = strlen(suffix);
+    if (suffix_len > value_len) {
+        return 0;
+    }
+    return strcasecmp(value + value_len - suffix_len, suffix) == 0;
+}
+
+static uint8_t piscsi64_media_scsi_type(enum piscsi64_media_kind media_kind) {
+    return (media_kind == PISCSI64_MEDIA_CDROM)
+             ? (uint8_t)PISCSI64_SCSI_TYPE_CDROM
+             : (uint8_t)PISCSI64_SCSI_TYPE_DIRECT_ACCESS;
+}
+
+static enum piscsi64_media_kind piscsi64_parse_media_spec(const char *spec, const char **path_out) {
+    const char *path = spec;
+    enum piscsi64_media_kind media_kind = PISCSI64_MEDIA_DISK;
+
+    if (!spec || spec[0] == '\0') {
+        if (path_out) {
+            *path_out = spec;
+        }
+        return PISCSI64_MEDIA_NONE;
+    }
+
+    if (strncasecmp(spec, "disk:", 5) == 0) {
+        path = spec + 5;
+        media_kind = PISCSI64_MEDIA_DISK;
+    } else if (strncasecmp(spec, "cdrom:", 6) == 0) {
+        path = spec + 6;
+        media_kind = PISCSI64_MEDIA_CDROM;
+    } else {
+        if (strncasecmp(spec, "file:", 5) == 0) {
+            path = spec + 5;
+        }
+        media_kind = str_ends_with_ci(path, ".iso") ? PISCSI64_MEDIA_CDROM : PISCSI64_MEDIA_DISK;
+    }
+
+    if (path_out) {
+        *path_out = path;
+    }
+    return media_kind;
+}
+
+static void piscsi64_reset_dev(struct piscsi64_dev *d) {
+    if (!d) {
+        return;
+    }
+
+    if (d->fd != -1) {
+        close(d->fd);
+    }
+    d->fd = -1;
+
+    if (d->rdb) {
+        free(d->rdb);
+        d->rdb = NULL;
+    }
+    for (int i = 0; i < 16; i++) {
+        if (d->pb[i]) {
+            free(d->pb[i]);
+            d->pb[i] = NULL;
+        }
+    }
+
+    d->c = 0;
+    d->h = 0;
+    d->s = 0;
+    d->fs = 0;
+    d->lba = 0;
+    d->num_partitions = 0;
+    d->fshd_offs = 0;
+    d->block_size = 0;
+    d->media_kind = PISCSI64_MEDIA_NONE;
+    d->read_only = 0;
+}
+
 void piscsi64_init(void) {
     const char *rom_dot_env = getenv("PISTORM_PISCSI64_ROM_DOTS");
+    const char *rom_progress_env = getenv("PISTORM_PISCSI64_ROM_PROGRESS");
     rom_read_dot_trace = 0;
+    rom_read_progress_trace = 0;
     if (rom_dot_env && (rom_dot_env[0] == '1' || rom_dot_env[0] == 'y' || rom_dot_env[0] == 'Y' ||
                         rom_dot_env[0] == 't' || rom_dot_env[0] == 'T')) {
         rom_read_dot_trace = 1;
+    }
+    if (rom_progress_env && (rom_progress_env[0] == '1' || rom_progress_env[0] == 'y' ||
+                             rom_progress_env[0] == 'Y' || rom_progress_env[0] == 't' ||
+                             rom_progress_env[0] == 'T')) {
+        rom_read_progress_trace = 1;
     }
 
     rom_read_logged = 0;
@@ -351,9 +438,21 @@ void piscsi64_init(void) {
     rom_read_ops_since_line = 0;
 
     for (int i = 0; i < PISCSI64_NUM_UNITS; i++) {
+        piscsi64_devs[i].c = 0;
+        piscsi64_devs[i].h = 0;
+        piscsi64_devs[i].s = 0;
+        piscsi64_devs[i].fs = 0;
         piscsi64_devs[i].fd = -1;
         piscsi64_devs[i].lba = 0;
-        piscsi64_devs[i].c = piscsi64_devs[i].h = piscsi64_devs[i].s = 0;
+        piscsi64_devs[i].num_partitions = 0;
+        piscsi64_devs[i].fshd_offs = 0;
+        piscsi64_devs[i].block_size = 0;
+        piscsi64_devs[i].media_kind = PISCSI64_MEDIA_NONE;
+        piscsi64_devs[i].read_only = 0;
+        piscsi64_devs[i].rdb = NULL;
+        for (int j = 0; j < 16; j++) {
+            piscsi64_devs[i].pb[j] = NULL;
+        }
     }
 
     if (piscsi64_rom_ptr == NULL) {
@@ -403,11 +502,7 @@ void piscsi64_shutdown(void) {
     LOG_INFO("[PISCSI64-ROM] total reads ops=%u bytes=%u\n", rom_read_total_ops, rom_read_total_bytes);
     printf("[PISCSI64] Shutting down PiSCSI.\n");
     for (int i = 0; i < PISCSI64_NUM_UNITS; i++) {
-        if (piscsi64_devs[i].fd != -1) {
-            close(piscsi64_devs[i].fd);
-            piscsi64_devs[i].fd = -1;
-            piscsi64_devs[i].block_size = 0;
-        }
+        piscsi64_reset_dev(&piscsi64_devs[i]);
     }
 
     for (int i = 0; i < NUM_FILESYSTEMS; i++) {
@@ -580,7 +675,8 @@ void piscsi64_refresh_drives(void) {
     piscsi64_num_partition_names = 0;
 
     for (int i = 0; i < PISCSI64_NUM_UNITS; i++) {
-        if (piscsi64_devs[i].fd != -1) {
+        if (piscsi64_devs[i].fd != -1 &&
+            piscsi64_devs[i].media_kind == PISCSI64_MEDIA_DISK) {
             piscsi64_parse_rdb(&piscsi64_devs[i]);
             piscsi64_find_partitions(&piscsi64_devs[i]);
             piscsi64_find_filesystems(&piscsi64_devs[i]);
@@ -695,15 +791,85 @@ struct piscsi64_dev *piscsi64_get_dev(uint8_t index) {
     return &piscsi64_devs[index];
 }
 
-void piscsi64_map_drive(const char *filename, uint8_t index) {
+int piscsi64_find_free_unit(void) {
+    for (int i = 1; i < PISCSI64_NUM_UNITS; i++) {
+        if (piscsi64_devs[i].fd == -1) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void piscsi64_map_drive(const char *spec, uint8_t index) {
     if (index >= PISCSI64_NUM_UNITS) {
-        printf("[PISCSI64] Drive index %d out of range.\nUnable to map file %s to drive.\n", index, filename);
+        printf("[PISCSI64] Drive index %d out of range.\nUnable to map spec %s to drive.\n",
+               index, spec ? spec : "(null)");
         return;
     }
 
-    int32_t tmp_fd = open(filename, O_RDWR);
+    if (!spec || spec[0] == '\0') {
+        printf("[PISCSI64] Empty drive spec for unit %d.\n", index);
+        return;
+    }
+
+    const char *path = NULL;
+    enum piscsi64_media_kind media_kind = piscsi64_parse_media_spec(spec, &path);
+    if (!path || path[0] == '\0') {
+        printf("[PISCSI64] Invalid drive spec '%s' for unit %d.\n", spec, index);
+        return;
+    }
+
+    int open_flags = (media_kind == PISCSI64_MEDIA_CDROM) ? O_RDONLY : O_RDWR;
+    int read_only = (open_flags == O_RDONLY) ? 1 : 0;
+    int32_t tmp_fd = open(path, open_flags);
     if (tmp_fd == -1) {
-        printf("[PISCSI64] Failed to open file %s, could not map drive %d.\n", filename, index);
+        int first_errno = errno;
+        if (media_kind == PISCSI64_MEDIA_DISK &&
+            (first_errno == EACCES || first_errno == EPERM || first_errno == EROFS)) {
+            tmp_fd = open(path, O_RDONLY);
+            if (tmp_fd != -1) {
+                read_only = 1;
+            }
+        }
+        if (tmp_fd == -1) {
+            printf("[PISCSI64] Failed to open %s, could not map drive %d (errno=%d).\n",
+                   path, index, first_errno);
+            return;
+        }
+    }
+
+    off64_t file_size_off = lseek64(tmp_fd, 0, SEEK_END);
+    if (file_size_off < 0) {
+        printf("[PISCSI64] Failed to determine size for %s (unit %d).\n", path, index);
+        close(tmp_fd);
+        return;
+    }
+    uint64_t file_size = (uint64_t)file_size_off;
+    lseek64(tmp_fd, 0, SEEK_SET);
+
+    struct piscsi64_dev *d = &piscsi64_devs[index];
+    piscsi64_reset_dev(d);
+
+    d->fs = file_size;
+    d->fd = tmp_fd;
+    d->media_kind = media_kind;
+    d->read_only = (uint8_t)read_only;
+    printf("[PISCSI64] Map %d: [%s] (%s%s) - %lu bytes.\n",
+           index, path,
+           media_kind == PISCSI64_MEDIA_CDROM ? "cdrom" : "disk",
+           d->read_only ? ",ro" : ",rw",
+           (unsigned long)file_size);
+
+    if (media_kind == PISCSI64_MEDIA_CDROM) {
+        uint64_t blocks = (file_size / 2048u);
+        d->block_size = 2048u;
+        d->h = 1;
+        d->s = 1;
+        d->c = (uint32_t)((blocks == 0) ? 1 : ((blocks > UINT32_MAX) ? UINT32_MAX : blocks));
+        d->num_partitions = 0;
+        d->fshd_offs = 0;
+        printf("[PISCSI64] Unit %d configured as CD-ROM (%llu blocks @ 2048 bytes).\n",
+               index, (unsigned long long)blocks);
         return;
     }
 
@@ -717,21 +883,13 @@ void piscsi64_map_drive(const char *filename, uint8_t index) {
          memcmp(hdfID, "MSH", 3) == 0 ||
          memcmp(hdfID, "MSD", 3) == 0 ||
          memcmp(hdfID, "UNI", 3) == 0)) {
-        printf("[!!!PISCSI64] The disk image %s is a UAE Single Partition Hardfile!\n", filename);
+        printf("[!!!PISCSI64] The disk image %s is a UAE Single Partition Hardfile!\n", path);
         printf("[!!!PISCSI64] Detected DOSType signature: %c%c%c\\x%02X (0x%02X%02X%02X%02X)\n",
                hdfID[0], hdfID[1], hdfID[2], hdfID[3], hdfID[0], hdfID[1], hdfID[2], hdfID[3]);
         printf("[!!!PISCSI64] WARNING: PiSCSI does NOT support UAE Single Partition Hardfiles!\n");
         printf("[!!!PISCSI64] PLEASE check the PiSCSI readme file in the GitHub repo for more information.\n");
         printf("[!!!PISCSI64] If this is merely an empty or placeholder file you've created to partition and format on the Amiga, please disregard this warning message.\n");
     }
-
-    struct piscsi64_dev *d = &piscsi64_devs[index];
-
-    uint64_t file_size = (uint64_t)lseek(tmp_fd, 0, SEEK_END);
-    d->fs = file_size;
-    d->fd = tmp_fd;
-    lseek(tmp_fd, 0, SEEK_SET);
-    printf("[PISCSI64] Map %d: [%s] - %lu bytes.\n", index, filename, (unsigned long)file_size);
 
     if (piscsi64_parse_rdb(d) == -1) {
         DEBUG("[PISCSI64] No RDB found on disk, making up some CHS values.\n");
@@ -750,10 +908,10 @@ void piscsi64_map_drive(const char *filename, uint8_t index) {
 
     // Perform self-test to validate HDF integrity
     printf("[PISCSI64-SELFTEST] Running HDF integrity validation for drive %d...\n", index);
-    if (!piscsi64_validate_hdf(d, filename)) {
-        printf("[PISCSI64-SELFTEST-ERROR] HDF validation failed for drive %d (%s)\n", index, filename);
+    if (!piscsi64_validate_hdf(d, path)) {
+        printf("[PISCSI64-SELFTEST-ERROR] HDF validation failed for drive %d (%s)\n", index, path);
     } else {
-        printf("[PISCSI64-SELFTEST-SUCCESS] HDF validation passed for drive %d (%s)\n", index, filename);
+        printf("[PISCSI64-SELFTEST-SUCCESS] HDF validation passed for drive %d (%s)\n", index, path);
     }
 }
 
@@ -849,11 +1007,13 @@ int piscsi64_validate_hdf(struct piscsi64_dev *d, const char *filename) {
 }
 
 void piscsi64_unmap_drive(uint8_t index) {
+    if (index >= PISCSI64_NUM_UNITS) {
+        return;
+    }
     if (piscsi64_devs[index].fd != -1) {
         DEBUG("[PISCSI64] Unmapped drive %d.\n", index);
-        close (piscsi64_devs[index].fd);
-        piscsi64_devs[index].fd = -1;
     }
+    piscsi64_reset_dev(&piscsi64_devs[index]);
 }
 
 static __attribute__((unused)) const char *io_cmd_name(int index) {
@@ -1068,9 +1228,7 @@ static void piscsi64_debugme(uint32_t index) {
             break;
     }
 
-    if (index == 8) {
-        stop_cpu_emulation(1);
-    }
+    (void)index;
 }
 
 void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
@@ -1235,6 +1393,10 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
             d = &piscsi64_devs[val];
             if (d->fd == -1) {
                 DEBUG ("[PISCSI64] BUG: Attempted write to unmapped drive %d.\n", val);
+                break;
+            }
+            if (d->read_only) {
+                DEBUG("[PISCSI64] Ignoring write to read-only unit %d.\n", val);
                 break;
             }
 
@@ -1465,14 +1627,25 @@ skip_disk:;
             break;
         case PISCSI64_CMD_NEXTPART:
             DEBUG("[PISCSI64] Switch partition %d -> %d\n", piscsi64_rom_cur_partition, piscsi64_rom_cur_partition + 1);
-            piscsi64_rom_cur_partition++;
+            if (piscsi64_rom_cur_partition < 127) {
+                piscsi64_rom_cur_partition++;
+            }
             break;
         case PISCSI64_CMD_NEXTFS:
             DEBUG("[PISCSI64] Switch file file system %d -> %d\n", piscsi64_rom_cur_fs, piscsi64_rom_cur_fs + 1);
-            piscsi64_rom_cur_fs++;
+            if (piscsi64_rom_cur_fs < piscsi64_num_fs) {
+                piscsi64_rom_cur_fs++;
+            }
             break;
         case PISCSI64_CMD_COPYFS:
             DEBUG("[PISCSI64] Copy file system %d to %.8X and reloc.\n", piscsi64_rom_cur_fs, piscsi64_u32[2]);
+            if (piscsi64_rom_cur_fs >= piscsi64_num_fs ||
+                piscsi64_filesystems[piscsi64_rom_cur_fs].binary_data == NULL ||
+                !piscsi64_filesystems[piscsi64_rom_cur_fs].valid) {
+                DEBUG("[PISCSI64] COPYFS ignored for invalid fs index %u (num_fs=%u).\n",
+                      (unsigned int)piscsi64_rom_cur_fs, (unsigned int)piscsi64_num_fs);
+                break;
+            }
             int32_t copy_r = get_mapped_item_by_address(cfg, piscsi64_u32[2]);
             if (copy_r != -1) {
                 uint32_t copy_base_addr = (uint32_t)(piscsi64_u32[2] - cfg->map_offset[copy_r]);
@@ -1569,9 +1742,14 @@ fs_found:;
                 DEBUG("[FS-HANDLER] Handler: %d Stacksize: %d\n", BE(node->dn_Handler), BE(node->dn_StackSize));
                 DEBUG("[FS-HANDLER] Priority: %d Startup: %d (%.8X)\n", BE(node->dn_Priority), BE(node->dn_Startup), BE(node->dn_Startup));
                 DEBUG("[FS-HANDLER] SegList: %.8X GlobalVec: %d\n", BE((uint32_t)node->dn_SegList), (int)BE(node->dn_GlobalVec));
-                DEBUG("[PISCSI64] Handler for partition %.8X set to %.8X (%.8X).\n",
-                      (uint32_t)BE(node->dn_Name), (uint32_t)BE(piscsi64_filesystems[fs_idx].FS_ID),
-                      piscsi64_filesystems[fs_idx].handler);
+                if (fs_idx < piscsi64_num_fs) {
+                    DEBUG("[PISCSI64] Handler for partition %.8X set to %.8X (%.8X).\n",
+                          (uint32_t)BE(node->dn_Name), (uint32_t)BE(piscsi64_filesystems[fs_idx].FS_ID),
+                          piscsi64_filesystems[fs_idx].handler);
+                } else {
+                    DEBUG("[PISCSI64] Handler for partition %.8X not set (no matching FS entry).\n",
+                          (uint32_t)BE(node->dn_Name));
+                }
             }
             break;
         }
@@ -1616,7 +1794,7 @@ fs_found:;
 }
 
 #define PIB 0x00
-#define PISCSI64_ROM_PROGRESS_BYTES (16u * 4u)
+#define PISCSI64_ROM_PROGRESS_BYTES (1024u * 4u)
 #define PISCSI64_ROM_DOT_CHUNK_OPS 64u
 
 uint32_t handle_piscsi64_read(uint32_t addr, uint8_t type) {
@@ -1678,7 +1856,7 @@ uint32_t handle_piscsi64_read(uint32_t addr, uint8_t type) {
                 }
                 fflush(stdout);
             }
-            if (rom_read_bytes_since_log >= PISCSI64_ROM_PROGRESS_BYTES) {
+            if (rom_read_progress_trace && rom_read_bytes_since_log >= PISCSI64_ROM_PROGRESS_BYTES) {
                 LOG_DEBUG("[PISCSI64-ROM] progress bytes=%u romoffs=$%.4X type=%s val=$%.8X\n",
                           rom_read_total_bytes, romoffs, op_type_names[type], v);
                 rom_read_bytes_since_log = 0;
@@ -1723,8 +1901,13 @@ uint32_t handle_piscsi64_read(uint32_t addr, uint8_t type) {
                 DEBUG("[PISCSI64] %s Read from DRVTYPE %d, drive not attached.\n", op_type_names[type], piscsi64_cur_drive);
                 return 0;
             }
-            DEBUG("[PISCSI64] %s Read from DRVTYPE %d, drive attached.\n", op_type_names[type], piscsi64_cur_drive);
-            return 1;
+            DEBUG("[PISCSI64] %s Read from DRVTYPE %d: kind=%u ro=%u\n",
+                  op_type_names[type], piscsi64_cur_drive,
+                  (unsigned int)piscsi64_devs[piscsi64_cur_drive].media_kind,
+                  (unsigned int)piscsi64_devs[piscsi64_cur_drive].read_only);
+            return PISCSI64_DRVTYPE_BUILD(
+                piscsi64_media_scsi_type((enum piscsi64_media_kind)piscsi64_devs[piscsi64_cur_drive].media_kind),
+                piscsi64_devs[piscsi64_cur_drive].read_only);
             break;
         case PISCSI64_CMD_DRVNUM:
             return piscsi64_cur_drive;
@@ -1742,6 +1925,9 @@ uint32_t handle_piscsi64_read(uint32_t addr, uint8_t type) {
             return piscsi64_devs[piscsi64_cur_drive].s;
             break;
         case PISCSI64_CMD_BLOCKS: {
+            if (piscsi64_devs[piscsi64_cur_drive].block_size == 0) {
+                return 0;
+            }
             uint32_t blox = (uint32_t)(piscsi64_devs[piscsi64_cur_drive].fs / piscsi64_devs[piscsi64_cur_drive].block_size);
             DEBUG("[PISCSI64] %s Read from BLOCKS %d: %d\n", op_type_names[type], piscsi64_cur_drive, (uint32_t)(piscsi64_devs[piscsi64_cur_drive].fs / piscsi64_devs[piscsi64_cur_drive].block_size));
             DEBUG("fs: %llu (%d)\n", (unsigned long long)piscsi64_devs[piscsi64_cur_drive].fs, blox);
@@ -1749,21 +1935,33 @@ uint32_t handle_piscsi64_read(uint32_t addr, uint8_t type) {
             break;
         }
         case PISCSI64_CMD_GETPART: {
+            if (piscsi64_rom_cur_partition >= 128) {
+                return 0;
+            }
             DEBUG("[PISCSI64] Get ROM partition %d offset: %.8X\n", piscsi64_rom_cur_partition, piscsi64_rom_partitions[piscsi64_rom_cur_partition]);
             return piscsi64_rom_partitions[piscsi64_rom_cur_partition];
             break;
         }
         case PISCSI64_CMD_GETPRIO:
+            if (piscsi64_rom_cur_partition >= 128) {
+                return 0;
+            }
             DEBUG("[PISCSI64] Get partition %d boot priority: %d\n", piscsi64_rom_cur_partition, piscsi64_rom_partition_prio[piscsi64_rom_cur_partition]);
             return piscsi64_rom_partition_prio[piscsi64_rom_cur_partition];
             break;
         case PISCSI64_CMD_CHECKFS: {
+            if (piscsi64_rom_cur_fs >= piscsi64_num_fs) {
+                return 0;
+            }
             /* FS_ID is stored in on-disk big-endian byte order; MMIO must return CPU-order value. */
             uint32_t fs_id = (uint32_t)BE(piscsi64_filesystems[piscsi64_rom_cur_fs].FS_ID);
             DEBUG("[PISCSI64] Get current loaded file system: %.8X\n", fs_id);
             return fs_id;
         }
         case PISCSI64_CMD_FSSIZE:
+            if (piscsi64_rom_cur_fs >= piscsi64_num_fs) {
+                return 0;
+            }
             DEBUG("[PISCSI64] Get alloc size of loaded file system: %d\n", piscsi64_filesystems[piscsi64_rom_cur_fs].h_info.alloc_size);
             return piscsi64_filesystems[piscsi64_rom_cur_fs].h_info.alloc_size;
         case PISCSI64_CMD_BLOCKSIZE:

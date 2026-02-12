@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 
+#include <stdint.h>
+
 #define PISCSI64_NUM_UNITS 16
 #define PISCSI64_OFFSET 0x80020000
 #define PISCSI64_REGSIZE 0x00010000
@@ -13,6 +15,22 @@
 #define SCSIERR_ILLEGAL (1 << 2)
 #define SCSIERR_ERASERES (1 << 1)
 #define SCSIERR_IDLE (1 << 0)
+
+/* Encoded in PISCSI64_CMD_DRVTYPE register */
+#define PISCSI64_DRVTYPE_PRESENT  0x8000u
+#define PISCSI64_DRVTYPE_READONLY 0x4000u
+#define PISCSI64_DRVTYPE_TYPEMASK 0x001Fu
+
+#define PISCSI64_SCSI_TYPE_DIRECT_ACCESS 0x00u
+#define PISCSI64_SCSI_TYPE_CDROM         0x05u
+
+#define PISCSI64_DRVTYPE_BUILD(scsi_type, read_only) \
+  ((uint16_t)(PISCSI64_DRVTYPE_PRESENT | \
+             (((read_only) ? PISCSI64_DRVTYPE_READONLY : 0u)) | \
+             ((scsi_type) & PISCSI64_DRVTYPE_TYPEMASK)))
+#define PISCSI64_DRVTYPE_IS_PRESENT(v) (((v) & PISCSI64_DRVTYPE_PRESENT) != 0u)
+#define PISCSI64_DRVTYPE_IS_READONLY(v) (((v) & PISCSI64_DRVTYPE_READONLY) != 0u)
+#define PISCSI64_DRVTYPE_SCSI_TYPE(v) ((uint8_t)((v) & PISCSI64_DRVTYPE_TYPEMASK))
 
 enum piscsi64_stuff {
   PISCSI64_BLOCK_SIZE = 512, // Deprecated, do not use

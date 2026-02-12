@@ -49,6 +49,7 @@ struct piscsi64_base {
     uint8_t present;
     uint8_t valid;
     uint8_t read_only;
+    uint8_t scsi_type;
     uint8_t motor;
     uint8_t unit_num;
     uint16_t scsi_num;
@@ -106,7 +107,46 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io);
 //#define debug(c, v) WRITESHORT(c, v)
 //#define debugval(c, v) WRITELONG(c, v)
 
+void *memset(void *dst, int c, unsigned long len) {
+  unsigned char *p = (unsigned char *)dst;
+  unsigned char v = (unsigned char)c;
+  while (len--) {
+    *p++ = v;
+  }
+  return dst;
+}
+
 struct piscsi64_base* dev_base = NULL;
+
+static uint16_t piscsi64_swap16(uint16_t v) {
+  return (uint16_t)((v << 8) | (v >> 8));
+}
+
+static uint16_t piscsi64_normalize_drvtype(uint16_t raw) {
+  uint16_t swapped = piscsi64_swap16(raw);
+
+  if (raw == 0) {
+    return 0;
+  }
+  if (raw == 0xFFFF || swapped == 0xFFFF) {
+    return 0;
+  }
+
+  if (PISCSI64_DRVTYPE_IS_PRESENT(raw)) {
+    return raw;
+  }
+  if (PISCSI64_DRVTYPE_IS_PRESENT(swapped)) {
+    return swapped;
+  }
+
+  // Legacy protocol: non-zero means present direct-access disk.
+  if (raw == 1 || swapped == 1) {
+    return PISCSI64_DRVTYPE_BUILD(PISCSI64_SCSI_TYPE_DIRECT_ACCESS, 0);
+  }
+
+  // Last-resort compatibility for older firmware or lane-swizzled values.
+  return PISCSI64_DRVTYPE_BUILD(PISCSI64_SCSI_TYPE_DIRECT_ACCESS, 0);
+}
 
 static uint32_t find_piscsi64_board_base(void) {
   uint32_t board_addr = 0;
@@ -153,13 +193,17 @@ static struct Library __attribute__((used)) *
   piscsi64_base_addr = find_piscsi64_board_base();
 
   for (int i = 0; i < PISCSI64_NUM_UNITS; i++) {
-    uint16_t r = 0;
+    uint16_t drvtype_raw = 0;
+    uint16_t drvtype = 0;
     WRITESHORT(PISCSI64_CMD_DRVNUM, (i));
     dev_base->units[i].regs_ptr = piscsi64_base_addr;
-    READSHORT(PISCSI64_CMD_DRVTYPE, r);
-    dev_base->units[i].enabled = r;
-    dev_base->units[i].present = r;
-    dev_base->units[i].valid = r;
+    READSHORT(PISCSI64_CMD_DRVTYPE, drvtype_raw);
+    drvtype = piscsi64_normalize_drvtype(drvtype_raw);
+    dev_base->units[i].enabled = PISCSI64_DRVTYPE_IS_PRESENT(drvtype) ? 1 : 0;
+    dev_base->units[i].present = dev_base->units[i].enabled;
+    dev_base->units[i].valid = dev_base->units[i].enabled;
+    dev_base->units[i].read_only = PISCSI64_DRVTYPE_IS_READONLY(drvtype) ? 1 : 0;
+    dev_base->units[i].scsi_type = PISCSI64_DRVTYPE_SCSI_TYPE(drvtype);
     dev_base->units[i].unit_num = i;
     dev_base->units[i].scsi_num = i;
     if (dev_base->units[i].present) {
@@ -263,6 +307,21 @@ uint8_t piscsi64_rw(struct piscsi64_unit* u, struct IORequest* io) {
   uint32_t len;
   // uint32_t block, num_blocks;
   uint8_t sderr = 0;
+
+  if (u->read_only) {
+    switch (io->io_Command) {
+    case CMD_WRITE:
+    case TD_FORMAT:
+    case TD_FORMAT64:
+    case NSCMD_TD_FORMAT64:
+    case TD_WRITE64:
+    case NSCMD_TD_WRITE64:
+      iostd->io_Actual = 0;
+      return TDERR_WriteProt;
+    default:
+      break;
+    }
+  }
   uint32_t block_size = 512;
 
   data = iotd->iotd_Req.io_Data;
@@ -339,20 +398,75 @@ uint8_t piscsi64_rw(struct piscsi64_unit* u, struct IORequest* io) {
   return 0;
 }
 
-#define PISCSI64_ID_STRING "PISTORM Fake SCSI Disk  0.1 1111111111111111"
+#define PISCSI64_VENDOR_ID   "PISTORM "
+#define PISCSI64_DISK_PRODID "Virtual Disk    "
+#define PISCSI64_CD_PRODID   "Virtual CD-ROM  "
+#define PISCSI64_REV_ID      "1.0 "
+
+static void piscsi64_store_be16(uint8_t* dst, uint16_t value) {
+  dst[0] = (uint8_t)((value >> 8) & 0xFF);
+  dst[1] = (uint8_t)(value & 0xFF);
+}
+
+static void piscsi64_store_be32(uint8_t* dst, uint32_t value) {
+  dst[0] = (uint8_t)((value >> 24) & 0xFF);
+  dst[1] = (uint8_t)((value >> 16) & 0xFF);
+  dst[2] = (uint8_t)((value >> 8) & 0xFF);
+  dst[3] = (uint8_t)(value & 0xFF);
+}
+
+static uint32_t piscsi64_min_u32(uint32_t a, uint32_t b) {
+  return (a < b) ? a : b;
+}
+
+static void piscsi64_copy_ascii_field(uint8_t* dst, uint32_t len, const char* src) {
+  uint32_t i = 0;
+  for (i = 0; i < len; i++) {
+    dst[i] = ' ';
+  }
+  if (!src) {
+    return;
+  }
+  for (i = 0; i < len && src[i] != '\0'; i++) {
+    dst[i] = (uint8_t)src[i];
+  }
+}
+
+static void piscsi64_lba_to_msf(uint32_t lba, uint8_t* dst) {
+  uint32_t f = lba + 150; // 2 second pregap
+  dst[0] = 0;
+  dst[1] = (uint8_t)(f / (75 * 60));
+  dst[2] = (uint8_t)((f / 75) % 60);
+  dst[3] = (uint8_t)(f % 75);
+}
 
 uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
   struct IOStdReq* iostd = (struct IOStdReq*)io;
   struct SCSICmd* scsi = iostd->io_Data;
-  // uint8_t* registers = sdu->sdu_Registers;
-  uint8_t* data = (uint8_t*)scsi->scsi_Data;
-  uint32_t i, block = 0, blocks = 0, maxblocks = 0;
+  uint8_t* data = scsi ? (uint8_t*)scsi->scsi_Data : NULL;
+  uint32_t block = 0;
+  uint32_t blocks = 0;
+  uint32_t maxblocks = 0;
   uint8_t err = 0;
   uint8_t write = 0;
+  uint8_t rw_is_6byte = 0;
   uint32_t block_size = 512;
+  uint8_t scsi_type = (u->scsi_type == PISCSI64_SCSI_TYPE_CDROM)
+                        ? (uint8_t)PISCSI64_SCSI_TYPE_CDROM
+                        : (uint8_t)PISCSI64_SCSI_TYPE_DIRECT_ACCESS;
 
   WRITESHORT(PISCSI64_CMD_DRVNUMX, u->unit_num);
   READLONG(PISCSI64_CMD_BLOCKSIZE, block_size);
+  if (block_size == 0) {
+    block_size = (scsi_type == PISCSI64_SCSI_TYPE_CDROM) ? 2048u : 512u;
+  }
+
+  if (!scsi || !scsi->scsi_Command) {
+    return IOERR_BADADDRESS;
+  }
+  if (scsi->scsi_CmdLength < 6) {
+    return IOERR_BADLENGTH;
+  }
 
   debugval(PISCSI64_DBG_VAL1, iostd->io_Length);
   debugval(PISCSI64_DBG_VAL2, scsi->scsi_Command[0]);
@@ -361,134 +475,200 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
   debugval(PISCSI64_DBG_VAL5, scsi->scsi_CmdLength);
   debug(PISCSI64_DBG_MSG, DBG_SCSICMD);
 
-  // maxblocks = u->s * u->c * u->h;
-
-  if (scsi->scsi_CmdLength < 6) {
-    return IOERR_BADLENGTH;
-  }
-
-  if (scsi->scsi_Command == NULL) {
-    return IOERR_BADADDRESS;
-  }
-
   scsi->scsi_Actual = 0;
-  // iostd->io_Actual = sizeof(*scsi);
 
   switch (scsi->scsi_Command[0]) {
   case SCSICMD_TEST_UNIT_READY:
-    err = 0;
+    err = u->present ? 0 : HFERR_BadStatus;
     break;
 
-  case SCSICMD_INQUIRY:
-    for (i = 0; i < scsi->scsi_Length; i++) {
-      uint8_t val = 0;
-
-      switch (i) {
-      case 0: // SCSI device type: direct-access device
-        val = (0 << 5) | 0;
-        break;
-      case 1: // RMB = 1
-        val = (1 << 7);
-        break;
-      case 2: // VERSION = 0
-        val = 0;
-        break;
-      case 3: // NORMACA=0, HISUP = 0, RESPONSE_DATA_FORMAT = 2
-        val = (0 << 5) | (0 << 4) | 2;
-        break;
-      case 4: // ADDITIONAL_LENGTH = 44 - 4
-        val = 44 - 4;
-        break;
-      default:
-        if (i >= 8 && i < 44)
-          val = PISCSI64_ID_STRING[i - 8];
-        else
-          val = 0;
-        break;
-      }
-      data[i] = val;
+  case SCSICMD_REQUEST_SENSE: {
+    uint32_t sense_len = piscsi64_min_u32(scsi->scsi_Length, 18u);
+    uint32_t i = 0;
+    if (!data || scsi->scsi_Length == 0) {
+      err = IOERR_BADADDRESS;
+      break;
     }
-    scsi->scsi_Actual = i;
+    for (i = 0; i < sense_len; i++) {
+      data[i] = 0;
+    }
+    if (sense_len > 0) {
+      data[0] = 0x70; // current errors, fixed format
+    }
+    if (sense_len > 2) {
+      data[2] = 0x00; // NO SENSE
+    }
+    if (sense_len > 7) {
+      data[7] = 10;   // additional sense length
+    }
+    scsi->scsi_Actual = sense_len;
     err = 0;
     break;
+  }
+
+  case SCSICMD_INQUIRY: {
+    uint32_t i = 0;
+    if (!data || scsi->scsi_Length == 0) {
+      err = IOERR_BADADDRESS;
+      break;
+    }
+    for (i = 0; i < scsi->scsi_Length; i++) {
+      data[i] = 0;
+    }
+    if (scsi->scsi_Length > 0) {
+      data[0] = (0 << 5) | (scsi_type & 0x1F);
+    }
+    if (scsi->scsi_Length > 1) {
+      data[1] = (scsi_type == PISCSI64_SCSI_TYPE_CDROM) ? 0x80 : 0x00; // removable for CD
+    }
+    if (scsi->scsi_Length > 2) {
+      data[2] = 2; // SCSI-2
+    }
+    if (scsi->scsi_Length > 3) {
+      data[3] = 2; // response format
+    }
+    if (scsi->scsi_Length > 4) {
+      data[4] = 31; // additional length (36-byte inquiry)
+    }
+    if (scsi->scsi_Length > 8) {
+      piscsi64_copy_ascii_field(&data[8], 8, PISCSI64_VENDOR_ID);
+    }
+    if (scsi->scsi_Length > 16) {
+      piscsi64_copy_ascii_field(&data[16], 16,
+                                (scsi_type == PISCSI64_SCSI_TYPE_CDROM)
+                                  ? PISCSI64_CD_PRODID
+                                  : PISCSI64_DISK_PRODID);
+    }
+    if (scsi->scsi_Length > 32) {
+      piscsi64_copy_ascii_field(&data[32], 4, PISCSI64_REV_ID);
+    }
+    scsi->scsi_Actual = piscsi64_min_u32(scsi->scsi_Length, 36u);
+    err = 0;
+    break;
+  }
 
   case SCSICMD_WRITE_6:
     write = 1;
   case SCSICMD_READ_6:
-    // block = *(uint32_t *)(&scsi->scsi_Command[0]) & 0x001FFFFF;
+    rw_is_6byte = 1;
     block = scsi->scsi_Command[1] & 0x1f;
     block = (block << 8) | scsi->scsi_Command[2];
     block = (block << 8) | scsi->scsi_Command[3];
     blocks = scsi->scsi_Command[4];
+    if (blocks == 0) {
+      blocks = 256; // SCSI-1/2 READ/WRITE(6) semantics
+    }
     debugval(PISCSI64_DBG_VAL1, (uint32_t)scsi->scsi_Command);
     debug(PISCSI64_DBG_MSG, DBG_SCSICMD_RW6);
     goto scsireadwrite;
+
   case SCSICMD_WRITE_10:
     write = 1;
   case SCSICMD_READ_10:
     debugval(PISCSI64_DBG_VAL1, (uint32_t)scsi->scsi_Command);
     debug(PISCSI64_DBG_MSG, DBG_SCSICMD_RW10);
-    // block = *(uint32_t *)(&scsi->scsi_Command[2]);
     block = scsi->scsi_Command[2];
     block = (block << 8) | scsi->scsi_Command[3];
     block = (block << 8) | scsi->scsi_Command[4];
     block = (block << 8) | scsi->scsi_Command[5];
-
-    // blocks = *(uint16_t *)(&scsi->scsi_Command[7]);
     blocks = scsi->scsi_Command[7];
     blocks = (blocks << 8) | scsi->scsi_Command[8];
+    goto scsireadwrite;
 
-  scsireadwrite:;
+  case SCSICMD_WRITE_12:
+    write = 1;
+  case SCSICMD_READ_12:
+    block = scsi->scsi_Command[2];
+    block = (block << 8) | scsi->scsi_Command[3];
+    block = (block << 8) | scsi->scsi_Command[4];
+    block = (block << 8) | scsi->scsi_Command[5];
+    blocks = scsi->scsi_Command[6];
+    blocks = (blocks << 8) | scsi->scsi_Command[7];
+    blocks = (blocks << 8) | scsi->scsi_Command[8];
+    blocks = (blocks << 8) | scsi->scsi_Command[9];
+    goto scsireadwrite;
+
+  scsireadwrite: {
+    uint32_t bytes = 0;
     WRITESHORT(PISCSI64_CMD_DRVNUM, (u->scsi_num));
     READLONG(PISCSI64_CMD_BLOCKS, maxblocks);
-    if (block + blocks > maxblocks || blocks == 0) {
+
+    if (write && (u->read_only || scsi_type == PISCSI64_SCSI_TYPE_CDROM)) {
+      err = HFERR_BadStatus;
+      break;
+    }
+    if (!rw_is_6byte && blocks == 0) {
+      // READ/WRITE(10/12) with transfer length 0 means no data.
+      scsi->scsi_Actual = 0;
+      err = 0;
+      break;
+    }
+    if (!data) {
       err = IOERR_BADADDRESS;
       break;
     }
-    if (data == NULL) {
+    if (block >= maxblocks || blocks > (maxblocks - block)) {
       err = IOERR_BADADDRESS;
+      break;
+    }
+    if (blocks > (0xFFFFFFFFu / block_size)) {
+      err = IOERR_BADLENGTH;
+      break;
+    }
+    bytes = blocks * block_size;
+    if (bytes > scsi->scsi_Length) {
+      err = IOERR_BADLENGTH;
       break;
     }
 
-    if (write == 0) {
-      WRITELONG(PISCSI64_CMD_ADDR1, block);
-      WRITELONG(PISCSI64_CMD_ADDR2, (blocks << 9));
-      WRITELONG(PISCSI64_CMD_ADDR3, (uint32_t)data);
+    WRITELONG(PISCSI64_CMD_ADDR1, block);
+    WRITELONG(PISCSI64_CMD_ADDR2, bytes);
+    WRITELONG(PISCSI64_CMD_ADDR3, (uint32_t)data);
+    if (!write) {
       WRITESHORT(PISCSI64_CMD_READ, u->unit_num);
     } else {
-      WRITELONG(PISCSI64_CMD_ADDR1, block);
-      WRITELONG(PISCSI64_CMD_ADDR2, (blocks << 9));
-      WRITELONG(PISCSI64_CMD_ADDR3, (uint32_t)data);
       WRITESHORT(PISCSI64_CMD_WRITE, u->unit_num);
     }
 
-    scsi->scsi_Actual = scsi->scsi_Length;
+    scsi->scsi_Actual = bytes;
     err = 0;
     break;
+  }
 
   case SCSICMD_READ_CAPACITY_10:
     if (scsi->scsi_CmdLength < 10) {
       err = HFERR_BadStatus;
       break;
     }
-
-    if (scsi->scsi_Length < 8) {
+    if (!data || scsi->scsi_Length < 8) {
       err = IOERR_BADLENGTH;
       break;
     }
-
     WRITESHORT(PISCSI64_CMD_DRVNUM, (u->scsi_num));
     READLONG(PISCSI64_CMD_BLOCKS, blocks);
-    ((uint32_t*)data)[0] = blocks - 1;
-    ((uint32_t*)data)[1] = block_size;
-
+    piscsi64_store_be32(&data[0], (blocks == 0) ? 0 : (blocks - 1));
+    piscsi64_store_be32(&data[4], block_size);
     scsi->scsi_Actual = 8;
     err = 0;
-
     break;
+
   case SCSICMD_MODE_SENSE_6:
+    if (!data || scsi->scsi_Length < 4) {
+      err = IOERR_BADLENGTH;
+      break;
+    }
+    if (scsi_type == PISCSI64_SCSI_TYPE_CDROM) {
+      data[0] = 3;
+      data[1] = 0;
+      data[2] = 0x80; // write protected
+      data[3] = 0;
+      scsi->scsi_Actual = 4;
+      err = 0;
+      break;
+    }
+
     data[0] = 3 + 8 + 0x16;
-    data[1] = 0; // MEDIUM TYPE
+    data[1] = 0;
     data[2] = 0;
     data[3] = 8;
 
@@ -497,51 +677,55 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
 
     WRITESHORT(PISCSI64_CMD_DRVNUM, (u->scsi_num));
     READLONG(PISCSI64_CMD_BLOCKS, maxblocks);
-    (blocks = (maxblocks - 1) & 0xFFFFFF);
+    blocks = (maxblocks == 0) ? 0 : ((maxblocks - 1) & 0xFFFFFFu);
 
-    *((uint32_t*)&data[4]) = blocks;
-    *((uint32_t*)&data[8]) = block_size;
+    piscsi64_store_be32(&data[4], blocks);
+    piscsi64_store_be32(&data[8], block_size);
 
     switch (((UWORD)scsi->scsi_Command[2] << 8) | scsi->scsi_Command[3]) {
     case 0x0300: { // Format Device Mode
-      debug(PISCSI64_DBG_MSG, DBG_SCSI_FORMATDEVICE);
       uint8_t* datext = data + 12;
+      debug(PISCSI64_DBG_MSG, DBG_SCSI_FORMATDEVICE);
       datext[0] = 0x03;
       datext[1] = 0x16;
       datext[2] = 0x00;
       datext[3] = 0x01;
-      *((uint32_t*)&datext[4]) = 0;
-      *((uint32_t*)&datext[8]) = 0;
-      *((uint16_t*)&datext[10]) = u->s;
-      *((uint16_t*)&datext[12]) = block_size;
+      piscsi64_store_be32(&datext[4], 0);
+      piscsi64_store_be32(&datext[8], 0);
+      piscsi64_store_be16(&datext[10], u->s);
+      piscsi64_store_be16(&datext[12], (uint16_t)block_size);
       datext[14] = 0x00;
       datext[15] = 0x01;
-      *((uint32_t*)&datext[16]) = 0;
+      piscsi64_store_be32(&datext[16], 0);
       datext[20] = 0x80;
 
       scsi->scsi_Actual = data[0] + 1;
       err = 0;
       break;
     }
-    case 0x0400: // Rigid Drive Geometry
-      debug(PISCSI64_DBG_MSG, DBG_SCSI_RDG);
+    case 0x0400: { // Rigid Drive Geometry
       uint8_t* datext = data + 12;
+      debug(PISCSI64_DBG_MSG, DBG_SCSI_RDG);
       datext[0] = 0x04;
-      *((uint32_t*)&datext[1]) = u->c;
       datext[1] = 0x16;
+      datext[2] = (uint8_t)((u->c >> 16) & 0xFF);
+      datext[3] = (uint8_t)((u->c >> 8) & 0xFF);
+      datext[4] = (uint8_t)(u->c & 0xFF);
       datext[5] = u->h;
       datext[6] = 0x00;
-      *((uint32_t*)&datext[6]) = 0;
-      *((uint32_t*)&datext[10]) = 0;
-      *((uint32_t*)&datext[13]) = u->c;
+      piscsi64_store_be32(&datext[6], 0);
+      piscsi64_store_be32(&datext[10], 0);
+      datext[13] = (uint8_t)((u->c >> 16) & 0xFF);
+      datext[14] = (uint8_t)((u->c >> 8) & 0xFF);
+      datext[15] = (uint8_t)(u->c & 0xFF);
       datext[17] = 0;
-      *((uint32_t*)&datext[18]) = 0;
-      *((uint16_t*)&datext[20]) = 5400;
+      piscsi64_store_be32(&datext[18], 0);
+      piscsi64_store_be16(&datext[20], 5400);
 
       scsi->scsi_Actual = data[0] + 1;
       err = 0;
       break;
-
+    }
     default:
       debugval(PISCSI64_DBG_VAL1, (((UWORD)scsi->scsi_Command[2] << 8) | scsi->scsi_Command[3]));
       debug(PISCSI64_DBG_MSG, DBG_SCSI_UNKNOWN_MODESENSE);
@@ -550,9 +734,62 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
     }
     break;
 
-  case SCSICMD_READ_DEFECT_DATA_10:
+  case SCSICMD_READ_TOC_PMA_ATIP: {
+    uint8_t use_msf = (scsi->scsi_Command[1] & 0x02) ? 1 : 0;
+    if (scsi_type != PISCSI64_SCSI_TYPE_CDROM) {
+      err = HFERR_BadStatus;
+      break;
+    }
+    if (!data || scsi->scsi_Length < 4) {
+      err = IOERR_BADLENGTH;
+      break;
+    }
+    WRITESHORT(PISCSI64_CMD_DRVNUM, (u->scsi_num));
+    READLONG(PISCSI64_CMD_BLOCKS, maxblocks);
+
+    {
+      uint32_t i = 0;
+      uint32_t out_len = piscsi64_min_u32(scsi->scsi_Length, 20u);
+      for (i = 0; i < out_len; i++) {
+        data[i] = 0;
+      }
+      if (out_len > 0) data[0] = 0x00;
+      if (out_len > 1) data[1] = 0x12;
+      if (out_len > 2) data[2] = 0x01;
+      if (out_len > 3) data[3] = 0x01;
+      if (out_len > 5) data[5] = 0x14;
+      if (out_len > 6) data[6] = 0x01;
+      if (out_len > 13) data[13] = 0x14;
+      if (out_len > 14) data[14] = 0xAA;
+      if (out_len >= 12) {
+        if (use_msf) {
+          piscsi64_lba_to_msf(0, &data[8]);
+        } else {
+          piscsi64_store_be32(&data[8], 0);
+        }
+      }
+      if (out_len >= 20) {
+        if (use_msf) {
+          piscsi64_lba_to_msf(maxblocks, &data[16]);
+        } else {
+          piscsi64_store_be32(&data[16], maxblocks);
+        }
+      }
+      scsi->scsi_Actual = out_len;
+      err = 0;
+    }
     break;
+  }
+
+  case SCSICMD_START_STOP_UNIT:
+    // ISO-backed media currently behaves as always inserted/non-ejectable.
+    scsi->scsi_Actual = 0;
+    err = 0;
+    break;
+
+  case SCSICMD_READ_DEFECT_DATA_10:
   case SCSICMD_CHANGE_DEFINITION:
+    err = 0;
     break;
 
   default:
@@ -645,7 +882,7 @@ uint8_t piscsi64_perform_io(struct piscsi64_unit* u, struct IORequest* io) {
   case TD_CHANGESTATE:
     DUMMYCMD;
   case TD_GETDRIVETYPE:
-    iostd->io_Actual = DG_DIRECT_ACCESS;
+    iostd->io_Actual = (u->scsi_type == PISCSI64_SCSI_TYPE_CDROM) ? DG_CDROM : DG_DIRECT_ACCESS;
     break;
   case TD_MOTOR:
     iostd->io_Actual = u->motor;
@@ -661,7 +898,7 @@ uint8_t piscsi64_perform_io(struct piscsi64_unit* u, struct IORequest* io) {
     res->dg_Heads = u->h;
     res->dg_TrackSectors = u->s;
     res->dg_BufMemType = MEMF_PUBLIC;
-    res->dg_DeviceType = 0;
+    res->dg_DeviceType = (u->scsi_type == PISCSI64_SCSI_TYPE_CDROM) ? DG_CDROM : DG_DIRECT_ACCESS;
     res->dg_Flags = 0;
 
     return 0;

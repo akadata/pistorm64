@@ -911,6 +911,27 @@ void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val)
     adjust_ranges_amiga(cfg);
   }
   if (piscsi64_enabled && strncmp(var, "piscsi64_", 9) == 0) {
+    if (strcmp(var, "piscsi64_cdrom") == 0) {
+      if (val && strlen(val) != 0) {
+        int idx = piscsi64_find_free_unit();
+        if (idx < 0) {
+          LOG_WARN("[AMIGA] No free PiSCSI64 unit available for %s\n", val);
+        } else {
+          char spec[PATH_MAX + 8];
+          if (strncmp(val, "disk:", 5) == 0 ||
+              strncmp(val, "cdrom:", 6) == 0 ||
+              strncmp(val, "file:", 5) == 0) {
+            snprintf(spec, sizeof(spec), "%s", val);
+          } else {
+            snprintf(spec, sizeof(spec), "cdrom:%s", val);
+          }
+          piscsi64_map_drive(spec, (uint8_t)idx);
+          LOG_INFO("[AMIGA] PiSCSI64 CD-ROM mapped to unit %d: %s\n", idx, val);
+        }
+      }
+      return;
+    }
+
     char *end = NULL;
     long idx = strtol(var + 9, &end, 10);
     if (end && *end == '\0' && idx > 0 && idx < PISCSI64_NUM_UNITS) {

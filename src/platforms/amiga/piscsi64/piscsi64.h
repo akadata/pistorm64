@@ -69,6 +69,12 @@
 #define PISCSI64_DRIVER_OFFSET 0x1000
 #define NUM_FILESYSTEMS 32
 
+enum piscsi64_media_kind {
+    PISCSI64_MEDIA_NONE = 0,
+    PISCSI64_MEDIA_DISK = 1,
+    PISCSI64_MEDIA_CDROM = 2,
+};
+
 struct piscsi64_dev {
     uint32_t c;
     uint16_t h, s;
@@ -78,6 +84,8 @@ struct piscsi64_dev {
     uint32_t num_partitions;
     uint32_t fshd_offs;
     uint32_t block_size;
+    uint8_t media_kind;
+    uint8_t read_only;
     struct PartitionBlock *pb[16];
     struct RigidDiskBlock *rdb;
 };
@@ -264,6 +272,7 @@ void piscsi64_init(void);
 void piscsi64_shutdown(void);
 void piscsi64_map_drive(const char *filename, uint8_t index);
 void piscsi64_unmap_drive(uint8_t index);
+int piscsi64_find_free_unit(void);
 int piscsi64_validate_hdf(struct piscsi64_dev *d, const char *filename);
 struct piscsi64_dev *piscsi64_get_dev(uint8_t index);
 

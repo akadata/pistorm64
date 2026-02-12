@@ -788,7 +788,7 @@ endif
 	# Apply sysctl settings (continue even if hugepages not supported)
 	sudo sysctl -p /etc/sysctl.d/10-hugepages.conf || echo "Note: Some hugepage settings may not be supported on this system"
 	# Enable and start the emulator service
-	sudo systemctl enable kernelpistorm64.service
+	# sudo systemctl enable kernelpistorm64.service
 	echo "Loading Kernel PiStorm64"
 #	sudo modprobe pistorm run_batch_enable=1 berr_reset_input=1 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV) 2>/dev/null || true
 	sudo modprobe pistorm $(PISTORM_KMOD_PARAMS) 2>/dev/null || true

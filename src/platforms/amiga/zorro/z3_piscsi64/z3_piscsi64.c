@@ -11,26 +11,26 @@
 
 static uint8_t z3_piscsi64_rom[] = {
     Z2_Z2 | Z2_BOOTROM,
-    AC_MEM_SIZE_64KB,
-    0x01,
-    0x02,
-    0x00,
-    0x00,
-    0x00,
-    0x00,
+    AC_MEM_SIZE_64KB, // 00/01, Z2, bootrom, 64KB
+    0x1,
+    0x2,              // 04/06, product id = 0x12
+    0x0,
+    0x0,              // 08/0A, any space where it fits
+    0x0,
+    0x0,              // 0C/0E, reserved
     PISTORM_AC_MANUF_ID,
-    0x00,
-    0x00,
-    0x00,
-    0x00,
-    0x00,
-    0x04,
-    0x02,
-    0x00, // serial
-    0x04,
-    0x00,
-    0x00,
-    0x00, // Optional BOOT ROM vector (nibble format, matching legacy Z2 layout)
+    0x0,
+    0x0,
+    0x0,
+    0x0,
+    0x0,
+    0x4,
+    0x2,
+    0x1,              // serial nibble (match known-good PiSCSI Z2 format)
+    0x4,
+    0x0,
+    0x0,
+    0x0,              // optional BOOT ROM vector nibble tail
 };
 
 static uint8_t z3_piscsi64_read8(zorro_device_t *dev, uint32_t offset) {
