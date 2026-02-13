@@ -77,6 +77,31 @@ Example: `setvar pi-net`
 Enables the **(currently non-working)** Pi-Net interface. This is currently just a skeleton driver and interface for a SANA-II compatible virtual ethernet card thing.  
 **This is not a very useful option, and you should definitely not be enabling it unless you know you need it.**
 
+# net64
+
+Example: `setvar net64`  
+Enables the new `net64` Zorro-II network card implementation.
+
+# net64_tap
+
+Example: `setvar net64_tap tap0`  
+Selects which Linux TAP interface `net64` uses.
+
+# net64_mac
+
+Example: `setvar net64_mac 02:50:12:34:56:78`  
+Overrides the default, host-derived MAC address for `net64`.
+
+# net64_promisc
+
+Example: `setvar net64_promisc 1`  
+Enables or disables promiscuous mode on the host TAP interface.
+
+# net64_queue_depth
+
+Example: `setvar net64_queue_depth 256`  
+Sets host-side RX queue depth used by `net64`.
+
 # piscsi
 
 Example: `setvar piscsi`  

@@ -236,6 +236,10 @@ MAINFILES += src/platforms/amiga/rtg/rtg-gfx.c
 MAINFILES += src/platforms/amiga/piscsi/piscsi.c
 MAINFILES += src/platforms/amiga/piscsi64/piscsi64.c
 MAINFILES += src/platforms/amiga/net/pi-net.c
+MAINFILES += src/platforms/amiga/net64/net64_config.c
+MAINFILES += src/platforms/amiga/net64/net64_device.c
+MAINFILES += src/platforms/amiga/net64/net64_bus.c
+MAINFILES += src/platforms/amiga/net64/net64_autoconfig.c
 
 MAINFILES += src/platforms/shared/rtc.c
 MAINFILES += src/platforms/shared/common.c
@@ -493,6 +497,7 @@ HELP_TARGETS = \
 	"make PISTORM_KMOD=0"             "Build emulator with legacy userspace GPIO" \
 	"make clean"                      "Remove build artifacts" \
 	"make amiga-net"                  "Build Amiga net driver (.device)" \
+	"make amiga-net64"                "Build Amiga net64 driver (.device)" \
 	"make amiga-piscsi"               "Build Amiga PiSCSI driver + bootrom" \
 	"make amiga-piscsi64"             "Build Amiga PiSCSI64 Z3 driver + bootrom" \
 	"make amiga-rtg"                  "Build Amiga RTG driver (.card)" \
@@ -725,6 +730,9 @@ kernel_clean:
 amiga-net:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/net/net_driver_amiga
 
+amiga-net64:
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/net64/net_driver_amiga
+
 amiga-piscsi:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi/device_driver_amiga
 
@@ -743,10 +751,11 @@ amiga-pissa:
 amiga-pissl:
 	$(AMIGA_SUBMAKE) -C amiga/pissl
 
-amiga-all: amiga-net amiga-piscsi amiga-piscsi64 amiga-rtg amiga-pissa amiga-pissl
+amiga-all: amiga-net amiga-net64 amiga-piscsi amiga-piscsi64 amiga-rtg amiga-pissa amiga-pissl
 
 amiga-clean:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/net/net_driver_amiga clean
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/net64/net_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi/device_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi64/device_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/rtg/rtg_driver_amiga clean
@@ -799,4 +808,4 @@ help:
 
 -include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d $(UAE_OBJS:%.o=%.d)
 
-.PHONY: all clean buptest pistorm_truth_test  install uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-piscsi amiga-piscsi64 amiga-rtg amiga-ahi amiga-all amiga-clean
+.PHONY: all clean buptest pistorm_truth_test  install uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-net64 amiga-piscsi amiga-piscsi64 amiga-rtg amiga-ahi amiga-all amiga-clean

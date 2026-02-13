@@ -14,6 +14,9 @@
 #include "hunk-reloc.h"
 #include "net/pi-net-enums.h"
 #include "net/pi-net.h"
+#include "net64/net64_bus.h"
+#include "net64/net64_config.h"
+#include "net64/net64_autoconfig.h"
 #include "piscsi/piscsi-enums.h"
 #include "piscsi/piscsi.h"
 #include "piscsi64/piscsi64-api.h"
@@ -115,6 +118,7 @@ uint8_t rtg_enabled = 0;
 uint8_t piscsi_enabled = 0;
 uint8_t piscsi64_enabled = 0;
 uint8_t pinet_enabled = 0;
+uint8_t net64_enabled = 0;
 uint8_t kick13_mode = 0;
 uint8_t pistorm_dev_enabled = 1;
 uint8_t pi_ahi_enabled = 0;
@@ -508,7 +512,20 @@ void adjust_ranges_amiga(struct emulator_config* cfg) {
   if (pinet_enabled)  CUSTOM_RANGE_STEP("pinet", PINET_OFFSET, PINET_UPPER);
   if (pi_ahi_enabled) CUSTOM_RANGE_STEP("ahi",   PI_AHI_OFFSET, PI_AHI_UPPER);
 
-  if (zorro_get_device_count() > 0) CUSTOM_RANGE_STEP("zorro", z2_cfg_base, z2_cfg_base + cfg_win_size);
+  if (zorro_get_device_count() > 0) {
+    CUSTOM_RANGE_STEP("zorro", z2_cfg_base, z2_cfg_base + cfg_win_size);
+  }
+
+  for (uint8_t i = 0; i < zorro_get_device_count(); i++) {
+    zorro_device_t *dev = zorro_get_device_by_index(i);
+    if (dev == NULL) {
+      continue;
+    }
+    if (dev->base == 0 || dev->size == 0) {
+      continue;
+    }
+    CUSTOM_RANGE_STEP(dev->name ? dev->name : "zdev", dev->base, dev->base + dev->size);
+  }
 
   if (ac_z2_pic_count && !ac_z2_done) CUSTOM_RANGE_STEP("ac_z2", z2_cfg_base, z2_cfg_base + cfg_win_size);
   if (ac_z3_pic_count && !ac_z3_done) CUSTOM_RANGE_STEP("ac_z3", z3_cfg_base, z3_cfg_base + cfg_win_size);
@@ -867,7 +884,23 @@ void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val)
     }
   }
 
+  if (CHKVAR("net64") || strncmp(var, "net64_", 6) == 0) {
+    (void)net64_config_setvar(var, val);
+  }
+
   zorro_setvar(cfg, var, val);
+
+  if (CHKVAR("net64") && !net64_enabled) {
+    if (net64_init() == 0) {
+      LOG_INFO("[AMIGA] net64 interface enabled (manuf=$%04X product=$%04X).\n",
+               PISTORM_MANUF_ID, PISTORM_PROD_NET64_Z2);
+      net64_register();
+      net64_enabled = 1;
+      adjust_ranges_amiga(cfg);
+    } else {
+      LOG_WARN("[AMIGA] net64 initialization failed.\n");
+    }
+  }
 
   // PiSCSI stuff
   if (CHKVAR("piscsi") && !piscsi_enabled) {
@@ -1050,6 +1083,9 @@ void handle_reset_amiga(struct emulator_config* cfg) {
   if (piscsi64_enabled) {
     piscsi64_refresh_drives();
   }
+  if (net64_enabled) {
+    net64_handle_reset();
+  }
 
   if (move_slow_to_chip && !force_move_slow_to_chip) {
     ps_write_16(VPOSW, 0x00); // Poke poke... wake up Agnus!
@@ -1097,6 +1133,10 @@ void shutdown_platform_amiga(struct emulator_config* cfg) {
   }
   if (pinet_enabled) {
     pinet_enabled = 0;
+  }
+  if (net64_enabled) {
+    net64_shutdown();
+    net64_enabled = 0;
   }
   if (pi_ahi_enabled) {
     pi_ahi_shutdown();

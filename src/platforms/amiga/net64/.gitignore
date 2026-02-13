@@ -1,0 +1,3 @@
+*.o
+*.d
+net_driver_amiga/*.device

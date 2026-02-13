@@ -545,7 +545,7 @@ void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t s
 
   draw_mode &= 0x03;
 
-  tmpl_x = offset_x / 8;
+  tmpl_x = offset_x / 4;
   cur_bit = base_bit = (0x80 >> (offset_x % 8));
 
   if (realtime_graphics_debug) {

@@ -1,0 +1,36 @@
+#ifndef NET64_REGS_H
+#define NET64_REGS_H 1
+
+#define NET64_REG_CMD        0x0000
+#define NET64_REG_STATUS     0x0004
+#define NET64_REG_TX_ADDR    0x0008
+#define NET64_REG_TX_LEN     0x000C
+#define NET64_REG_RX_ADDR    0x0010
+#define NET64_REG_RX_LEN     0x0014
+#define NET64_REG_RX_ACTUAL  0x0018
+#define NET64_REG_IRQ_STATUS 0x001C
+#define NET64_REG_IRQ_MASK   0x0020
+#define NET64_REG_MAC_LO     0x0024
+#define NET64_REG_MAC_HI     0x0028
+#define NET64_REG_FEATURES   0x002C
+#define NET64_REG_LINK       0x0030
+#define NET64_REG_MTU        0x0034
+
+#define NET64_CMD_NOP       0
+#define NET64_CMD_RESET     1
+#define NET64_CMD_TX_KICK   2
+#define NET64_CMD_RX_POP    3
+#define NET64_CMD_APPLY_CFG 4
+
+#define NET64_STATUS_LINK_UP (1 << 1)
+
+#define NET64_FEATURE_PROMISC (1 << 0)
+
+#define NET64_VENDOR_ID 2011
+#define NET64_PRODUCT_ID 0x0032
+#define NET64_DEFAULT_BASE 0x00E90000UL
+
+#define NET64_ETH_MTU 1500
+#define NET64_RAW_MTU 1518
+
+#endif

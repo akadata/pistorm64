@@ -1,0 +1,1 @@
+./emulator --config min.cfg --log net64.log --lob-level debug
