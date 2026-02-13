@@ -1,0 +1,4499 @@
+
+piscsi64.rom:     file format binary
+
+
+Disassembly of section .data:
+
+00ea0000  .data:
+  ea0000:	9000           	sub.b d0,d0
+  ea0002:	0102           	btst d0,d2
+  ea0004:	007c 00de      	ori.w #222,sr
+  ea0008:	0028 0000 0000 	ori.b #0,0(a0)
+  ea000e:	4afc           	illegal
+  ea0010:	0000 000e      	ori.b #14,d0
+  ea0014:	0000 0102      	ori.b #2,d0
+  ea0018:	0101           	btst d0,d1
+  ea001a:	0314           	btst d1,(a4)
+  ea001c:	0000 0028      	ori.b #40,d0
+  ea0020:	0000 003a      	ori.b #58,d0
+  ea0024:	0000 0110      	ori.b #16,d0
+  ea0028:	7069           	moveq #105,d0
+  ea002a:	2d73 6373 6936 	move.l ([1765159982,a3],1684371049),25445(a6)
+  ea0030:	342e 6465 7669 
+  ea0036:	6365 
+  ea0038:	0000 5069      	ori.b #105,d0
+  ea003c:	5343           	subq.w #1,d3
+  ea003e:	5349           	subq.w #1,a1
+  ea0040:	3634 2076      	move.w (118,a4,d2.w),d3
+  ea0044:	302e 3100      	move.w 12544(a6),d0
+  ea0048:	646f           	bcc.s 0xea00b9
+  ea004a:	732e 6c69      	mvs.b 27753(a6),d1
+  ea004e:	6272           	bhi.s 0xea00c2
+  ea0050:	6172           	bsr.s 0xea00c4
+  ea0052:	7900           	mvs.b d0,d4
+  ea0054:	6578           	bcs.s 0xea00ce
+  ea0056:	7061           	moveq #97,d0
+  ea0058:	6e73           	bgt.s 0xea00cd
+  ea005a:	696f           	bvs.s 0xea00cb
+  ea005c:	6e2e           	bgt.s 0xea008c
+  ea005e:	6c69           	bge.s 0xea00c9
+  ea0060:	6272           	bhi.s 0xea00d4
+  ea0062:	6172           	bsr.s 0xea00d6
+  ea0064:	7900           	mvs.b d0,d4
+  ea0066:	7069           	moveq #105,d0
+  ea0068:	2d73 6373 6936 	move.l ([1765159982,a3],1684371049),25445(a6)
+  ea006e:	342e 6465 7669 
+  ea0074:	6365 
+  ea0076:	0000 4142      	ori.b #66,d0
+  ea007a:	4300           	chk.l d0,d1
+  ea007c:	4e71           	nop
+  ea007e:	4e71           	nop
+  ea0080:	4e71           	nop
+  ea0082:	2a48           	movea.l a0,a5
+  ea0084:	2b7c 0000 0001 	move.l #1,32(a5)
+  ea008a:	0020 
+  ea008c:	2b4b 0010      	move.l a3,16(a5)
+  ea0090:	2b7c 0000 000c 	move.l #12,32(a5)
+  ea0096:	0020 
+  ea0098:	4e71           	nop
+  ea009a:	4e71           	nop
+  ea009c:	4e71           	nop
+  ea009e:	4e71           	nop
+  ea00a0:	4e71           	nop
+  ea00a2:	4e71           	nop
+  ea00a4:	43e8 0102      	lea 258(a0),a1
+  ea00a8:	43e9 4000      	lea 16384(a1),a1
+  ea00ac:	220a           	move.l a2,d1
+  ea00ae:	3019           	move.w (a1)+,d0
+  ea00b0:	6b06           	bmi.s 0xea00b8
+  ea00b2:	d3b2 0000      	add.l d1,(0,a2,d0.w)
+  ea00b6:	60f6           	bra.s 0xea00ae
+  ea00b8:	2b7c 0000 000d 	move.l #13,32(a5)
+  ea00be:	0020 
+  ea00c0:	2208           	move.l a0,d1
+  ea00c2:	d2bc 0000 4000 	add.l #16384,d1
+  ea00c8:	3019           	move.w (a1)+,d0
+  ea00ca:	6b06           	bmi.s 0xea00d2
+  ea00cc:	d3b2 0000      	add.l d1,(0,a2,d0.w)
+  ea00d0:	60f6           	bra.s 0xea00c8
+  ea00d2:	2b7c 0000 000e 	move.l #14,32(a5)
+  ea00d8:	0020 
+  ea00da:	7001           	moveq #1,d0
+  ea00dc:	4e75           	rts
+  ea00de:	0000 2a48      	ori.b #72,d0
+  ea00e2:	2b7c 0000 0002 	move.l #2,32(a5)
+  ea00e8:	0020 
+  ea00ea:	43fa ff5c      	lea 0xea0048(pc),a1
+  ea00ee:	4eae ffa0      	jsr -96(a6)
+  ea00f2:	4a80           	tst.l d0
+  ea00f4:	6708           	beq.s 0xea00fe
+  ea00f6:	2040           	movea.l d0,a0
+  ea00f8:	2068 0016      	movea.l 22(a0),a0
+  ea00fc:	4e90           	jsr (a0)
+  ea00fe:	7001           	moveq #1,d0
+  ea0100:	4e75           	rts
+  ea0102:	0010 0014      	ori.b #20,(a0)
+  ea0106:	001c 0020      	ori.b #32,(a4)+
+  ea010a:	ffff           	.short 0xffff
+  ea010c:	0024 ffff      	ori.b #-1,-(a4)
+  ea0110:	48e7 7ffe      	movem.l d1-a6,-(sp)
+  ea0114:	2c78 0004      	movea.l 0x4,a6
+  ea0118:	43fa ff3a      	lea 0xea0054(pc),a1
+  ea011c:	7000           	moveq #0,d0
+  ea011e:	4eae fdd8      	jsr -552(a6)
+  ea0122:	2840           	movea.l d0,a4
+  ea0124:	6732           	beq.s 0xea0158
+  ea0126:	2c40           	movea.l d0,a6
+  ea0128:	91c8           	suba.l a0,a0
+  ea012a:	203c 0000 07db 	move.l #2011,d0
+  ea0130:	7212           	moveq #18,d1
+  ea0132:	4eae ffb8      	jsr -72(a6)
+  ea0136:	4a80           	tst.l d0
+  ea0138:	670c           	beq.s 0xea0146
+  ea013a:	2040           	movea.l d0,a0
+  ea013c:	2a68 0020      	movea.l 32(a0),a5
+  ea0140:	240d           	move.l a5,d2
+  ea0142:	4a82           	tst.l d2
+  ea0144:	6606           	bne.s 0xea014c
+  ea0146:	2a7c 00e9 0000 	movea.l #15269888,a5
+  ea014c:	2c78 0004      	movea.l 0x4,a6
+  ea0150:	224c           	movea.l a4,a1
+  ea0152:	4eae fe62      	jsr -414(a6)
+  ea0156:	6006           	bra.s 0xea015e
+  ea0158:	2a7c 00e9 0000 	movea.l #15269888,a5
+  ea015e:	2b7c 0000 0003 	move.l #3,32(a5)
+  ea0164:	0020 
+  ea0166:	2b4b 001c      	move.l a3,28(a5)
+  ea016a:	2c78 0004      	movea.l 0x4,a6
+  ea016e:	2b7c 0000 000b 	move.l #11,32(a5)
+  ea0174:	0020 
+  ea0176:	43fa feee      	lea 0xea0066(pc),a1
+  ea017a:	4eae ffa0      	jsr -96(a6)
+  ea017e:	2b7c 0000 000a 	move.l #10,32(a5)
+  ea0184:	0020 
+  ea0186:	4a80           	tst.l d0
+  ea0188:	6656           	bne.s 0xea01e0
+  ea018a:	2b7c 0000 0004 	move.l #4,32(a5)
+  ea0190:	0020 
+  ea0192:	2c78 0004      	movea.l 0x4,a6
+  ea0196:	7004           	moveq #4,d0
+  ea0198:	4840           	swap d0
+  ea019a:	7200           	moveq #0,d1
+  ea019c:	4eae ff3a      	jsr -198(a6)
+  ea01a0:	2b40 0040      	move.l d0,64(a5)
+  ea01a4:	2b7c 0000 0005 	move.l #5,32(a5)
+  ea01aa:	0020 
+  ea01ac:	2240           	movea.l d0,a1
+  ea01ae:	7200           	moveq #0,d1
+  ea01b0:	2c78 0004      	movea.l 0x4,a6
+  ea01b4:	343c 17ff      	move.w #6143,d2
+  ea01b8:	0c51 4afc      	cmpi.w #19196,(a1)
+  ea01bc:	6716           	beq.s 0xea01d4
+  ea01be:	5489           	addq.l #2,a1
+  ea01c0:	51ca fff6      	dbf d2,0xea01b8
+  ea01c4:	2240           	movea.l d0,a1
+  ea01c6:	43e9 0028      	lea 40(a1),a1
+  ea01ca:	2b7c 0000 0010 	move.l #16,32(a5)
+  ea01d0:	0020 
+  ea01d2:	6008           	bra.s 0xea01dc
+  ea01d4:	2b7c 0000 000f 	move.l #15,32(a5)
+  ea01da:	0020 
+  ea01dc:	4eae ff9a      	jsr -102(a6)
+  ea01e0:	2b7c 0000 0009 	move.l #9,32(a5)
+  ea01e6:	0020 
+  ea01e8:	4eba 00da      	jsr 0xea02c4(pc)
+  ea01ec:	43fa fe66      	lea 0xea0054(pc),a1
+  ea01f0:	7000           	moveq #0,d0
+  ea01f2:	4eae fdd8      	jsr -552(a6)
+  ea01f6:	284e           	movea.l a6,a4
+  ea01f8:	2c40           	movea.l d0,a6
+  ea01fa:	2b7c 0000 0007 	move.l #7,32(a5)
+  ea0200:	0020 
+  ea0202:	202d 0048      	move.l 72(a5),d0
+  ea0206:	6700 0048      	beq.w 0xea0250
+  ea020a:	2040           	movea.l d0,a0
+  ea020c:	4eae ff70      	jsr -144(a6)
+  ea0210:	4aad 0088      	tst.l 136(a5)
+  ea0214:	6712           	beq.s 0xea0228
+  ea0216:	2b40 0084      	move.l d0,132(a5)
+  ea021a:	0cad ffff ffff 	cmpi.l #-1,28(a5)
+  ea0220:	001c 
+  ea0222:	6704           	beq.s 0xea0228
+  ea0224:	4eba 009e      	jsr 0xea02c4(pc)
+  ea0228:	2b40 0070      	move.l d0,112(a5)
+  ea022c:	2040           	movea.l d0,a0
+  ea022e:	202d 004c      	move.l 76(a5),d0
+  ea0232:	7200           	moveq #0,d1
+  ea0234:	226d 0010      	movea.l 16(a5),a1
+  ea0238:	2b7c 0000 0026 	move.l #38,32(a5)
+  ea023e:	0020 
+  ea0240:	4eae ffdc      	jsr -36(a6)
+  ea0244:	2b7c 0000 0001 	move.l #1,68(a5)
+  ea024a:	0044 
+  ea024c:	6000 ffb4      	bra.w 0xea0202
+  ea0250:	2b7c 0000 0008 	move.l #8,32(a5)
+  ea0256:	0020 
+  ea0258:	224e           	movea.l a6,a1
+  ea025a:	2b7c 0000 0320 	move.l #800,32(a5)
+  ea0260:	0020 
+  ea0262:	2c78 0004      	movea.l 0x4,a6
+  ea0266:	2b7c 0000 0321 	move.l #801,32(a5)
+  ea026c:	0020 
+  ea026e:	4eae fe62      	jsr -414(a6)
+  ea0272:	2b7c 0000 0322 	move.l #802,32(a5)
+  ea0278:	0020 
+  ea027a:	2b7c 0000 0323 	move.l #803,32(a5)
+  ea0280:	0020 
+  ea0282:	2b7c 0000 0324 	move.l #804,32(a5)
+  ea0288:	0020 
+  ea028a:	7001           	moveq #1,d0
+  ea028c:	2b7c 0000 0325 	move.l #805,32(a5)
+  ea0292:	0020 
+  ea0294:	4cdf 7ffe      	movem.l (sp)+,d1-a6
+  ea0298:	4e75           	rts
+  ea029a:	0000 0000      	ori.b #0,d0
+  ea029e:	0000 4669      	ori.b #105,d0
+  ea02a2:	6c65           	bge.s 0xea0309
+  ea02a4:	5379 7374 656d 	subq.w #1,0x7374656d
+  ea02aa:	2e72 6573 6f75 	movea.l ([1869967971,a2],1694519401),sp
+  ea02b0:	7263 6500 5069 
+  ea02b6:	5374 6f72 6d00 	subq.w #1,([1828716544,a4],0)
+  ea02bc:	0000 0000 
+  ea02c0:	0000 0000      	ori.b #0,d0
+  ea02c4:	48e7 fffe      	movem.l d0-a6,-(sp)
+  ea02c8:	2b7c 0000 001e 	move.l #30,32(a5)
+  ea02ce:	0020 
+  ea02d0:	2c78 0004      	movea.l 0x4,a6
+  ea02d4:	202d 0060      	move.l 96(a5),d0
+  ea02d8:	4a80           	tst.l d0
+  ea02da:	674a           	beq.s 0xea0326
+  ea02dc:	2b7c 0000 0027 	move.l #39,32(a5)
+  ea02e2:	0020 
+  ea02e4:	202d 006c      	move.l 108(a5),d0
+  ea02e8:	2b7c 0000 0028 	move.l #40,32(a5)
+  ea02ee:	0020 
+  ea02f0:	223c 0001 0001 	move.l #65537,d1
+  ea02f6:	2b7c 0000 0029 	move.l #41,32(a5)
+  ea02fc:	0020 
+  ea02fe:	4eae ff3a      	jsr -198(a6)
+  ea0302:	4a80           	tst.l d0
+  ea0304:	670e           	beq.s 0xea0314
+  ea0306:	2b40 0018      	move.l d0,24(a5)
+  ea030a:	2040           	movea.l d0,a0
+  ea030c:	2b7c 0000 0001 	move.l #1,104(a5)
+  ea0312:	0068 
+  ea0314:	2b7c 0000 01e0 	move.l #480,32(a5)
+  ea031a:	0020 
+  ea031c:	2b7c 0000 0001 	move.l #1,100(a5)
+  ea0322:	0064 
+  ea0324:	60ae           	bra.s 0xea02d4
+  ea0326:	2b7c 0000 0020 	move.l #32,32(a5)
+  ea032c:	0020 
+  ea032e:	4cdf 7fff      	movem.l (sp)+,d0-a6
+  ea0332:	4e75           	rts
+  ea0334:	0000 0000      	ori.b #0,d0
+  ea0338:	0000 0000      	ori.b #0,d0
+  ea033c:	0800 0000      	btst #0,d0
+  ea0340:	02a0 0000 02b4 	andi.l #692,-(a0)
+  ea0346:	0000 034a      	ori.b #74,d0
+  ea034a:	0000 0000      	ori.b #0,d0
+  ea034e:	0000 0346      	ori.b #70,d0
+  ea0352:	0800 0000      	btst #0,d0
+  ea0356:	0000 0000      	ori.b #0,d0
+  ea035a:	0000 0000      	ori.b #0,d0
+  ea035e:	0000 0000      	ori.b #0,d0
+  ea0362:	0000 0000      	ori.b #0,d0
+  ea0366:	0000 0000      	ori.b #0,d0
+  ea036a:	0000 0000      	ori.b #0,d0
+  ea036e:	0000 0000      	ori.b #0,d0
+  ea0372:	0000 0000      	ori.b #0,d0
+  ea0376:	0000 0000      	ori.b #0,d0
+  ea037a:	0000 0000      	ori.b #0,d0
+  ea037e:	0000 0000      	ori.b #0,d0
+  ea0382:	0000 0000      	ori.b #0,d0
+  ea0386:	0000 0000      	ori.b #0,d0
+  ea038a:	0000 0000      	ori.b #0,d0
+  ea038e:	0000 0000      	ori.b #0,d0
+  ea0392:	0000 0000      	ori.b #0,d0
+  ea0396:	0000 0000      	ori.b #0,d0
+  ea039a:	0000 0000      	ori.b #0,d0
+  ea039e:	0000 0000      	ori.b #0,d0
+  ea03a2:	0000 0000      	ori.b #0,d0
+  ea03a6:	0000 0000      	ori.b #0,d0
+  ea03aa:	0000 0000      	ori.b #0,d0
+  ea03ae:	0000 0000      	ori.b #0,d0
+  ea03b2:	0000 0000      	ori.b #0,d0
+  ea03b6:	0000 0000      	ori.b #0,d0
+  ea03ba:	0000 0000      	ori.b #0,d0
+  ea03be:	0000 0000      	ori.b #0,d0
+  ea03c2:	0000 0000      	ori.b #0,d0
+  ea03c6:	0000 0000      	ori.b #0,d0
+  ea03ca:	0000 0000      	ori.b #0,d0
+  ea03ce:	0000 0000      	ori.b #0,d0
+  ea03d2:	0000 0000      	ori.b #0,d0
+  ea03d6:	0000 0000      	ori.b #0,d0
+  ea03da:	0000 0000      	ori.b #0,d0
+  ea03de:	0000 0000      	ori.b #0,d0
+  ea03e2:	0000 0000      	ori.b #0,d0
+  ea03e6:	0000 0000      	ori.b #0,d0
+  ea03ea:	0000 0000      	ori.b #0,d0
+  ea03ee:	0000 0000      	ori.b #0,d0
+  ea03f2:	0000 0000      	ori.b #0,d0
+  ea03f6:	0000 0000      	ori.b #0,d0
+  ea03fa:	0000 0000      	ori.b #0,d0
+  ea03fe:	0000 0000      	ori.b #0,d0
+  ea0402:	0000 0000      	ori.b #0,d0
+  ea0406:	0000 0000      	ori.b #0,d0
+  ea040a:	0000 0000      	ori.b #0,d0
+  ea040e:	0000 0000      	ori.b #0,d0
+  ea0412:	0000 0000      	ori.b #0,d0
+  ea0416:	0000 0000      	ori.b #0,d0
+  ea041a:	0000 0000      	ori.b #0,d0
+  ea041e:	0000 0000      	ori.b #0,d0
+  ea0422:	0000 0000      	ori.b #0,d0
+  ea0426:	0000 0000      	ori.b #0,d0
+  ea042a:	0000 0000      	ori.b #0,d0
+  ea042e:	0000 0000      	ori.b #0,d0
+  ea0432:	0000 0000      	ori.b #0,d0
+  ea0436:	0000 0000      	ori.b #0,d0
+  ea043a:	0000 0000      	ori.b #0,d0
+  ea043e:	0000 0000      	ori.b #0,d0
+  ea0442:	0000 0000      	ori.b #0,d0
+  ea0446:	0000 0000      	ori.b #0,d0
+  ea044a:	0000 0000      	ori.b #0,d0
+  ea044e:	0000 0000      	ori.b #0,d0
+  ea0452:	0000 0000      	ori.b #0,d0
+  ea0456:	0000 0000      	ori.b #0,d0
+  ea045a:	0000 0000      	ori.b #0,d0
+  ea045e:	0000 0000      	ori.b #0,d0
+  ea0462:	0000 0000      	ori.b #0,d0
+  ea0466:	0000 0000      	ori.b #0,d0
+  ea046a:	0000 0000      	ori.b #0,d0
+  ea046e:	0000 0000      	ori.b #0,d0
+  ea0472:	0000 0000      	ori.b #0,d0
+  ea0476:	0000 0000      	ori.b #0,d0
+  ea047a:	0000 0000      	ori.b #0,d0
+  ea047e:	0000 0000      	ori.b #0,d0
+  ea0482:	0000 0000      	ori.b #0,d0
+  ea0486:	0000 0000      	ori.b #0,d0
+  ea048a:	0000 0000      	ori.b #0,d0
+  ea048e:	0000 0000      	ori.b #0,d0
+  ea0492:	0000 0000      	ori.b #0,d0
+  ea0496:	0000 0000      	ori.b #0,d0
+  ea049a:	0000 0000      	ori.b #0,d0
+  ea049e:	0000 0000      	ori.b #0,d0
+  ea04a2:	0000 0000      	ori.b #0,d0
+  ea04a6:	0000 0000      	ori.b #0,d0
+  ea04aa:	0000 0000      	ori.b #0,d0
+  ea04ae:	0000 0000      	ori.b #0,d0
+  ea04b2:	0000 0000      	ori.b #0,d0
+  ea04b6:	0000 0000      	ori.b #0,d0
+  ea04ba:	0000 0000      	ori.b #0,d0
+  ea04be:	0000 0000      	ori.b #0,d0
+  ea04c2:	0000 0000      	ori.b #0,d0
+  ea04c6:	0000 0000      	ori.b #0,d0
+  ea04ca:	0000 0000      	ori.b #0,d0
+  ea04ce:	0000 0000      	ori.b #0,d0
+  ea04d2:	0000 0000      	ori.b #0,d0
+  ea04d6:	0000 0000      	ori.b #0,d0
+  ea04da:	0000 0000      	ori.b #0,d0
+  ea04de:	0000 0000      	ori.b #0,d0
+  ea04e2:	0000 0000      	ori.b #0,d0
+  ea04e6:	0000 0000      	ori.b #0,d0
+  ea04ea:	0000 0000      	ori.b #0,d0
+  ea04ee:	0000 0000      	ori.b #0,d0
+  ea04f2:	0000 0000      	ori.b #0,d0
+  ea04f6:	0000 0000      	ori.b #0,d0
+  ea04fa:	0000 0000      	ori.b #0,d0
+  ea04fe:	0000 0000      	ori.b #0,d0
+  ea0502:	0000 0000      	ori.b #0,d0
+  ea0506:	0000 0000      	ori.b #0,d0
+  ea050a:	0000 0000      	ori.b #0,d0
+  ea050e:	0000 0000      	ori.b #0,d0
+  ea0512:	0000 0000      	ori.b #0,d0
+  ea0516:	0000 0000      	ori.b #0,d0
+  ea051a:	0000 0000      	ori.b #0,d0
+  ea051e:	0000 0000      	ori.b #0,d0
+  ea0522:	0000 0000      	ori.b #0,d0
+  ea0526:	0000 0000      	ori.b #0,d0
+  ea052a:	0000 0000      	ori.b #0,d0
+  ea052e:	0000 0000      	ori.b #0,d0
+  ea0532:	0000 0000      	ori.b #0,d0
+  ea0536:	0000 0000      	ori.b #0,d0
+  ea053a:	0000 0000      	ori.b #0,d0
+  ea053e:	0000 0000      	ori.b #0,d0
+  ea0542:	0000 0000      	ori.b #0,d0
+  ea0546:	0000 0000      	ori.b #0,d0
+  ea054a:	0000 0000      	ori.b #0,d0
+  ea054e:	0000 0000      	ori.b #0,d0
+  ea0552:	0000 0000      	ori.b #0,d0
+  ea0556:	0000 0000      	ori.b #0,d0
+  ea055a:	0000 0000      	ori.b #0,d0
+  ea055e:	0000 0000      	ori.b #0,d0
+  ea0562:	0000 0000      	ori.b #0,d0
+  ea0566:	0000 0000      	ori.b #0,d0
+  ea056a:	0000 0000      	ori.b #0,d0
+  ea056e:	0000 0000      	ori.b #0,d0
+  ea0572:	0000 0000      	ori.b #0,d0
+  ea0576:	0000 0000      	ori.b #0,d0
+  ea057a:	0000 0000      	ori.b #0,d0
+  ea057e:	0000 0000      	ori.b #0,d0
+  ea0582:	0000 0000      	ori.b #0,d0
+  ea0586:	0000 0000      	ori.b #0,d0
+  ea058a:	0000 0000      	ori.b #0,d0
+  ea058e:	0000 0000      	ori.b #0,d0
+  ea0592:	0000 0000      	ori.b #0,d0
+  ea0596:	0000 0000      	ori.b #0,d0
+  ea059a:	0000 0000      	ori.b #0,d0
+  ea059e:	0000 0000      	ori.b #0,d0
+  ea05a2:	0000 0000      	ori.b #0,d0
+  ea05a6:	0000 0000      	ori.b #0,d0
+  ea05aa:	0000 0000      	ori.b #0,d0
+  ea05ae:	0000 0000      	ori.b #0,d0
+  ea05b2:	0000 0000      	ori.b #0,d0
+  ea05b6:	0000 0000      	ori.b #0,d0
+  ea05ba:	0000 0000      	ori.b #0,d0
+  ea05be:	0000 0000      	ori.b #0,d0
+  ea05c2:	0000 0000      	ori.b #0,d0
+  ea05c6:	0000 0000      	ori.b #0,d0
+  ea05ca:	0000 0000      	ori.b #0,d0
+  ea05ce:	0000 0000      	ori.b #0,d0
+  ea05d2:	0000 0000      	ori.b #0,d0
+  ea05d6:	0000 0000      	ori.b #0,d0
+  ea05da:	0000 0000      	ori.b #0,d0
+  ea05de:	0000 0000      	ori.b #0,d0
+  ea05e2:	0000 0000      	ori.b #0,d0
+  ea05e6:	0000 0000      	ori.b #0,d0
+  ea05ea:	0000 0000      	ori.b #0,d0
+  ea05ee:	0000 0000      	ori.b #0,d0
+  ea05f2:	0000 0000      	ori.b #0,d0
+  ea05f6:	0000 0000      	ori.b #0,d0
+  ea05fa:	0000 0000      	ori.b #0,d0
+  ea05fe:	0000 0000      	ori.b #0,d0
+  ea0602:	0000 0000      	ori.b #0,d0
+  ea0606:	0000 0000      	ori.b #0,d0
+  ea060a:	0000 0000      	ori.b #0,d0
+  ea060e:	0000 0000      	ori.b #0,d0
+  ea0612:	0000 0000      	ori.b #0,d0
+  ea0616:	0000 0000      	ori.b #0,d0
+  ea061a:	0000 0000      	ori.b #0,d0
+  ea061e:	0000 0000      	ori.b #0,d0
+  ea0622:	0000 0000      	ori.b #0,d0
+  ea0626:	0000 0000      	ori.b #0,d0
+  ea062a:	0000 0000      	ori.b #0,d0
+  ea062e:	0000 0000      	ori.b #0,d0
+  ea0632:	0000 0000      	ori.b #0,d0
+  ea0636:	0000 0000      	ori.b #0,d0
+  ea063a:	0000 0000      	ori.b #0,d0
+  ea063e:	0000 0000      	ori.b #0,d0
+  ea0642:	0000 0000      	ori.b #0,d0
+  ea0646:	0000 0000      	ori.b #0,d0
+  ea064a:	0000 0000      	ori.b #0,d0
+  ea064e:	0000 0000      	ori.b #0,d0
+  ea0652:	0000 0000      	ori.b #0,d0
+  ea0656:	0000 0000      	ori.b #0,d0
+  ea065a:	0000 0000      	ori.b #0,d0
+  ea065e:	0000 0000      	ori.b #0,d0
+  ea0662:	0000 0000      	ori.b #0,d0
+  ea0666:	0000 0000      	ori.b #0,d0
+  ea066a:	0000 0000      	ori.b #0,d0
+  ea066e:	0000 0000      	ori.b #0,d0
+  ea0672:	0000 0000      	ori.b #0,d0
+  ea0676:	0000 0000      	ori.b #0,d0
+  ea067a:	0000 0000      	ori.b #0,d0
+  ea067e:	0000 0000      	ori.b #0,d0
+  ea0682:	0000 0000      	ori.b #0,d0
+  ea0686:	0000 0000      	ori.b #0,d0
+  ea068a:	0000 0000      	ori.b #0,d0
+  ea068e:	0000 0000      	ori.b #0,d0
+  ea0692:	0000 0000      	ori.b #0,d0
+  ea0696:	0000 0000      	ori.b #0,d0
+  ea069a:	0000 0000      	ori.b #0,d0
+  ea069e:	0000 0000      	ori.b #0,d0
+  ea06a2:	0000 0000      	ori.b #0,d0
+  ea06a6:	0000 0000      	ori.b #0,d0
+  ea06aa:	0000 0000      	ori.b #0,d0
+  ea06ae:	0000 0000      	ori.b #0,d0
+  ea06b2:	0000 0000      	ori.b #0,d0
+  ea06b6:	0000 0000      	ori.b #0,d0
+  ea06ba:	0000 0000      	ori.b #0,d0
+  ea06be:	0000 0000      	ori.b #0,d0
+  ea06c2:	0000 0000      	ori.b #0,d0
+  ea06c6:	0000 0000      	ori.b #0,d0
+  ea06ca:	0000 0000      	ori.b #0,d0
+  ea06ce:	0000 0000      	ori.b #0,d0
+  ea06d2:	0000 0000      	ori.b #0,d0
+  ea06d6:	0000 0000      	ori.b #0,d0
+  ea06da:	0000 0000      	ori.b #0,d0
+  ea06de:	0000 0000      	ori.b #0,d0
+  ea06e2:	0000 0000      	ori.b #0,d0
+  ea06e6:	0000 0000      	ori.b #0,d0
+  ea06ea:	0000 0000      	ori.b #0,d0
+  ea06ee:	0000 0000      	ori.b #0,d0
+  ea06f2:	0000 0000      	ori.b #0,d0
+  ea06f6:	0000 0000      	ori.b #0,d0
+  ea06fa:	0000 0000      	ori.b #0,d0
+  ea06fe:	0000 0000      	ori.b #0,d0
+  ea0702:	0000 0000      	ori.b #0,d0
+  ea0706:	0000 0000      	ori.b #0,d0
+  ea070a:	0000 0000      	ori.b #0,d0
+  ea070e:	0000 0000      	ori.b #0,d0
+  ea0712:	0000 0000      	ori.b #0,d0
+  ea0716:	0000 0000      	ori.b #0,d0
+  ea071a:	0000 0000      	ori.b #0,d0
+  ea071e:	0000 0000      	ori.b #0,d0
+  ea0722:	0000 0000      	ori.b #0,d0
+  ea0726:	0000 0000      	ori.b #0,d0
+  ea072a:	0000 0000      	ori.b #0,d0
+  ea072e:	0000 0000      	ori.b #0,d0
+  ea0732:	0000 0000      	ori.b #0,d0
+  ea0736:	0000 0000      	ori.b #0,d0
+  ea073a:	0000 0000      	ori.b #0,d0
+  ea073e:	0000 0000      	ori.b #0,d0
+  ea0742:	0000 0000      	ori.b #0,d0
+  ea0746:	0000 0000      	ori.b #0,d0
+  ea074a:	0000 0000      	ori.b #0,d0
+  ea074e:	0000 0000      	ori.b #0,d0
+  ea0752:	0000 0000      	ori.b #0,d0
+  ea0756:	0000 0000      	ori.b #0,d0
+  ea075a:	0000 0000      	ori.b #0,d0
+  ea075e:	0000 0000      	ori.b #0,d0
+  ea0762:	0000 0000      	ori.b #0,d0
+  ea0766:	0000 0000      	ori.b #0,d0
+  ea076a:	0000 0000      	ori.b #0,d0
+  ea076e:	0000 0000      	ori.b #0,d0
+  ea0772:	0000 0000      	ori.b #0,d0
+  ea0776:	0000 0000      	ori.b #0,d0
+  ea077a:	0000 0000      	ori.b #0,d0
+  ea077e:	0000 0000      	ori.b #0,d0
+  ea0782:	0000 0000      	ori.b #0,d0
+  ea0786:	0000 0000      	ori.b #0,d0
+  ea078a:	0000 0000      	ori.b #0,d0
+  ea078e:	0000 0000      	ori.b #0,d0
+  ea0792:	0000 0000      	ori.b #0,d0
+  ea0796:	0000 0000      	ori.b #0,d0
+  ea079a:	0000 0000      	ori.b #0,d0
+  ea079e:	0000 0000      	ori.b #0,d0
+  ea07a2:	0000 0000      	ori.b #0,d0
+  ea07a6:	0000 0000      	ori.b #0,d0
+  ea07aa:	0000 0000      	ori.b #0,d0
+  ea07ae:	0000 0000      	ori.b #0,d0
+  ea07b2:	0000 0000      	ori.b #0,d0
+  ea07b6:	0000 0000      	ori.b #0,d0
+  ea07ba:	0000 0000      	ori.b #0,d0
+  ea07be:	0000 0000      	ori.b #0,d0
+  ea07c2:	0000 0000      	ori.b #0,d0
+  ea07c6:	0000 0000      	ori.b #0,d0
+  ea07ca:	0000 0000      	ori.b #0,d0
+  ea07ce:	0000 0000      	ori.b #0,d0
+  ea07d2:	0000 0000      	ori.b #0,d0
+  ea07d6:	0000 0000      	ori.b #0,d0
+  ea07da:	0000 0000      	ori.b #0,d0
+  ea07de:	0000 0000      	ori.b #0,d0
+  ea07e2:	0000 0000      	ori.b #0,d0
+  ea07e6:	0000 0000      	ori.b #0,d0
+  ea07ea:	0000 0000      	ori.b #0,d0
+  ea07ee:	0000 0000      	ori.b #0,d0
+  ea07f2:	0000 0000      	ori.b #0,d0
+  ea07f6:	0000 0000      	ori.b #0,d0
+  ea07fa:	0000 0000      	ori.b #0,d0
+  ea07fe:	0000 0000      	ori.b #0,d0
+  ea0802:	0000 0000      	ori.b #0,d0
+  ea0806:	0000 0000      	ori.b #0,d0
+  ea080a:	0000 0000      	ori.b #0,d0
+  ea080e:	0000 0000      	ori.b #0,d0
+  ea0812:	0000 0000      	ori.b #0,d0
+  ea0816:	0000 0000      	ori.b #0,d0
+  ea081a:	0000 0000      	ori.b #0,d0
+  ea081e:	0000 0000      	ori.b #0,d0
+  ea0822:	0000 0000      	ori.b #0,d0
+  ea0826:	0000 0000      	ori.b #0,d0
+  ea082a:	0000 0000      	ori.b #0,d0
+  ea082e:	0000 0000      	ori.b #0,d0
+  ea0832:	0000 0000      	ori.b #0,d0
+  ea0836:	0000 0000      	ori.b #0,d0
+  ea083a:	0000 0000      	ori.b #0,d0
+  ea083e:	0000 0000      	ori.b #0,d0
+  ea0842:	0000 0000      	ori.b #0,d0
+  ea0846:	0000 0000      	ori.b #0,d0
+  ea084a:	0000 0000      	ori.b #0,d0
+  ea084e:	0000 0000      	ori.b #0,d0
+  ea0852:	0000 0000      	ori.b #0,d0
+  ea0856:	0000 0000      	ori.b #0,d0
+  ea085a:	0000 0000      	ori.b #0,d0
+  ea085e:	0000 0000      	ori.b #0,d0
+  ea0862:	0000 0000      	ori.b #0,d0
+  ea0866:	0000 0000      	ori.b #0,d0
+  ea086a:	0000 0000      	ori.b #0,d0
+  ea086e:	0000 0000      	ori.b #0,d0
+  ea0872:	0000 0000      	ori.b #0,d0
+  ea0876:	0000 0000      	ori.b #0,d0
+  ea087a:	0000 0000      	ori.b #0,d0
+  ea087e:	0000 0000      	ori.b #0,d0
+  ea0882:	0000 0000      	ori.b #0,d0
+  ea0886:	0000 0000      	ori.b #0,d0
+  ea088a:	0000 0000      	ori.b #0,d0
+  ea088e:	0000 0000      	ori.b #0,d0
+  ea0892:	0000 0000      	ori.b #0,d0
+  ea0896:	0000 0000      	ori.b #0,d0
+  ea089a:	0000 0000      	ori.b #0,d0
+  ea089e:	0000 0000      	ori.b #0,d0
+  ea08a2:	0000 0000      	ori.b #0,d0
+  ea08a6:	0000 0000      	ori.b #0,d0
+  ea08aa:	0000 0000      	ori.b #0,d0
+  ea08ae:	0000 0000      	ori.b #0,d0
+  ea08b2:	0000 0000      	ori.b #0,d0
+  ea08b6:	0000 0000      	ori.b #0,d0
+  ea08ba:	0000 0000      	ori.b #0,d0
+  ea08be:	0000 0000      	ori.b #0,d0
+  ea08c2:	0000 0000      	ori.b #0,d0
+  ea08c6:	0000 0000      	ori.b #0,d0
+  ea08ca:	0000 0000      	ori.b #0,d0
+  ea08ce:	0000 0000      	ori.b #0,d0
+  ea08d2:	0000 0000      	ori.b #0,d0
+  ea08d6:	0000 0000      	ori.b #0,d0
+  ea08da:	0000 0000      	ori.b #0,d0
+  ea08de:	0000 0000      	ori.b #0,d0
+  ea08e2:	0000 0000      	ori.b #0,d0
+  ea08e6:	0000 0000      	ori.b #0,d0
+  ea08ea:	0000 0000      	ori.b #0,d0
+  ea08ee:	0000 0000      	ori.b #0,d0
+  ea08f2:	0000 0000      	ori.b #0,d0
+  ea08f6:	0000 0000      	ori.b #0,d0
+  ea08fa:	0000 0000      	ori.b #0,d0
+  ea08fe:	0000 0000      	ori.b #0,d0
+  ea0902:	0000 0000      	ori.b #0,d0
+  ea0906:	0000 0000      	ori.b #0,d0
+  ea090a:	0000 0000      	ori.b #0,d0
+  ea090e:	0000 0000      	ori.b #0,d0
+  ea0912:	0000 0000      	ori.b #0,d0
+  ea0916:	0000 0000      	ori.b #0,d0
+  ea091a:	0000 0000      	ori.b #0,d0
+  ea091e:	0000 0000      	ori.b #0,d0
+  ea0922:	0000 0000      	ori.b #0,d0
+  ea0926:	0000 0000      	ori.b #0,d0
+  ea092a:	0000 0000      	ori.b #0,d0
+  ea092e:	0000 0000      	ori.b #0,d0
+  ea0932:	0000 0000      	ori.b #0,d0
+  ea0936:	0000 0000      	ori.b #0,d0
+  ea093a:	0000 0000      	ori.b #0,d0
+  ea093e:	0000 0000      	ori.b #0,d0
+  ea0942:	0000 0000      	ori.b #0,d0
+  ea0946:	0000 0000      	ori.b #0,d0
+  ea094a:	0000 0000      	ori.b #0,d0
+  ea094e:	0000 0000      	ori.b #0,d0
+  ea0952:	0000 0000      	ori.b #0,d0
+  ea0956:	0000 0000      	ori.b #0,d0
+  ea095a:	0000 0000      	ori.b #0,d0
+  ea095e:	0000 0000      	ori.b #0,d0
+  ea0962:	0000 0000      	ori.b #0,d0
+  ea0966:	0000 0000      	ori.b #0,d0
+  ea096a:	0000 0000      	ori.b #0,d0
+  ea096e:	0000 0000      	ori.b #0,d0
+  ea0972:	0000 0000      	ori.b #0,d0
+  ea0976:	0000 0000      	ori.b #0,d0
+  ea097a:	0000 0000      	ori.b #0,d0
+  ea097e:	0000 0000      	ori.b #0,d0
+  ea0982:	0000 0000      	ori.b #0,d0
+  ea0986:	0000 0000      	ori.b #0,d0
+  ea098a:	0000 0000      	ori.b #0,d0
+  ea098e:	0000 0000      	ori.b #0,d0
+  ea0992:	0000 0000      	ori.b #0,d0
+  ea0996:	0000 0000      	ori.b #0,d0
+  ea099a:	0000 0000      	ori.b #0,d0
+  ea099e:	0000 0000      	ori.b #0,d0
+  ea09a2:	0000 0000      	ori.b #0,d0
+  ea09a6:	0000 0000      	ori.b #0,d0
+  ea09aa:	0000 0000      	ori.b #0,d0
+  ea09ae:	0000 0000      	ori.b #0,d0
+  ea09b2:	0000 0000      	ori.b #0,d0
+  ea09b6:	0000 0000      	ori.b #0,d0
+  ea09ba:	0000 0000      	ori.b #0,d0
+  ea09be:	0000 0000      	ori.b #0,d0
+  ea09c2:	0000 0000      	ori.b #0,d0
+  ea09c6:	0000 0000      	ori.b #0,d0
+  ea09ca:	0000 0000      	ori.b #0,d0
+  ea09ce:	0000 0000      	ori.b #0,d0
+  ea09d2:	0000 0000      	ori.b #0,d0
+  ea09d6:	0000 0000      	ori.b #0,d0
+  ea09da:	0000 0000      	ori.b #0,d0
+  ea09de:	0000 0000      	ori.b #0,d0
+  ea09e2:	0000 0000      	ori.b #0,d0
+  ea09e6:	0000 0000      	ori.b #0,d0
+  ea09ea:	0000 0000      	ori.b #0,d0
+  ea09ee:	0000 0000      	ori.b #0,d0
+  ea09f2:	0000 0000      	ori.b #0,d0
+  ea09f6:	0000 0000      	ori.b #0,d0
+  ea09fa:	0000 0000      	ori.b #0,d0
+  ea09fe:	0000 0000      	ori.b #0,d0
+  ea0a02:	0000 0000      	ori.b #0,d0
+  ea0a06:	0000 0000      	ori.b #0,d0
+  ea0a0a:	0000 0000      	ori.b #0,d0
+  ea0a0e:	0000 0000      	ori.b #0,d0
+  ea0a12:	0000 0000      	ori.b #0,d0
+  ea0a16:	0000 0000      	ori.b #0,d0
+  ea0a1a:	0000 0000      	ori.b #0,d0
+  ea0a1e:	0000 0000      	ori.b #0,d0
+  ea0a22:	0000 0000      	ori.b #0,d0
+  ea0a26:	0000 0000      	ori.b #0,d0
+  ea0a2a:	0000 0000      	ori.b #0,d0
+  ea0a2e:	0000 0000      	ori.b #0,d0
+  ea0a32:	0000 0000      	ori.b #0,d0
+  ea0a36:	0000 0000      	ori.b #0,d0
+  ea0a3a:	0000 0000      	ori.b #0,d0
+  ea0a3e:	0000 0000      	ori.b #0,d0
+  ea0a42:	0000 0000      	ori.b #0,d0
+  ea0a46:	0000 0000      	ori.b #0,d0
+  ea0a4a:	0000 0000      	ori.b #0,d0
+  ea0a4e:	0000 0000      	ori.b #0,d0
+  ea0a52:	0000 0000      	ori.b #0,d0
+  ea0a56:	0000 0000      	ori.b #0,d0
+  ea0a5a:	0000 0000      	ori.b #0,d0
+  ea0a5e:	0000 0000      	ori.b #0,d0
+  ea0a62:	0000 0000      	ori.b #0,d0
+  ea0a66:	0000 0000      	ori.b #0,d0
+  ea0a6a:	0000 0000      	ori.b #0,d0
+  ea0a6e:	0000 0000      	ori.b #0,d0
+  ea0a72:	0000 0000      	ori.b #0,d0
+  ea0a76:	0000 0000      	ori.b #0,d0
+  ea0a7a:	0000 0000      	ori.b #0,d0
+  ea0a7e:	0000 0000      	ori.b #0,d0
+  ea0a82:	0000 0000      	ori.b #0,d0
+  ea0a86:	0000 0000      	ori.b #0,d0
+  ea0a8a:	0000 0000      	ori.b #0,d0
+  ea0a8e:	0000 0000      	ori.b #0,d0
+  ea0a92:	0000 0000      	ori.b #0,d0
+  ea0a96:	0000 0000      	ori.b #0,d0
+  ea0a9a:	0000 0000      	ori.b #0,d0
+  ea0a9e:	0000 0000      	ori.b #0,d0
+  ea0aa2:	0000 0000      	ori.b #0,d0
+  ea0aa6:	0000 0000      	ori.b #0,d0
+  ea0aaa:	0000 0000      	ori.b #0,d0
+  ea0aae:	0000 0000      	ori.b #0,d0
+  ea0ab2:	0000 0000      	ori.b #0,d0
+  ea0ab6:	0000 0000      	ori.b #0,d0
+  ea0aba:	0000 0000      	ori.b #0,d0
+  ea0abe:	0000 0000      	ori.b #0,d0
+  ea0ac2:	0000 0000      	ori.b #0,d0
+  ea0ac6:	0000 0000      	ori.b #0,d0
+  ea0aca:	0000 0000      	ori.b #0,d0
+  ea0ace:	0000 0000      	ori.b #0,d0
+  ea0ad2:	0000 0000      	ori.b #0,d0
+  ea0ad6:	0000 0000      	ori.b #0,d0
+  ea0ada:	0000 0000      	ori.b #0,d0
+  ea0ade:	0000 0000      	ori.b #0,d0
+  ea0ae2:	0000 0000      	ori.b #0,d0
+  ea0ae6:	0000 0000      	ori.b #0,d0
+  ea0aea:	0000 0000      	ori.b #0,d0
+  ea0aee:	0000 0000      	ori.b #0,d0
+  ea0af2:	0000 0000      	ori.b #0,d0
+  ea0af6:	0000 0000      	ori.b #0,d0
+  ea0afa:	0000 0000      	ori.b #0,d0
+  ea0afe:	0000 0000      	ori.b #0,d0
+  ea0b02:	0000 0000      	ori.b #0,d0
+  ea0b06:	0000 0000      	ori.b #0,d0
+  ea0b0a:	0000 0000      	ori.b #0,d0
+  ea0b0e:	0000 0000      	ori.b #0,d0
+  ea0b12:	0000 0000      	ori.b #0,d0
+  ea0b16:	0000 0000      	ori.b #0,d0
+  ea0b1a:	0000 0000      	ori.b #0,d0
+  ea0b1e:	0000 0000      	ori.b #0,d0
+  ea0b22:	0000 0000      	ori.b #0,d0
+  ea0b26:	0000 0000      	ori.b #0,d0
+  ea0b2a:	0000 0000      	ori.b #0,d0
+  ea0b2e:	0000 0000      	ori.b #0,d0
+  ea0b32:	0000 0000      	ori.b #0,d0
+  ea0b36:	0000 0000      	ori.b #0,d0
+  ea0b3a:	0000 0000      	ori.b #0,d0
+  ea0b3e:	0000 0000      	ori.b #0,d0
+  ea0b42:	0000 0000      	ori.b #0,d0
+  ea0b46:	0000 0000      	ori.b #0,d0
+  ea0b4a:	0000 0000      	ori.b #0,d0
+  ea0b4e:	0000 0000      	ori.b #0,d0
+  ea0b52:	0000 0000      	ori.b #0,d0
+  ea0b56:	0000 0000      	ori.b #0,d0
+  ea0b5a:	0000 0000      	ori.b #0,d0
+  ea0b5e:	0000 0000      	ori.b #0,d0
+  ea0b62:	0000 0000      	ori.b #0,d0
+  ea0b66:	0000 0000      	ori.b #0,d0
+  ea0b6a:	0000 0000      	ori.b #0,d0
+  ea0b6e:	0000 0000      	ori.b #0,d0
+  ea0b72:	0000 0000      	ori.b #0,d0
+  ea0b76:	0000 0000      	ori.b #0,d0
+  ea0b7a:	0000 0000      	ori.b #0,d0
+  ea0b7e:	0000 0000      	ori.b #0,d0
+  ea0b82:	0000 0000      	ori.b #0,d0
+  ea0b86:	0000 0000      	ori.b #0,d0
+  ea0b8a:	0000 0000      	ori.b #0,d0
+  ea0b8e:	0000 0000      	ori.b #0,d0
+  ea0b92:	0000 0000      	ori.b #0,d0
+  ea0b96:	0000 0000      	ori.b #0,d0
+  ea0b9a:	0000 0000      	ori.b #0,d0
+  ea0b9e:	0000 0000      	ori.b #0,d0
+  ea0ba2:	0000 0000      	ori.b #0,d0
+  ea0ba6:	0000 0000      	ori.b #0,d0
+  ea0baa:	0000 0000      	ori.b #0,d0
+  ea0bae:	0000 0000      	ori.b #0,d0
+  ea0bb2:	0000 0000      	ori.b #0,d0
+  ea0bb6:	0000 0000      	ori.b #0,d0
+  ea0bba:	0000 0000      	ori.b #0,d0
+  ea0bbe:	0000 0000      	ori.b #0,d0
+  ea0bc2:	0000 0000      	ori.b #0,d0
+  ea0bc6:	0000 0000      	ori.b #0,d0
+  ea0bca:	0000 0000      	ori.b #0,d0
+  ea0bce:	0000 0000      	ori.b #0,d0
+  ea0bd2:	0000 0000      	ori.b #0,d0
+  ea0bd6:	0000 0000      	ori.b #0,d0
+  ea0bda:	0000 0000      	ori.b #0,d0
+  ea0bde:	0000 0000      	ori.b #0,d0
+  ea0be2:	0000 0000      	ori.b #0,d0
+  ea0be6:	0000 0000      	ori.b #0,d0
+  ea0bea:	0000 0000      	ori.b #0,d0
+  ea0bee:	0000 0000      	ori.b #0,d0
+  ea0bf2:	0000 0000      	ori.b #0,d0
+  ea0bf6:	0000 0000      	ori.b #0,d0
+  ea0bfa:	0000 0000      	ori.b #0,d0
+  ea0bfe:	0000 0000      	ori.b #0,d0
+  ea0c02:	0000 0000      	ori.b #0,d0
+  ea0c06:	0000 0000      	ori.b #0,d0
+  ea0c0a:	0000 0000      	ori.b #0,d0
+  ea0c0e:	0000 0000      	ori.b #0,d0
+  ea0c12:	0000 0000      	ori.b #0,d0
+  ea0c16:	0000 0000      	ori.b #0,d0
+  ea0c1a:	0000 0000      	ori.b #0,d0
+  ea0c1e:	0000 0000      	ori.b #0,d0
+  ea0c22:	0000 0000      	ori.b #0,d0
+  ea0c26:	0000 0000      	ori.b #0,d0
+  ea0c2a:	0000 0000      	ori.b #0,d0
+  ea0c2e:	0000 0000      	ori.b #0,d0
+  ea0c32:	0000 0000      	ori.b #0,d0
+  ea0c36:	0000 0000      	ori.b #0,d0
+  ea0c3a:	0000 0000      	ori.b #0,d0
+  ea0c3e:	0000 0000      	ori.b #0,d0
+  ea0c42:	0000 0000      	ori.b #0,d0
+  ea0c46:	0000 0000      	ori.b #0,d0
+  ea0c4a:	0000 0000      	ori.b #0,d0
+  ea0c4e:	0000 0000      	ori.b #0,d0
+  ea0c52:	0000 0000      	ori.b #0,d0
+  ea0c56:	0000 0000      	ori.b #0,d0
+  ea0c5a:	0000 0000      	ori.b #0,d0
+  ea0c5e:	0000 0000      	ori.b #0,d0
+  ea0c62:	0000 0000      	ori.b #0,d0
+  ea0c66:	0000 0000      	ori.b #0,d0
+  ea0c6a:	0000 0000      	ori.b #0,d0
+  ea0c6e:	0000 0000      	ori.b #0,d0
+  ea0c72:	0000 0000      	ori.b #0,d0
+  ea0c76:	0000 0000      	ori.b #0,d0
+  ea0c7a:	0000 0000      	ori.b #0,d0
+  ea0c7e:	0000 0000      	ori.b #0,d0
+  ea0c82:	0000 0000      	ori.b #0,d0
+  ea0c86:	0000 0000      	ori.b #0,d0
+  ea0c8a:	0000 0000      	ori.b #0,d0
+  ea0c8e:	0000 0000      	ori.b #0,d0
+  ea0c92:	0000 0000      	ori.b #0,d0
+  ea0c96:	0000 0000      	ori.b #0,d0
+  ea0c9a:	0000 0000      	ori.b #0,d0
+  ea0c9e:	0000 0000      	ori.b #0,d0
+  ea0ca2:	0000 0000      	ori.b #0,d0
+  ea0ca6:	0000 0000      	ori.b #0,d0
+  ea0caa:	0000 0000      	ori.b #0,d0
+  ea0cae:	0000 0000      	ori.b #0,d0
+  ea0cb2:	0000 0000      	ori.b #0,d0
+  ea0cb6:	0000 0000      	ori.b #0,d0
+  ea0cba:	0000 0000      	ori.b #0,d0
+  ea0cbe:	0000 0000      	ori.b #0,d0
+  ea0cc2:	0000 0000      	ori.b #0,d0
+  ea0cc6:	0000 0000      	ori.b #0,d0
+  ea0cca:	0000 0000      	ori.b #0,d0
+  ea0cce:	0000 0000      	ori.b #0,d0
+  ea0cd2:	0000 0000      	ori.b #0,d0
+  ea0cd6:	0000 0000      	ori.b #0,d0
+  ea0cda:	0000 0000      	ori.b #0,d0
+  ea0cde:	0000 0000      	ori.b #0,d0
+  ea0ce2:	0000 0000      	ori.b #0,d0
+  ea0ce6:	0000 0000      	ori.b #0,d0
+  ea0cea:	0000 0000      	ori.b #0,d0
+  ea0cee:	0000 0000      	ori.b #0,d0
+  ea0cf2:	0000 0000      	ori.b #0,d0
+  ea0cf6:	0000 0000      	ori.b #0,d0
+  ea0cfa:	0000 0000      	ori.b #0,d0
+  ea0cfe:	0000 0000      	ori.b #0,d0
+  ea0d02:	0000 0000      	ori.b #0,d0
+  ea0d06:	0000 0000      	ori.b #0,d0
+  ea0d0a:	0000 0000      	ori.b #0,d0
+  ea0d0e:	0000 0000      	ori.b #0,d0
+  ea0d12:	0000 0000      	ori.b #0,d0
+  ea0d16:	0000 0000      	ori.b #0,d0
+  ea0d1a:	0000 0000      	ori.b #0,d0
+  ea0d1e:	0000 0000      	ori.b #0,d0
+  ea0d22:	0000 0000      	ori.b #0,d0
+  ea0d26:	0000 0000      	ori.b #0,d0
+  ea0d2a:	0000 0000      	ori.b #0,d0
+  ea0d2e:	0000 0000      	ori.b #0,d0
+  ea0d32:	0000 0000      	ori.b #0,d0
+  ea0d36:	0000 0000      	ori.b #0,d0
+  ea0d3a:	0000 0000      	ori.b #0,d0
+  ea0d3e:	0000 0000      	ori.b #0,d0
+  ea0d42:	0000 0000      	ori.b #0,d0
+  ea0d46:	0000 0000      	ori.b #0,d0
+  ea0d4a:	0000 0000      	ori.b #0,d0
+  ea0d4e:	0000 0000      	ori.b #0,d0
+  ea0d52:	0000 0000      	ori.b #0,d0
+  ea0d56:	0000 0000      	ori.b #0,d0
+  ea0d5a:	0000 0000      	ori.b #0,d0
+  ea0d5e:	0000 0000      	ori.b #0,d0
+  ea0d62:	0000 0000      	ori.b #0,d0
+  ea0d66:	0000 0000      	ori.b #0,d0
+  ea0d6a:	0000 0000      	ori.b #0,d0
+  ea0d6e:	0000 0000      	ori.b #0,d0
+  ea0d72:	0000 0000      	ori.b #0,d0
+  ea0d76:	0000 0000      	ori.b #0,d0
+  ea0d7a:	0000 0000      	ori.b #0,d0
+  ea0d7e:	0000 0000      	ori.b #0,d0
+  ea0d82:	0000 0000      	ori.b #0,d0
+  ea0d86:	0000 0000      	ori.b #0,d0
+  ea0d8a:	0000 0000      	ori.b #0,d0
+  ea0d8e:	0000 0000      	ori.b #0,d0
+  ea0d92:	0000 0000      	ori.b #0,d0
+  ea0d96:	0000 0000      	ori.b #0,d0
+  ea0d9a:	0000 0000      	ori.b #0,d0
+  ea0d9e:	0000 0000      	ori.b #0,d0
+  ea0da2:	0000 0000      	ori.b #0,d0
+  ea0da6:	0000 0000      	ori.b #0,d0
+  ea0daa:	0000 0000      	ori.b #0,d0
+  ea0dae:	0000 0000      	ori.b #0,d0
+  ea0db2:	0000 0000      	ori.b #0,d0
+  ea0db6:	0000 0000      	ori.b #0,d0
+  ea0dba:	0000 0000      	ori.b #0,d0
+  ea0dbe:	0000 0000      	ori.b #0,d0
+  ea0dc2:	0000 0000      	ori.b #0,d0
+  ea0dc6:	0000 0000      	ori.b #0,d0
+  ea0dca:	0000 0000      	ori.b #0,d0
+  ea0dce:	0000 0000      	ori.b #0,d0
+  ea0dd2:	0000 0000      	ori.b #0,d0
+  ea0dd6:	0000 0000      	ori.b #0,d0
+  ea0dda:	0000 0000      	ori.b #0,d0
+  ea0dde:	0000 0000      	ori.b #0,d0
+  ea0de2:	0000 0000      	ori.b #0,d0
+  ea0de6:	0000 0000      	ori.b #0,d0
+  ea0dea:	0000 0000      	ori.b #0,d0
+  ea0dee:	0000 0000      	ori.b #0,d0
+  ea0df2:	0000 0000      	ori.b #0,d0
+  ea0df6:	0000 0000      	ori.b #0,d0
+  ea0dfa:	0000 0000      	ori.b #0,d0
+  ea0dfe:	0000 0000      	ori.b #0,d0
+  ea0e02:	0000 0000      	ori.b #0,d0
+  ea0e06:	0000 0000      	ori.b #0,d0
+  ea0e0a:	0000 0000      	ori.b #0,d0
+  ea0e0e:	0000 0000      	ori.b #0,d0
+  ea0e12:	0000 0000      	ori.b #0,d0
+  ea0e16:	0000 0000      	ori.b #0,d0
+  ea0e1a:	0000 0000      	ori.b #0,d0
+  ea0e1e:	0000 0000      	ori.b #0,d0
+  ea0e22:	0000 0000      	ori.b #0,d0
+  ea0e26:	0000 0000      	ori.b #0,d0
+  ea0e2a:	0000 0000      	ori.b #0,d0
+  ea0e2e:	0000 0000      	ori.b #0,d0
+  ea0e32:	0000 0000      	ori.b #0,d0
+  ea0e36:	0000 0000      	ori.b #0,d0
+  ea0e3a:	0000 0000      	ori.b #0,d0
+  ea0e3e:	0000 0000      	ori.b #0,d0
+  ea0e42:	0000 0000      	ori.b #0,d0
+  ea0e46:	0000 0000      	ori.b #0,d0
+  ea0e4a:	0000 0000      	ori.b #0,d0
+  ea0e4e:	0000 0000      	ori.b #0,d0
+  ea0e52:	0000 0000      	ori.b #0,d0
+  ea0e56:	0000 0000      	ori.b #0,d0
+  ea0e5a:	0000 0000      	ori.b #0,d0
+  ea0e5e:	0000 0000      	ori.b #0,d0
+  ea0e62:	0000 0000      	ori.b #0,d0
+  ea0e66:	0000 0000      	ori.b #0,d0
+  ea0e6a:	0000 0000      	ori.b #0,d0
+  ea0e6e:	0000 0000      	ori.b #0,d0
+  ea0e72:	0000 0000      	ori.b #0,d0
+  ea0e76:	0000 0000      	ori.b #0,d0
+  ea0e7a:	0000 0000      	ori.b #0,d0
+  ea0e7e:	0000 0000      	ori.b #0,d0
+  ea0e82:	0000 0000      	ori.b #0,d0
+  ea0e86:	0000 0000      	ori.b #0,d0
+  ea0e8a:	0000 0000      	ori.b #0,d0
+  ea0e8e:	0000 0000      	ori.b #0,d0
+  ea0e92:	0000 0000      	ori.b #0,d0
+  ea0e96:	0000 0000      	ori.b #0,d0
+  ea0e9a:	0000 0000      	ori.b #0,d0
+  ea0e9e:	0000 0000      	ori.b #0,d0
+  ea0ea2:	0000 0000      	ori.b #0,d0
+  ea0ea6:	0000 0000      	ori.b #0,d0
+  ea0eaa:	0000 0000      	ori.b #0,d0
+  ea0eae:	0000 0000      	ori.b #0,d0
+  ea0eb2:	0000 0000      	ori.b #0,d0
+  ea0eb6:	0000 0000      	ori.b #0,d0
+  ea0eba:	0000 0000      	ori.b #0,d0
+  ea0ebe:	0000 0000      	ori.b #0,d0
+  ea0ec2:	0000 0000      	ori.b #0,d0
+  ea0ec6:	0000 0000      	ori.b #0,d0
+  ea0eca:	0000 0000      	ori.b #0,d0
+  ea0ece:	0000 0000      	ori.b #0,d0
+  ea0ed2:	0000 0000      	ori.b #0,d0
+  ea0ed6:	0000 0000      	ori.b #0,d0
+  ea0eda:	0000 0000      	ori.b #0,d0
+  ea0ede:	0000 0000      	ori.b #0,d0
+  ea0ee2:	0000 0000      	ori.b #0,d0
+  ea0ee6:	0000 0000      	ori.b #0,d0
+  ea0eea:	0000 0000      	ori.b #0,d0
+  ea0eee:	0000 0000      	ori.b #0,d0
+  ea0ef2:	0000 0000      	ori.b #0,d0
+  ea0ef6:	0000 0000      	ori.b #0,d0
+  ea0efa:	0000 0000      	ori.b #0,d0
+  ea0efe:	0000 0000      	ori.b #0,d0
+  ea0f02:	0000 0000      	ori.b #0,d0
+  ea0f06:	0000 0000      	ori.b #0,d0
+  ea0f0a:	0000 0000      	ori.b #0,d0
+  ea0f0e:	0000 0000      	ori.b #0,d0
+  ea0f12:	0000 0000      	ori.b #0,d0
+  ea0f16:	0000 0000      	ori.b #0,d0
+  ea0f1a:	0000 0000      	ori.b #0,d0
+  ea0f1e:	0000 0000      	ori.b #0,d0
+  ea0f22:	0000 0000      	ori.b #0,d0
+  ea0f26:	0000 0000      	ori.b #0,d0
+  ea0f2a:	0000 0000      	ori.b #0,d0
+  ea0f2e:	0000 0000      	ori.b #0,d0
+  ea0f32:	0000 0000      	ori.b #0,d0
+  ea0f36:	0000 0000      	ori.b #0,d0
+  ea0f3a:	0000 0000      	ori.b #0,d0
+  ea0f3e:	0000 0000      	ori.b #0,d0
+  ea0f42:	0000 0000      	ori.b #0,d0
+  ea0f46:	0000 0000      	ori.b #0,d0
+  ea0f4a:	0000 0000      	ori.b #0,d0
+  ea0f4e:	0000 0000      	ori.b #0,d0
+  ea0f52:	0000 0000      	ori.b #0,d0
+  ea0f56:	0000 0000      	ori.b #0,d0
+  ea0f5a:	0000 0000      	ori.b #0,d0
+  ea0f5e:	0000 0000      	ori.b #0,d0
+  ea0f62:	0000 0000      	ori.b #0,d0
+  ea0f66:	0000 0000      	ori.b #0,d0
+  ea0f6a:	0000 0000      	ori.b #0,d0
+  ea0f6e:	0000 0000      	ori.b #0,d0
+  ea0f72:	0000 0000      	ori.b #0,d0
+  ea0f76:	0000 0000      	ori.b #0,d0
+  ea0f7a:	0000 0000      	ori.b #0,d0
+  ea0f7e:	0000 0000      	ori.b #0,d0
+  ea0f82:	0000 0000      	ori.b #0,d0
+  ea0f86:	0000 0000      	ori.b #0,d0
+  ea0f8a:	0000 0000      	ori.b #0,d0
+  ea0f8e:	0000 0000      	ori.b #0,d0
+  ea0f92:	0000 0000      	ori.b #0,d0
+  ea0f96:	0000 0000      	ori.b #0,d0
+  ea0f9a:	0000 0000      	ori.b #0,d0
+  ea0f9e:	0000 0000      	ori.b #0,d0
+  ea0fa2:	0000 0000      	ori.b #0,d0
+  ea0fa6:	0000 0000      	ori.b #0,d0
+  ea0faa:	0000 0000      	ori.b #0,d0
+  ea0fae:	0000 0000      	ori.b #0,d0
+  ea0fb2:	0000 0000      	ori.b #0,d0
+  ea0fb6:	0000 0000      	ori.b #0,d0
+  ea0fba:	0000 0000      	ori.b #0,d0
+  ea0fbe:	0000 0000      	ori.b #0,d0
+  ea0fc2:	0000 0000      	ori.b #0,d0
+  ea0fc6:	0000 0000      	ori.b #0,d0
+  ea0fca:	0000 0000      	ori.b #0,d0
+  ea0fce:	0000 0000      	ori.b #0,d0
+  ea0fd2:	0000 0000      	ori.b #0,d0
+  ea0fd6:	0000 0000      	ori.b #0,d0
+  ea0fda:	0000 0000      	ori.b #0,d0
+  ea0fde:	0000 0000      	ori.b #0,d0
+  ea0fe2:	0000 0000      	ori.b #0,d0
+  ea0fe6:	0000 0000      	ori.b #0,d0
+  ea0fea:	0000 0000      	ori.b #0,d0
+  ea0fee:	0000 0000      	ori.b #0,d0
+  ea0ff2:	0000 0000      	ori.b #0,d0
+  ea0ff6:	0000 0000      	ori.b #0,d0
+  ea0ffa:	0000 0000      	ori.b #0,d0
+  ea0ffe:	0000 0000      	ori.b #0,d0
+  ea1002:	03f3 0000      	bset d1,(0,a3,d0.w)
+  ea1006:	0000 0000      	ori.b #0,d0
+  ea100a:	0003 0000      	ori.b #0,d3
+  ea100e:	0000 0000      	ori.b #0,d0
+  ea1012:	0002 0000      	ori.b #0,d2
+  ea1016:	0434 0000 0027 	subi.b #0,(39,a4,d0.w)
+  ea101c:	0000 0005      	ori.b #5,d0
+  ea1020:	0000 03e9      	ori.b #-23,d0
+  ea1024:	0000 0434      	ori.b #52,d0
+  ea1028:	70ff           	moveq #-1,d0
+  ea102a:	4e75           	rts
+  ea102c:	2f02           	move.l d2,-(sp)
+  ea102e:	242f 0008      	move.l 8(sp),d2
+  ea1032:	202f 0010      	move.l 16(sp),d0
+  ea1036:	6716           	beq.s 0xea104e
+  ea1038:	2f00           	move.l d0,-(sp)
+  ea103a:	7000           	moveq #0,d0
+  ea103c:	4600           	not.b d0
+  ea103e:	c0af 0010      	and.l 16(sp),d0
+  ea1042:	2f00           	move.l d0,-(sp)
+  ea1044:	2f02           	move.l d2,-(sp)
+  ea1046:	4eba ffe4      	jsr 0xea102c(pc)
+  ea104a:	4fef 000c      	lea 12(sp),sp
+  ea104e:	2002           	move.l d2,d0
+  ea1050:	241f           	move.l (sp)+,d2
+  ea1052:	4e75           	rts
+  ea1054:	6578           	bcs.s 0xea10ce
+  ea1056:	7061           	moveq #97,d0
+  ea1058:	6e73           	bgt.s 0xea10cd
+  ea105a:	696f           	bvs.s 0xea10cb
+  ea105c:	6e2e           	bgt.s 0xea108c
+  ea105e:	6c69           	bge.s 0xea10c9
+  ea1060:	6272           	bhi.s 0xea10d4
+  ea1062:	6172           	bsr.s 0xea10d6
+  ea1064:	7900           	mvs.b d0,d4
+  ea1066:	48e7 3f3e      	movem.l d2-d7/a2-a6,-(sp)
+  ea106a:	2c78 0004      	movea.l 0x4,a6
+  ea106e:	2c00           	move.l d0,d6
+  ea1070:	23ce 0000 000c 	move.l a6,0xc
+  ea1076:	203c 0000 0404 	move.l #1028,d0
+  ea107c:	223c 0001 0001 	move.l #65537,d1
+  ea1082:	4eae ff3a      	jsr -198(a6)
+  ea1086:	23c0 0000 0000 	move.l d0,0x0
+  ea108c:	2040           	movea.l d0,a0
+  ea108e:	2086           	move.l d6,(a0)
+  ea1090:	2c79 0000 000c 	movea.l 0xc,a6
+  ea1096:	4280           	clr.l d0
+  ea1098:	43fa ffba      	lea 0xea1054(pc),a1
+  ea109c:	4eae fdd8      	jsr -552(a6)
+  ea10a0:	2600           	move.l d0,d3
+  ea10a2:	6700 0088      	beq.w 0xea112c
+  ea10a6:	2839 0000 0008 	move.l 0x8,d4
+  ea10ac:	23c0 0000 0008 	move.l d0,0x8
+  ea10b2:	2c40           	movea.l d0,a6
+  ea10b4:	243c 0000 07db 	move.l #2011,d2
+  ea10ba:	91c8           	suba.l a0,a0
+  ea10bc:	2002           	move.l d2,d0
+  ea10be:	7212           	moveq #18,d1
+  ea10c0:	4eae ffb8      	jsr -72(a6)
+  ea10c4:	2040           	movea.l d0,a0
+  ea10c6:	4a80           	tst.l d0
+  ea10c8:	671c           	beq.s 0xea10e6
+  ea10ca:	2468 0020      	movea.l 32(a0),a2
+  ea10ce:	200a           	move.l a2,d0
+  ea10d0:	6642           	bne.s 0xea1114
+  ea10d2:	2c79 0000 0008 	movea.l 0x8,a6
+  ea10d8:	2002           	move.l d2,d0
+  ea10da:	7212           	moveq #18,d1
+  ea10dc:	4eae ffb8      	jsr -72(a6)
+  ea10e0:	2040           	movea.l d0,a0
+  ea10e2:	4a80           	tst.l d0
+  ea10e4:	66e4           	bne.s 0xea10ca
+  ea10e6:	243c 0000 07db 	move.l #2011,d2
+  ea10ec:	2c79 0000 0008 	movea.l 0x8,a6
+  ea10f2:	2002           	move.l d2,d0
+  ea10f4:	72ff           	moveq #-1,d1
+  ea10f6:	4eae ffb8      	jsr -72(a6)
+  ea10fa:	2040           	movea.l d0,a0
+  ea10fc:	4a80           	tst.l d0
+  ea10fe:	6700 0122      	beq.w 0xea1222
+  ea1102:	2468 0020      	movea.l 32(a0),a2
+  ea1106:	200a           	move.l a2,d0
+  ea1108:	67e2           	beq.s 0xea10ec
+  ea110a:	0ca8 0000 ffff 	cmpi.l #65535,36(a0)
+  ea1110:	0024 
+  ea1112:	63d8           	bls.s 0xea10ec
+  ea1114:	23c4 0000 0008 	move.l d4,0x8
+  ea111a:	2243           	movea.l d3,a1
+  ea111c:	2c79 0000 000c 	movea.l 0xc,a6
+  ea1122:	4eae fe62      	jsr -414(a6)
+  ea1126:	200a           	move.l a2,d0
+  ea1128:	6600 00cc      	bne.w 0xea11f6
+  ea112c:	287c 8002 0006 	movea.l #-2147352570,a4
+  ea1132:	247c 8002 0000 	movea.l #-2147352576,a2
+  ea1138:	267c 8002 0004 	movea.l #-2147352572,a3
+  ea113e:	23ca 0000 0000 	move.l a2,0x0
+  ea1144:	327c 002a      	movea.w #42,a1
+  ea1148:	d3f9 0000 0000 	adda.l 0x0,a1
+  ea114e:	4283           	clr.l d3
+  ea1150:	7e0a           	moveq #10,d7
+  ea1152:	de8a           	add.l a2,d7
+  ea1154:	7a0e           	moveq #14,d5
+  ea1156:	4dea 000c      	lea 12(a2),a6
+  ea115a:	da8a           	add.l a2,d5
+  ea115c:	740f           	moveq #15,d2
+  ea115e:	3043           	movea.w d3,a0
+  ea1160:	3683           	move.w d3,(a3)
+  ea1162:	228a           	move.l a2,(a1)
+  ea1164:	3214           	move.w (a4),d1
+  ea1166:	3001           	move.w d1,d0
+  ea1168:	5340           	subq.w #1,d0
+  ea116a:	0c40 fffd      	cmpi.w #-3,d0
+  ea116e:	6258           	bhi.s 0xea11c8
+  ea1170:	3001           	move.w d1,d0
+  ea1172:	e058           	ror.w #8,d0
+  ea1174:	0c40 ffff      	cmpi.w #-1,d0
+  ea1178:	674e           	beq.s 0xea11c8
+  ea117a:	4a41           	tst.w d1
+  ea117c:	6d52           	blt.s 0xea11d0
+  ea117e:	4a40           	tst.w d0
+  ea1180:	6d60           	blt.s 0xea11e2
+  ea1182:	4201           	clr.b d1
+  ea1184:	1801           	move.b d1,d4
+  ea1186:	7001           	moveq #1,d0
+  ea1188:	4be9 0004      	lea 4(a1),a5
+  ea118c:	1ac0           	move.b d0,(a5)+
+  ea118e:	1ac0           	move.b d0,(a5)+
+  ea1190:	1ac0           	move.b d0,(a5)+
+  ea1192:	1ac4           	move.b d4,(a5)+
+  ea1194:	1a81           	move.b d1,(a5)
+  ea1196:	1343 000a      	move.b d3,10(a1)
+  ea119a:	3348 000c      	move.w a0,12(a1)
+  ea119e:	4a00           	tst.b d0
+  ea11a0:	6710           	beq.s 0xea11b2
+  ea11a2:	2047           	movea.l d7,a0
+  ea11a4:	2350 0012      	move.l (a0),18(a1)
+  ea11a8:	3356 000e      	move.w (a6),14(a1)
+  ea11ac:	2045           	movea.l d5,a0
+  ea11ae:	3350 0010      	move.w (a0),16(a1)
+  ea11b2:	52a9 0016      	addq.l #1,22(a1)
+  ea11b6:	5283           	addq.l #1,d3
+  ea11b8:	43e9 0040      	lea 64(a1),a1
+  ea11bc:	51ca ffa0      	dbf d2,0xea115e
+  ea11c0:	2006           	move.l d6,d0
+  ea11c2:	4cdf 7cfc      	movem.l (sp)+,d2-d7/a2-a6
+  ea11c6:	4e75           	rts
+  ea11c8:	4201           	clr.b d1
+  ea11ca:	1801           	move.b d1,d4
+  ea11cc:	1001           	move.b d1,d0
+  ea11ce:	60b8           	bra.s 0xea1188
+  ea11d0:	3801           	move.w d1,d4
+  ea11d2:	e04c           	lsr.w #8,d4
+  ea11d4:	ec4c           	lsr.w #6,d4
+  ea11d6:	0204 0001      	andi.b #1,d4
+  ea11da:	0201 001f      	andi.b #31,d1
+  ea11de:	7001           	moveq #1,d0
+  ea11e0:	60a6           	bra.s 0xea1188
+  ea11e2:	3800           	move.w d0,d4
+  ea11e4:	e04c           	lsr.w #8,d4
+  ea11e6:	ec4c           	lsr.w #6,d4
+  ea11e8:	0204 0001      	andi.b #1,d4
+  ea11ec:	1200           	move.b d0,d1
+  ea11ee:	0201 001f      	andi.b #31,d1
+  ea11f2:	7001           	moveq #1,d0
+  ea11f4:	6092           	bra.s 0xea1188
+  ea11f6:	47ea 0004      	lea 4(a2),a3
+  ea11fa:	49ea 0006      	lea 6(a2),a4
+  ea11fe:	23ca 0000 0000 	move.l a2,0x0
+  ea1204:	327c 002a      	movea.w #42,a1
+  ea1208:	d3f9 0000 0000 	adda.l 0x0,a1
+  ea120e:	4283           	clr.l d3
+  ea1210:	7e0a           	moveq #10,d7
+  ea1212:	de8a           	add.l a2,d7
+  ea1214:	7a0e           	moveq #14,d5
+  ea1216:	4dea 000c      	lea 12(a2),a6
+  ea121a:	da8a           	add.l a2,d5
+  ea121c:	740f           	moveq #15,d2
+  ea121e:	6000 ff3e      	bra.w 0xea115e
+  ea1222:	2440           	movea.l d0,a2
+  ea1224:	23c4 0000 0008 	move.l d4,0x8
+  ea122a:	2243           	movea.l d3,a1
+  ea122c:	2c79 0000 000c 	movea.l 0xc,a6
+  ea1232:	4eae fe62      	jsr -414(a6)
+  ea1236:	200a           	move.l a2,d0
+  ea1238:	6700 fef2      	beq.w 0xea112c
+  ea123c:	60b8           	bra.s 0xea11f6
+  ea123e:	4280           	clr.l d0
+  ea1240:	4e75           	rts
+  ea1242:	2f0b           	move.l a3,-(sp)
+  ea1244:	2f0a           	move.l a2,-(sp)
+  ea1246:	2079 0000 0000 	movea.l 0x0,a0
+  ea124c:	2209           	move.l a1,d1
+  ea124e:	6740           	beq.s 0xea1290
+  ea1250:	720f           	moveq #15,d1
+  ea1252:	b280           	cmp.l d0,d1
+  ea1254:	6d3a           	blt.s 0xea1290
+  ea1256:	ed88           	lsl.l #6,d0
+  ea1258:	45f0 0800      	lea (0,a0,d0.l),a2
+  ea125c:	7220           	moveq #32,d1
+  ea125e:	4a2a 002e      	tst.b 46(a2)
+  ea1262:	671c           	beq.s 0xea1280
+  ea1264:	4a2a 002f      	tst.b 47(a2)
+  ea1268:	6716           	beq.s 0xea1280
+  ea126a:	47f0 0804      	lea (4,a0,d0.l),a3
+  ea126e:	234b 0018      	move.l a3,24(a1)
+  ea1272:	157c 0001 0026 	move.b #1,38(a2)
+  ea1278:	357c 0001 0028 	move.w #1,40(a2)
+  ea127e:	4201           	clr.b d1
+  ea1280:	1341 001f      	move.b d1,31(a1)
+  ea1284:	2050           	movea.l (a0),a0
+  ea1286:	5268 0020      	addq.w #1,32(a0)
+  ea128a:	245f           	movea.l (sp)+,a2
+  ea128c:	265f           	movea.l (sp)+,a3
+  ea128e:	4e75           	rts
+  ea1290:	7020           	moveq #32,d0
+  ea1292:	1340 001f      	move.b d0,31(a1)
+  ea1296:	2050           	movea.l (a0),a0
+  ea1298:	5268 0020      	addq.w #1,32(a0)
+  ea129c:	245f           	movea.l (sp)+,a2
+  ea129e:	265f           	movea.l (sp)+,a3
+  ea12a0:	4e75           	rts
+  ea12a2:	2079 0000 0000 	movea.l 0x0,a0
+  ea12a8:	2050           	movea.l (a0),a0
+  ea12aa:	5368 0020      	subq.w #1,32(a0)
+  ea12ae:	4280           	clr.l d0
+  ea12b0:	4e75           	rts
+  ea12b2:	598f           	subq.l #4,sp
+  ea12b4:	48e7 203a      	movem.l d2/a2-a4/a6,-(sp)
+  ea12b8:	4ab9 0000 0000 	tst.l 0x0
+  ea12be:	672a           	beq.s 0xea12ea
+  ea12c0:	2009           	move.l a1,d0
+  ea12c2:	6726           	beq.s 0xea12ea
+  ea12c4:	2069 0018      	movea.l 24(a1),a0
+  ea12c8:	2008           	move.l a0,d0
+  ea12ca:	671e           	beq.s 0xea12ea
+  ea12cc:	50c0           	st d0
+  ea12ce:	4a28 002a      	tst.b 42(a0)
+  ea12d2:	661e           	bne.s 0xea12f2
+  ea12d4:	1340 001f      	move.b d0,31(a1)
+  ea12d8:	0829 0000 001e 	btst #0,30(a1)
+  ea12de:	660a           	bne.s 0xea12ea
+  ea12e0:	2c79 0000 000c 	movea.l 0xc,a6
+  ea12e6:	4eae fe86      	jsr -378(a6)
+  ea12ea:	4cdf 5c04      	movem.l (sp)+,d2/a2-a4/a6
+  ea12ee:	588f           	addq.l #4,sp
+  ea12f0:	4e75           	rts
+  ea12f2:	70fe           	moveq #-2,d0
+  ea12f4:	b029 001f      	cmp.b 31(a1),d0
+  ea12f8:	67da           	beq.s 0xea12d4
+  ea12fa:	3029 001c      	move.w 28(a1),d0
+  ea12fe:	0c40 000f      	cmpi.w #15,d0
+  ea1302:	6724           	beq.s 0xea1328
+  ea1304:	6234           	bhi.s 0xea133a
+  ea1306:	0c40 0009      	cmpi.w #9,d0
+  ea130a:	6700 0162      	beq.w 0xea146e
+  ea130e:	637e           	bls.s 0xea138e
+  ea1310:	0c40 000c      	cmpi.w #12,d0
+  ea1314:	6712           	beq.s 0xea1328
+  ea1316:	6300 01ce      	bls.w 0xea14e6
+  ea131a:	0c40 000d      	cmpi.w #13,d0
+  ea131e:	6700 0136      	beq.w 0xea1456
+  ea1322:	0c40 000e      	cmpi.w #14,d0
+  ea1326:	6676           	bne.s 0xea139e
+  ea1328:	42a9 0020      	clr.l 32(a1)
+  ea132c:	4229 001f      	clr.b 31(a1)
+  ea1330:	0829 0000 001e 	btst #0,30(a1)
+  ea1336:	67a8           	beq.s 0xea12e0
+  ea1338:	60b0           	bra.s 0xea12ea
+  ea133a:	0c40 001b      	cmpi.w #27,d0
+  ea133e:	6700 015e      	beq.w 0xea149e
+  ea1342:	636e           	bls.s 0xea13b2
+  ea1344:	0c40 c001      	cmpi.w #-16383,d0
+  ea1348:	6200 01b8      	bhi.w 0xea1502
+  ea134c:	0c40 c000      	cmpi.w #-16384,d0
+  ea1350:	6400 014c      	bcc.w 0xea149e
+  ea1354:	0c40 001c      	cmpi.w #28,d0
+  ea1358:	6700 0168      	beq.w 0xea14c2
+  ea135c:	0c40 4000      	cmpi.w #16384,d0
+  ea1360:	663c           	bne.s 0xea139e
+  ea1362:	2069 0028      	movea.l 40(a1),a0
+  ea1366:	4298           	clr.l (a0)+
+  ea1368:	7010           	moveq #16,d0
+  ea136a:	20c0           	move.l d0,(a0)+
+  ea136c:	20fc 0005 0000 	move.l #327680,(a0)+
+  ea1372:	20bc 0000 004c 	move.l #76,(a0)
+  ea1378:	2340 0020      	move.l d0,32(a1)
+  ea137c:	4229 001f      	clr.b 31(a1)
+  ea1380:	0829 0000 001e 	btst #0,30(a1)
+  ea1386:	6700 ff58      	beq.w 0xea12e0
+  ea138a:	6000 ff5e      	bra.w 0xea12ea
+  ea138e:	0c40 0004      	cmpi.w #4,d0
+  ea1392:	6794           	beq.s 0xea1328
+  ea1394:	6300 0100      	bls.w 0xea1496
+  ea1398:	0c40 0005      	cmpi.w #5,d0
+  ea139c:	678a           	beq.s 0xea1328
+  ea139e:	70fd           	moveq #-3,d0
+  ea13a0:	1340 001f      	move.b d0,31(a1)
+  ea13a4:	0829 0000 001e 	btst #0,30(a1)
+  ea13aa:	6700 ff34      	beq.w 0xea12e0
+  ea13ae:	6000 ff3a      	bra.w 0xea12ea
+  ea13b2:	0c40 0016      	cmpi.w #22,d0
+  ea13b6:	6736           	beq.s 0xea13ee
+  ea13b8:	6200 0164      	bhi.w 0xea151e
+  ea13bc:	0c40 0012      	cmpi.w #18,d0
+  ea13c0:	66dc           	bne.s 0xea139e
+  ea13c2:	4280           	clr.l d0
+  ea13c4:	0c28 0005 002e 	cmpi.b #5,46(a0)
+  ea13ca:	6718           	beq.s 0xea13e4
+  ea13cc:	2340 0020      	move.l d0,32(a1)
+  ea13d0:	4200           	clr.b d0
+  ea13d2:	1340 001f      	move.b d0,31(a1)
+  ea13d6:	0829 0000 001e 	btst #0,30(a1)
+  ea13dc:	6700 ff02      	beq.w 0xea12e0
+  ea13e0:	6000 ff08      	bra.w 0xea12ea
+  ea13e4:	7005           	moveq #5,d0
+  ea13e6:	2340 0020      	move.l d0,32(a1)
+  ea13ea:	4200           	clr.b d0
+  ea13ec:	60e4           	bra.s 0xea13d2
+  ea13ee:	2679 0000 0000 	movea.l 0x0,a3
+  ea13f4:	2469 0028      	movea.l 40(a1),a2
+  ea13f8:	49eb 0080      	lea 128(a3),a4
+  ea13fc:	4240           	clr.w d0
+  ea13fe:	1028 0030      	move.b 48(a0),d0
+  ea1402:	3880           	move.w d0,(a4)
+  ea1404:	24eb 0074      	move.l 116(a3),(a2)+
+  ea1408:	508b           	addq.l #8,a3
+  ea140a:	24d3           	move.l (a3),(a2)+
+  ea140c:	24e8 0038      	move.l 56(a0),(a2)+
+  ea1410:	4280           	clr.l d0
+  ea1412:	3028 0036      	move.w 54(a0),d0
+  ea1416:	4281           	clr.l d1
+  ea1418:	3228 0034      	move.w 52(a0),d1
+  ea141c:	3400           	move.w d0,d2
+  ea141e:	c4c1           	mulu.w d1,d2
+  ea1420:	24c2           	move.l d2,(a2)+
+  ea1422:	24c1           	move.l d1,(a2)+
+  ea1424:	24c0           	move.l d0,(a2)+
+  ea1426:	7001           	moveq #1,d0
+  ea1428:	24c0           	move.l d0,(a2)+
+  ea142a:	4200           	clr.b d0
+  ea142c:	0c28 0005 002e 	cmpi.b #5,46(a0)
+  ea1432:	6718           	beq.s 0xea144c
+  ea1434:	14c0           	move.b d0,(a2)+
+  ea1436:	4212           	clr.b (a2)
+  ea1438:	4200           	clr.b d0
+  ea143a:	1340 001f      	move.b d0,31(a1)
+  ea143e:	0829 0000 001e 	btst #0,30(a1)
+  ea1444:	6700 fe9a      	beq.w 0xea12e0
+  ea1448:	6000 fea0      	bra.w 0xea12ea
+  ea144c:	7005           	moveq #5,d0
+  ea144e:	14c0           	move.b d0,(a2)+
+  ea1450:	4212           	clr.b (a2)
+  ea1452:	4200           	clr.b d0
+  ea1454:	60e4           	bra.s 0xea143a
+  ea1456:	2368 003c 0020 	move.l 60(a0),32(a1)
+  ea145c:	4229 001f      	clr.b 31(a1)
+  ea1460:	0829 0000 001e 	btst #0,30(a1)
+  ea1466:	6700 fe78      	beq.w 0xea12e0
+  ea146a:	6000 fe7e      	bra.w 0xea12ea
+  ea146e:	4280           	clr.l d0
+  ea1470:	1028 002f      	move.b 47(a0),d0
+  ea1474:	2340 0020      	move.l d0,32(a1)
+  ea1478:	4aa9 0024      	tst.l 36(a1)
+  ea147c:	56c0           	sne d0
+  ea147e:	4400           	neg.b d0
+  ea1480:	1140 002f      	move.b d0,47(a0)
+  ea1484:	4229 001f      	clr.b 31(a1)
+  ea1488:	0829 0000 001e 	btst #0,30(a1)
+  ea148e:	6700 fe50      	beq.w 0xea12e0
+  ea1492:	6000 fe56      	bra.w 0xea12ea
+  ea1496:	0c40 0002      	cmpi.w #2,d0
+  ea149a:	6500 ff02      	bcs.w 0xea139e
+  ea149e:	2f09           	move.l a1,-(sp)
+  ea14a0:	2f08           	move.l a0,-(sp)
+  ea14a2:	2f49 001c      	move.l a1,28(sp)
+  ea14a6:	4eba 00aa      	jsr 0xea1552(pc)
+  ea14aa:	508f           	addq.l #8,sp
+  ea14ac:	226f 0014      	movea.l 20(sp),a1
+  ea14b0:	1340 001f      	move.b d0,31(a1)
+  ea14b4:	0829 0000 001e 	btst #0,30(a1)
+  ea14ba:	6700 fe24      	beq.w 0xea12e0
+  ea14be:	6000 fe2a      	bra.w 0xea12ea
+  ea14c2:	2f09           	move.l a1,-(sp)
+  ea14c4:	2f08           	move.l a0,-(sp)
+  ea14c6:	2f49 001c      	move.l a1,28(sp)
+  ea14ca:	4eba 022a      	jsr 0xea16f6(pc)
+  ea14ce:	508f           	addq.l #8,sp
+  ea14d0:	226f 0014      	movea.l 20(sp),a1
+  ea14d4:	1340 001f      	move.b d0,31(a1)
+  ea14d8:	0829 0000 001e 	btst #0,30(a1)
+  ea14de:	6700 fe00      	beq.w 0xea12e0
+  ea14e2:	6000 fe06      	bra.w 0xea12ea
+  ea14e6:	0c40 000b      	cmpi.w #11,d0
+  ea14ea:	6600 feb2      	bne.w 0xea139e
+  ea14ee:	2f09           	move.l a1,-(sp)
+  ea14f0:	2f08           	move.l a0,-(sp)
+  ea14f2:	2f49 001c      	move.l a1,28(sp)
+  ea14f6:	4eba 005a      	jsr 0xea1552(pc)
+  ea14fa:	508f           	addq.l #8,sp
+  ea14fc:	226f 0014      	movea.l 20(sp),a1
+  ea1500:	60ae           	bra.s 0xea14b0
+  ea1502:	0c40 c003      	cmpi.w #-16381,d0
+  ea1506:	6600 fe96      	bne.w 0xea139e
+  ea150a:	2f09           	move.l a1,-(sp)
+  ea150c:	2f08           	move.l a0,-(sp)
+  ea150e:	2f49 001c      	move.l a1,28(sp)
+  ea1512:	4eba 003e      	jsr 0xea1552(pc)
+  ea1516:	508f           	addq.l #8,sp
+  ea1518:	226f 0014      	movea.l 20(sp),a1
+  ea151c:	6092           	bra.s 0xea14b0
+  ea151e:	0640 ffe8      	addi.w #-24,d0
+  ea1522:	0c40 0001      	cmpi.w #1,d0
+  ea1526:	6200 fe76      	bhi.w 0xea139e
+  ea152a:	2f09           	move.l a1,-(sp)
+  ea152c:	2f08           	move.l a0,-(sp)
+  ea152e:	2f49 001c      	move.l a1,28(sp)
+  ea1532:	4eba 001e      	jsr 0xea1552(pc)
+  ea1536:	508f           	addq.l #8,sp
+  ea1538:	226f 0014      	movea.l 20(sp),a1
+  ea153c:	6000 ff72      	bra.w 0xea14b0
+  ea1540:	2009           	move.l a1,d0
+  ea1542:	670a           	beq.s 0xea154e
+  ea1544:	137c 00fe 001f 	move.b #-2,31(a1)
+  ea154a:	70fe           	moveq #-2,d0
+  ea154c:	4e75           	rts
+  ea154e:	70fd           	moveq #-3,d0
+  ea1550:	4e75           	rts
+  ea1552:	48e7 2030      	movem.l d2/a2-a3,-(sp)
+  ea1556:	246f 0010      	movea.l 16(sp),a2
+  ea155a:	206f 0014      	movea.l 20(sp),a0
+  ea155e:	4a2a 002d      	tst.b 45(a2)
+  ea1562:	671e           	beq.s 0xea1582
+  ea1564:	3028 001c      	move.w 28(a0),d0
+  ea1568:	0c40 0019      	cmpi.w #25,d0
+  ea156c:	6756           	beq.s 0xea15c4
+  ea156e:	6348           	bls.s 0xea15b8
+  ea1570:	0c40 c001      	cmpi.w #-16383,d0
+  ea1574:	674e           	beq.s 0xea15c4
+  ea1576:	0c40 c003      	cmpi.w #-16381,d0
+  ea157a:	6748           	beq.s 0xea15c4
+  ea157c:	0c40 001b      	cmpi.w #27,d0
+  ea1580:	6742           	beq.s 0xea15c4
+  ea1582:	2428 0028      	move.l 40(a0),d2
+  ea1586:	2279 0000 0000 	movea.l 0x0,a1
+  ea158c:	2228 0024      	move.l 36(a0),d1
+  ea1590:	47e9 0080      	lea 128(a1),a3
+  ea1594:	4240           	clr.w d0
+  ea1596:	102a 0030      	move.b 48(a2),d0
+  ea159a:	3680           	move.w d0,(a3)
+  ea159c:	47e9 0074      	lea 116(a1),a3
+  ea15a0:	2653           	movea.l (a3),a3
+  ea15a2:	70fb           	moveq #-5,d0
+  ea15a4:	4a82           	tst.l d2
+  ea15a6:	670a           	beq.s 0xea15b2
+  ea15a8:	b7c1           	cmpa.l d1,a3
+  ea15aa:	6324           	bls.s 0xea15d0
+  ea15ac:	42a8 0020      	clr.l 32(a0)
+  ea15b0:	70fc           	moveq #-4,d0
+  ea15b2:	4cdf 0c04      	movem.l (sp)+,d2/a2-a3
+  ea15b6:	4e75           	rts
+  ea15b8:	0c40 0003      	cmpi.w #3,d0
+  ea15bc:	6706           	beq.s 0xea15c4
+  ea15be:	0c40 000b      	cmpi.w #11,d0
+  ea15c2:	66be           	bne.s 0xea1582
+  ea15c4:	42a8 0020      	clr.l 32(a0)
+  ea15c8:	701c           	moveq #28,d0
+  ea15ca:	4cdf 0c04      	movem.l (sp)+,d2/a2-a3
+  ea15ce:	4e75           	rts
+  ea15d0:	3028 001c      	move.w 28(a0),d0
+  ea15d4:	0c40 0019      	cmpi.w #25,d0
+  ea15d8:	675c           	beq.s 0xea1636
+  ea15da:	6244           	bhi.s 0xea1620
+  ea15dc:	0c40 0003      	cmpi.w #3,d0
+  ea15e0:	6700 00a4      	beq.w 0xea1686
+  ea15e4:	6378           	bls.s 0xea165e
+  ea15e6:	0c40 000b      	cmpi.w #11,d0
+  ea15ea:	6700 009a      	beq.w 0xea1686
+  ea15ee:	0c40 0018      	cmpi.w #24,d0
+  ea15f2:	6620           	bne.s 0xea1614
+  ea15f4:	2368 002c 0010 	move.l 44(a0),16(a1)
+  ea15fa:	2341 0014      	move.l d1,20(a1)
+  ea15fe:	2342 0018      	move.l d2,24(a1)
+  ea1602:	2368 0020 001c 	move.l 32(a0),28(a1)
+  ea1608:	43e9 0052      	lea 82(a1),a1
+  ea160c:	4240           	clr.w d0
+  ea160e:	102a 0030      	move.b 48(a2),d0
+  ea1612:	3280           	move.w d0,(a1)
+  ea1614:	2141 0020      	move.l d1,32(a0)
+  ea1618:	4200           	clr.b d0
+  ea161a:	4cdf 0c04      	movem.l (sp)+,d2/a2-a3
+  ea161e:	4e75           	rts
+  ea1620:	0c40 c000      	cmpi.w #-16384,d0
+  ea1624:	67ce           	beq.s 0xea15f4
+  ea1626:	6300 0082      	bls.w 0xea16aa
+  ea162a:	0c40 c001      	cmpi.w #-16383,d0
+  ea162e:	6706           	beq.s 0xea1636
+  ea1630:	0c40 c003      	cmpi.w #-16381,d0
+  ea1634:	66de           	bne.s 0xea1614
+  ea1636:	2368 002c 0010 	move.l 44(a0),16(a1)
+  ea163c:	2341 0014      	move.l d1,20(a1)
+  ea1640:	2342 0018      	move.l d2,24(a1)
+  ea1644:	2368 0020 001c 	move.l 32(a0),28(a1)
+  ea164a:	43e9 0050      	lea 80(a1),a1
+  ea164e:	4240           	clr.w d0
+  ea1650:	102a 0030      	move.b 48(a2),d0
+  ea1654:	3280           	move.w d0,(a1)
+  ea1656:	2141 0020      	move.l d1,32(a0)
+  ea165a:	4200           	clr.b d0
+  ea165c:	60bc           	bra.s 0xea161a
+  ea165e:	0c40 0002      	cmpi.w #2,d0
+  ea1662:	66b0           	bne.s 0xea1614
+  ea1664:	2368 002c 0010 	move.l 44(a0),16(a1)
+  ea166a:	2341 0014      	move.l d1,20(a1)
+  ea166e:	2342 0018      	move.l d2,24(a1)
+  ea1672:	43e9 0078      	lea 120(a1),a1
+  ea1676:	4240           	clr.w d0
+  ea1678:	102a 0030      	move.b 48(a2),d0
+  ea167c:	3280           	move.w d0,(a1)
+  ea167e:	2141 0020      	move.l d1,32(a0)
+  ea1682:	4200           	clr.b d0
+  ea1684:	6094           	bra.s 0xea161a
+  ea1686:	2368 002c 0010 	move.l 44(a0),16(a1)
+  ea168c:	2341 0014      	move.l d1,20(a1)
+  ea1690:	2342 0018      	move.l d2,24(a1)
+  ea1694:	43e9 007c      	lea 124(a1),a1
+  ea1698:	4240           	clr.w d0
+  ea169a:	102a 0030      	move.b 48(a2),d0
+  ea169e:	3280           	move.w d0,(a1)
+  ea16a0:	2141 0020      	move.l d1,32(a0)
+  ea16a4:	4200           	clr.b d0
+  ea16a6:	6000 ff72      	bra.w 0xea161a
+  ea16aa:	0c40 001b      	cmpi.w #27,d0
+  ea16ae:	6600 ff64      	bne.w 0xea1614
+  ea16b2:	2368 002c 0010 	move.l 44(a0),16(a1)
+  ea16b8:	2341 0014      	move.l d1,20(a1)
+  ea16bc:	2342 0018      	move.l d2,24(a1)
+  ea16c0:	2368 0020 001c 	move.l 32(a0),28(a1)
+  ea16c6:	43e9 0050      	lea 80(a1),a1
+  ea16ca:	4240           	clr.w d0
+  ea16cc:	102a 0030      	move.b 48(a2),d0
+  ea16d0:	3280           	move.w d0,(a1)
+  ea16d2:	6082           	bra.s 0xea1656
+  ea16d4:	5669 7274      	addq.w #3,29300(a1)
+  ea16d8:	7561           	mvs.w -(a1),d2
+  ea16da:	6c20           	bge.s 0xea16fc
+  ea16dc:	4469 736b      	neg.w 29547(a1)
+  ea16e0:	2020           	move.l -(a0),d0
+  ea16e2:	2020           	move.l -(a0),d0
+  ea16e4:	0056 6972      	ori.w #26994,(a6)
+  ea16e8:	7475           	moveq #117,d2
+  ea16ea:	616c           	bsr.s 0xea1758
+  ea16ec:	2043           	movea.l d3,a0
+  ea16ee:	442d 524f      	neg.b 21071(a5)
+  ea16f2:	4d20           	chk.l -(a0),d6
+  ea16f4:	2000           	move.l d0,d0
+  ea16f6:	48e7 3c38      	movem.l d2-d5/a2-a4,-(sp)
+  ea16fa:	226f 0020      	movea.l 32(sp),a1
+  ea16fe:	206f 0024      	movea.l 36(sp),a0
+  ea1702:	2468 0028      	movea.l 40(a0),a2
+  ea1706:	97cb           	suba.l a3,a3
+  ea1708:	200a           	move.l a2,d0
+  ea170a:	6702           	beq.s 0xea170e
+  ea170c:	2652           	movea.l (a2),a3
+  ea170e:	1229 002e      	move.b 46(a1),d1
+  ea1712:	0c01 0005      	cmpi.b #5,d1
+  ea1716:	6742           	beq.s 0xea175a
+  ea1718:	2079 0000 0000 	movea.l 0x0,a0
+  ea171e:	49e8 0080      	lea 128(a0),a4
+  ea1722:	4240           	clr.w d0
+  ea1724:	1029 0030      	move.b 48(a1),d0
+  ea1728:	3880           	move.w d0,(a4)
+  ea172a:	2428 0074      	move.l 116(a0),d2
+  ea172e:	4201           	clr.b d1
+  ea1730:	4a82           	tst.l d2
+  ea1732:	6720           	beq.s 0xea1754
+  ea1734:	70fb           	moveq #-5,d0
+  ea1736:	260a           	move.l a2,d3
+  ea1738:	6714           	beq.s 0xea174e
+  ea173a:	286a 000c      	movea.l 12(a2),a4
+  ea173e:	260c           	move.l a4,d3
+  ea1740:	670c           	beq.s 0xea174e
+  ea1742:	362a 0010      	move.w 16(a2),d3
+  ea1746:	70fc           	moveq #-4,d0
+  ea1748:	0c43 0005      	cmpi.w #5,d3
+  ea174c:	622a           	bhi.s 0xea1778
+  ea174e:	4cdf 1c3c      	movem.l (sp)+,d2-d5/a2-a4
+  ea1752:	4e75           	rts
+  ea1754:	343c 0200      	move.w #512,d2
+  ea1758:	60da           	bra.s 0xea1734
+  ea175a:	2079 0000 0000 	movea.l 0x0,a0
+  ea1760:	49e8 0080      	lea 128(a0),a4
+  ea1764:	4240           	clr.w d0
+  ea1766:	1029 0030      	move.b 48(a1),d0
+  ea176a:	3880           	move.w d0,(a4)
+  ea176c:	2428 0074      	move.l 116(a0),d2
+  ea1770:	66c2           	bne.s 0xea1734
+  ea1772:	343c 0800      	move.w #2048,d2
+  ea1776:	60bc           	bra.s 0xea1734
+  ea1778:	42aa 0008      	clr.l 8(a2)
+  ea177c:	1014           	move.b (a4),d0
+  ea177e:	0c00 0025      	cmpi.b #37,d0
+  ea1782:	6700 046a      	beq.w 0xea1bee
+  ea1786:	622e           	bhi.s 0xea17b6
+  ea1788:	0c00 000a      	cmpi.b #10,d0
+  ea178c:	6700 03cc      	beq.w 0xea1b5a
+  ea1790:	6200 0144      	bhi.w 0xea18d6
+  ea1794:	0c00 0003      	cmpi.b #3,d0
+  ea1798:	6700 062a      	beq.w 0xea1dc4
+  ea179c:	0c00 0008      	cmpi.b #8,d0
+  ea17a0:	6700 061c      	beq.w 0xea1dbe
+  ea17a4:	4a00           	tst.b d0
+  ea17a6:	6700 0392      	beq.w 0xea1b3a
+  ea17aa:	702d           	moveq #45,d0
+  ea17ac:	42aa 0008      	clr.l 8(a2)
+  ea17b0:	4cdf 1c3c      	movem.l (sp)+,d2-d5/a2-a4
+  ea17b4:	4e75           	rts
+  ea17b6:	0c00 0040      	cmpi.b #64,d0
+  ea17ba:	6700 0112      	beq.w 0xea18ce
+  ea17be:	6300 030c      	bls.w 0xea1acc
+  ea17c2:	0c00 00a8      	cmpi.b #-88,d0
+  ea17c6:	6700 04e2      	beq.w 0xea1caa
+  ea17ca:	0c00 00aa      	cmpi.b #-86,d0
+  ea17ce:	6700 04a2      	beq.w 0xea1c72
+  ea17d2:	0c00 0043      	cmpi.b #67,d0
+  ea17d6:	66d2           	bne.s 0xea17aa
+  ea17d8:	0c01 0005      	cmpi.b #5,d1
+  ea17dc:	66cc           	bne.s 0xea17aa
+  ea17de:	200b           	move.l a3,d0
+  ea17e0:	6700 0402      	beq.w 0xea1be4
+  ea17e4:	242a 0004      	move.l 4(a2),d2
+  ea17e8:	7003           	moveq #3,d0
+  ea17ea:	b082           	cmp.l d2,d0
+  ea17ec:	6400 03f6      	bcc.w 0xea1be4
+  ea17f0:	182c 0001      	move.b 1(a4),d4
+  ea17f4:	3169 0032 0004 	move.w 50(a1),4(a0)
+  ea17fa:	5088           	addq.l #8,a0
+  ea17fc:	2610           	move.l (a0),d3
+  ea17fe:	7014           	moveq #20,d0
+  ea1800:	b082           	cmp.l d2,d0
+  ea1802:	6402           	bcc.s 0xea1806
+  ea1804:	2400           	move.l d0,d2
+  ea1806:	2f02           	move.l d2,-(sp)
+  ea1808:	42a7           	clr.l -(sp)
+  ea180a:	2f0b           	move.l a3,-(sp)
+  ea180c:	4eba f81e      	jsr 0xea102c(pc)
+  ea1810:	4213           	clr.b (a3)
+  ea1812:	177c 0012 0001 	move.b #18,1(a3)
+  ea1818:	177c 0001 0002 	move.b #1,2(a3)
+  ea181e:	177c 0001 0003 	move.b #1,3(a3)
+  ea1824:	4fef 000c      	lea 12(sp),sp
+  ea1828:	7005           	moveq #5,d0
+  ea182a:	b082           	cmp.l d2,d0
+  ea182c:	6400 009c      	bcc.w 0xea18ca
+  ea1830:	177c 0014 0005 	move.b #20,5(a3)
+  ea1836:	7006           	moveq #6,d0
+  ea1838:	b082           	cmp.l d2,d0
+  ea183a:	6700 008e      	beq.w 0xea18ca
+  ea183e:	177c 0001 0006 	move.b #1,6(a3)
+  ea1844:	700d           	moveq #13,d0
+  ea1846:	b082           	cmp.l d2,d0
+  ea1848:	6400 06b8      	bcc.w 0xea1f02
+  ea184c:	177c 0014 000d 	move.b #20,13(a3)
+  ea1852:	700e           	moveq #14,d0
+  ea1854:	b082           	cmp.l d2,d0
+  ea1856:	6706           	beq.s 0xea185e
+  ea1858:	177c 00aa 000e 	move.b #-86,14(a3)
+  ea185e:	1004           	move.b d4,d0
+  ea1860:	0200 0002      	andi.b #2,d0
+  ea1864:	41eb 0008      	lea 8(a3),a0
+  ea1868:	6700 0664      	beq.w 0xea1ece
+  ea186c:	20bc 0000 0200 	move.l #512,(a0)
+  ea1872:	7014           	moveq #20,d0
+  ea1874:	b082           	cmp.l d2,d0
+  ea1876:	6652           	bne.s 0xea18ca
+  ea1878:	47eb 0010      	lea 16(a3),a3
+  ea187c:	0683 0000 0096 	addi.l #150,d3
+  ea1882:	421b           	clr.b (a3)+
+  ea1884:	2203           	move.l d3,d1
+  ea1886:	4c3c 1400 e904 	mulu.l #-385592619,d0,d1
+  ea188c:	52d5 
+  ea188e:	720c           	moveq #12,d1
+  ea1890:	e2a8           	lsr.l d1,d0
+  ea1892:	16c0           	move.b d0,(a3)+
+  ea1894:	2203           	move.l d3,d1
+  ea1896:	4c3c 1400 1b4e 	mulu.l #458129845,d0,d1
+  ea189c:	81b5 
+  ea189e:	e688           	lsr.l #3,d0
+  ea18a0:	2200           	move.l d0,d1
+  ea18a2:	4c3c 1404 8888 	mulu.l #-2004318071,d4,d1
+  ea18a8:	8889 
+  ea18aa:	ea8c           	lsr.l #5,d4
+  ea18ac:	2204           	move.l d4,d1
+  ea18ae:	e989           	lsl.l #4,d1
+  ea18b0:	9284           	sub.l d4,d1
+  ea18b2:	e589           	lsl.l #2,d1
+  ea18b4:	1800           	move.b d0,d4
+  ea18b6:	9801           	sub.b d1,d4
+  ea18b8:	16c4           	move.b d4,(a3)+
+  ea18ba:	2200           	move.l d0,d1
+  ea18bc:	e589           	lsl.l #2,d1
+  ea18be:	d081           	add.l d1,d0
+  ea18c0:	2200           	move.l d0,d1
+  ea18c2:	e989           	lsl.l #4,d1
+  ea18c4:	9280           	sub.l d0,d1
+  ea18c6:	9601           	sub.b d1,d3
+  ea18c8:	1683           	move.b d3,(a3)
+  ea18ca:	2542 0008      	move.l d2,8(a2)
+  ea18ce:	4200           	clr.b d0
+  ea18d0:	4cdf 1c3c      	movem.l (sp)+,d2-d5/a2-a4
+  ea18d4:	4e75           	rts
+  ea18d6:	0c00 001a      	cmpi.b #26,d0
+  ea18da:	6700 0406      	beq.w 0xea1ce2
+  ea18de:	0c00 001b      	cmpi.b #27,d0
+  ea18e2:	67ea           	beq.s 0xea18ce
+  ea18e4:	0c00 0012      	cmpi.b #18,d0
+  ea18e8:	6600 fec0      	bne.w 0xea17aa
+  ea18ec:	200b           	move.l a3,d0
+  ea18ee:	6700 0260      	beq.w 0xea1b50
+  ea18f2:	4aaa 0004      	tst.l 4(a2)
+  ea18f6:	6700 0258      	beq.w 0xea1b50
+  ea18fa:	204b           	movea.l a3,a0
+  ea18fc:	4282           	clr.l d2
+  ea18fe:	4218           	clr.b (a0)+
+  ea1900:	5282           	addq.l #1,d2
+  ea1902:	202a 0004      	move.l 4(a2),d0
+  ea1906:	b480           	cmp.l d0,d2
+  ea1908:	65f4           	bcs.s 0xea18fe
+  ea190a:	4a80           	tst.l d0
+  ea190c:	6700 01ac      	beq.w 0xea1aba
+  ea1910:	1681           	move.b d1,(a3)
+  ea1912:	202a 0004      	move.l 4(a2),d0
+  ea1916:	7401           	moveq #1,d2
+  ea1918:	b480           	cmp.l d0,d2
+  ea191a:	6400 019e      	bcc.w 0xea1aba
+  ea191e:	4200           	clr.b d0
+  ea1920:	0c01 0005      	cmpi.b #5,d1
+  ea1924:	6700 0224      	beq.w 0xea1b4a
+  ea1928:	1740 0001      	move.b d0,1(a3)
+  ea192c:	202a 0004      	move.l 4(a2),d0
+  ea1930:	7402           	moveq #2,d2
+  ea1932:	b480           	cmp.l d0,d2
+  ea1934:	6400 0184      	bcc.w 0xea1aba
+  ea1938:	177c 0002 0002 	move.b #2,2(a3)
+  ea193e:	202a 0004      	move.l 4(a2),d0
+  ea1942:	7403           	moveq #3,d2
+  ea1944:	b480           	cmp.l d0,d2
+  ea1946:	6400 0172      	bcc.w 0xea1aba
+  ea194a:	177c 0002 0003 	move.b #2,3(a3)
+  ea1950:	202a 0004      	move.l 4(a2),d0
+  ea1954:	7404           	moveq #4,d2
+  ea1956:	b480           	cmp.l d0,d2
+  ea1958:	6400 0160      	bcc.w 0xea1aba
+  ea195c:	177c 001f 0004 	move.b #31,4(a3)
+  ea1962:	202a 0004      	move.l 4(a2),d0
+  ea1966:	7408           	moveq #8,d2
+  ea1968:	b480           	cmp.l d0,d2
+  ea196a:	6400 014e      	bcc.w 0xea1aba
+  ea196e:	41f3 2800      	lea (0,a3,d2.l),a0
+  ea1972:	203c 2020 2020 	move.l #538976288,d0
+  ea1978:	20c0           	move.l d0,(a0)+
+  ea197a:	20c0           	move.l d0,(a0)+
+  ea197c:	177c 0050 0008 	move.b #80,8(a3)
+  ea1982:	177c 0049 0009 	move.b #73,9(a3)
+  ea1988:	177c 0053 000a 	move.b #83,10(a3)
+  ea198e:	177c 0054 000b 	move.b #84,11(a3)
+  ea1994:	177c 004f 000c 	move.b #79,12(a3)
+  ea199a:	177c 0052 000d 	move.b #82,13(a3)
+  ea19a0:	177c 004d 000e 	move.b #77,14(a3)
+  ea19a6:	177c 0020 000f 	move.b #32,15(a3)
+  ea19ac:	202a 0004      	move.l 4(a2),d0
+  ea19b0:	7410           	moveq #16,d2
+  ea19b2:	b480           	cmp.l d0,d2
+  ea19b4:	6400 0104      	bcc.w 0xea1aba
+  ea19b8:	0c01 0005      	cmpi.b #5,d1
+  ea19bc:	6700 0508      	beq.w 0xea1ec6
+  ea19c0:	41fa fd12      	lea 0xea16d4(pc),a0
+  ea19c4:	43eb 0010      	lea 16(a3),a1
+  ea19c8:	203c 2020 2020 	move.l #538976288,d0
+  ea19ce:	22c0           	move.l d0,(a1)+
+  ea19d0:	22c0           	move.l d0,(a1)+
+  ea19d2:	22c0           	move.l d0,(a1)+
+  ea19d4:	22c0           	move.l d0,(a1)+
+  ea19d6:	1758 0010      	move.b (a0)+,16(a3)
+  ea19da:	1018           	move.b (a0)+,d0
+  ea19dc:	6700 04d0      	beq.w 0xea1eae
+  ea19e0:	1740 0011      	move.b d0,17(a3)
+  ea19e4:	1010           	move.b (a0),d0
+  ea19e6:	6700 04c6      	beq.w 0xea1eae
+  ea19ea:	1740 0012      	move.b d0,18(a3)
+  ea19ee:	1028 0001      	move.b 1(a0),d0
+  ea19f2:	6700 04ba      	beq.w 0xea1eae
+  ea19f6:	1740 0013      	move.b d0,19(a3)
+  ea19fa:	1028 0002      	move.b 2(a0),d0
+  ea19fe:	6700 04ae      	beq.w 0xea1eae
+  ea1a02:	1740 0014      	move.b d0,20(a3)
+  ea1a06:	1028 0003      	move.b 3(a0),d0
+  ea1a0a:	6700 04a2      	beq.w 0xea1eae
+  ea1a0e:	1740 0015      	move.b d0,21(a3)
+  ea1a12:	1028 0004      	move.b 4(a0),d0
+  ea1a16:	6700 0496      	beq.w 0xea1eae
+  ea1a1a:	1740 0016      	move.b d0,22(a3)
+  ea1a1e:	1028 0005      	move.b 5(a0),d0
+  ea1a22:	6700 048a      	beq.w 0xea1eae
+  ea1a26:	1740 0017      	move.b d0,23(a3)
+  ea1a2a:	1028 0006      	move.b 6(a0),d0
+  ea1a2e:	6700 047e      	beq.w 0xea1eae
+  ea1a32:	1740 0018      	move.b d0,24(a3)
+  ea1a36:	1028 0007      	move.b 7(a0),d0
+  ea1a3a:	6700 0472      	beq.w 0xea1eae
+  ea1a3e:	1740 0019      	move.b d0,25(a3)
+  ea1a42:	1028 0008      	move.b 8(a0),d0
+  ea1a46:	6700 0466      	beq.w 0xea1eae
+  ea1a4a:	1740 001a      	move.b d0,26(a3)
+  ea1a4e:	1028 0009      	move.b 9(a0),d0
+  ea1a52:	6700 045a      	beq.w 0xea1eae
+  ea1a56:	1740 001b      	move.b d0,27(a3)
+  ea1a5a:	1028 000a      	move.b 10(a0),d0
+  ea1a5e:	6700 044e      	beq.w 0xea1eae
+  ea1a62:	1740 001c      	move.b d0,28(a3)
+  ea1a66:	1028 000b      	move.b 11(a0),d0
+  ea1a6a:	6700 0442      	beq.w 0xea1eae
+  ea1a6e:	1740 001d      	move.b d0,29(a3)
+  ea1a72:	1028 000c      	move.b 12(a0),d0
+  ea1a76:	6700 0436      	beq.w 0xea1eae
+  ea1a7a:	1740 001e      	move.b d0,30(a3)
+  ea1a7e:	1028 000d      	move.b 13(a0),d0
+  ea1a82:	6700 042a      	beq.w 0xea1eae
+  ea1a86:	1740 001f      	move.b d0,31(a3)
+  ea1a8a:	202a 0004      	move.l 4(a2),d0
+  ea1a8e:	7220           	moveq #32,d1
+  ea1a90:	b280           	cmp.l d0,d1
+  ea1a92:	6426           	bcc.s 0xea1aba
+  ea1a94:	41f3 1800      	lea (0,a3,d1.l),a0
+  ea1a98:	20fc 2020 2020 	move.l #538976288,(a0)+
+  ea1a9e:	177c 0031 0020 	move.b #49,32(a3)
+  ea1aa4:	177c 002e 0021 	move.b #46,33(a3)
+  ea1aaa:	177c 0030 0022 	move.b #48,34(a3)
+  ea1ab0:	177c 0020 0023 	move.b #32,35(a3)
+  ea1ab6:	202a 0004      	move.l 4(a2),d0
+  ea1aba:	7224           	moveq #36,d1
+  ea1abc:	b280           	cmp.l d0,d1
+  ea1abe:	6402           	bcc.s 0xea1ac2
+  ea1ac0:	2001           	move.l d1,d0
+  ea1ac2:	2540 0008      	move.l d0,8(a2)
+  ea1ac6:	4200           	clr.b d0
+  ea1ac8:	6000 fe06      	bra.w 0xea18d0
+  ea1acc:	0c00 002a      	cmpi.b #42,d0
+  ea1ad0:	6700 017c      	beq.w 0xea1c4e
+  ea1ad4:	0c00 0037      	cmpi.b #55,d0
+  ea1ad8:	6700 fdf4      	beq.w 0xea18ce
+  ea1adc:	4203           	clr.b d3
+  ea1ade:	0c00 0028      	cmpi.b #40,d0
+  ea1ae2:	6600 fcc6      	bne.w 0xea17aa
+  ea1ae6:	4280           	clr.l d0
+  ea1ae8:	302c 0002      	move.w 2(a4),d0
+  ea1aec:	e188           	lsl.l #8,d0
+  ea1aee:	4284           	clr.l d4
+  ea1af0:	182c 0004      	move.b 4(a4),d4
+  ea1af4:	8880           	or.l d0,d4
+  ea1af6:	e18c           	lsl.l #8,d4
+  ea1af8:	4280           	clr.l d0
+  ea1afa:	102c 0005      	move.b 5(a4),d0
+  ea1afe:	8880           	or.l d0,d4
+  ea1b00:	302c 0007      	move.w 7(a4),d0
+  ea1b04:	3169 0032 0004 	move.w 50(a1),4(a0)
+  ea1b0a:	49e8 0008      	lea 8(a0),a4
+  ea1b0e:	2854           	movea.l (a4),a4
+  ea1b10:	4a03           	tst.b d3
+  ea1b12:	6718           	beq.s 0xea1b2c
+  ea1b14:	4203           	clr.b d3
+  ea1b16:	4a29 002d      	tst.b 45(a1)
+  ea1b1a:	6600 fc8e      	bne.w 0xea17aa
+  ea1b1e:	0c01 0005      	cmpi.b #5,d1
+  ea1b22:	6700 fc86      	beq.w 0xea17aa
+  ea1b26:	4a03           	tst.b d3
+  ea1b28:	6674           	bne.s 0xea1b9e
+  ea1b2a:	7601           	moveq #1,d3
+  ea1b2c:	4a80           	tst.l d0
+  ea1b2e:	666e           	bne.s 0xea1b9e
+  ea1b30:	2540 0008      	move.l d0,8(a2)
+  ea1b34:	4cdf 1c3c      	movem.l (sp)+,d2-d5/a2-a4
+  ea1b38:	4e75           	rts
+  ea1b3a:	4200           	clr.b d0
+  ea1b3c:	4a29 002b      	tst.b 43(a1)
+  ea1b40:	6700 fc68      	beq.w 0xea17aa
+  ea1b44:	4cdf 1c3c      	movem.l (sp)+,d2-d5/a2-a4
+  ea1b48:	4e75           	rts
+  ea1b4a:	7080           	moveq #-128,d0
+  ea1b4c:	6000 fdda      	bra.w 0xea1928
+  ea1b50:	70fb           	moveq #-5,d0
+  ea1b52:	42aa 0008      	clr.l 8(a2)
+  ea1b56:	6000 fc58      	bra.w 0xea17b0
+  ea1b5a:	7601           	moveq #1,d3
+  ea1b5c:	102c 0001      	move.b 1(a4),d0
+  ea1b60:	0200 001f      	andi.b #31,d0
+  ea1b64:	0280 0000 00ff 	andi.l #255,d0
+  ea1b6a:	e188           	lsl.l #8,d0
+  ea1b6c:	4284           	clr.l d4
+  ea1b6e:	182c 0002      	move.b 2(a4),d4
+  ea1b72:	8880           	or.l d0,d4
+  ea1b74:	e18c           	lsl.l #8,d4
+  ea1b76:	4280           	clr.l d0
+  ea1b78:	102c 0003      	move.b 3(a4),d0
+  ea1b7c:	8880           	or.l d0,d4
+  ea1b7e:	102c 0004      	move.b 4(a4),d0
+  ea1b82:	4a80           	tst.l d0
+  ea1b84:	6606           	bne.s 0xea1b8c
+  ea1b86:	203c 0000 0100 	move.l #256,d0
+  ea1b8c:	3169 0032 0004 	move.w 50(a1),4(a0)
+  ea1b92:	49e8 0008      	lea 8(a0),a4
+  ea1b96:	2854           	movea.l (a4),a4
+  ea1b98:	4a03           	tst.b d3
+  ea1b9a:	6600 ff7a      	bne.w 0xea1b16
+  ea1b9e:	220b           	move.l a3,d1
+  ea1ba0:	67ae           	beq.s 0xea1b50
+  ea1ba2:	b88c           	cmp.l a4,d4
+  ea1ba4:	64aa           	bcc.s 0xea1b50
+  ea1ba6:	99c4           	suba.l d4,a4
+  ea1ba8:	b9c0           	cmpa.l d0,a4
+  ea1baa:	65a4           	bcs.s 0xea1b50
+  ea1bac:	72ff           	moveq #-1,d1
+  ea1bae:	4c42 1001      	divul.l d2,d1,d1
+  ea1bb2:	b280           	cmp.l d0,d1
+  ea1bb4:	652e           	bcs.s 0xea1be4
+  ea1bb6:	4c02 0800      	muls.l d2,d0
+  ea1bba:	b0aa 0004      	cmp.l 4(a2),d0
+  ea1bbe:	6224           	bhi.s 0xea1be4
+  ea1bc0:	2144 0010      	move.l d4,16(a0)
+  ea1bc4:	2140 0014      	move.l d0,20(a0)
+  ea1bc8:	214b 0018      	move.l a3,24(a0)
+  ea1bcc:	4a03           	tst.b d3
+  ea1bce:	6600 02e6      	bne.w 0xea1eb6
+  ea1bd2:	5488           	addq.l #2,a0
+  ea1bd4:	4241           	clr.w d1
+  ea1bd6:	1229 0030      	move.b 48(a1),d1
+  ea1bda:	3081           	move.w d1,(a0)
+  ea1bdc:	2540 0008      	move.l d0,8(a2)
+  ea1be0:	6000 fee4      	bra.w 0xea1ac6
+  ea1be4:	70fc           	moveq #-4,d0
+  ea1be6:	42aa 0008      	clr.l 8(a2)
+  ea1bea:	6000 fbc4      	bra.w 0xea17b0
+  ea1bee:	0c43 0009      	cmpi.w #9,d3
+  ea1bf2:	6300 fbb6      	bls.w 0xea17aa
+  ea1bf6:	200b           	move.l a3,d0
+  ea1bf8:	67ea           	beq.s 0xea1be4
+  ea1bfa:	7007           	moveq #7,d0
+  ea1bfc:	b0aa 0004      	cmp.l 4(a2),d0
+  ea1c00:	64e2           	bcc.s 0xea1be4
+  ea1c02:	3169 0032 0004 	move.w 50(a1),4(a0)
+  ea1c08:	5088           	addq.l #8,a0
+  ea1c0a:	2010           	move.l (a0),d0
+  ea1c0c:	6700 0220      	beq.w 0xea1e2e
+  ea1c10:	2200           	move.l d0,d1
+  ea1c12:	5381           	subq.l #1,d1
+  ea1c14:	2001           	move.l d1,d0
+  ea1c16:	7618           	moveq #24,d3
+  ea1c18:	e6a8           	lsr.l d3,d0
+  ea1c1a:	2801           	move.l d1,d4
+  ea1c1c:	4244           	clr.w d4
+  ea1c1e:	4844           	swap d4
+  ea1c20:	2601           	move.l d1,d3
+  ea1c22:	e08b           	lsr.l #8,d3
+  ea1c24:	16c0           	move.b d0,(a3)+
+  ea1c26:	16c4           	move.b d4,(a3)+
+  ea1c28:	16c3           	move.b d3,(a3)+
+  ea1c2a:	16c1           	move.b d1,(a3)+
+  ea1c2c:	2002           	move.l d2,d0
+  ea1c2e:	7218           	moveq #24,d1
+  ea1c30:	e2a8           	lsr.l d1,d0
+  ea1c32:	16c0           	move.b d0,(a3)+
+  ea1c34:	2002           	move.l d2,d0
+  ea1c36:	4240           	clr.w d0
+  ea1c38:	4840           	swap d0
+  ea1c3a:	16c0           	move.b d0,(a3)+
+  ea1c3c:	2002           	move.l d2,d0
+  ea1c3e:	e088           	lsr.l #8,d0
+  ea1c40:	16c0           	move.b d0,(a3)+
+  ea1c42:	1682           	move.b d2,(a3)
+  ea1c44:	7008           	moveq #8,d0
+  ea1c46:	2540 0008      	move.l d0,8(a2)
+  ea1c4a:	6000 fc82      	bra.w 0xea18ce
+  ea1c4e:	7601           	moveq #1,d3
+  ea1c50:	4280           	clr.l d0
+  ea1c52:	302c 0002      	move.w 2(a4),d0
+  ea1c56:	e188           	lsl.l #8,d0
+  ea1c58:	4284           	clr.l d4
+  ea1c5a:	182c 0004      	move.b 4(a4),d4
+  ea1c5e:	8880           	or.l d0,d4
+  ea1c60:	e18c           	lsl.l #8,d4
+  ea1c62:	4280           	clr.l d0
+  ea1c64:	102c 0005      	move.b 5(a4),d0
+  ea1c68:	8880           	or.l d0,d4
+  ea1c6a:	302c 0007      	move.w 7(a4),d0
+  ea1c6e:	6000 fe94      	bra.w 0xea1b04
+  ea1c72:	7601           	moveq #1,d3
+  ea1c74:	4280           	clr.l d0
+  ea1c76:	302c 0002      	move.w 2(a4),d0
+  ea1c7a:	e188           	lsl.l #8,d0
+  ea1c7c:	4284           	clr.l d4
+  ea1c7e:	182c 0004      	move.b 4(a4),d4
+  ea1c82:	8880           	or.l d0,d4
+  ea1c84:	e18c           	lsl.l #8,d4
+  ea1c86:	4280           	clr.l d0
+  ea1c88:	102c 0005      	move.b 5(a4),d0
+  ea1c8c:	8880           	or.l d0,d4
+  ea1c8e:	4285           	clr.l d5
+  ea1c90:	3a2c 0006      	move.w 6(a4),d5
+  ea1c94:	e18d           	lsl.l #8,d5
+  ea1c96:	102c 0008      	move.b 8(a4),d0
+  ea1c9a:	8085           	or.l d5,d0
+  ea1c9c:	e188           	lsl.l #8,d0
+  ea1c9e:	4285           	clr.l d5
+  ea1ca0:	1a2c 0009      	move.b 9(a4),d5
+  ea1ca4:	8085           	or.l d5,d0
+  ea1ca6:	6000 fe5c      	bra.w 0xea1b04
+  ea1caa:	4203           	clr.b d3
+  ea1cac:	4280           	clr.l d0
+  ea1cae:	302c 0002      	move.w 2(a4),d0
+  ea1cb2:	e188           	lsl.l #8,d0
+  ea1cb4:	4284           	clr.l d4
+  ea1cb6:	182c 0004      	move.b 4(a4),d4
+  ea1cba:	8880           	or.l d0,d4
+  ea1cbc:	e18c           	lsl.l #8,d4
+  ea1cbe:	4280           	clr.l d0
+  ea1cc0:	102c 0005      	move.b 5(a4),d0
+  ea1cc4:	8880           	or.l d0,d4
+  ea1cc6:	4285           	clr.l d5
+  ea1cc8:	3a2c 0006      	move.w 6(a4),d5
+  ea1ccc:	e18d           	lsl.l #8,d5
+  ea1cce:	102c 0008      	move.b 8(a4),d0
+  ea1cd2:	8085           	or.l d5,d0
+  ea1cd4:	e188           	lsl.l #8,d0
+  ea1cd6:	4285           	clr.l d5
+  ea1cd8:	1a2c 0009      	move.b 9(a4),d5
+  ea1cdc:	8085           	or.l d5,d0
+  ea1cde:	6000 fe24      	bra.w 0xea1b04
+  ea1ce2:	200b           	move.l a3,d0
+  ea1ce4:	6700 fefe      	beq.w 0xea1be4
+  ea1ce8:	7003           	moveq #3,d0
+  ea1cea:	b0aa 0004      	cmp.l 4(a2),d0
+  ea1cee:	6400 fef4      	bcc.w 0xea1be4
+  ea1cf2:	0c01 0005      	cmpi.b #5,d1
+  ea1cf6:	6700 0120      	beq.w 0xea1e18
+  ea1cfa:	16bc 0021      	move.b #33,(a3)
+  ea1cfe:	422b 0001      	clr.b 1(a3)
+  ea1d02:	422b 0002      	clr.b 2(a3)
+  ea1d06:	177c 0008 0003 	move.b #8,3(a3)
+  ea1d0c:	3169 0032 0004 	move.w 50(a1),4(a0)
+  ea1d12:	5088           	addq.l #8,a0
+  ea1d14:	2010           	move.l (a0),d0
+  ea1d16:	6700 00f8      	beq.w 0xea1e10
+  ea1d1a:	2200           	move.l d0,d1
+  ea1d1c:	5381           	subq.l #1,d1
+  ea1d1e:	0281 00ff ffff 	andi.l #16777215,d1
+  ea1d24:	2001           	move.l d1,d0
+  ea1d26:	4240           	clr.w d0
+  ea1d28:	4840           	swap d0
+  ea1d2a:	2601           	move.l d1,d3
+  ea1d2c:	e08b           	lsr.l #8,d3
+  ea1d2e:	41eb 0004      	lea 4(a3),a0
+  ea1d32:	4218           	clr.b (a0)+
+  ea1d34:	10c0           	move.b d0,(a0)+
+  ea1d36:	10c3           	move.b d3,(a0)+
+  ea1d38:	10c1           	move.b d1,(a0)+
+  ea1d3a:	2002           	move.l d2,d0
+  ea1d3c:	7218           	moveq #24,d1
+  ea1d3e:	e2a8           	lsr.l d1,d0
+  ea1d40:	10c0           	move.b d0,(a0)+
+  ea1d42:	2002           	move.l d2,d0
+  ea1d44:	4240           	clr.w d0
+  ea1d46:	4840           	swap d0
+  ea1d48:	10c0           	move.b d0,(a0)+
+  ea1d4a:	2002           	move.l d2,d0
+  ea1d4c:	e088           	lsr.l #8,d0
+  ea1d4e:	10c0           	move.b d0,(a0)+
+  ea1d50:	1082           	move.b d2,(a0)
+  ea1d52:	206a 000c      	movea.l 12(a2),a0
+  ea1d56:	3028 0002      	move.w 2(a0),d0
+  ea1d5a:	0c40 0300      	cmpi.w #768,d0
+  ea1d5e:	6700 00fa      	beq.w 0xea1e5a
+  ea1d62:	0c40 0400      	cmpi.w #1024,d0
+  ea1d66:	6600 fa42      	bne.w 0xea17aa
+  ea1d6a:	41eb 000c      	lea 12(a3),a0
+  ea1d6e:	30fc 0416      	move.w #1046,(a0)+
+  ea1d72:	10e9 0039      	move.b 57(a1),(a0)+
+  ea1d76:	10e9 003a      	move.b 58(a1),(a0)+
+  ea1d7a:	10e9 003b      	move.b 59(a1),(a0)+
+  ea1d7e:	10e9 0035      	move.b 53(a1),(a0)+
+  ea1d82:	4298           	clr.l (a0)+
+  ea1d84:	4290           	clr.l (a0)
+  ea1d86:	1769 0039 0019 	move.b 57(a1),25(a3)
+  ea1d8c:	1769 003a 001a 	move.b 58(a1),26(a3)
+  ea1d92:	1769 003b 001b 	move.b 59(a1),27(a3)
+  ea1d98:	422b 001d      	clr.b 29(a3)
+  ea1d9c:	422b 001e      	clr.b 30(a3)
+  ea1da0:	422b 001f      	clr.b 31(a3)
+  ea1da4:	177c 0015 0020 	move.b #21,32(a3)
+  ea1daa:	177c 0018 0021 	move.b #24,33(a3)
+  ea1db0:	4280           	clr.l d0
+  ea1db2:	1013           	move.b (a3),d0
+  ea1db4:	5280           	addq.l #1,d0
+  ea1db6:	2540 0008      	move.l d0,8(a2)
+  ea1dba:	6000 fd0a      	bra.w 0xea1ac6
+  ea1dbe:	4203           	clr.b d3
+  ea1dc0:	6000 fd9a      	bra.w 0xea1b5c
+  ea1dc4:	242a 0004      	move.l 4(a2),d2
+  ea1dc8:	200b           	move.l a3,d0
+  ea1dca:	6700 fd84      	beq.w 0xea1b50
+  ea1dce:	4a82           	tst.l d2
+  ea1dd0:	6700 fd7e      	beq.w 0xea1b50
+  ea1dd4:	7012           	moveq #18,d0
+  ea1dd6:	b082           	cmp.l d2,d0
+  ea1dd8:	6402           	bcc.s 0xea1ddc
+  ea1dda:	2400           	move.l d0,d2
+  ea1ddc:	2f02           	move.l d2,-(sp)
+  ea1dde:	42a7           	clr.l -(sp)
+  ea1de0:	2f0b           	move.l a3,-(sp)
+  ea1de2:	4eba f248      	jsr 0xea102c(pc)
+  ea1de6:	16bc 0070      	move.b #112,(a3)
+  ea1dea:	4fef 000c      	lea 12(sp),sp
+  ea1dee:	7002           	moveq #2,d0
+  ea1df0:	b082           	cmp.l d2,d0
+  ea1df2:	6400 fad6      	bcc.w 0xea18ca
+  ea1df6:	422b 0002      	clr.b 2(a3)
+  ea1dfa:	7007           	moveq #7,d0
+  ea1dfc:	b082           	cmp.l d2,d0
+  ea1dfe:	6400 faca      	bcc.w 0xea18ca
+  ea1e02:	177c 000a 0007 	move.b #10,7(a3)
+  ea1e08:	2542 0008      	move.l d2,8(a2)
+  ea1e0c:	6000 fac0      	bra.w 0xea18ce
+  ea1e10:	1200           	move.b d0,d1
+  ea1e12:	1600           	move.b d0,d3
+  ea1e14:	6000 ff18      	bra.w 0xea1d2e
+  ea1e18:	36fc 0300      	move.w #768,(a3)+
+  ea1e1c:	36bc 8000      	move.w #-32768,(a3)
+  ea1e20:	7004           	moveq #4,d0
+  ea1e22:	2540 0008      	move.l d0,8(a2)
+  ea1e26:	4200           	clr.b d0
+  ea1e28:	4cdf 1c3c      	movem.l (sp)+,d2-d5/a2-a4
+  ea1e2c:	4e75           	rts
+  ea1e2e:	1200           	move.b d0,d1
+  ea1e30:	1600           	move.b d0,d3
+  ea1e32:	1800           	move.b d0,d4
+  ea1e34:	16c0           	move.b d0,(a3)+
+  ea1e36:	16c4           	move.b d4,(a3)+
+  ea1e38:	16c3           	move.b d3,(a3)+
+  ea1e3a:	16c1           	move.b d1,(a3)+
+  ea1e3c:	2002           	move.l d2,d0
+  ea1e3e:	7218           	moveq #24,d1
+  ea1e40:	e2a8           	lsr.l d1,d0
+  ea1e42:	16c0           	move.b d0,(a3)+
+  ea1e44:	2002           	move.l d2,d0
+  ea1e46:	4240           	clr.w d0
+  ea1e48:	4840           	swap d0
+  ea1e4a:	16c0           	move.b d0,(a3)+
+  ea1e4c:	2002           	move.l d2,d0
+  ea1e4e:	e088           	lsr.l #8,d0
+  ea1e50:	16c0           	move.b d0,(a3)+
+  ea1e52:	1682           	move.b d2,(a3)
+  ea1e54:	7008           	moveq #8,d0
+  ea1e56:	6000 fdee      	bra.w 0xea1c46
+  ea1e5a:	41eb 000c      	lea 12(a3),a0
+  ea1e5e:	20fc 0316 0001 	move.l #51773441,(a0)+
+  ea1e64:	4298           	clr.l (a0)+
+  ea1e66:	4290           	clr.l (a0)
+  ea1e68:	3029 0036      	move.w 54(a1),d0
+  ea1e6c:	3200           	move.w d0,d1
+  ea1e6e:	e049           	lsr.w #8,d1
+  ea1e70:	1741 0016      	move.b d1,22(a3)
+  ea1e74:	1740 0017      	move.b d0,23(a3)
+  ea1e78:	3002           	move.w d2,d0
+  ea1e7a:	e048           	lsr.w #8,d0
+  ea1e7c:	1740 0018      	move.b d0,24(a3)
+  ea1e80:	1742 0019      	move.b d2,25(a3)
+  ea1e84:	422b 001a      	clr.b 26(a3)
+  ea1e88:	177c 0001 001b 	move.b #1,27(a3)
+  ea1e8e:	422b 001c      	clr.b 28(a3)
+  ea1e92:	422b 001d      	clr.b 29(a3)
+  ea1e96:	422b 001e      	clr.b 30(a3)
+  ea1e9a:	422b 001f      	clr.b 31(a3)
+  ea1e9e:	177c 0080 0020 	move.b #-128,32(a3)
+  ea1ea4:	4280           	clr.l d0
+  ea1ea6:	1013           	move.b (a3),d0
+  ea1ea8:	5280           	addq.l #1,d0
+  ea1eaa:	6000 ff0a      	bra.w 0xea1db6
+  ea1eae:	202a 0004      	move.l 4(a2),d0
+  ea1eb2:	6000 fbda      	bra.w 0xea1a8e
+  ea1eb6:	4241           	clr.w d1
+  ea1eb8:	1229 0030      	move.b 48(a1),d1
+  ea1ebc:	3081           	move.w d1,(a0)
+  ea1ebe:	2540 0008      	move.l d0,8(a2)
+  ea1ec2:	6000 fc02      	bra.w 0xea1ac6
+  ea1ec6:	41fa f81d      	lea 0xea16e5(pc),a0
+  ea1eca:	6000 faf8      	bra.w 0xea19c4
+  ea1ece:	10c0           	move.b d0,(a0)+
+  ea1ed0:	10c0           	move.b d0,(a0)+
+  ea1ed2:	10c0           	move.b d0,(a0)+
+  ea1ed4:	1080           	move.b d0,(a0)
+  ea1ed6:	7014           	moveq #20,d0
+  ea1ed8:	b082           	cmp.l d2,d0
+  ea1eda:	6600 f9ee      	bne.w 0xea18ca
+  ea1ede:	2003           	move.l d3,d0
+  ea1ee0:	7218           	moveq #24,d1
+  ea1ee2:	47eb 0010      	lea 16(a3),a3
+  ea1ee6:	e2a8           	lsr.l d1,d0
+  ea1ee8:	16c0           	move.b d0,(a3)+
+  ea1eea:	2003           	move.l d3,d0
+  ea1eec:	4240           	clr.w d0
+  ea1eee:	4840           	swap d0
+  ea1ef0:	16c0           	move.b d0,(a3)+
+  ea1ef2:	2003           	move.l d3,d0
+  ea1ef4:	e088           	lsr.l #8,d0
+  ea1ef6:	16c0           	move.b d0,(a3)+
+  ea1ef8:	1683           	move.b d3,(a3)
+  ea1efa:	2542 0008      	move.l d2,8(a2)
+  ea1efe:	6000 f9ce      	bra.w 0xea18ce
+  ea1f02:	700b           	moveq #11,d0
+  ea1f04:	b082           	cmp.l d2,d0
+  ea1f06:	6500 f956      	bcs.w 0xea185e
+  ea1f0a:	2542 0008      	move.l d2,8(a2)
+  ea1f0e:	6000 f9be      	bra.w 0xea18ce
+  ea1f12:	48e7 2030      	movem.l d2/a2-a3,-(sp)
+  ea1f16:	206f 0010      	movea.l 16(sp),a0
+  ea1f1a:	226f 0014      	movea.l 20(sp),a1
+  ea1f1e:	50c0           	st d0
+  ea1f20:	4a28 002a      	tst.b 42(a0)
+  ea1f24:	6606           	bne.s 0xea1f2c
+  ea1f26:	4cdf 0c04      	movem.l (sp)+,d2/a2-a3
+  ea1f2a:	4e75           	rts
+  ea1f2c:	0c29 00fe 001f 	cmpi.b #-2,31(a1)
+  ea1f32:	6700 0084      	beq.w 0xea1fb8
+  ea1f36:	3029 001c      	move.w 28(a1),d0
+  ea1f3a:	0c40 000f      	cmpi.w #15,d0
+  ea1f3e:	6726           	beq.s 0xea1f66
+  ea1f40:	6230           	bhi.s 0xea1f72
+  ea1f42:	0c40 0009      	cmpi.w #9,d0
+  ea1f46:	6700 0152      	beq.w 0xea209a
+  ea1f4a:	6300 009c      	bls.w 0xea1fe8
+  ea1f4e:	0c40 000c      	cmpi.w #12,d0
+  ea1f52:	6712           	beq.s 0xea1f66
+  ea1f54:	6300 017a      	bls.w 0xea20d0
+  ea1f58:	0c40 000d      	cmpi.w #13,d0
+  ea1f5c:	6700 012e      	beq.w 0xea208c
+  ea1f60:	0c40 000e      	cmpi.w #14,d0
+  ea1f64:	667a           	bne.s 0xea1fe0
+  ea1f66:	42a9 0020      	clr.l 32(a1)
+  ea1f6a:	4200           	clr.b d0
+  ea1f6c:	4cdf 0c04      	movem.l (sp)+,d2/a2-a3
+  ea1f70:	4e75           	rts
+  ea1f72:	0c40 001b      	cmpi.w #27,d0
+  ea1f76:	674e           	beq.s 0xea1fc6
+  ea1f78:	6300 008a      	bls.w 0xea2004
+  ea1f7c:	0c40 c001      	cmpi.w #-16383,d0
+  ea1f80:	623e           	bhi.s 0xea1fc0
+  ea1f82:	0c40 c000      	cmpi.w #-16384,d0
+  ea1f86:	643e           	bcc.s 0xea1fc6
+  ea1f88:	0c40 001c      	cmpi.w #28,d0
+  ea1f8c:	6700 00ee      	beq.w 0xea207c
+  ea1f90:	0c40 4000      	cmpi.w #16384,d0
+  ea1f94:	664a           	bne.s 0xea1fe0
+  ea1f96:	2069 0028      	movea.l 40(a1),a0
+  ea1f9a:	4298           	clr.l (a0)+
+  ea1f9c:	7010           	moveq #16,d0
+  ea1f9e:	20c0           	move.l d0,(a0)+
+  ea1fa0:	20fc 0005 0000 	move.l #327680,(a0)+
+  ea1fa6:	20bc 0000 004c 	move.l #76,(a0)
+  ea1fac:	2340 0020      	move.l d0,32(a1)
+  ea1fb0:	4200           	clr.b d0
+  ea1fb2:	4cdf 0c04      	movem.l (sp)+,d2/a2-a3
+  ea1fb6:	4e75           	rts
+  ea1fb8:	70fe           	moveq #-2,d0
+  ea1fba:	4cdf 0c04      	movem.l (sp)+,d2/a2-a3
+  ea1fbe:	4e75           	rts
+  ea1fc0:	0c40 c003      	cmpi.w #-16381,d0
+  ea1fc4:	661a           	bne.s 0xea1fe0
+  ea1fc6:	2f49 0014      	move.l a1,20(sp)
+  ea1fca:	2f48 0010      	move.l a0,16(sp)
+  ea1fce:	4cdf 0c04      	movem.l (sp)+,d2/a2-a3
+  ea1fd2:	4efa f57e      	jmp 0xea1552(pc)
+  ea1fd6:	0640 ffe8      	addi.w #-24,d0
+  ea1fda:	0c40 0001      	cmpi.w #1,d0
+  ea1fde:	63e6           	bls.s 0xea1fc6
+  ea1fe0:	70fd           	moveq #-3,d0
+  ea1fe2:	4cdf 0c04      	movem.l (sp)+,d2/a2-a3
+  ea1fe6:	4e75           	rts
+  ea1fe8:	0c40 0004      	cmpi.w #4,d0
+  ea1fec:	6700 ff78      	beq.w 0xea1f66
+  ea1ff0:	6300 00c6      	bls.w 0xea20b8
+  ea1ff4:	0c40 0005      	cmpi.w #5,d0
+  ea1ff8:	66e6           	bne.s 0xea1fe0
+  ea1ffa:	42a9 0020      	clr.l 32(a1)
+  ea1ffe:	4200           	clr.b d0
+  ea2000:	6000 ff6a      	bra.w 0xea1f6c
+  ea2004:	0c40 0016      	cmpi.w #22,d0
+  ea2008:	6720           	beq.s 0xea202a
+  ea200a:	62ca           	bhi.s 0xea1fd6
+  ea200c:	0c40 0012      	cmpi.w #18,d0
+  ea2010:	66ce           	bne.s 0xea1fe0
+  ea2012:	7005           	moveq #5,d0
+  ea2014:	0c28 0005 002e 	cmpi.b #5,46(a0)
+  ea201a:	6702           	beq.s 0xea201e
+  ea201c:	4280           	clr.l d0
+  ea201e:	2340 0020      	move.l d0,32(a1)
+  ea2022:	4200           	clr.b d0
+  ea2024:	4cdf 0c04      	movem.l (sp)+,d2/a2-a3
+  ea2028:	4e75           	rts
+  ea202a:	2479 0000 0000 	movea.l 0x0,a2
+  ea2030:	2269 0028      	movea.l 40(a1),a1
+  ea2034:	47ea 0080      	lea 128(a2),a3
+  ea2038:	4240           	clr.w d0
+  ea203a:	1028 0030      	move.b 48(a0),d0
+  ea203e:	3680           	move.w d0,(a3)
+  ea2040:	22ea 0074      	move.l 116(a2),(a1)+
+  ea2044:	508a           	addq.l #8,a2
+  ea2046:	22d2           	move.l (a2),(a1)+
+  ea2048:	22e8 0038      	move.l 56(a0),(a1)+
+  ea204c:	4280           	clr.l d0
+  ea204e:	3028 0036      	move.w 54(a0),d0
+  ea2052:	4281           	clr.l d1
+  ea2054:	3228 0034      	move.w 52(a0),d1
+  ea2058:	3400           	move.w d0,d2
+  ea205a:	c4c1           	mulu.w d1,d2
+  ea205c:	22c2           	move.l d2,(a1)+
+  ea205e:	22c1           	move.l d1,(a1)+
+  ea2060:	22c0           	move.l d0,(a1)+
+  ea2062:	7001           	moveq #1,d0
+  ea2064:	22c0           	move.l d0,(a1)+
+  ea2066:	7005           	moveq #5,d0
+  ea2068:	b028 002e      	cmp.b 46(a0),d0
+  ea206c:	6702           	beq.s 0xea2070
+  ea206e:	4200           	clr.b d0
+  ea2070:	12c0           	move.b d0,(a1)+
+  ea2072:	4211           	clr.b (a1)
+  ea2074:	4200           	clr.b d0
+  ea2076:	4cdf 0c04      	movem.l (sp)+,d2/a2-a3
+  ea207a:	4e75           	rts
+  ea207c:	2f49 0014      	move.l a1,20(sp)
+  ea2080:	2f48 0010      	move.l a0,16(sp)
+  ea2084:	4cdf 0c04      	movem.l (sp)+,d2/a2-a3
+  ea2088:	4efa f66c      	jmp 0xea16f6(pc)
+  ea208c:	2368 003c 0020 	move.l 60(a0),32(a1)
+  ea2092:	4200           	clr.b d0
+  ea2094:	4cdf 0c04      	movem.l (sp)+,d2/a2-a3
+  ea2098:	4e75           	rts
+  ea209a:	4280           	clr.l d0
+  ea209c:	1028 002f      	move.b 47(a0),d0
+  ea20a0:	2340 0020      	move.l d0,32(a1)
+  ea20a4:	4aa9 0024      	tst.l 36(a1)
+  ea20a8:	56c0           	sne d0
+  ea20aa:	4400           	neg.b d0
+  ea20ac:	1140 002f      	move.b d0,47(a0)
+  ea20b0:	4200           	clr.b d0
+  ea20b2:	4cdf 0c04      	movem.l (sp)+,d2/a2-a3
+  ea20b6:	4e75           	rts
+  ea20b8:	0c40 0002      	cmpi.w #2,d0
+  ea20bc:	6500 ff22      	bcs.w 0xea1fe0
+  ea20c0:	2f49 0014      	move.l a1,20(sp)
+  ea20c4:	2f48 0010      	move.l a0,16(sp)
+  ea20c8:	4cdf 0c04      	movem.l (sp)+,d2/a2-a3
+  ea20cc:	4efa f484      	jmp 0xea1552(pc)
+  ea20d0:	0c40 000b      	cmpi.w #11,d0
+  ea20d4:	6600 ff0a      	bne.w 0xea1fe0
+  ea20d8:	2f49 0014      	move.l a1,20(sp)
+  ea20dc:	2f48 0010      	move.l a0,16(sp)
+  ea20e0:	4cdf 0c04      	movem.l (sp)+,d2/a2-a3
+  ea20e4:	4efa f46c      	jmp 0xea1552(pc)
+  ea20e8:	0000 0022      	ori.b #34,d0
+  ea20ec:	0000 0080      	ori.b #-128,d0
+  ea20f0:	0000 0000      	ori.b #0,d0
+  ea20f4:	0000 003e      	ori.b #62,d0
+  ea20f8:	0000 03ec      	ori.b #-20,d0
+  ea20fc:	0000 0001      	ori.b #1,d0
+  ea2100:	0000 0000      	ori.b #0,d0
+  ea2104:	0000 10cc      	ori.b #-52,d0
+  ea2108:	0000 000a      	ori.b #10,d0
+  ea210c:	0000 0001      	ori.b #1,d0
+  ea2110:	0000 0118      	ori.b #24,d0
+  ea2114:	0000 01d8      	ori.b #-40,d0
+  ea2118:	0000 034c      	ori.b #76,d0
+  ea211c:	0000 0f80      	ori.b #-128,d0
+  ea2120:	0000 10c4      	ori.b #-60,d0
+  ea2124:	0000 03c8      	ori.b #-56,d0
+  ea2128:	0000 0560      	ori.b #96,d0
+  ea212c:	0000 06f2      	ori.b #-14,d0
+  ea2130:	0000 0734      	ori.b #52,d0
+  ea2134:	0000 1004      	ori.b #4,d0
+  ea2138:	0000 0011      	ori.b #17,d0
+  ea213c:	0000 0002      	ori.b #2,d0
+  ea2140:	0000 0060      	ori.b #96,d0
+  ea2144:	0000 0122      	ori.b #34,d0
+  ea2148:	0000 01e2      	ori.b #-30,d0
+  ea214c:	0000 0220      	ori.b #32,d0
+  ea2150:	0000 027c      	ori.b #124,d0
+  ea2154:	0000 0292      	ori.b #-110,d0
+  ea2158:	0000 004a      	ori.b #74,d0
+  ea215c:	0000 006a      	ori.b #106,d0
+  ea2160:	0000 00f6      	ori.b #-10,d0
+  ea2164:	0000 0206      	ori.b #6,d0
+  ea2168:	0000 02ba      	ori.b #-70,d0
+  ea216c:	0000 01fe      	ori.b #-2,d0
+  ea2170:	0000 0080      	ori.b #-128,d0
+  ea2174:	0000 00ac      	ori.b #-84,d0
+  ea2178:	0000 00c6      	ori.b #-58,d0
+  ea217c:	0000 0086      	ori.b #-122,d0
+  ea2180:	0000 00ee      	ori.b #-18,d0
+  ea2184:	0000 0000      	ori.b #0,d0
+  ea2188:	0000 03f0      	ori.b #-16,d0
+  ea218c:	0000 0003      	ori.b #3,d0
+  ea2190:	5f70 6973 6373 	subq.w #7,([1668507958,a0],878670455)
+  ea2196:	6936 345f 7277 
+  ea219c:	0000 052a      	ori.b #42,d0
+  ea21a0:	0000 0005      	ori.b #5,d0
+  ea21a4:	5f61           	subq.w #7,-(a1)
+  ea21a6:	7574 6f5f 696e 	mvs.w ([0,a4],1768843636),d2
+  ea21ac:	6974 
+  ea21ae:	5f74 6162 6c65 	subq.w #7,([27749,a4],29440)
+  ea21b4:	7300 
+  ea21b6:	0000 0000      	ori.b #0,d0
+  ea21ba:	10c0           	move.b d0,(a0)+
+  ea21bc:	0000 0002      	ori.b #2,d0
+  ea21c0:	5f5f           	subq.w #7,(sp)+
+  ea21c2:	6574           	bcs.s 0xea2238
+  ea21c4:	6578           	bcs.s 0xea223e
+  ea21c6:	7400           	moveq #0,d2
+  ea21c8:	0000 10d0      	ori.b #-48,d0
+  ea21cc:	0000 0002      	ori.b #2,d0
+  ea21d0:	5f6d 656d      	subq.w #7,25965(a5)
+  ea21d4:	7365           	mvs.w -(a5),d1
+  ea21d6:	7400           	moveq #0,d2
+  ea21d8:	0000 0004      	ori.b #4,d0
+  ea21dc:	0000 0002      	ori.b #2,d0
+  ea21e0:	5f5f           	subq.w #7,(sp)+
+  ea21e2:	7374 6172 7400 	mvs.w ([1946157056,a4],0),d1
+  ea21e8:	0000 0000 
+  ea21ec:	0000 0005      	ori.b #5,d0
+  ea21f0:	5f5f           	subq.w #7,(sp)+
+  ea21f2:	5f64           	subq.w #7,-(a4)
+  ea21f4:	6174           	bsr.s 0xea226a
+  ea21f6:	6164           	bsr.s 0xea225c
+  ea21f8:	6174           	bsr.s 0xea226e
+  ea21fa:	615f           	bsr.s 0xea225b
+  ea21fc:	7265           	moveq #101,d1
+  ea21fe:	6c6f           	bge.s 0xea226f
+  ea2200:	6373           	bls.s 0xea2275
+  ea2202:	0000 0000      	ori.b #0,d0
+  ea2206:	10d0           	move.b (a0),(a0)+
+  ea2208:	0000 0002      	ori.b #2,d0
+  ea220c:	5f5f           	subq.w #7,(sp)+
+  ea220e:	7374 6578 7400 	mvs.w (1946157056,a4),d1
+  ea2214:	0000 
+  ea2216:	0000 0000      	ori.b #0,d0
+  ea221a:	0004 5f70      	ori.b #112,d4
+  ea221e:	6973           	bvs.s 0xea2293
+  ea2220:	6373           	bls.s 0xea2295
+  ea2222:	6936           	bvs.s 0xea225a
+  ea2224:	345f           	movea.w (sp)+,a2
+  ea2226:	7363           	mvs.w -(a3),d1
+  ea2228:	7369 0000      	mvs.w 0(a1),d1
+  ea222c:	0000 06ce      	ori.b #-50,d0
+  ea2230:	0000 0005      	ori.b #5,d0
+  ea2234:	5f70 6973 6373 	subq.w #7,([1668507958,a0],878669925)
+  ea223a:	6936 345f 7065 
+  ea2240:	7266           	moveq #102,d1
+  ea2242:	6f72           	ble.s 0xea22b6
+  ea2244:	6d5f           	blt.s 0xea22a5
+  ea2246:	696f           	bvs.s 0xea22b7
+  ea2248:	0000 0eea      	ori.b #-22,d0
+  ea224c:	0000 0000      	ori.b #0,d0
+  ea2250:	0000 03f2      	ori.b #-14,d0
+  ea2254:	0000 03ea      	ori.b #-22,d0
+  ea2258:	0000 0027      	ori.b #39,d0
+  ea225c:	8002           	or.b d2,d0
+  ea225e:	0000 4afc      	ori.b #-4,d0
+  ea2262:	0000 0004      	ori.b #4,d0
+  ea2266:	0000 001e      	ori.b #30,d0
+  ea226a:	802b 0300      	or.b 768(a3),d0
+  ea226e:	0000 001e      	ori.b #30,d0
+  ea2272:	0000 002f      	ori.b #47,d0
+  ea2276:	0000 10c0      	ori.b #-64,d0
+  ea227a:	7069           	moveq #105,d0
+  ea227c:	2d73 6373 6936 	move.l ([1765159982,a3],1684371049),25445(a6)
+  ea2282:	342e 6465 7669 
+  ea2288:	6365 
+  ea228a:	0050 6953      	ori.w #26963,(a0)
+  ea228e:	4353           	.short 0x4353
+  ea2290:	4936 3420      	chk.l (32,a6,d3.w*4),d4
+  ea2294:	3433 2e32      	move.w (50,a3,d2.l*8),d2
+  ea2298:	3020           	move.w -(a0),d0
+  ea229a:	2833 2046      	move.l (70,a3,d2.w),d4
+  ea229e:	6562           	bcs.s 0xea2302
+  ea22a0:	2032 3032      	move.l (50,a2,d3.w),d0
+  ea22a4:	3129 0000      	move.w 0(a1),-(a0)
+  ea22a8:	4000           	negx.b d0
+  ea22aa:	0001 0002      	ori.b #2,d1
+  ea22ae:	0003 0004      	ori.b #4,d3
+  ea22b2:	0005 0007      	ori.b #7,d5
+  ea22b6:	0006 0008      	ori.b #8,d6
+  ea22ba:	0009           	.short 0x0009
+  ea22bc:	000a           	.short 0x000a
+  ea22be:	000b           	.short 0x000b
+  ea22c0:	000c           	.short 0x000c
+  ea22c2:	000d           	.short 0x000d
+  ea22c4:	000e           	.short 0x000e
+  ea22c6:	000f           	.short 0x000f
+  ea22c8:	0012 0016      	ori.b #22,(a2)
+  ea22cc:	0014 0015      	ori.b #21,(a4)
+  ea22d0:	001c c000      	ori.b #0,(a4)+
+  ea22d4:	c001           	and.b d1,d0
+  ea22d6:	c002           	and.b d2,d0
+  ea22d8:	c003           	and.b d3,d0
+  ea22da:	0000 0000      	ori.b #0,d0
+  ea22de:	021a 0000      	andi.b #0,(a2)+
+  ea22e2:	027a           	.short 0x027a
+  ea22e4:	0000 0216      	ori.b #22,d0
+  ea22e8:	0000 0000      	ori.b #0,d0
+  ea22ec:	0000 028a      	ori.b #-118,d0
+  ea22f0:	0000 0518      	ori.b #24,d0
+  ea22f4:	ffff           	.short 0xffff
+  ea22f6:	ffff           	.short 0xffff
+  ea22f8:	0000 03ec      	ori.b #-20,d0
+  ea22fc:	0000 0006      	ori.b #6,d0
+  ea2300:	0000 0000      	ori.b #0,d0
+  ea2304:	0000 001a      	ori.b #26,d0
+  ea2308:	0000 0080      	ori.b #-128,d0
+  ea230c:	0000 0084      	ori.b #-124,d0
+  ea2310:	0000 0088      	ori.b #-120,d0
+  ea2314:	0000 0090      	ori.b #-112,d0
+  ea2318:	0000 0094      	ori.b #-108,d0
+  ea231c:	0000 0004      	ori.b #4,d0
+  ea2320:	0000 0001      	ori.b #1,d0
+  ea2324:	0000 0006      	ori.b #6,d0
+  ea2328:	0000 000a      	ori.b #10,d0
+  ea232c:	0000 0012      	ori.b #18,d0
+  ea2330:	0000 0016      	ori.b #22,d0
+  ea2334:	0000 0000      	ori.b #0,d0
+  ea2338:	0000 03f0      	ori.b #-16,d0
+  ea233c:	0000 0003      	ori.b #3,d0
+  ea2340:	5f64           	subq.w #7,-(a4)
+  ea2342:	6576           	bcs.s 0xea23ba
+  ea2344:	6963           	bvs.s 0xea23a9
+  ea2346:	655f           	bcs.s 0xea23a7
+  ea2348:	6e61           	bgt.s 0xea23ab
+  ea234a:	6d65           	blt.s 0xea23b1
+  ea234c:	0000 001e      	ori.b #30,d0
+  ea2350:	0000 0002      	ori.b #2,d0
+  ea2354:	5f5f           	subq.w #7,(sp)+
+  ea2356:	6564           	bcs.s 0xea23bc
+  ea2358:	6174           	bsr.s 0xea23ce
+  ea235a:	6100 0000      	bsr.w 0xea235c
+  ea235e:	009c 0000 0003 	ori.l #3,(a4)+
+  ea2364:	5f6e 735f      	subq.w #7,29535(a6)
+  ea2368:	7375 7070      	mvs.w (112,a5,d7.w),d1
+  ea236c:	6f72           	ble.s 0xea23e0
+  ea236e:	7400           	moveq #0,d2
+  ea2370:	0000 004c      	ori.b #76,d0
+  ea2374:	0000 0005      	ori.b #5,d0
+  ea2378:	5f64           	subq.w #7,-(a4)
+  ea237a:	6576           	bcs.s 0xea23f2
+  ea237c:	6963           	bvs.s 0xea23e1
+  ea237e:	655f           	bcs.s 0xea23df
+  ea2380:	6964           	bvs.s 0xea23e6
+  ea2382:	5f73 7472      	subq.w #7,(114,a3,d7.w*4)
+  ea2386:	696e           	bvs.s 0xea23f6
+  ea2388:	6700 0000      	beq.w 0xea238a
+  ea238c:	0000 002f      	ori.b #47,d0
+  ea2390:	0000 0002      	ori.b #2,d0
+  ea2394:	5f5f           	subq.w #7,(sp)+
+  ea2396:	7364           	mvs.w -(a4),d1
+  ea2398:	6174           	bsr.s 0xea240e
+  ea239a:	6100 0000      	bsr.w 0xea239c
+  ea239e:	0000 0000      	ori.b #0,d0
+  ea23a2:	0000 0000      	ori.b #0,d0
+  ea23a6:	03f2 0000      	bset d1,(0,a2,d0.w)
+  ea23aa:	03eb 0000      	bset d1,0(a3)
+  ea23ae:	0005 0000      	ori.b #0,d5
+  ea23b2:	03f0 0000      	bset d1,(0,a0,d0.w)
+  ea23b6:	0005 5f5f      	ori.b #95,d5
+  ea23ba:	6465           	bcc.s 0xea2421
+  ea23bc:	6275           	bhi.s 0xea2433
+  ea23be:	675f           	beq.s 0xea241f
+  ea23c0:	6162           	bsr.s 0xea2424
+  ea23c2:	6272           	bhi.s 0xea2436
+  ea23c4:	6576           	bcs.s 0xea243c
+  ea23c6:	5f73 7461      	subq.w #7,(97,a3,d7.w*4)
+  ea23ca:	7274           	moveq #116,d1
+  ea23cc:	0000 0014      	ori.b #20,d0
+  ea23d0:	0000 0003      	ori.b #3,d0
+  ea23d4:	5f64           	subq.w #7,-(a4)
+  ea23d6:	6576           	bcs.s 0xea244e
+  ea23d8:	5f62           	subq.w #7,-(a2)
+  ea23da:	6173           	bsr.s 0xea244f
+  ea23dc:	6500 0000      	bcs.w 0xea23de
+  ea23e0:	0000 0000      	ori.b #0,d0
+  ea23e4:	0000 0002      	ori.b #2,d0
+  ea23e8:	5f69 735f      	subq.w #7,29535(a1)
+  ea23ec:	6f70           	ble.s 0xea245e
+  ea23ee:	656e           	bcs.s 0xea245e
+  ea23f0:	0000 0004      	ori.b #4,d0
+  ea23f4:	0000 0006      	ori.b #6,d0
+  ea23f8:	5f5f           	subq.w #7,(sp)+
+  ea23fa:	6465           	bcc.s 0xea2461
+  ea23fc:	6275           	bhi.s 0xea2473
+  ea23fe:	675f           	beq.s 0xea245f
+  ea2400:	6c69           	bge.s 0xea246b
+  ea2402:	6e65           	bgt.s 0xea2469
+  ea2404:	5f73 7472      	subq.w #7,(114,a3,d7.w*4)
+  ea2408:	5f73 7461      	subq.w #7,(97,a3,d7.w*4)
+  ea240c:	7274           	moveq #116,d1
+  ea240e:	0000 0000      	ori.b #0,d0
+  ea2412:	0014 0000      	ori.b #0,(a4)
+  ea2416:	0005 5f5f      	ori.b #95,d5
+  ea241a:	6465           	bcc.s 0xea2481
+  ea241c:	6275           	bhi.s 0xea2493
+  ea241e:	675f           	beq.s 0xea247f
+  ea2420:	6672           	bne.s 0xea2494
+  ea2422:	616d           	bsr.s 0xea2491
+  ea2424:	655f           	bcs.s 0xea2485
+  ea2426:	7374 6172 7400 	mvs.w ([1946157056,a4],20),d1
+  ea242c:	0000 0014 
+  ea2430:	0000 0006      	ori.b #6,d0
+  ea2434:	5f5f           	subq.w #7,(sp)+
+  ea2436:	6465           	bcc.s 0xea249d
+  ea2438:	6275           	bhi.s 0xea24af
+  ea243a:	675f           	beq.s 0xea249b
+  ea243c:	6172           	bsr.s 0xea24b0
+  ea243e:	616e           	bsr.s 0xea24ae
+  ea2440:	6765           	beq.s 0xea24a7
+  ea2442:	735f           	mvs.w (sp)+,d1
+  ea2444:	7374 6172 7400 	mvs.w ([1946157056,a4],0),d1
+  ea244a:	0000 0000 
+  ea244e:	0014 0000      	ori.b #0,(a4)
+  ea2452:	0002 5f5f      	ori.b #95,d2
+  ea2456:	656e           	bcs.s 0xea24c6
+  ea2458:	6400 0000      	bcc.w 0xea245a
+  ea245c:	0000 0014      	ori.b #20,d0
+  ea2460:	0000 0004      	ori.b #4,d0
+  ea2464:	5f45           	subq.w #7,d5
+  ea2466:	7870           	moveq #112,d4
+  ea2468:	616e           	bsr.s 0xea24d8
+  ea246a:	7369 6f6e      	mvs.w 28526(a1),d1
+  ea246e:	4261           	clr.w -(a1)
+  ea2470:	7365           	mvs.w -(a5),d1
+  ea2472:	0000 0000      	ori.b #0,d0
+  ea2476:	0008           	.short 0x0008
+  ea2478:	0000 0003      	ori.b #3,d0
+  ea247c:	5f5f           	subq.w #7,(sp)+
+  ea247e:	6273           	bhi.s 0xea24f3
+  ea2480:	735f           	mvs.w (sp)+,d1
+  ea2482:	7374 6172 7400 	mvs.w ([1946157056,a4],0),d1
+  ea2488:	0000 0000 
+  ea248c:	0000 0005      	ori.b #5,d0
+  ea2490:	5f5f           	subq.w #7,(sp)+
+  ea2492:	6465           	bcc.s 0xea24f9
+  ea2494:	6275           	bhi.s 0xea250b
+  ea2496:	675f           	beq.s 0xea24f7
+  ea2498:	696e           	bvs.s 0xea2508
+  ea249a:	666f           	bne.s 0xea250b
+  ea249c:	5f73 7461      	subq.w #7,(97,a3,d7.w*4)
+  ea24a0:	7274           	moveq #116,d1
+  ea24a2:	0000 0000      	ori.b #0,d0
+  ea24a6:	0014 0000      	ori.b #0,(a4)
+  ea24aa:	0002 5f53      	ori.b #83,d2
+  ea24ae:	7973 4261      	mvs.w (97,a3,d4.w*2),d4
+  ea24b2:	7365           	mvs.w -(a5),d1
+  ea24b4:	0000 000c      	ori.b #12,d0
+  ea24b8:	0000 0005      	ori.b #5,d0
+  ea24bc:	5f5f           	subq.w #7,(sp)+
+  ea24be:	6465           	bcc.s 0xea2525
+  ea24c0:	6275           	bhi.s 0xea2537
+  ea24c2:	675f           	beq.s 0xea2523
+  ea24c4:	7374 725f      	mvs.w (95,a4,d7.w*2),d1
+  ea24c8:	7374 6172 7400 	mvs.w ([1946157056,a4],0),d1
+  ea24ce:	0000 0000 
+  ea24d2:	0014 0000      	ori.b #0,(a4)
+  ea24d6:	0004 5f73      	ori.b #115,d4
+  ea24da:	6176           	bsr.s 0xea2552
+  ea24dc:	6564           	bcs.s 0xea2542
+  ea24de:	5f73 6567 5f6c 	subq.w #7,([24428,a3],1769174016)
+  ea24e4:	6973 7400 
+  ea24e8:	0000 0010      	ori.b #16,d0
+  ea24ec:	0000 0006      	ori.b #6,d0
+  ea24f0:	5f5f           	subq.w #7,(sp)+
+  ea24f2:	6465           	bcc.s 0xea2559
+  ea24f4:	6275           	bhi.s 0xea256b
+  ea24f6:	675f           	beq.s 0xea2557
+  ea24f8:	6c6f           	bge.s 0xea2569
+  ea24fa:	636c           	bls.s 0xea2568
+  ea24fc:	6973           	bvs.s 0xea2571
+  ea24fe:	7473           	moveq #115,d2
+  ea2500:	5f73 7461      	subq.w #7,(97,a3,d7.w*4)
+  ea2504:	7274           	moveq #116,d1
+  ea2506:	0000 0000      	ori.b #0,d0
+  ea250a:	0014 0000      	ori.b #0,(a4)
+  ea250e:	0006 5f5f      	ori.b #95,d6
+  ea2512:	6465           	bcc.s 0xea2579
+  ea2514:	6275           	bhi.s 0xea258b
+  ea2516:	675f           	beq.s 0xea2577
+  ea2518:	7267           	moveq #103,d1
+  ea251a:	6e6c           	bgt.s 0xea2588
+  ea251c:	6973           	bvs.s 0xea2591
+  ea251e:	7473           	moveq #115,d2
+  ea2520:	5f73 7461      	subq.w #7,(97,a3,d7.w*4)
+  ea2524:	7274           	moveq #116,d1
+  ea2526:	0000 0000      	ori.b #0,d0
+  ea252a:	0014 0000      	ori.b #0,(a4)
+  ea252e:	0005 5f5f      	ori.b #95,d5
+  ea2532:	6465           	bcc.s 0xea2599
+  ea2534:	6275           	bhi.s 0xea25ab
+  ea2536:	675f           	beq.s 0xea2597
+  ea2538:	6c69           	bge.s 0xea25a3
+  ea253a:	6e65           	bgt.s 0xea25a1
+  ea253c:	5f73 7461      	subq.w #7,(97,a3,d7.w*4)
+  ea2540:	7274           	moveq #116,d1
+  ea2542:	0000 0000      	ori.b #0,d0
+  ea2546:	0014 0000      	ori.b #0,(a4)
+  ea254a:	0000 0000      	ori.b #0,d0
+  ea254e:	03f2 0000      	bset d1,(0,a2,d0.w)
+  ea2552:	0000 0000      	ori.b #0,d0
+  ea2556:	0000 0000      	ori.b #0,d0
+  ea255a:	0000 0000      	ori.b #0,d0
+  ea255e:	0000 0000      	ori.b #0,d0
+  ea2562:	0000 0000      	ori.b #0,d0
+  ea2566:	0000 0000      	ori.b #0,d0
+  ea256a:	0000 0000      	ori.b #0,d0
+  ea256e:	0000 0000      	ori.b #0,d0
+  ea2572:	0000 0000      	ori.b #0,d0
+  ea2576:	0000 0000      	ori.b #0,d0
+  ea257a:	0000 0000      	ori.b #0,d0
+  ea257e:	0000 0000      	ori.b #0,d0
+  ea2582:	0000 0000      	ori.b #0,d0
+  ea2586:	0000 0000      	ori.b #0,d0
+  ea258a:	0000 0000      	ori.b #0,d0
+  ea258e:	0000 0000      	ori.b #0,d0
+  ea2592:	0000 0000      	ori.b #0,d0
+  ea2596:	0000 0000      	ori.b #0,d0
+  ea259a:	0000 0000      	ori.b #0,d0
+  ea259e:	0000 0000      	ori.b #0,d0
+  ea25a2:	0000 0000      	ori.b #0,d0
+  ea25a6:	0000 0000      	ori.b #0,d0
+  ea25aa:	0000 0000      	ori.b #0,d0
+  ea25ae:	0000 0000      	ori.b #0,d0
+  ea25b2:	0000 0000      	ori.b #0,d0
+  ea25b6:	0000 0000      	ori.b #0,d0
+  ea25ba:	0000 0000      	ori.b #0,d0
+  ea25be:	0000 0000      	ori.b #0,d0
+  ea25c2:	0000 0000      	ori.b #0,d0
+  ea25c6:	0000 0000      	ori.b #0,d0
+  ea25ca:	0000 0000      	ori.b #0,d0
+  ea25ce:	0000 0000      	ori.b #0,d0
+  ea25d2:	0000 0000      	ori.b #0,d0
+  ea25d6:	0000 0000      	ori.b #0,d0
+  ea25da:	0000 0000      	ori.b #0,d0
+  ea25de:	0000 0000      	ori.b #0,d0
+  ea25e2:	0000 0000      	ori.b #0,d0
+  ea25e6:	0000 0000      	ori.b #0,d0
+  ea25ea:	0000 0000      	ori.b #0,d0
+  ea25ee:	0000 0000      	ori.b #0,d0
+  ea25f2:	0000 0000      	ori.b #0,d0
+  ea25f6:	0000 0000      	ori.b #0,d0
+  ea25fa:	0000 0000      	ori.b #0,d0
+  ea25fe:	0000 0000      	ori.b #0,d0
+  ea2602:	0000 0000      	ori.b #0,d0
+  ea2606:	0000 0000      	ori.b #0,d0
+  ea260a:	0000 0000      	ori.b #0,d0
+  ea260e:	0000 0000      	ori.b #0,d0
+  ea2612:	0000 0000      	ori.b #0,d0
+  ea2616:	0000 0000      	ori.b #0,d0
+  ea261a:	0000 0000      	ori.b #0,d0
+  ea261e:	0000 0000      	ori.b #0,d0
+  ea2622:	0000 0000      	ori.b #0,d0
+  ea2626:	0000 0000      	ori.b #0,d0
+  ea262a:	0000 0000      	ori.b #0,d0
+  ea262e:	0000 0000      	ori.b #0,d0
+  ea2632:	0000 0000      	ori.b #0,d0
+  ea2636:	0000 0000      	ori.b #0,d0
+  ea263a:	0000 0000      	ori.b #0,d0
+  ea263e:	0000 0000      	ori.b #0,d0
+  ea2642:	0000 0000      	ori.b #0,d0
+  ea2646:	0000 0000      	ori.b #0,d0
+  ea264a:	0000 0000      	ori.b #0,d0
+  ea264e:	0000 0000      	ori.b #0,d0
+  ea2652:	0000 0000      	ori.b #0,d0
+  ea2656:	0000 0000      	ori.b #0,d0
+  ea265a:	0000 0000      	ori.b #0,d0
+  ea265e:	0000 0000      	ori.b #0,d0
+  ea2662:	0000 0000      	ori.b #0,d0
+  ea2666:	0000 0000      	ori.b #0,d0
+  ea266a:	0000 0000      	ori.b #0,d0
+  ea266e:	0000 0000      	ori.b #0,d0
+  ea2672:	0000 0000      	ori.b #0,d0
+  ea2676:	0000 0000      	ori.b #0,d0
+  ea267a:	0000 0000      	ori.b #0,d0
+  ea267e:	0000 0000      	ori.b #0,d0
+  ea2682:	0000 0000      	ori.b #0,d0
+  ea2686:	0000 0000      	ori.b #0,d0
+  ea268a:	0000 0000      	ori.b #0,d0
+  ea268e:	0000 0000      	ori.b #0,d0
+  ea2692:	0000 0000      	ori.b #0,d0
+  ea2696:	0000 0000      	ori.b #0,d0
+  ea269a:	0000 0000      	ori.b #0,d0
+  ea269e:	0000 0000      	ori.b #0,d0
+  ea26a2:	0000 0000      	ori.b #0,d0
+  ea26a6:	0000 0000      	ori.b #0,d0
+  ea26aa:	0000 0000      	ori.b #0,d0
+  ea26ae:	0000 0000      	ori.b #0,d0
+  ea26b2:	0000 0000      	ori.b #0,d0
+  ea26b6:	0000 0000      	ori.b #0,d0
+  ea26ba:	0000 0000      	ori.b #0,d0
+  ea26be:	0000 0000      	ori.b #0,d0
+  ea26c2:	0000 0000      	ori.b #0,d0
+  ea26c6:	0000 0000      	ori.b #0,d0
+  ea26ca:	0000 0000      	ori.b #0,d0
+  ea26ce:	0000 0000      	ori.b #0,d0
+  ea26d2:	0000 0000      	ori.b #0,d0
+  ea26d6:	0000 0000      	ori.b #0,d0
+  ea26da:	0000 0000      	ori.b #0,d0
+  ea26de:	0000 0000      	ori.b #0,d0
+  ea26e2:	0000 0000      	ori.b #0,d0
+  ea26e6:	0000 0000      	ori.b #0,d0
+  ea26ea:	0000 0000      	ori.b #0,d0
+  ea26ee:	0000 0000      	ori.b #0,d0
+  ea26f2:	0000 0000      	ori.b #0,d0
+  ea26f6:	0000 0000      	ori.b #0,d0
+  ea26fa:	0000 0000      	ori.b #0,d0
+  ea26fe:	0000 0000      	ori.b #0,d0
+  ea2702:	0000 0000      	ori.b #0,d0
+  ea2706:	0000 0000      	ori.b #0,d0
+  ea270a:	0000 0000      	ori.b #0,d0
+  ea270e:	0000 0000      	ori.b #0,d0
+  ea2712:	0000 0000      	ori.b #0,d0
+  ea2716:	0000 0000      	ori.b #0,d0
+  ea271a:	0000 0000      	ori.b #0,d0
+  ea271e:	0000 0000      	ori.b #0,d0
+  ea2722:	0000 0000      	ori.b #0,d0
+  ea2726:	0000 0000      	ori.b #0,d0
+  ea272a:	0000 0000      	ori.b #0,d0
+  ea272e:	0000 0000      	ori.b #0,d0
+  ea2732:	0000 0000      	ori.b #0,d0
+  ea2736:	0000 0000      	ori.b #0,d0
+  ea273a:	0000 0000      	ori.b #0,d0
+  ea273e:	0000 0000      	ori.b #0,d0
+  ea2742:	0000 0000      	ori.b #0,d0
+  ea2746:	0000 0000      	ori.b #0,d0
+  ea274a:	0000 0000      	ori.b #0,d0
+  ea274e:	0000 0000      	ori.b #0,d0
+  ea2752:	0000 0000      	ori.b #0,d0
+  ea2756:	0000 0000      	ori.b #0,d0
+  ea275a:	0000 0000      	ori.b #0,d0
+  ea275e:	0000 0000      	ori.b #0,d0
+  ea2762:	0000 0000      	ori.b #0,d0
+  ea2766:	0000 0000      	ori.b #0,d0
+  ea276a:	0000 0000      	ori.b #0,d0
+  ea276e:	0000 0000      	ori.b #0,d0
+  ea2772:	0000 0000      	ori.b #0,d0
+  ea2776:	0000 0000      	ori.b #0,d0
+  ea277a:	0000 0000      	ori.b #0,d0
+  ea277e:	0000 0000      	ori.b #0,d0
+  ea2782:	0000 0000      	ori.b #0,d0
+  ea2786:	0000 0000      	ori.b #0,d0
+  ea278a:	0000 0000      	ori.b #0,d0
+  ea278e:	0000 0000      	ori.b #0,d0
+  ea2792:	0000 0000      	ori.b #0,d0
+  ea2796:	0000 0000      	ori.b #0,d0
+  ea279a:	0000 0000      	ori.b #0,d0
+  ea279e:	0000 0000      	ori.b #0,d0
+  ea27a2:	0000 0000      	ori.b #0,d0
+  ea27a6:	0000 0000      	ori.b #0,d0
+  ea27aa:	0000 0000      	ori.b #0,d0
+  ea27ae:	0000 0000      	ori.b #0,d0
+  ea27b2:	0000 0000      	ori.b #0,d0
+  ea27b6:	0000 0000      	ori.b #0,d0
+  ea27ba:	0000 0000      	ori.b #0,d0
+  ea27be:	0000 0000      	ori.b #0,d0
+  ea27c2:	0000 0000      	ori.b #0,d0
+  ea27c6:	0000 0000      	ori.b #0,d0
+  ea27ca:	0000 0000      	ori.b #0,d0
+  ea27ce:	0000 0000      	ori.b #0,d0
+  ea27d2:	0000 0000      	ori.b #0,d0
+  ea27d6:	0000 0000      	ori.b #0,d0
+  ea27da:	0000 0000      	ori.b #0,d0
+  ea27de:	0000 0000      	ori.b #0,d0
+  ea27e2:	0000 0000      	ori.b #0,d0
+  ea27e6:	0000 0000      	ori.b #0,d0
+  ea27ea:	0000 0000      	ori.b #0,d0
+  ea27ee:	0000 0000      	ori.b #0,d0
+  ea27f2:	0000 0000      	ori.b #0,d0
+  ea27f6:	0000 0000      	ori.b #0,d0
+  ea27fa:	0000 0000      	ori.b #0,d0
+  ea27fe:	0000 0000      	ori.b #0,d0
+  ea2802:	0000 0000      	ori.b #0,d0
+  ea2806:	0000 0000      	ori.b #0,d0
+  ea280a:	0000 0000      	ori.b #0,d0
+  ea280e:	0000 0000      	ori.b #0,d0
+  ea2812:	0000 0000      	ori.b #0,d0
+  ea2816:	0000 0000      	ori.b #0,d0
+  ea281a:	0000 0000      	ori.b #0,d0
+  ea281e:	0000 0000      	ori.b #0,d0
+  ea2822:	0000 0000      	ori.b #0,d0
+  ea2826:	0000 0000      	ori.b #0,d0
+  ea282a:	0000 0000      	ori.b #0,d0
+  ea282e:	0000 0000      	ori.b #0,d0
+  ea2832:	0000 0000      	ori.b #0,d0
+  ea2836:	0000 0000      	ori.b #0,d0
+  ea283a:	0000 0000      	ori.b #0,d0
+  ea283e:	0000 0000      	ori.b #0,d0
+  ea2842:	0000 0000      	ori.b #0,d0
+  ea2846:	0000 0000      	ori.b #0,d0
+  ea284a:	0000 0000      	ori.b #0,d0
+  ea284e:	0000 0000      	ori.b #0,d0
+  ea2852:	0000 0000      	ori.b #0,d0
+  ea2856:	0000 0000      	ori.b #0,d0
+  ea285a:	0000 0000      	ori.b #0,d0
+  ea285e:	0000 0000      	ori.b #0,d0
+  ea2862:	0000 0000      	ori.b #0,d0
+  ea2866:	0000 0000      	ori.b #0,d0
+  ea286a:	0000 0000      	ori.b #0,d0
+  ea286e:	0000 0000      	ori.b #0,d0
+  ea2872:	0000 0000      	ori.b #0,d0
+  ea2876:	0000 0000      	ori.b #0,d0
+  ea287a:	0000 0000      	ori.b #0,d0
+  ea287e:	0000 0000      	ori.b #0,d0
+  ea2882:	0000 0000      	ori.b #0,d0
+  ea2886:	0000 0000      	ori.b #0,d0
+  ea288a:	0000 0000      	ori.b #0,d0
+  ea288e:	0000 0000      	ori.b #0,d0
+  ea2892:	0000 0000      	ori.b #0,d0
+  ea2896:	0000 0000      	ori.b #0,d0
+  ea289a:	0000 0000      	ori.b #0,d0
+  ea289e:	0000 0000      	ori.b #0,d0
+  ea28a2:	0000 0000      	ori.b #0,d0
+  ea28a6:	0000 0000      	ori.b #0,d0
+  ea28aa:	0000 0000      	ori.b #0,d0
+  ea28ae:	0000 0000      	ori.b #0,d0
+  ea28b2:	0000 0000      	ori.b #0,d0
+  ea28b6:	0000 0000      	ori.b #0,d0
+  ea28ba:	0000 0000      	ori.b #0,d0
+  ea28be:	0000 0000      	ori.b #0,d0
+  ea28c2:	0000 0000      	ori.b #0,d0
+  ea28c6:	0000 0000      	ori.b #0,d0
+  ea28ca:	0000 0000      	ori.b #0,d0
+  ea28ce:	0000 0000      	ori.b #0,d0
+  ea28d2:	0000 0000      	ori.b #0,d0
+  ea28d6:	0000 0000      	ori.b #0,d0
+  ea28da:	0000 0000      	ori.b #0,d0
+  ea28de:	0000 0000      	ori.b #0,d0
+  ea28e2:	0000 0000      	ori.b #0,d0
+  ea28e6:	0000 0000      	ori.b #0,d0
+  ea28ea:	0000 0000      	ori.b #0,d0
+  ea28ee:	0000 0000      	ori.b #0,d0
+  ea28f2:	0000 0000      	ori.b #0,d0
+  ea28f6:	0000 0000      	ori.b #0,d0
+  ea28fa:	0000 0000      	ori.b #0,d0
+  ea28fe:	0000 0000      	ori.b #0,d0
+  ea2902:	0000 0000      	ori.b #0,d0
+  ea2906:	0000 0000      	ori.b #0,d0
+  ea290a:	0000 0000      	ori.b #0,d0
+  ea290e:	0000 0000      	ori.b #0,d0
+  ea2912:	0000 0000      	ori.b #0,d0
+  ea2916:	0000 0000      	ori.b #0,d0
+  ea291a:	0000 0000      	ori.b #0,d0
+  ea291e:	0000 0000      	ori.b #0,d0
+  ea2922:	0000 0000      	ori.b #0,d0
+  ea2926:	0000 0000      	ori.b #0,d0
+  ea292a:	0000 0000      	ori.b #0,d0
+  ea292e:	0000 0000      	ori.b #0,d0
+  ea2932:	0000 0000      	ori.b #0,d0
+  ea2936:	0000 0000      	ori.b #0,d0
+  ea293a:	0000 0000      	ori.b #0,d0
+  ea293e:	0000 0000      	ori.b #0,d0
+  ea2942:	0000 0000      	ori.b #0,d0
+  ea2946:	0000 0000      	ori.b #0,d0
+  ea294a:	0000 0000      	ori.b #0,d0
+  ea294e:	0000 0000      	ori.b #0,d0
+  ea2952:	0000 0000      	ori.b #0,d0
+  ea2956:	0000 0000      	ori.b #0,d0
+  ea295a:	0000 0000      	ori.b #0,d0
+  ea295e:	0000 0000      	ori.b #0,d0
+  ea2962:	0000 0000      	ori.b #0,d0
+  ea2966:	0000 0000      	ori.b #0,d0
+  ea296a:	0000 0000      	ori.b #0,d0
+  ea296e:	0000 0000      	ori.b #0,d0
+  ea2972:	0000 0000      	ori.b #0,d0
+  ea2976:	0000 0000      	ori.b #0,d0
+  ea297a:	0000 0000      	ori.b #0,d0
+  ea297e:	0000 0000      	ori.b #0,d0
+  ea2982:	0000 0000      	ori.b #0,d0
+  ea2986:	0000 0000      	ori.b #0,d0
+  ea298a:	0000 0000      	ori.b #0,d0
+  ea298e:	0000 0000      	ori.b #0,d0
+  ea2992:	0000 0000      	ori.b #0,d0
+  ea2996:	0000 0000      	ori.b #0,d0
+  ea299a:	0000 0000      	ori.b #0,d0
+  ea299e:	0000 0000      	ori.b #0,d0
+  ea29a2:	0000 0000      	ori.b #0,d0
+  ea29a6:	0000 0000      	ori.b #0,d0
+  ea29aa:	0000 0000      	ori.b #0,d0
+  ea29ae:	0000 0000      	ori.b #0,d0
+  ea29b2:	0000 0000      	ori.b #0,d0
+  ea29b6:	0000 0000      	ori.b #0,d0
+  ea29ba:	0000 0000      	ori.b #0,d0
+  ea29be:	0000 0000      	ori.b #0,d0
+  ea29c2:	0000 0000      	ori.b #0,d0
+  ea29c6:	0000 0000      	ori.b #0,d0
+  ea29ca:	0000 0000      	ori.b #0,d0
+  ea29ce:	0000 0000      	ori.b #0,d0
+  ea29d2:	0000 0000      	ori.b #0,d0
+  ea29d6:	0000 0000      	ori.b #0,d0
+  ea29da:	0000 0000      	ori.b #0,d0
+  ea29de:	0000 0000      	ori.b #0,d0
+  ea29e2:	0000 0000      	ori.b #0,d0
+  ea29e6:	0000 0000      	ori.b #0,d0
+  ea29ea:	0000 0000      	ori.b #0,d0
+  ea29ee:	0000 0000      	ori.b #0,d0
+  ea29f2:	0000 0000      	ori.b #0,d0
+  ea29f6:	0000 0000      	ori.b #0,d0
+  ea29fa:	0000 0000      	ori.b #0,d0
+  ea29fe:	0000 0000      	ori.b #0,d0
+  ea2a02:	0000 0000      	ori.b #0,d0
+  ea2a06:	0000 0000      	ori.b #0,d0
+  ea2a0a:	0000 0000      	ori.b #0,d0
+  ea2a0e:	0000 0000      	ori.b #0,d0
+  ea2a12:	0000 0000      	ori.b #0,d0
+  ea2a16:	0000 0000      	ori.b #0,d0
+  ea2a1a:	0000 0000      	ori.b #0,d0
+  ea2a1e:	0000 0000      	ori.b #0,d0
+  ea2a22:	0000 0000      	ori.b #0,d0
+  ea2a26:	0000 0000      	ori.b #0,d0
+  ea2a2a:	0000 0000      	ori.b #0,d0
+  ea2a2e:	0000 0000      	ori.b #0,d0
+  ea2a32:	0000 0000      	ori.b #0,d0
+  ea2a36:	0000 0000      	ori.b #0,d0
+  ea2a3a:	0000 0000      	ori.b #0,d0
+  ea2a3e:	0000 0000      	ori.b #0,d0
+  ea2a42:	0000 0000      	ori.b #0,d0
+  ea2a46:	0000 0000      	ori.b #0,d0
+  ea2a4a:	0000 0000      	ori.b #0,d0
+  ea2a4e:	0000 0000      	ori.b #0,d0
+  ea2a52:	0000 0000      	ori.b #0,d0
+  ea2a56:	0000 0000      	ori.b #0,d0
+  ea2a5a:	0000 0000      	ori.b #0,d0
+  ea2a5e:	0000 0000      	ori.b #0,d0
+  ea2a62:	0000 0000      	ori.b #0,d0
+  ea2a66:	0000 0000      	ori.b #0,d0
+  ea2a6a:	0000 0000      	ori.b #0,d0
+  ea2a6e:	0000 0000      	ori.b #0,d0
+  ea2a72:	0000 0000      	ori.b #0,d0
+  ea2a76:	0000 0000      	ori.b #0,d0
+  ea2a7a:	0000 0000      	ori.b #0,d0
+  ea2a7e:	0000 0000      	ori.b #0,d0
+  ea2a82:	0000 0000      	ori.b #0,d0
+  ea2a86:	0000 0000      	ori.b #0,d0
+  ea2a8a:	0000 0000      	ori.b #0,d0
+  ea2a8e:	0000 0000      	ori.b #0,d0
+  ea2a92:	0000 0000      	ori.b #0,d0
+  ea2a96:	0000 0000      	ori.b #0,d0
+  ea2a9a:	0000 0000      	ori.b #0,d0
+  ea2a9e:	0000 0000      	ori.b #0,d0
+  ea2aa2:	0000 0000      	ori.b #0,d0
+  ea2aa6:	0000 0000      	ori.b #0,d0
+  ea2aaa:	0000 0000      	ori.b #0,d0
+  ea2aae:	0000 0000      	ori.b #0,d0
+  ea2ab2:	0000 0000      	ori.b #0,d0
+  ea2ab6:	0000 0000      	ori.b #0,d0
+  ea2aba:	0000 0000      	ori.b #0,d0
+  ea2abe:	0000 0000      	ori.b #0,d0
+  ea2ac2:	0000 0000      	ori.b #0,d0
+  ea2ac6:	0000 0000      	ori.b #0,d0
+  ea2aca:	0000 0000      	ori.b #0,d0
+  ea2ace:	0000 0000      	ori.b #0,d0
+  ea2ad2:	0000 0000      	ori.b #0,d0
+  ea2ad6:	0000 0000      	ori.b #0,d0
+  ea2ada:	0000 0000      	ori.b #0,d0
+  ea2ade:	0000 0000      	ori.b #0,d0
+  ea2ae2:	0000 0000      	ori.b #0,d0
+  ea2ae6:	0000 0000      	ori.b #0,d0
+  ea2aea:	0000 0000      	ori.b #0,d0
+  ea2aee:	0000 0000      	ori.b #0,d0
+  ea2af2:	0000 0000      	ori.b #0,d0
+  ea2af6:	0000 0000      	ori.b #0,d0
+  ea2afa:	0000 0000      	ori.b #0,d0
+  ea2afe:	0000 0000      	ori.b #0,d0
+  ea2b02:	0000 0000      	ori.b #0,d0
+  ea2b06:	0000 0000      	ori.b #0,d0
+  ea2b0a:	0000 0000      	ori.b #0,d0
+  ea2b0e:	0000 0000      	ori.b #0,d0
+  ea2b12:	0000 0000      	ori.b #0,d0
+  ea2b16:	0000 0000      	ori.b #0,d0
+  ea2b1a:	0000 0000      	ori.b #0,d0
+  ea2b1e:	0000 0000      	ori.b #0,d0
+  ea2b22:	0000 0000      	ori.b #0,d0
+  ea2b26:	0000 0000      	ori.b #0,d0
+  ea2b2a:	0000 0000      	ori.b #0,d0
+  ea2b2e:	0000 0000      	ori.b #0,d0
+  ea2b32:	0000 0000      	ori.b #0,d0
+  ea2b36:	0000 0000      	ori.b #0,d0
+  ea2b3a:	0000 0000      	ori.b #0,d0
+  ea2b3e:	0000 0000      	ori.b #0,d0
+  ea2b42:	0000 0000      	ori.b #0,d0
+  ea2b46:	0000 0000      	ori.b #0,d0
+  ea2b4a:	0000 0000      	ori.b #0,d0
+  ea2b4e:	0000 0000      	ori.b #0,d0
+  ea2b52:	0000 0000      	ori.b #0,d0
+  ea2b56:	0000 0000      	ori.b #0,d0
+  ea2b5a:	0000 0000      	ori.b #0,d0
+  ea2b5e:	0000 0000      	ori.b #0,d0
+  ea2b62:	0000 0000      	ori.b #0,d0
+  ea2b66:	0000 0000      	ori.b #0,d0
+  ea2b6a:	0000 0000      	ori.b #0,d0
+  ea2b6e:	0000 0000      	ori.b #0,d0
+  ea2b72:	0000 0000      	ori.b #0,d0
+  ea2b76:	0000 0000      	ori.b #0,d0
+  ea2b7a:	0000 0000      	ori.b #0,d0
+  ea2b7e:	0000 0000      	ori.b #0,d0
+  ea2b82:	0000 0000      	ori.b #0,d0
+  ea2b86:	0000 0000      	ori.b #0,d0
+  ea2b8a:	0000 0000      	ori.b #0,d0
+  ea2b8e:	0000 0000      	ori.b #0,d0
+  ea2b92:	0000 0000      	ori.b #0,d0
+  ea2b96:	0000 0000      	ori.b #0,d0
+  ea2b9a:	0000 0000      	ori.b #0,d0
+  ea2b9e:	0000 0000      	ori.b #0,d0
+  ea2ba2:	0000 0000      	ori.b #0,d0
+  ea2ba6:	0000 0000      	ori.b #0,d0
+  ea2baa:	0000 0000      	ori.b #0,d0
+  ea2bae:	0000 0000      	ori.b #0,d0
+  ea2bb2:	0000 0000      	ori.b #0,d0
+  ea2bb6:	0000 0000      	ori.b #0,d0
+  ea2bba:	0000 0000      	ori.b #0,d0
+  ea2bbe:	0000 0000      	ori.b #0,d0
+  ea2bc2:	0000 0000      	ori.b #0,d0
+  ea2bc6:	0000 0000      	ori.b #0,d0
+  ea2bca:	0000 0000      	ori.b #0,d0
+  ea2bce:	0000 0000      	ori.b #0,d0
+  ea2bd2:	0000 0000      	ori.b #0,d0
+  ea2bd6:	0000 0000      	ori.b #0,d0
+  ea2bda:	0000 0000      	ori.b #0,d0
+  ea2bde:	0000 0000      	ori.b #0,d0
+  ea2be2:	0000 0000      	ori.b #0,d0
+  ea2be6:	0000 0000      	ori.b #0,d0
+  ea2bea:	0000 0000      	ori.b #0,d0
+  ea2bee:	0000 0000      	ori.b #0,d0
+  ea2bf2:	0000 0000      	ori.b #0,d0
+  ea2bf6:	0000 0000      	ori.b #0,d0
+  ea2bfa:	0000 0000      	ori.b #0,d0
+  ea2bfe:	0000 0000      	ori.b #0,d0
+  ea2c02:	0000 0000      	ori.b #0,d0
+  ea2c06:	0000 0000      	ori.b #0,d0
+  ea2c0a:	0000 0000      	ori.b #0,d0
+  ea2c0e:	0000 0000      	ori.b #0,d0
+  ea2c12:	0000 0000      	ori.b #0,d0
+  ea2c16:	0000 0000      	ori.b #0,d0
+  ea2c1a:	0000 0000      	ori.b #0,d0
+  ea2c1e:	0000 0000      	ori.b #0,d0
+  ea2c22:	0000 0000      	ori.b #0,d0
+  ea2c26:	0000 0000      	ori.b #0,d0
+  ea2c2a:	0000 0000      	ori.b #0,d0
+  ea2c2e:	0000 0000      	ori.b #0,d0
+  ea2c32:	0000 0000      	ori.b #0,d0
+  ea2c36:	0000 0000      	ori.b #0,d0
+  ea2c3a:	0000 0000      	ori.b #0,d0
+  ea2c3e:	0000 0000      	ori.b #0,d0
+  ea2c42:	0000 0000      	ori.b #0,d0
+  ea2c46:	0000 0000      	ori.b #0,d0
+  ea2c4a:	0000 0000      	ori.b #0,d0
+  ea2c4e:	0000 0000      	ori.b #0,d0
+  ea2c52:	0000 0000      	ori.b #0,d0
+  ea2c56:	0000 0000      	ori.b #0,d0
+  ea2c5a:	0000 0000      	ori.b #0,d0
+  ea2c5e:	0000 0000      	ori.b #0,d0
+  ea2c62:	0000 0000      	ori.b #0,d0
+  ea2c66:	0000 0000      	ori.b #0,d0
+  ea2c6a:	0000 0000      	ori.b #0,d0
+  ea2c6e:	0000 0000      	ori.b #0,d0
+  ea2c72:	0000 0000      	ori.b #0,d0
+  ea2c76:	0000 0000      	ori.b #0,d0
+  ea2c7a:	0000 0000      	ori.b #0,d0
+  ea2c7e:	0000 0000      	ori.b #0,d0
+  ea2c82:	0000 0000      	ori.b #0,d0
+  ea2c86:	0000 0000      	ori.b #0,d0
+  ea2c8a:	0000 0000      	ori.b #0,d0
+  ea2c8e:	0000 0000      	ori.b #0,d0
+  ea2c92:	0000 0000      	ori.b #0,d0
+  ea2c96:	0000 0000      	ori.b #0,d0
+  ea2c9a:	0000 0000      	ori.b #0,d0
+  ea2c9e:	0000 0000      	ori.b #0,d0
+  ea2ca2:	0000 0000      	ori.b #0,d0
+  ea2ca6:	0000 0000      	ori.b #0,d0
+  ea2caa:	0000 0000      	ori.b #0,d0
+  ea2cae:	0000 0000      	ori.b #0,d0
+  ea2cb2:	0000 0000      	ori.b #0,d0
+  ea2cb6:	0000 0000      	ori.b #0,d0
+  ea2cba:	0000 0000      	ori.b #0,d0
+  ea2cbe:	0000 0000      	ori.b #0,d0
+  ea2cc2:	0000 0000      	ori.b #0,d0
+  ea2cc6:	0000 0000      	ori.b #0,d0
+  ea2cca:	0000 0000      	ori.b #0,d0
+  ea2cce:	0000 0000      	ori.b #0,d0
+  ea2cd2:	0000 0000      	ori.b #0,d0
+  ea2cd6:	0000 0000      	ori.b #0,d0
+  ea2cda:	0000 0000      	ori.b #0,d0
+  ea2cde:	0000 0000      	ori.b #0,d0
+  ea2ce2:	0000 0000      	ori.b #0,d0
+  ea2ce6:	0000 0000      	ori.b #0,d0
+  ea2cea:	0000 0000      	ori.b #0,d0
+  ea2cee:	0000 0000      	ori.b #0,d0
+  ea2cf2:	0000 0000      	ori.b #0,d0
+  ea2cf6:	0000 0000      	ori.b #0,d0
+  ea2cfa:	0000 0000      	ori.b #0,d0
+  ea2cfe:	0000 0000      	ori.b #0,d0
+  ea2d02:	0000 0000      	ori.b #0,d0
+  ea2d06:	0000 0000      	ori.b #0,d0
+  ea2d0a:	0000 0000      	ori.b #0,d0
+  ea2d0e:	0000 0000      	ori.b #0,d0
+  ea2d12:	0000 0000      	ori.b #0,d0
+  ea2d16:	0000 0000      	ori.b #0,d0
+  ea2d1a:	0000 0000      	ori.b #0,d0
+  ea2d1e:	0000 0000      	ori.b #0,d0
+  ea2d22:	0000 0000      	ori.b #0,d0
+  ea2d26:	0000 0000      	ori.b #0,d0
+  ea2d2a:	0000 0000      	ori.b #0,d0
+  ea2d2e:	0000 0000      	ori.b #0,d0
+  ea2d32:	0000 0000      	ori.b #0,d0
+  ea2d36:	0000 0000      	ori.b #0,d0
+  ea2d3a:	0000 0000      	ori.b #0,d0
+  ea2d3e:	0000 0000      	ori.b #0,d0
+  ea2d42:	0000 0000      	ori.b #0,d0
+  ea2d46:	0000 0000      	ori.b #0,d0
+  ea2d4a:	0000 0000      	ori.b #0,d0
+  ea2d4e:	0000 0000      	ori.b #0,d0
+  ea2d52:	0000 0000      	ori.b #0,d0
+  ea2d56:	0000 0000      	ori.b #0,d0
+  ea2d5a:	0000 0000      	ori.b #0,d0
+  ea2d5e:	0000 0000      	ori.b #0,d0
+  ea2d62:	0000 0000      	ori.b #0,d0
+  ea2d66:	0000 0000      	ori.b #0,d0
+  ea2d6a:	0000 0000      	ori.b #0,d0
+  ea2d6e:	0000 0000      	ori.b #0,d0
+  ea2d72:	0000 0000      	ori.b #0,d0
+  ea2d76:	0000 0000      	ori.b #0,d0
+  ea2d7a:	0000 0000      	ori.b #0,d0
+  ea2d7e:	0000 0000      	ori.b #0,d0
+  ea2d82:	0000 0000      	ori.b #0,d0
+  ea2d86:	0000 0000      	ori.b #0,d0
+  ea2d8a:	0000 0000      	ori.b #0,d0
+  ea2d8e:	0000 0000      	ori.b #0,d0
+  ea2d92:	0000 0000      	ori.b #0,d0
+  ea2d96:	0000 0000      	ori.b #0,d0
+  ea2d9a:	0000 0000      	ori.b #0,d0
+  ea2d9e:	0000 0000      	ori.b #0,d0
+  ea2da2:	0000 0000      	ori.b #0,d0
+  ea2da6:	0000 0000      	ori.b #0,d0
+  ea2daa:	0000 0000      	ori.b #0,d0
+  ea2dae:	0000 0000      	ori.b #0,d0
+  ea2db2:	0000 0000      	ori.b #0,d0
+  ea2db6:	0000 0000      	ori.b #0,d0
+  ea2dba:	0000 0000      	ori.b #0,d0
+  ea2dbe:	0000 0000      	ori.b #0,d0
+  ea2dc2:	0000 0000      	ori.b #0,d0
+  ea2dc6:	0000 0000      	ori.b #0,d0
+  ea2dca:	0000 0000      	ori.b #0,d0
+  ea2dce:	0000 0000      	ori.b #0,d0
+  ea2dd2:	0000 0000      	ori.b #0,d0
+  ea2dd6:	0000 0000      	ori.b #0,d0
+  ea2dda:	0000 0000      	ori.b #0,d0
+  ea2dde:	0000 0000      	ori.b #0,d0
+  ea2de2:	0000 0000      	ori.b #0,d0
+  ea2de6:	0000 0000      	ori.b #0,d0
+  ea2dea:	0000 0000      	ori.b #0,d0
+  ea2dee:	0000 0000      	ori.b #0,d0
+  ea2df2:	0000 0000      	ori.b #0,d0
+  ea2df6:	0000 0000      	ori.b #0,d0
+  ea2dfa:	0000 0000      	ori.b #0,d0
+  ea2dfe:	0000 0000      	ori.b #0,d0
+  ea2e02:	0000 0000      	ori.b #0,d0
+  ea2e06:	0000 0000      	ori.b #0,d0
+  ea2e0a:	0000 0000      	ori.b #0,d0
+  ea2e0e:	0000 0000      	ori.b #0,d0
+  ea2e12:	0000 0000      	ori.b #0,d0
+  ea2e16:	0000 0000      	ori.b #0,d0
+  ea2e1a:	0000 0000      	ori.b #0,d0
+  ea2e1e:	0000 0000      	ori.b #0,d0
+  ea2e22:	0000 0000      	ori.b #0,d0
+  ea2e26:	0000 0000      	ori.b #0,d0
+  ea2e2a:	0000 0000      	ori.b #0,d0
+  ea2e2e:	0000 0000      	ori.b #0,d0
+  ea2e32:	0000 0000      	ori.b #0,d0
+  ea2e36:	0000 0000      	ori.b #0,d0
+  ea2e3a:	0000 0000      	ori.b #0,d0
+  ea2e3e:	0000 0000      	ori.b #0,d0
+  ea2e42:	0000 0000      	ori.b #0,d0
+  ea2e46:	0000 0000      	ori.b #0,d0
+  ea2e4a:	0000 0000      	ori.b #0,d0
+  ea2e4e:	0000 0000      	ori.b #0,d0
+  ea2e52:	0000 0000      	ori.b #0,d0
+  ea2e56:	0000 0000      	ori.b #0,d0
+  ea2e5a:	0000 0000      	ori.b #0,d0
+  ea2e5e:	0000 0000      	ori.b #0,d0
+  ea2e62:	0000 0000      	ori.b #0,d0
+  ea2e66:	0000 0000      	ori.b #0,d0
+  ea2e6a:	0000 0000      	ori.b #0,d0
+  ea2e6e:	0000 0000      	ori.b #0,d0
+  ea2e72:	0000 0000      	ori.b #0,d0
+  ea2e76:	0000 0000      	ori.b #0,d0
+  ea2e7a:	0000 0000      	ori.b #0,d0
+  ea2e7e:	0000 0000      	ori.b #0,d0
+  ea2e82:	0000 0000      	ori.b #0,d0
+  ea2e86:	0000 0000      	ori.b #0,d0
+  ea2e8a:	0000 0000      	ori.b #0,d0
+  ea2e8e:	0000 0000      	ori.b #0,d0
+  ea2e92:	0000 0000      	ori.b #0,d0
+  ea2e96:	0000 0000      	ori.b #0,d0
+  ea2e9a:	0000 0000      	ori.b #0,d0
+  ea2e9e:	0000 0000      	ori.b #0,d0
+  ea2ea2:	0000 0000      	ori.b #0,d0
+  ea2ea6:	0000 0000      	ori.b #0,d0
+  ea2eaa:	0000 0000      	ori.b #0,d0
+  ea2eae:	0000 0000      	ori.b #0,d0
+  ea2eb2:	0000 0000      	ori.b #0,d0
+  ea2eb6:	0000 0000      	ori.b #0,d0
+  ea2eba:	0000 0000      	ori.b #0,d0
+  ea2ebe:	0000 0000      	ori.b #0,d0
+  ea2ec2:	0000 0000      	ori.b #0,d0
+  ea2ec6:	0000 0000      	ori.b #0,d0
+  ea2eca:	0000 0000      	ori.b #0,d0
+  ea2ece:	0000 0000      	ori.b #0,d0
+  ea2ed2:	0000 0000      	ori.b #0,d0
+  ea2ed6:	0000 0000      	ori.b #0,d0
+  ea2eda:	0000 0000      	ori.b #0,d0
+  ea2ede:	0000 0000      	ori.b #0,d0
+  ea2ee2:	0000 0000      	ori.b #0,d0
+  ea2ee6:	0000 0000      	ori.b #0,d0
+  ea2eea:	0000 0000      	ori.b #0,d0
+  ea2eee:	0000 0000      	ori.b #0,d0
+  ea2ef2:	0000 0000      	ori.b #0,d0
+  ea2ef6:	0000 0000      	ori.b #0,d0
+  ea2efa:	0000 0000      	ori.b #0,d0
+  ea2efe:	0000 0000      	ori.b #0,d0
+  ea2f02:	0000 0000      	ori.b #0,d0
+  ea2f06:	0000 0000      	ori.b #0,d0
+  ea2f0a:	0000 0000      	ori.b #0,d0
+  ea2f0e:	0000 0000      	ori.b #0,d0
+  ea2f12:	0000 0000      	ori.b #0,d0
+  ea2f16:	0000 0000      	ori.b #0,d0
+  ea2f1a:	0000 0000      	ori.b #0,d0
+  ea2f1e:	0000 0000      	ori.b #0,d0
+  ea2f22:	0000 0000      	ori.b #0,d0
+  ea2f26:	0000 0000      	ori.b #0,d0
+  ea2f2a:	0000 0000      	ori.b #0,d0
+  ea2f2e:	0000 0000      	ori.b #0,d0
+  ea2f32:	0000 0000      	ori.b #0,d0
+  ea2f36:	0000 0000      	ori.b #0,d0
+  ea2f3a:	0000 0000      	ori.b #0,d0
+  ea2f3e:	0000 0000      	ori.b #0,d0
+  ea2f42:	0000 0000      	ori.b #0,d0
+  ea2f46:	0000 0000      	ori.b #0,d0
+  ea2f4a:	0000 0000      	ori.b #0,d0
+  ea2f4e:	0000 0000      	ori.b #0,d0
+  ea2f52:	0000 0000      	ori.b #0,d0
+  ea2f56:	0000 0000      	ori.b #0,d0
+  ea2f5a:	0000 0000      	ori.b #0,d0
+  ea2f5e:	0000 0000      	ori.b #0,d0
+  ea2f62:	0000 0000      	ori.b #0,d0
+  ea2f66:	0000 0000      	ori.b #0,d0
+  ea2f6a:	0000 0000      	ori.b #0,d0
+  ea2f6e:	0000 0000      	ori.b #0,d0
+  ea2f72:	0000 0000      	ori.b #0,d0
+  ea2f76:	0000 0000      	ori.b #0,d0
+  ea2f7a:	0000 0000      	ori.b #0,d0
+  ea2f7e:	0000 0000      	ori.b #0,d0
+  ea2f82:	0000 0000      	ori.b #0,d0
+  ea2f86:	0000 0000      	ori.b #0,d0
+  ea2f8a:	0000 0000      	ori.b #0,d0
+  ea2f8e:	0000 0000      	ori.b #0,d0
+  ea2f92:	0000 0000      	ori.b #0,d0
+  ea2f96:	0000 0000      	ori.b #0,d0
+  ea2f9a:	0000 0000      	ori.b #0,d0
+  ea2f9e:	0000 0000      	ori.b #0,d0
+  ea2fa2:	0000 0000      	ori.b #0,d0
+  ea2fa6:	0000 0000      	ori.b #0,d0
+  ea2faa:	0000 0000      	ori.b #0,d0
+  ea2fae:	0000 0000      	ori.b #0,d0
+  ea2fb2:	0000 0000      	ori.b #0,d0
+  ea2fb6:	0000 0000      	ori.b #0,d0
+  ea2fba:	0000 0000      	ori.b #0,d0
+  ea2fbe:	0000 0000      	ori.b #0,d0
+  ea2fc2:	0000 0000      	ori.b #0,d0
+  ea2fc6:	0000 0000      	ori.b #0,d0
+  ea2fca:	0000 0000      	ori.b #0,d0
+  ea2fce:	0000 0000      	ori.b #0,d0
+  ea2fd2:	0000 0000      	ori.b #0,d0
+  ea2fd6:	0000 0000      	ori.b #0,d0
+  ea2fda:	0000 0000      	ori.b #0,d0
+  ea2fde:	0000 0000      	ori.b #0,d0
+  ea2fe2:	0000 0000      	ori.b #0,d0
+  ea2fe6:	0000 0000      	ori.b #0,d0
+  ea2fea:	0000 0000      	ori.b #0,d0
+  ea2fee:	0000 0000      	ori.b #0,d0
+  ea2ff2:	0000 0000      	ori.b #0,d0
+  ea2ff6:	0000 0000      	ori.b #0,d0
+  ea2ffa:	0000 0000      	ori.b #0,d0
+  ea2ffe:	0000 0000      	ori.b #0,d0
+  ea3002:	0000 0000      	ori.b #0,d0
+  ea3006:	0000 0000      	ori.b #0,d0
+  ea300a:	0000 0000      	ori.b #0,d0
+  ea300e:	0000 0000      	ori.b #0,d0
+  ea3012:	0000 0000      	ori.b #0,d0
+  ea3016:	0000 0000      	ori.b #0,d0
+  ea301a:	0000 0000      	ori.b #0,d0
+  ea301e:	0000 0000      	ori.b #0,d0
+  ea3022:	0000 0000      	ori.b #0,d0
+  ea3026:	0000 0000      	ori.b #0,d0
+  ea302a:	0000 0000      	ori.b #0,d0
+  ea302e:	0000 0000      	ori.b #0,d0
+  ea3032:	0000 0000      	ori.b #0,d0
+  ea3036:	0000 0000      	ori.b #0,d0
+  ea303a:	0000 0000      	ori.b #0,d0
+  ea303e:	0000 0000      	ori.b #0,d0
+  ea3042:	0000 0000      	ori.b #0,d0
+  ea3046:	0000 0000      	ori.b #0,d0
+  ea304a:	0000 0000      	ori.b #0,d0
+  ea304e:	0000 0000      	ori.b #0,d0
+  ea3052:	0000 0000      	ori.b #0,d0
+  ea3056:	0000 0000      	ori.b #0,d0
+  ea305a:	0000 0000      	ori.b #0,d0
+  ea305e:	0000 0000      	ori.b #0,d0
+  ea3062:	0000 0000      	ori.b #0,d0
+  ea3066:	0000 0000      	ori.b #0,d0
+  ea306a:	0000 0000      	ori.b #0,d0
+  ea306e:	0000 0000      	ori.b #0,d0
+  ea3072:	0000 0000      	ori.b #0,d0
+  ea3076:	0000 0000      	ori.b #0,d0
+  ea307a:	0000 0000      	ori.b #0,d0
+  ea307e:	0000 0000      	ori.b #0,d0
+  ea3082:	0000 0000      	ori.b #0,d0
+  ea3086:	0000 0000      	ori.b #0,d0
+  ea308a:	0000 0000      	ori.b #0,d0
+  ea308e:	0000 0000      	ori.b #0,d0
+  ea3092:	0000 0000      	ori.b #0,d0
+  ea3096:	0000 0000      	ori.b #0,d0
+  ea309a:	0000 0000      	ori.b #0,d0
+  ea309e:	0000 0000      	ori.b #0,d0
+  ea30a2:	0000 0000      	ori.b #0,d0
+  ea30a6:	0000 0000      	ori.b #0,d0
+  ea30aa:	0000 0000      	ori.b #0,d0
+  ea30ae:	0000 0000      	ori.b #0,d0
+  ea30b2:	0000 0000      	ori.b #0,d0
+  ea30b6:	0000 0000      	ori.b #0,d0
+  ea30ba:	0000 0000      	ori.b #0,d0
+  ea30be:	0000 0000      	ori.b #0,d0
+  ea30c2:	0000 0000      	ori.b #0,d0
+  ea30c6:	0000 0000      	ori.b #0,d0
+  ea30ca:	0000 0000      	ori.b #0,d0
+  ea30ce:	0000 0000      	ori.b #0,d0
+  ea30d2:	0000 0000      	ori.b #0,d0
+  ea30d6:	0000 0000      	ori.b #0,d0
+  ea30da:	0000 0000      	ori.b #0,d0
+  ea30de:	0000 0000      	ori.b #0,d0
+  ea30e2:	0000 0000      	ori.b #0,d0
+  ea30e6:	0000 0000      	ori.b #0,d0
+  ea30ea:	0000 0000      	ori.b #0,d0
+  ea30ee:	0000 0000      	ori.b #0,d0
+  ea30f2:	0000 0000      	ori.b #0,d0
+  ea30f6:	0000 0000      	ori.b #0,d0
+  ea30fa:	0000 0000      	ori.b #0,d0
+  ea30fe:	0000 0000      	ori.b #0,d0
+  ea3102:	0000 0000      	ori.b #0,d0
+  ea3106:	0000 0000      	ori.b #0,d0
+  ea310a:	0000 0000      	ori.b #0,d0
+  ea310e:	0000 0000      	ori.b #0,d0
+  ea3112:	0000 0000      	ori.b #0,d0
+  ea3116:	0000 0000      	ori.b #0,d0
+  ea311a:	0000 0000      	ori.b #0,d0
+  ea311e:	0000 0000      	ori.b #0,d0
+  ea3122:	0000 0000      	ori.b #0,d0
+  ea3126:	0000 0000      	ori.b #0,d0
+  ea312a:	0000 0000      	ori.b #0,d0
+  ea312e:	0000 0000      	ori.b #0,d0
+  ea3132:	0000 0000      	ori.b #0,d0
+  ea3136:	0000 0000      	ori.b #0,d0
+  ea313a:	0000 0000      	ori.b #0,d0
+  ea313e:	0000 0000      	ori.b #0,d0
+  ea3142:	0000 0000      	ori.b #0,d0
+  ea3146:	0000 0000      	ori.b #0,d0
+  ea314a:	0000 0000      	ori.b #0,d0
+  ea314e:	0000 0000      	ori.b #0,d0
+  ea3152:	0000 0000      	ori.b #0,d0
+  ea3156:	0000 0000      	ori.b #0,d0
+  ea315a:	0000 0000      	ori.b #0,d0
+  ea315e:	0000 0000      	ori.b #0,d0
+  ea3162:	0000 0000      	ori.b #0,d0
+  ea3166:	0000 0000      	ori.b #0,d0
+  ea316a:	0000 0000      	ori.b #0,d0
+  ea316e:	0000 0000      	ori.b #0,d0
+  ea3172:	0000 0000      	ori.b #0,d0
+  ea3176:	0000 0000      	ori.b #0,d0
+  ea317a:	0000 0000      	ori.b #0,d0
+  ea317e:	0000 0000      	ori.b #0,d0
+  ea3182:	0000 0000      	ori.b #0,d0
+  ea3186:	0000 0000      	ori.b #0,d0
+  ea318a:	0000 0000      	ori.b #0,d0
+  ea318e:	0000 0000      	ori.b #0,d0
+  ea3192:	0000 0000      	ori.b #0,d0
+  ea3196:	0000 0000      	ori.b #0,d0
+  ea319a:	0000 0000      	ori.b #0,d0
+  ea319e:	0000 0000      	ori.b #0,d0
+  ea31a2:	0000 0000      	ori.b #0,d0
+  ea31a6:	0000 0000      	ori.b #0,d0
+  ea31aa:	0000 0000      	ori.b #0,d0
+  ea31ae:	0000 0000      	ori.b #0,d0
+  ea31b2:	0000 0000      	ori.b #0,d0
+  ea31b6:	0000 0000      	ori.b #0,d0
+  ea31ba:	0000 0000      	ori.b #0,d0
+  ea31be:	0000 0000      	ori.b #0,d0
+  ea31c2:	0000 0000      	ori.b #0,d0
+  ea31c6:	0000 0000      	ori.b #0,d0
+  ea31ca:	0000 0000      	ori.b #0,d0
+  ea31ce:	0000 0000      	ori.b #0,d0
+  ea31d2:	0000 0000      	ori.b #0,d0
+  ea31d6:	0000 0000      	ori.b #0,d0
+  ea31da:	0000 0000      	ori.b #0,d0
+  ea31de:	0000 0000      	ori.b #0,d0
+  ea31e2:	0000 0000      	ori.b #0,d0
+  ea31e6:	0000 0000      	ori.b #0,d0
+  ea31ea:	0000 0000      	ori.b #0,d0
+  ea31ee:	0000 0000      	ori.b #0,d0
+  ea31f2:	0000 0000      	ori.b #0,d0
+  ea31f6:	0000 0000      	ori.b #0,d0
+  ea31fa:	0000 0000      	ori.b #0,d0
+  ea31fe:	0000 0000      	ori.b #0,d0
+  ea3202:	0000 0000      	ori.b #0,d0
+  ea3206:	0000 0000      	ori.b #0,d0
+  ea320a:	0000 0000      	ori.b #0,d0
+  ea320e:	0000 0000      	ori.b #0,d0
+  ea3212:	0000 0000      	ori.b #0,d0
+  ea3216:	0000 0000      	ori.b #0,d0
+  ea321a:	0000 0000      	ori.b #0,d0
+  ea321e:	0000 0000      	ori.b #0,d0
+  ea3222:	0000 0000      	ori.b #0,d0
+  ea3226:	0000 0000      	ori.b #0,d0
+  ea322a:	0000 0000      	ori.b #0,d0
+  ea322e:	0000 0000      	ori.b #0,d0
+  ea3232:	0000 0000      	ori.b #0,d0
+  ea3236:	0000 0000      	ori.b #0,d0
+  ea323a:	0000 0000      	ori.b #0,d0
+  ea323e:	0000 0000      	ori.b #0,d0
+  ea3242:	0000 0000      	ori.b #0,d0
+  ea3246:	0000 0000      	ori.b #0,d0
+  ea324a:	0000 0000      	ori.b #0,d0
+  ea324e:	0000 0000      	ori.b #0,d0
+  ea3252:	0000 0000      	ori.b #0,d0
+  ea3256:	0000 0000      	ori.b #0,d0
+  ea325a:	0000 0000      	ori.b #0,d0
+  ea325e:	0000 0000      	ori.b #0,d0
+  ea3262:	0000 0000      	ori.b #0,d0
+  ea3266:	0000 0000      	ori.b #0,d0
+  ea326a:	0000 0000      	ori.b #0,d0
+  ea326e:	0000 0000      	ori.b #0,d0
+  ea3272:	0000 0000      	ori.b #0,d0
+  ea3276:	0000 0000      	ori.b #0,d0
+  ea327a:	0000 0000      	ori.b #0,d0
+  ea327e:	0000 0000      	ori.b #0,d0
+  ea3282:	0000 0000      	ori.b #0,d0
+  ea3286:	0000 0000      	ori.b #0,d0
+  ea328a:	0000 0000      	ori.b #0,d0
+  ea328e:	0000 0000      	ori.b #0,d0
+  ea3292:	0000 0000      	ori.b #0,d0
+  ea3296:	0000 0000      	ori.b #0,d0
+  ea329a:	0000 0000      	ori.b #0,d0
+  ea329e:	0000 0000      	ori.b #0,d0
+  ea32a2:	0000 0000      	ori.b #0,d0
+  ea32a6:	0000 0000      	ori.b #0,d0
+  ea32aa:	0000 0000      	ori.b #0,d0
+  ea32ae:	0000 0000      	ori.b #0,d0
+  ea32b2:	0000 0000      	ori.b #0,d0
+  ea32b6:	0000 0000      	ori.b #0,d0
+  ea32ba:	0000 0000      	ori.b #0,d0
+  ea32be:	0000 0000      	ori.b #0,d0
+  ea32c2:	0000 0000      	ori.b #0,d0
+  ea32c6:	0000 0000      	ori.b #0,d0
+  ea32ca:	0000 0000      	ori.b #0,d0
+  ea32ce:	0000 0000      	ori.b #0,d0
+  ea32d2:	0000 0000      	ori.b #0,d0
+  ea32d6:	0000 0000      	ori.b #0,d0
+  ea32da:	0000 0000      	ori.b #0,d0
+  ea32de:	0000 0000      	ori.b #0,d0
+  ea32e2:	0000 0000      	ori.b #0,d0
+  ea32e6:	0000 0000      	ori.b #0,d0
+  ea32ea:	0000 0000      	ori.b #0,d0
+  ea32ee:	0000 0000      	ori.b #0,d0
+  ea32f2:	0000 0000      	ori.b #0,d0
+  ea32f6:	0000 0000      	ori.b #0,d0
+  ea32fa:	0000 0000      	ori.b #0,d0
+  ea32fe:	0000 0000      	ori.b #0,d0
+  ea3302:	0000 0000      	ori.b #0,d0
+  ea3306:	0000 0000      	ori.b #0,d0
+  ea330a:	0000 0000      	ori.b #0,d0
+  ea330e:	0000 0000      	ori.b #0,d0
+  ea3312:	0000 0000      	ori.b #0,d0
+  ea3316:	0000 0000      	ori.b #0,d0
+  ea331a:	0000 0000      	ori.b #0,d0
+  ea331e:	0000 0000      	ori.b #0,d0
+  ea3322:	0000 0000      	ori.b #0,d0
+  ea3326:	0000 0000      	ori.b #0,d0
+  ea332a:	0000 0000      	ori.b #0,d0
+  ea332e:	0000 0000      	ori.b #0,d0
+  ea3332:	0000 0000      	ori.b #0,d0
+  ea3336:	0000 0000      	ori.b #0,d0
+  ea333a:	0000 0000      	ori.b #0,d0
+  ea333e:	0000 0000      	ori.b #0,d0
+  ea3342:	0000 0000      	ori.b #0,d0
+  ea3346:	0000 0000      	ori.b #0,d0
+  ea334a:	0000 0000      	ori.b #0,d0
+  ea334e:	0000 0000      	ori.b #0,d0
+  ea3352:	0000 0000      	ori.b #0,d0
+  ea3356:	0000 0000      	ori.b #0,d0
+  ea335a:	0000 0000      	ori.b #0,d0
+  ea335e:	0000 0000      	ori.b #0,d0
+  ea3362:	0000 0000      	ori.b #0,d0
+  ea3366:	0000 0000      	ori.b #0,d0
+  ea336a:	0000 0000      	ori.b #0,d0
+  ea336e:	0000 0000      	ori.b #0,d0
+  ea3372:	0000 0000      	ori.b #0,d0
+  ea3376:	0000 0000      	ori.b #0,d0
+  ea337a:	0000 0000      	ori.b #0,d0
+  ea337e:	0000 0000      	ori.b #0,d0
+  ea3382:	0000 0000      	ori.b #0,d0
+  ea3386:	0000 0000      	ori.b #0,d0
+  ea338a:	0000 0000      	ori.b #0,d0
+  ea338e:	0000 0000      	ori.b #0,d0
+  ea3392:	0000 0000      	ori.b #0,d0
+  ea3396:	0000 0000      	ori.b #0,d0
+  ea339a:	0000 0000      	ori.b #0,d0
+  ea339e:	0000 0000      	ori.b #0,d0
+  ea33a2:	0000 0000      	ori.b #0,d0
+  ea33a6:	0000 0000      	ori.b #0,d0
+  ea33aa:	0000 0000      	ori.b #0,d0
+  ea33ae:	0000 0000      	ori.b #0,d0
+  ea33b2:	0000 0000      	ori.b #0,d0
+  ea33b6:	0000 0000      	ori.b #0,d0
+  ea33ba:	0000 0000      	ori.b #0,d0
+  ea33be:	0000 0000      	ori.b #0,d0
+  ea33c2:	0000 0000      	ori.b #0,d0
+  ea33c6:	0000 0000      	ori.b #0,d0
+  ea33ca:	0000 0000      	ori.b #0,d0
+  ea33ce:	0000 0000      	ori.b #0,d0
+  ea33d2:	0000 0000      	ori.b #0,d0
+  ea33d6:	0000 0000      	ori.b #0,d0
+  ea33da:	0000 0000      	ori.b #0,d0
+  ea33de:	0000 0000      	ori.b #0,d0
+  ea33e2:	0000 0000      	ori.b #0,d0
+  ea33e6:	0000 0000      	ori.b #0,d0
+  ea33ea:	0000 0000      	ori.b #0,d0
+  ea33ee:	0000 0000      	ori.b #0,d0
+  ea33f2:	0000 0000      	ori.b #0,d0
+  ea33f6:	0000 0000      	ori.b #0,d0
+  ea33fa:	0000 0000      	ori.b #0,d0
+  ea33fe:	0000 0000      	ori.b #0,d0
+  ea3402:	0000 0000      	ori.b #0,d0
+  ea3406:	0000 0000      	ori.b #0,d0
+  ea340a:	0000 0000      	ori.b #0,d0
+  ea340e:	0000 0000      	ori.b #0,d0
+  ea3412:	0000 0000      	ori.b #0,d0
+  ea3416:	0000 0000      	ori.b #0,d0
+  ea341a:	0000 0000      	ori.b #0,d0
+  ea341e:	0000 0000      	ori.b #0,d0
+  ea3422:	0000 0000      	ori.b #0,d0
+  ea3426:	0000 0000      	ori.b #0,d0
+  ea342a:	0000 0000      	ori.b #0,d0
+  ea342e:	0000 0000      	ori.b #0,d0
+  ea3432:	0000 0000      	ori.b #0,d0
+  ea3436:	0000 0000      	ori.b #0,d0
+  ea343a:	0000 0000      	ori.b #0,d0
+  ea343e:	0000 0000      	ori.b #0,d0
+  ea3442:	0000 0000      	ori.b #0,d0
+  ea3446:	0000 0000      	ori.b #0,d0
+  ea344a:	0000 0000      	ori.b #0,d0
+  ea344e:	0000 0000      	ori.b #0,d0
+  ea3452:	0000 0000      	ori.b #0,d0
+  ea3456:	0000 0000      	ori.b #0,d0
+  ea345a:	0000 0000      	ori.b #0,d0
+  ea345e:	0000 0000      	ori.b #0,d0
+  ea3462:	0000 0000      	ori.b #0,d0
+  ea3466:	0000 0000      	ori.b #0,d0
+  ea346a:	0000 0000      	ori.b #0,d0
+  ea346e:	0000 0000      	ori.b #0,d0
+  ea3472:	0000 0000      	ori.b #0,d0
+  ea3476:	0000 0000      	ori.b #0,d0
+  ea347a:	0000 0000      	ori.b #0,d0
+  ea347e:	0000 0000      	ori.b #0,d0
+  ea3482:	0000 0000      	ori.b #0,d0
+  ea3486:	0000 0000      	ori.b #0,d0
+  ea348a:	0000 0000      	ori.b #0,d0
+  ea348e:	0000 0000      	ori.b #0,d0
+  ea3492:	0000 0000      	ori.b #0,d0
+  ea3496:	0000 0000      	ori.b #0,d0
+  ea349a:	0000 0000      	ori.b #0,d0
+  ea349e:	0000 0000      	ori.b #0,d0
+  ea34a2:	0000 0000      	ori.b #0,d0
+  ea34a6:	0000 0000      	ori.b #0,d0
+  ea34aa:	0000 0000      	ori.b #0,d0
+  ea34ae:	0000 0000      	ori.b #0,d0
+  ea34b2:	0000 0000      	ori.b #0,d0
+  ea34b6:	0000 0000      	ori.b #0,d0
+  ea34ba:	0000 0000      	ori.b #0,d0
+  ea34be:	0000 0000      	ori.b #0,d0
+  ea34c2:	0000 0000      	ori.b #0,d0
+  ea34c6:	0000 0000      	ori.b #0,d0
+  ea34ca:	0000 0000      	ori.b #0,d0
+  ea34ce:	0000 0000      	ori.b #0,d0
+  ea34d2:	0000 0000      	ori.b #0,d0
+  ea34d6:	0000 0000      	ori.b #0,d0
+  ea34da:	0000 0000      	ori.b #0,d0
+  ea34de:	0000 0000      	ori.b #0,d0
+  ea34e2:	0000 0000      	ori.b #0,d0
+  ea34e6:	0000 0000      	ori.b #0,d0
+  ea34ea:	0000 0000      	ori.b #0,d0
+  ea34ee:	0000 0000      	ori.b #0,d0
+  ea34f2:	0000 0000      	ori.b #0,d0
+  ea34f6:	0000 0000      	ori.b #0,d0
+  ea34fa:	0000 0000      	ori.b #0,d0
+  ea34fe:	0000 0000      	ori.b #0,d0
+  ea3502:	0000 0000      	ori.b #0,d0
+  ea3506:	0000 0000      	ori.b #0,d0
+  ea350a:	0000 0000      	ori.b #0,d0
+  ea350e:	0000 0000      	ori.b #0,d0
+  ea3512:	0000 0000      	ori.b #0,d0
+  ea3516:	0000 0000      	ori.b #0,d0
+  ea351a:	0000 0000      	ori.b #0,d0
+  ea351e:	0000 0000      	ori.b #0,d0
+  ea3522:	0000 0000      	ori.b #0,d0
+  ea3526:	0000 0000      	ori.b #0,d0
+  ea352a:	0000 0000      	ori.b #0,d0
+  ea352e:	0000 0000      	ori.b #0,d0
+  ea3532:	0000 0000      	ori.b #0,d0
+  ea3536:	0000 0000      	ori.b #0,d0
+  ea353a:	0000 0000      	ori.b #0,d0
+  ea353e:	0000 0000      	ori.b #0,d0
+  ea3542:	0000 0000      	ori.b #0,d0
+  ea3546:	0000 0000      	ori.b #0,d0
+  ea354a:	0000 0000      	ori.b #0,d0
+  ea354e:	0000 0000      	ori.b #0,d0
+  ea3552:	0000 0000      	ori.b #0,d0
+  ea3556:	0000 0000      	ori.b #0,d0
+  ea355a:	0000 0000      	ori.b #0,d0
+  ea355e:	0000 0000      	ori.b #0,d0
+  ea3562:	0000 0000      	ori.b #0,d0
+  ea3566:	0000 0000      	ori.b #0,d0
+  ea356a:	0000 0000      	ori.b #0,d0
+  ea356e:	0000 0000      	ori.b #0,d0
+  ea3572:	0000 0000      	ori.b #0,d0
+  ea3576:	0000 0000      	ori.b #0,d0
+  ea357a:	0000 0000      	ori.b #0,d0
+  ea357e:	0000 0000      	ori.b #0,d0
+  ea3582:	0000 0000      	ori.b #0,d0
+  ea3586:	0000 0000      	ori.b #0,d0
+  ea358a:	0000 0000      	ori.b #0,d0
+  ea358e:	0000 0000      	ori.b #0,d0
+  ea3592:	0000 0000      	ori.b #0,d0
+  ea3596:	0000 0000      	ori.b #0,d0
+  ea359a:	0000 0000      	ori.b #0,d0
+  ea359e:	0000 0000      	ori.b #0,d0
+  ea35a2:	0000 0000      	ori.b #0,d0
+  ea35a6:	0000 0000      	ori.b #0,d0
+  ea35aa:	0000 0000      	ori.b #0,d0
+  ea35ae:	0000 0000      	ori.b #0,d0
+  ea35b2:	0000 0000      	ori.b #0,d0
+  ea35b6:	0000 0000      	ori.b #0,d0
+  ea35ba:	0000 0000      	ori.b #0,d0
+  ea35be:	0000 0000      	ori.b #0,d0
+  ea35c2:	0000 0000      	ori.b #0,d0
+  ea35c6:	0000 0000      	ori.b #0,d0
+  ea35ca:	0000 0000      	ori.b #0,d0
+  ea35ce:	0000 0000      	ori.b #0,d0
+  ea35d2:	0000 0000      	ori.b #0,d0
+  ea35d6:	0000 0000      	ori.b #0,d0
+  ea35da:	0000 0000      	ori.b #0,d0
+  ea35de:	0000 0000      	ori.b #0,d0
+  ea35e2:	0000 0000      	ori.b #0,d0
+  ea35e6:	0000 0000      	ori.b #0,d0
+  ea35ea:	0000 0000      	ori.b #0,d0
+  ea35ee:	0000 0000      	ori.b #0,d0
+  ea35f2:	0000 0000      	ori.b #0,d0
+  ea35f6:	0000 0000      	ori.b #0,d0
+  ea35fa:	0000 0000      	ori.b #0,d0
+  ea35fe:	0000 0000      	ori.b #0,d0
+  ea3602:	0000 0000      	ori.b #0,d0
+  ea3606:	0000 0000      	ori.b #0,d0
+  ea360a:	0000 0000      	ori.b #0,d0
+  ea360e:	0000 0000      	ori.b #0,d0
+  ea3612:	0000 0000      	ori.b #0,d0
+  ea3616:	0000 0000      	ori.b #0,d0
+  ea361a:	0000 0000      	ori.b #0,d0
+  ea361e:	0000 0000      	ori.b #0,d0
+  ea3622:	0000 0000      	ori.b #0,d0
+  ea3626:	0000 0000      	ori.b #0,d0
+  ea362a:	0000 0000      	ori.b #0,d0
+  ea362e:	0000 0000      	ori.b #0,d0
+  ea3632:	0000 0000      	ori.b #0,d0
+  ea3636:	0000 0000      	ori.b #0,d0
+  ea363a:	0000 0000      	ori.b #0,d0
+  ea363e:	0000 0000      	ori.b #0,d0
+  ea3642:	0000 0000      	ori.b #0,d0
+  ea3646:	0000 0000      	ori.b #0,d0
+  ea364a:	0000 0000      	ori.b #0,d0
+  ea364e:	0000 0000      	ori.b #0,d0
+  ea3652:	0000 0000      	ori.b #0,d0
+  ea3656:	0000 0000      	ori.b #0,d0
+  ea365a:	0000 0000      	ori.b #0,d0
+  ea365e:	0000 0000      	ori.b #0,d0
+  ea3662:	0000 0000      	ori.b #0,d0
+  ea3666:	0000 0000      	ori.b #0,d0
+  ea366a:	0000 0000      	ori.b #0,d0
+  ea366e:	0000 0000      	ori.b #0,d0
+  ea3672:	0000 0000      	ori.b #0,d0
+  ea3676:	0000 0000      	ori.b #0,d0
+  ea367a:	0000 0000      	ori.b #0,d0
+  ea367e:	0000 0000      	ori.b #0,d0
+  ea3682:	0000 0000      	ori.b #0,d0
+  ea3686:	0000 0000      	ori.b #0,d0
+  ea368a:	0000 0000      	ori.b #0,d0
+  ea368e:	0000 0000      	ori.b #0,d0
+  ea3692:	0000 0000      	ori.b #0,d0
+  ea3696:	0000 0000      	ori.b #0,d0
+  ea369a:	0000 0000      	ori.b #0,d0
+  ea369e:	0000 0000      	ori.b #0,d0
+  ea36a2:	0000 0000      	ori.b #0,d0
+  ea36a6:	0000 0000      	ori.b #0,d0
+  ea36aa:	0000 0000      	ori.b #0,d0
+  ea36ae:	0000 0000      	ori.b #0,d0
+  ea36b2:	0000 0000      	ori.b #0,d0
+  ea36b6:	0000 0000      	ori.b #0,d0
+  ea36ba:	0000 0000      	ori.b #0,d0
+  ea36be:	0000 0000      	ori.b #0,d0
+  ea36c2:	0000 0000      	ori.b #0,d0
+  ea36c6:	0000 0000      	ori.b #0,d0
+  ea36ca:	0000 0000      	ori.b #0,d0
+  ea36ce:	0000 0000      	ori.b #0,d0
+  ea36d2:	0000 0000      	ori.b #0,d0
+  ea36d6:	0000 0000      	ori.b #0,d0
+  ea36da:	0000 0000      	ori.b #0,d0
+  ea36de:	0000 0000      	ori.b #0,d0
+  ea36e2:	0000 0000      	ori.b #0,d0
+  ea36e6:	0000 0000      	ori.b #0,d0
+  ea36ea:	0000 0000      	ori.b #0,d0
+  ea36ee:	0000 0000      	ori.b #0,d0
+  ea36f2:	0000 0000      	ori.b #0,d0
+  ea36f6:	0000 0000      	ori.b #0,d0
+  ea36fa:	0000 0000      	ori.b #0,d0
+  ea36fe:	0000 0000      	ori.b #0,d0
+  ea3702:	0000 0000      	ori.b #0,d0
+  ea3706:	0000 0000      	ori.b #0,d0
+  ea370a:	0000 0000      	ori.b #0,d0
+  ea370e:	0000 0000      	ori.b #0,d0
+  ea3712:	0000 0000      	ori.b #0,d0
+  ea3716:	0000 0000      	ori.b #0,d0
+  ea371a:	0000 0000      	ori.b #0,d0
+  ea371e:	0000 0000      	ori.b #0,d0
+  ea3722:	0000 0000      	ori.b #0,d0
+  ea3726:	0000 0000      	ori.b #0,d0
+  ea372a:	0000 0000      	ori.b #0,d0
+  ea372e:	0000 0000      	ori.b #0,d0
+  ea3732:	0000 0000      	ori.b #0,d0
+  ea3736:	0000 0000      	ori.b #0,d0
+  ea373a:	0000 0000      	ori.b #0,d0
+  ea373e:	0000 0000      	ori.b #0,d0
+  ea3742:	0000 0000      	ori.b #0,d0
+  ea3746:	0000 0000      	ori.b #0,d0
+  ea374a:	0000 0000      	ori.b #0,d0
+  ea374e:	0000 0000      	ori.b #0,d0
+  ea3752:	0000 0000      	ori.b #0,d0
+  ea3756:	0000 0000      	ori.b #0,d0
+  ea375a:	0000 0000      	ori.b #0,d0
+  ea375e:	0000 0000      	ori.b #0,d0
+  ea3762:	0000 0000      	ori.b #0,d0
+  ea3766:	0000 0000      	ori.b #0,d0
+  ea376a:	0000 0000      	ori.b #0,d0
+  ea376e:	0000 0000      	ori.b #0,d0
+  ea3772:	0000 0000      	ori.b #0,d0
+  ea3776:	0000 0000      	ori.b #0,d0
+  ea377a:	0000 0000      	ori.b #0,d0
+  ea377e:	0000 0000      	ori.b #0,d0
+  ea3782:	0000 0000      	ori.b #0,d0
+  ea3786:	0000 0000      	ori.b #0,d0
+  ea378a:	0000 0000      	ori.b #0,d0
+  ea378e:	0000 0000      	ori.b #0,d0
+  ea3792:	0000 0000      	ori.b #0,d0
+  ea3796:	0000 0000      	ori.b #0,d0
+  ea379a:	0000 0000      	ori.b #0,d0
+  ea379e:	0000 0000      	ori.b #0,d0
+  ea37a2:	0000 0000      	ori.b #0,d0
+  ea37a6:	0000 0000      	ori.b #0,d0
+  ea37aa:	0000 0000      	ori.b #0,d0
+  ea37ae:	0000 0000      	ori.b #0,d0
+  ea37b2:	0000 0000      	ori.b #0,d0
+  ea37b6:	0000 0000      	ori.b #0,d0
+  ea37ba:	0000 0000      	ori.b #0,d0
+  ea37be:	0000 0000      	ori.b #0,d0
+  ea37c2:	0000 0000      	ori.b #0,d0
+  ea37c6:	0000 0000      	ori.b #0,d0
+  ea37ca:	0000 0000      	ori.b #0,d0
+  ea37ce:	0000 0000      	ori.b #0,d0
+  ea37d2:	0000 0000      	ori.b #0,d0
+  ea37d6:	0000 0000      	ori.b #0,d0
+  ea37da:	0000 0000      	ori.b #0,d0
+  ea37de:	0000 0000      	ori.b #0,d0
+  ea37e2:	0000 0000      	ori.b #0,d0
+  ea37e6:	0000 0000      	ori.b #0,d0
+  ea37ea:	0000 0000      	ori.b #0,d0
+  ea37ee:	0000 0000      	ori.b #0,d0
+  ea37f2:	0000 0000      	ori.b #0,d0
+  ea37f6:	0000 0000      	ori.b #0,d0
+  ea37fa:	0000 0000      	ori.b #0,d0
+  ea37fe:	0000 0000      	ori.b #0,d0
+  ea3802:	0000 0000      	ori.b #0,d0
+  ea3806:	0000 0000      	ori.b #0,d0
+  ea380a:	0000 0000      	ori.b #0,d0
+  ea380e:	0000 0000      	ori.b #0,d0
+  ea3812:	0000 0000      	ori.b #0,d0
+  ea3816:	0000 0000      	ori.b #0,d0
+  ea381a:	0000 0000      	ori.b #0,d0
+  ea381e:	0000 0000      	ori.b #0,d0
+  ea3822:	0000 0000      	ori.b #0,d0
+  ea3826:	0000 0000      	ori.b #0,d0
+  ea382a:	0000 0000      	ori.b #0,d0
+  ea382e:	0000 0000      	ori.b #0,d0
+  ea3832:	0000 0000      	ori.b #0,d0
+  ea3836:	0000 0000      	ori.b #0,d0
+  ea383a:	0000 0000      	ori.b #0,d0
+  ea383e:	0000 0000      	ori.b #0,d0
+  ea3842:	0000 0000      	ori.b #0,d0
+  ea3846:	0000 0000      	ori.b #0,d0
+  ea384a:	0000 0000      	ori.b #0,d0
+  ea384e:	0000 0000      	ori.b #0,d0
+  ea3852:	0000 0000      	ori.b #0,d0
+  ea3856:	0000 0000      	ori.b #0,d0
+  ea385a:	0000 0000      	ori.b #0,d0
+  ea385e:	0000 0000      	ori.b #0,d0
+  ea3862:	0000 0000      	ori.b #0,d0
+  ea3866:	0000 0000      	ori.b #0,d0
+  ea386a:	0000 0000      	ori.b #0,d0
+  ea386e:	0000 0000      	ori.b #0,d0
+  ea3872:	0000 0000      	ori.b #0,d0
+  ea3876:	0000 0000      	ori.b #0,d0
+  ea387a:	0000 0000      	ori.b #0,d0
+  ea387e:	0000 0000      	ori.b #0,d0
+  ea3882:	0000 0000      	ori.b #0,d0
+  ea3886:	0000 0000      	ori.b #0,d0
+  ea388a:	0000 0000      	ori.b #0,d0
+  ea388e:	0000 0000      	ori.b #0,d0
+  ea3892:	0000 0000      	ori.b #0,d0
+  ea3896:	0000 0000      	ori.b #0,d0
+  ea389a:	0000 0000      	ori.b #0,d0
+  ea389e:	0000 0000      	ori.b #0,d0
+  ea38a2:	0000 0000      	ori.b #0,d0
+  ea38a6:	0000 0000      	ori.b #0,d0
+  ea38aa:	0000 0000      	ori.b #0,d0
+  ea38ae:	0000 0000      	ori.b #0,d0
+  ea38b2:	0000 0000      	ori.b #0,d0
+  ea38b6:	0000 0000      	ori.b #0,d0
+  ea38ba:	0000 0000      	ori.b #0,d0
+  ea38be:	0000 0000      	ori.b #0,d0
+  ea38c2:	0000 0000      	ori.b #0,d0
+  ea38c6:	0000 0000      	ori.b #0,d0
+  ea38ca:	0000 0000      	ori.b #0,d0
+  ea38ce:	0000 0000      	ori.b #0,d0
+  ea38d2:	0000 0000      	ori.b #0,d0
+  ea38d6:	0000 0000      	ori.b #0,d0
+  ea38da:	0000 0000      	ori.b #0,d0
+  ea38de:	0000 0000      	ori.b #0,d0
+  ea38e2:	0000 0000      	ori.b #0,d0
+  ea38e6:	0000 0000      	ori.b #0,d0
+  ea38ea:	0000 0000      	ori.b #0,d0
+  ea38ee:	0000 0000      	ori.b #0,d0
+  ea38f2:	0000 0000      	ori.b #0,d0
+  ea38f6:	0000 0000      	ori.b #0,d0
+  ea38fa:	0000 0000      	ori.b #0,d0
+  ea38fe:	0000 0000      	ori.b #0,d0
+  ea3902:	0000 0000      	ori.b #0,d0
+  ea3906:	0000 0000      	ori.b #0,d0
+  ea390a:	0000 0000      	ori.b #0,d0
+  ea390e:	0000 0000      	ori.b #0,d0
+  ea3912:	0000 0000      	ori.b #0,d0
+  ea3916:	0000 0000      	ori.b #0,d0
+  ea391a:	0000 0000      	ori.b #0,d0
+  ea391e:	0000 0000      	ori.b #0,d0
+  ea3922:	0000 0000      	ori.b #0,d0
+  ea3926:	0000 0000      	ori.b #0,d0
+  ea392a:	0000 0000      	ori.b #0,d0
+  ea392e:	0000 0000      	ori.b #0,d0
+  ea3932:	0000 0000      	ori.b #0,d0
+  ea3936:	0000 0000      	ori.b #0,d0
+  ea393a:	0000 0000      	ori.b #0,d0
+  ea393e:	0000 0000      	ori.b #0,d0
+  ea3942:	0000 0000      	ori.b #0,d0
+  ea3946:	0000 0000      	ori.b #0,d0
+  ea394a:	0000 0000      	ori.b #0,d0
+  ea394e:	0000 0000      	ori.b #0,d0
+  ea3952:	0000 0000      	ori.b #0,d0
+  ea3956:	0000 0000      	ori.b #0,d0
+  ea395a:	0000 0000      	ori.b #0,d0
+  ea395e:	0000 0000      	ori.b #0,d0
+  ea3962:	0000 0000      	ori.b #0,d0
+  ea3966:	0000 0000      	ori.b #0,d0
+  ea396a:	0000 0000      	ori.b #0,d0
+  ea396e:	0000 0000      	ori.b #0,d0
+  ea3972:	0000 0000      	ori.b #0,d0
+  ea3976:	0000 0000      	ori.b #0,d0
+  ea397a:	0000 0000      	ori.b #0,d0
+  ea397e:	0000 0000      	ori.b #0,d0
+  ea3982:	0000 0000      	ori.b #0,d0
+  ea3986:	0000 0000      	ori.b #0,d0
+  ea398a:	0000 0000      	ori.b #0,d0
+  ea398e:	0000 0000      	ori.b #0,d0
+  ea3992:	0000 0000      	ori.b #0,d0
+  ea3996:	0000 0000      	ori.b #0,d0
+  ea399a:	0000 0000      	ori.b #0,d0
+  ea399e:	0000 0000      	ori.b #0,d0
+  ea39a2:	0000 0000      	ori.b #0,d0
+  ea39a6:	0000 0000      	ori.b #0,d0
+  ea39aa:	0000 0000      	ori.b #0,d0
+  ea39ae:	0000 0000      	ori.b #0,d0
+  ea39b2:	0000 0000      	ori.b #0,d0
+  ea39b6:	0000 0000      	ori.b #0,d0
+  ea39ba:	0000 0000      	ori.b #0,d0
+  ea39be:	0000 0000      	ori.b #0,d0
+  ea39c2:	0000 0000      	ori.b #0,d0
+  ea39c6:	0000 0000      	ori.b #0,d0
+  ea39ca:	0000 0000      	ori.b #0,d0
+  ea39ce:	0000 0000      	ori.b #0,d0
+  ea39d2:	0000 0000      	ori.b #0,d0
+  ea39d6:	0000 0000      	ori.b #0,d0
+  ea39da:	0000 0000      	ori.b #0,d0
+  ea39de:	0000 0000      	ori.b #0,d0
+  ea39e2:	0000 0000      	ori.b #0,d0
+  ea39e6:	0000 0000      	ori.b #0,d0
+  ea39ea:	0000 0000      	ori.b #0,d0
+  ea39ee:	0000 0000      	ori.b #0,d0
+  ea39f2:	0000 0000      	ori.b #0,d0
+  ea39f6:	0000 0000      	ori.b #0,d0
+  ea39fa:	0000 0000      	ori.b #0,d0
+  ea39fe:	0000 0000      	ori.b #0,d0
+  ea3a02:	0000 0000      	ori.b #0,d0
+  ea3a06:	0000 0000      	ori.b #0,d0
+  ea3a0a:	0000 0000      	ori.b #0,d0
+  ea3a0e:	0000 0000      	ori.b #0,d0
+  ea3a12:	0000 0000      	ori.b #0,d0
+  ea3a16:	0000 0000      	ori.b #0,d0
+  ea3a1a:	0000 0000      	ori.b #0,d0
+  ea3a1e:	0000 0000      	ori.b #0,d0
+  ea3a22:	0000 0000      	ori.b #0,d0
+  ea3a26:	0000 0000      	ori.b #0,d0
+  ea3a2a:	0000 0000      	ori.b #0,d0
+  ea3a2e:	0000 0000      	ori.b #0,d0
+  ea3a32:	0000 0000      	ori.b #0,d0
+  ea3a36:	0000 0000      	ori.b #0,d0
+  ea3a3a:	0000 0000      	ori.b #0,d0
+  ea3a3e:	0000 0000      	ori.b #0,d0
+  ea3a42:	0000 0000      	ori.b #0,d0
+  ea3a46:	0000 0000      	ori.b #0,d0
+  ea3a4a:	0000 0000      	ori.b #0,d0
+  ea3a4e:	0000 0000      	ori.b #0,d0
+  ea3a52:	0000 0000      	ori.b #0,d0
+  ea3a56:	0000 0000      	ori.b #0,d0
+  ea3a5a:	0000 0000      	ori.b #0,d0
+  ea3a5e:	0000 0000      	ori.b #0,d0
+  ea3a62:	0000 0000      	ori.b #0,d0
+  ea3a66:	0000 0000      	ori.b #0,d0
+  ea3a6a:	0000 0000      	ori.b #0,d0
+  ea3a6e:	0000 0000      	ori.b #0,d0
+  ea3a72:	0000 0000      	ori.b #0,d0
+  ea3a76:	0000 0000      	ori.b #0,d0
+  ea3a7a:	0000 0000      	ori.b #0,d0
+  ea3a7e:	0000 0000      	ori.b #0,d0
+  ea3a82:	0000 0000      	ori.b #0,d0
+  ea3a86:	0000 0000      	ori.b #0,d0
+  ea3a8a:	0000 0000      	ori.b #0,d0
+  ea3a8e:	0000 0000      	ori.b #0,d0
+  ea3a92:	0000 0000      	ori.b #0,d0
+  ea3a96:	0000 0000      	ori.b #0,d0
+  ea3a9a:	0000 0000      	ori.b #0,d0
+  ea3a9e:	0000 0000      	ori.b #0,d0
+  ea3aa2:	0000 0000      	ori.b #0,d0
+  ea3aa6:	0000 0000      	ori.b #0,d0
+  ea3aaa:	0000 0000      	ori.b #0,d0
+  ea3aae:	0000 0000      	ori.b #0,d0
+  ea3ab2:	0000 0000      	ori.b #0,d0
+  ea3ab6:	0000 0000      	ori.b #0,d0
+  ea3aba:	0000 0000      	ori.b #0,d0
+  ea3abe:	0000 0000      	ori.b #0,d0
+  ea3ac2:	0000 0000      	ori.b #0,d0
+  ea3ac6:	0000 0000      	ori.b #0,d0
+  ea3aca:	0000 0000      	ori.b #0,d0
+  ea3ace:	0000 0000      	ori.b #0,d0
+  ea3ad2:	0000 0000      	ori.b #0,d0
+  ea3ad6:	0000 0000      	ori.b #0,d0
+  ea3ada:	0000 0000      	ori.b #0,d0
+  ea3ade:	0000 0000      	ori.b #0,d0
+  ea3ae2:	0000 0000      	ori.b #0,d0
+  ea3ae6:	0000 0000      	ori.b #0,d0
+  ea3aea:	0000 0000      	ori.b #0,d0
+  ea3aee:	0000 0000      	ori.b #0,d0
+  ea3af2:	0000 0000      	ori.b #0,d0
+  ea3af6:	0000 0000      	ori.b #0,d0
+  ea3afa:	0000 0000      	ori.b #0,d0
+  ea3afe:	0000 0000      	ori.b #0,d0
+  ea3b02:	0000 0000      	ori.b #0,d0
+  ea3b06:	0000 0000      	ori.b #0,d0
+  ea3b0a:	0000 0000      	ori.b #0,d0
+  ea3b0e:	0000 0000      	ori.b #0,d0
+  ea3b12:	0000 0000      	ori.b #0,d0
+  ea3b16:	0000 0000      	ori.b #0,d0
+  ea3b1a:	0000 0000      	ori.b #0,d0
+  ea3b1e:	0000 0000      	ori.b #0,d0
+  ea3b22:	0000 0000      	ori.b #0,d0
+  ea3b26:	0000 0000      	ori.b #0,d0
+  ea3b2a:	0000 0000      	ori.b #0,d0
+  ea3b2e:	0000 0000      	ori.b #0,d0
+  ea3b32:	0000 0000      	ori.b #0,d0
+  ea3b36:	0000 0000      	ori.b #0,d0
+  ea3b3a:	0000 0000      	ori.b #0,d0
+  ea3b3e:	0000 0000      	ori.b #0,d0
+  ea3b42:	0000 0000      	ori.b #0,d0
+  ea3b46:	0000 0000      	ori.b #0,d0
+  ea3b4a:	0000 0000      	ori.b #0,d0
+  ea3b4e:	0000 0000      	ori.b #0,d0
+  ea3b52:	0000 0000      	ori.b #0,d0
+  ea3b56:	0000 0000      	ori.b #0,d0
+  ea3b5a:	0000 0000      	ori.b #0,d0
+  ea3b5e:	0000 0000      	ori.b #0,d0
+  ea3b62:	0000 0000      	ori.b #0,d0
+  ea3b66:	0000 0000      	ori.b #0,d0
+  ea3b6a:	0000 0000      	ori.b #0,d0
+  ea3b6e:	0000 0000      	ori.b #0,d0
+  ea3b72:	0000 0000      	ori.b #0,d0
+  ea3b76:	0000 0000      	ori.b #0,d0
+  ea3b7a:	0000 0000      	ori.b #0,d0
+  ea3b7e:	0000 0000      	ori.b #0,d0
+  ea3b82:	0000 0000      	ori.b #0,d0
+  ea3b86:	0000 0000      	ori.b #0,d0
+  ea3b8a:	0000 0000      	ori.b #0,d0
+  ea3b8e:	0000 0000      	ori.b #0,d0
+  ea3b92:	0000 0000      	ori.b #0,d0
+  ea3b96:	0000 0000      	ori.b #0,d0
+  ea3b9a:	0000 0000      	ori.b #0,d0
+  ea3b9e:	0000 0000      	ori.b #0,d0
+  ea3ba2:	0000 0000      	ori.b #0,d0
+  ea3ba6:	0000 0000      	ori.b #0,d0
+  ea3baa:	0000 0000      	ori.b #0,d0
+  ea3bae:	0000 0000      	ori.b #0,d0
+  ea3bb2:	0000 0000      	ori.b #0,d0
+  ea3bb6:	0000 0000      	ori.b #0,d0
+  ea3bba:	0000 0000      	ori.b #0,d0
+  ea3bbe:	0000 0000      	ori.b #0,d0
+  ea3bc2:	0000 0000      	ori.b #0,d0
+  ea3bc6:	0000 0000      	ori.b #0,d0
+  ea3bca:	0000 0000      	ori.b #0,d0
+  ea3bce:	0000 0000      	ori.b #0,d0
+  ea3bd2:	0000 0000      	ori.b #0,d0
+  ea3bd6:	0000 0000      	ori.b #0,d0
+  ea3bda:	0000 0000      	ori.b #0,d0
+  ea3bde:	0000 0000      	ori.b #0,d0
+  ea3be2:	0000 0000      	ori.b #0,d0
+  ea3be6:	0000 0000      	ori.b #0,d0
+  ea3bea:	0000 0000      	ori.b #0,d0
+  ea3bee:	0000 0000      	ori.b #0,d0
+  ea3bf2:	0000 0000      	ori.b #0,d0
+  ea3bf6:	0000 0000      	ori.b #0,d0
+  ea3bfa:	0000 0000      	ori.b #0,d0
+  ea3bfe:	0000 0000      	ori.b #0,d0
+  ea3c02:	0000 0000      	ori.b #0,d0
+  ea3c06:	0000 0000      	ori.b #0,d0
+  ea3c0a:	0000 0000      	ori.b #0,d0
+  ea3c0e:	0000 0000      	ori.b #0,d0
+  ea3c12:	0000 0000      	ori.b #0,d0
+  ea3c16:	0000 0000      	ori.b #0,d0
+  ea3c1a:	0000 0000      	ori.b #0,d0
+  ea3c1e:	0000 0000      	ori.b #0,d0
+  ea3c22:	0000 0000      	ori.b #0,d0
+  ea3c26:	0000 0000      	ori.b #0,d0
+  ea3c2a:	0000 0000      	ori.b #0,d0
+  ea3c2e:	0000 0000      	ori.b #0,d0
+  ea3c32:	0000 0000      	ori.b #0,d0
+  ea3c36:	0000 0000      	ori.b #0,d0
+  ea3c3a:	0000 0000      	ori.b #0,d0
+  ea3c3e:	0000 0000      	ori.b #0,d0
+  ea3c42:	0000 0000      	ori.b #0,d0
+  ea3c46:	0000 0000      	ori.b #0,d0
+  ea3c4a:	0000 0000      	ori.b #0,d0
+  ea3c4e:	0000 0000      	ori.b #0,d0
+  ea3c52:	0000 0000      	ori.b #0,d0
+  ea3c56:	0000 0000      	ori.b #0,d0
+  ea3c5a:	0000 0000      	ori.b #0,d0
+  ea3c5e:	0000 0000      	ori.b #0,d0
+  ea3c62:	0000 0000      	ori.b #0,d0
+  ea3c66:	0000 0000      	ori.b #0,d0
+  ea3c6a:	0000 0000      	ori.b #0,d0
+  ea3c6e:	0000 0000      	ori.b #0,d0
+  ea3c72:	0000 0000      	ori.b #0,d0
+  ea3c76:	0000 0000      	ori.b #0,d0
+  ea3c7a:	0000 0000      	ori.b #0,d0
+  ea3c7e:	0000 0000      	ori.b #0,d0
+  ea3c82:	0000 0000      	ori.b #0,d0
+  ea3c86:	0000 0000      	ori.b #0,d0
+  ea3c8a:	0000 0000      	ori.b #0,d0
+  ea3c8e:	0000 0000      	ori.b #0,d0
+  ea3c92:	0000 0000      	ori.b #0,d0
+  ea3c96:	0000 0000      	ori.b #0,d0
+  ea3c9a:	0000 0000      	ori.b #0,d0
+  ea3c9e:	0000 0000      	ori.b #0,d0
+  ea3ca2:	0000 0000      	ori.b #0,d0
+  ea3ca6:	0000 0000      	ori.b #0,d0
+  ea3caa:	0000 0000      	ori.b #0,d0
+  ea3cae:	0000 0000      	ori.b #0,d0
+  ea3cb2:	0000 0000      	ori.b #0,d0
+  ea3cb6:	0000 0000      	ori.b #0,d0
+  ea3cba:	0000 0000      	ori.b #0,d0
+  ea3cbe:	0000 0000      	ori.b #0,d0
+  ea3cc2:	0000 0000      	ori.b #0,d0
+  ea3cc6:	0000 0000      	ori.b #0,d0
+  ea3cca:	0000 0000      	ori.b #0,d0
+  ea3cce:	0000 0000      	ori.b #0,d0
+  ea3cd2:	0000 0000      	ori.b #0,d0
+  ea3cd6:	0000 0000      	ori.b #0,d0
+  ea3cda:	0000 0000      	ori.b #0,d0
+  ea3cde:	0000 0000      	ori.b #0,d0
+  ea3ce2:	0000 0000      	ori.b #0,d0
+  ea3ce6:	0000 0000      	ori.b #0,d0
+  ea3cea:	0000 0000      	ori.b #0,d0
+  ea3cee:	0000 0000      	ori.b #0,d0
+  ea3cf2:	0000 0000      	ori.b #0,d0
+  ea3cf6:	0000 0000      	ori.b #0,d0
+  ea3cfa:	0000 0000      	ori.b #0,d0
+  ea3cfe:	0000 0000      	ori.b #0,d0
+  ea3d02:	0000 0000      	ori.b #0,d0
+  ea3d06:	0000 0000      	ori.b #0,d0
+  ea3d0a:	0000 0000      	ori.b #0,d0
+  ea3d0e:	0000 0000      	ori.b #0,d0
+  ea3d12:	0000 0000      	ori.b #0,d0
+  ea3d16:	0000 0000      	ori.b #0,d0
+  ea3d1a:	0000 0000      	ori.b #0,d0
+  ea3d1e:	0000 0000      	ori.b #0,d0
+  ea3d22:	0000 0000      	ori.b #0,d0
+  ea3d26:	0000 0000      	ori.b #0,d0
+  ea3d2a:	0000 0000      	ori.b #0,d0
+  ea3d2e:	0000 0000      	ori.b #0,d0
+  ea3d32:	0000 0000      	ori.b #0,d0
+  ea3d36:	0000 0000      	ori.b #0,d0
+  ea3d3a:	0000 0000      	ori.b #0,d0
+  ea3d3e:	0000 0000      	ori.b #0,d0
+  ea3d42:	0000 0000      	ori.b #0,d0
+  ea3d46:	0000 0000      	ori.b #0,d0
+  ea3d4a:	0000 0000      	ori.b #0,d0
+  ea3d4e:	0000 0000      	ori.b #0,d0
+  ea3d52:	0000 0000      	ori.b #0,d0
+  ea3d56:	0000 0000      	ori.b #0,d0
+  ea3d5a:	0000 0000      	ori.b #0,d0
+  ea3d5e:	0000 0000      	ori.b #0,d0
+  ea3d62:	0000 0000      	ori.b #0,d0
+  ea3d66:	0000 0000      	ori.b #0,d0
+  ea3d6a:	0000 0000      	ori.b #0,d0
+  ea3d6e:	0000 0000      	ori.b #0,d0
+  ea3d72:	0000 0000      	ori.b #0,d0
+  ea3d76:	0000 0000      	ori.b #0,d0
+  ea3d7a:	0000 0000      	ori.b #0,d0
+  ea3d7e:	0000 0000      	ori.b #0,d0
+  ea3d82:	0000 0000      	ori.b #0,d0
+  ea3d86:	0000 0000      	ori.b #0,d0
+  ea3d8a:	0000 0000      	ori.b #0,d0
+  ea3d8e:	0000 0000      	ori.b #0,d0
+  ea3d92:	0000 0000      	ori.b #0,d0
+  ea3d96:	0000 0000      	ori.b #0,d0
+  ea3d9a:	0000 0000      	ori.b #0,d0
+  ea3d9e:	0000 0000      	ori.b #0,d0
+  ea3da2:	0000 0000      	ori.b #0,d0
+  ea3da6:	0000 0000      	ori.b #0,d0
+  ea3daa:	0000 0000      	ori.b #0,d0
+  ea3dae:	0000 0000      	ori.b #0,d0
+  ea3db2:	0000 0000      	ori.b #0,d0
+  ea3db6:	0000 0000      	ori.b #0,d0
+  ea3dba:	0000 0000      	ori.b #0,d0
+  ea3dbe:	0000 0000      	ori.b #0,d0
+  ea3dc2:	0000 0000      	ori.b #0,d0
+  ea3dc6:	0000 0000      	ori.b #0,d0
+  ea3dca:	0000 0000      	ori.b #0,d0
+  ea3dce:	0000 0000      	ori.b #0,d0
+  ea3dd2:	0000 0000      	ori.b #0,d0
+  ea3dd6:	0000 0000      	ori.b #0,d0
+  ea3dda:	0000 0000      	ori.b #0,d0
+  ea3dde:	0000 0000      	ori.b #0,d0
+  ea3de2:	0000 0000      	ori.b #0,d0
+  ea3de6:	0000 0000      	ori.b #0,d0
+  ea3dea:	0000 0000      	ori.b #0,d0
+  ea3dee:	0000 0000      	ori.b #0,d0
+  ea3df2:	0000 0000      	ori.b #0,d0
+  ea3df6:	0000 0000      	ori.b #0,d0
+  ea3dfa:	0000 0000      	ori.b #0,d0
+  ea3dfe:	0000 0000      	ori.b #0,d0
+  ea3e02:	0000 0000      	ori.b #0,d0
+  ea3e06:	0000 0000      	ori.b #0,d0
+  ea3e0a:	0000 0000      	ori.b #0,d0
+  ea3e0e:	0000 0000      	ori.b #0,d0
+  ea3e12:	0000 0000      	ori.b #0,d0
+  ea3e16:	0000 0000      	ori.b #0,d0
+  ea3e1a:	0000 0000      	ori.b #0,d0
+  ea3e1e:	0000 0000      	ori.b #0,d0
+  ea3e22:	0000 0000      	ori.b #0,d0
+  ea3e26:	0000 0000      	ori.b #0,d0
+  ea3e2a:	0000 0000      	ori.b #0,d0
+  ea3e2e:	0000 0000      	ori.b #0,d0
+  ea3e32:	0000 0000      	ori.b #0,d0
+  ea3e36:	0000 0000      	ori.b #0,d0
+  ea3e3a:	0000 0000      	ori.b #0,d0
+  ea3e3e:	0000 0000      	ori.b #0,d0
+  ea3e42:	0000 0000      	ori.b #0,d0
+  ea3e46:	0000 0000      	ori.b #0,d0
+  ea3e4a:	0000 0000      	ori.b #0,d0
+  ea3e4e:	0000 0000      	ori.b #0,d0
+  ea3e52:	0000 0000      	ori.b #0,d0
+  ea3e56:	0000 0000      	ori.b #0,d0
+  ea3e5a:	0000 0000      	ori.b #0,d0
+  ea3e5e:	0000 0000      	ori.b #0,d0
+  ea3e62:	0000 0000      	ori.b #0,d0
+  ea3e66:	0000 0000      	ori.b #0,d0
+  ea3e6a:	0000 0000      	ori.b #0,d0
+  ea3e6e:	0000 0000      	ori.b #0,d0
+  ea3e72:	0000 0000      	ori.b #0,d0
+  ea3e76:	0000 0000      	ori.b #0,d0
+  ea3e7a:	0000 0000      	ori.b #0,d0
+  ea3e7e:	0000 0000      	ori.b #0,d0
+  ea3e82:	0000 0000      	ori.b #0,d0
+  ea3e86:	0000 0000      	ori.b #0,d0
+  ea3e8a:	0000 0000      	ori.b #0,d0
+  ea3e8e:	0000 0000      	ori.b #0,d0
+  ea3e92:	0000 0000      	ori.b #0,d0
+  ea3e96:	0000 0000      	ori.b #0,d0
+  ea3e9a:	0000 0000      	ori.b #0,d0
+  ea3e9e:	0000 0000      	ori.b #0,d0
+  ea3ea2:	0000 0000      	ori.b #0,d0
+  ea3ea6:	0000 0000      	ori.b #0,d0
+  ea3eaa:	0000 0000      	ori.b #0,d0
+  ea3eae:	0000 0000      	ori.b #0,d0
+  ea3eb2:	0000 0000      	ori.b #0,d0
+  ea3eb6:	0000 0000      	ori.b #0,d0
+  ea3eba:	0000 0000      	ori.b #0,d0
+  ea3ebe:	0000 0000      	ori.b #0,d0
+  ea3ec2:	0000 0000      	ori.b #0,d0
+  ea3ec6:	0000 0000      	ori.b #0,d0
+  ea3eca:	0000 0000      	ori.b #0,d0
+  ea3ece:	0000 0000      	ori.b #0,d0
+  ea3ed2:	0000 0000      	ori.b #0,d0
+  ea3ed6:	0000 0000      	ori.b #0,d0
+  ea3eda:	0000 0000      	ori.b #0,d0
+  ea3ede:	0000 0000      	ori.b #0,d0
+  ea3ee2:	0000 0000      	ori.b #0,d0
+  ea3ee6:	0000 0000      	ori.b #0,d0
+  ea3eea:	0000 0000      	ori.b #0,d0
+  ea3eee:	0000 0000      	ori.b #0,d0
+  ea3ef2:	0000 0000      	ori.b #0,d0
+  ea3ef6:	0000 0000      	ori.b #0,d0
+  ea3efa:	0000 0000      	ori.b #0,d0
+  ea3efe:	0000 0000      	ori.b #0,d0
+  ea3f02:	0000 0000      	ori.b #0,d0
+  ea3f06:	0000 0000      	ori.b #0,d0
+  ea3f0a:	0000 0000      	ori.b #0,d0
+  ea3f0e:	0000 0000      	ori.b #0,d0
+  ea3f12:	0000 0000      	ori.b #0,d0
+  ea3f16:	0000 0000      	ori.b #0,d0
+  ea3f1a:	0000 0000      	ori.b #0,d0
+  ea3f1e:	0000 0000      	ori.b #0,d0
+  ea3f22:	0000 0000      	ori.b #0,d0
+  ea3f26:	0000 0000      	ori.b #0,d0
+  ea3f2a:	0000 0000      	ori.b #0,d0
+  ea3f2e:	0000 0000      	ori.b #0,d0
+  ea3f32:	0000 0000      	ori.b #0,d0
+  ea3f36:	0000 0000      	ori.b #0,d0
+  ea3f3a:	0000 0000      	ori.b #0,d0
+  ea3f3e:	0000 0000      	ori.b #0,d0
+  ea3f42:	0000 0000      	ori.b #0,d0
+  ea3f46:	0000 0000      	ori.b #0,d0
+  ea3f4a:	0000 0000      	ori.b #0,d0
+  ea3f4e:	0000 0000      	ori.b #0,d0
+  ea3f52:	0000 0000      	ori.b #0,d0
+  ea3f56:	0000 0000      	ori.b #0,d0
+  ea3f5a:	0000 0000      	ori.b #0,d0
+  ea3f5e:	0000 0000      	ori.b #0,d0
+  ea3f62:	0000 0000      	ori.b #0,d0
+  ea3f66:	0000 0000      	ori.b #0,d0
+  ea3f6a:	0000 0000      	ori.b #0,d0
+  ea3f6e:	0000 0000      	ori.b #0,d0
+  ea3f72:	0000 0000      	ori.b #0,d0
+  ea3f76:	0000 0000      	ori.b #0,d0
+  ea3f7a:	0000 0000      	ori.b #0,d0
+  ea3f7e:	0000 0000      	ori.b #0,d0
+  ea3f82:	0000 0000      	ori.b #0,d0
+  ea3f86:	0000 0000      	ori.b #0,d0
+  ea3f8a:	0000 0000      	ori.b #0,d0
+  ea3f8e:	0000 0000      	ori.b #0,d0
+  ea3f92:	0000 0000      	ori.b #0,d0
+  ea3f96:	0000 0000      	ori.b #0,d0
+  ea3f9a:	0000 0000      	ori.b #0,d0
+  ea3f9e:	0000 0000      	ori.b #0,d0
+  ea3fa2:	0000 0000      	ori.b #0,d0
+  ea3fa6:	0000 0000      	ori.b #0,d0
+  ea3faa:	0000 0000      	ori.b #0,d0
+  ea3fae:	0000 0000      	ori.b #0,d0
+  ea3fb2:	0000 0000      	ori.b #0,d0
+  ea3fb6:	0000 0000      	ori.b #0,d0
+  ea3fba:	0000 0000      	ori.b #0,d0
+  ea3fbe:	0000 0000      	ori.b #0,d0
+  ea3fc2:	0000 0000      	ori.b #0,d0
+  ea3fc6:	0000 0000      	ori.b #0,d0
+  ea3fca:	0000 0000      	ori.b #0,d0
+  ea3fce:	0000 0000      	ori.b #0,d0
+  ea3fd2:	0000 0000      	ori.b #0,d0
+  ea3fd6:	0000 0000      	ori.b #0,d0
+  ea3fda:	0000 0000      	ori.b #0,d0
+  ea3fde:	0000 0000      	ori.b #0,d0
+  ea3fe2:	0000 0000      	ori.b #0,d0
+  ea3fe6:	0000 0000      	ori.b #0,d0
+  ea3fea:	0000 0000      	ori.b #0,d0
+  ea3fee:	0000 0000      	ori.b #0,d0
+  ea3ff2:	0000 0000      	ori.b #0,d0
+  ea3ff6:	0000 0000      	ori.b #0,d0
+  ea3ffa:	0000 0000      	ori.b #0,d0
+  ea3ffe:	0000           	Address 0x0000000000ea4000 is out of bounds.
+Address 0x0000000000ea4000 is out of bounds.
+.short 0x0000
