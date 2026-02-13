@@ -6,6 +6,7 @@
 #include "platforms/amiga/hunk-reloc.h"
 
 #define PISCSI64_NUM_UNITS 16
+#define PISCSI64_MAX_SPEC 384
 #define PISCSI64_OFFSET 0x80020000
 #define PISCSI64_REGSIZE 0x00010000
 #define PISCSI64_UPPER 0x80030000
@@ -102,6 +103,7 @@ struct piscsi64_dev {
     enum piscsi64_backend_type backend_type;
     const struct piscsi64_backend_ops *backend_ops;
     char backend_spec[256];
+    char configured_spec[PISCSI64_MAX_SPEC];
     uint32_t lba;
     uint32_t num_partitions;
     uint32_t fshd_offs;

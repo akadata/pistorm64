@@ -148,6 +148,60 @@ static uint16_t piscsi64_normalize_drvtype(uint16_t raw) {
   return PISCSI64_DRVTYPE_BUILD(PISCSI64_SCSI_TYPE_DIRECT_ACCESS, 0);
 }
 
+static void piscsi64_refresh_unit_state(struct piscsi64_unit* u) {
+  uint16_t drvtype_raw = 0;
+  uint16_t drvtype = 0;
+  uint8_t present = 0;
+  uint8_t read_only = 0;
+  uint8_t scsi_type = (uint8_t)PISCSI64_SCSI_TYPE_DIRECT_ACCESS;
+  uint8_t changed = 0;
+
+  if (!u) {
+    return;
+  }
+
+  WRITESHORT(PISCSI64_CMD_DRVNUMX, u->unit_num);
+  READSHORT(PISCSI64_CMD_DRVTYPE, drvtype_raw);
+  drvtype = piscsi64_normalize_drvtype(drvtype_raw);
+  present = PISCSI64_DRVTYPE_IS_PRESENT(drvtype) ? 1 : 0;
+  read_only = PISCSI64_DRVTYPE_IS_READONLY(drvtype) ? 1 : 0;
+  scsi_type = PISCSI64_DRVTYPE_SCSI_TYPE(drvtype);
+
+  if (present != u->present || read_only != u->read_only || scsi_type != u->scsi_type) {
+    changed = 1;
+  }
+
+  if (present) {
+    READLONG(PISCSI64_CMD_CYLS, u->c);
+    READSHORT(PISCSI64_CMD_HEADS, u->h);
+    READSHORT(PISCSI64_CMD_SECS, u->s);
+    u->enabled = 1;
+    u->valid = 1;
+  } else {
+    u->c = 0;
+    u->h = 0;
+    u->s = 0;
+    u->valid = 0;
+  }
+
+  u->present = present;
+  u->read_only = read_only;
+  u->scsi_type = scsi_type;
+  if (changed) {
+    u->change_num++;
+  }
+}
+
+static void piscsi64_media_control(struct piscsi64_unit* u, uint16_t cmd) {
+  if (!u) {
+    return;
+  }
+
+  WRITESHORT(PISCSI64_CMD_DRVNUMX, u->unit_num);
+  WRITESHORT(cmd, u->unit_num);
+  piscsi64_refresh_unit_state(u);
+}
+
 static uint32_t find_piscsi64_board_base(void) {
   uint32_t board_addr = 0;
   struct Library* expansion_lib = OpenLibrary((STRPTR)"expansion.library", 0L);
@@ -193,30 +247,22 @@ static struct Library __attribute__((used)) *
   piscsi64_base_addr = find_piscsi64_board_base();
 
   for (int i = 0; i < PISCSI64_NUM_UNITS; i++) {
-    uint16_t drvtype_raw = 0;
-    uint16_t drvtype = 0;
-    WRITESHORT(PISCSI64_CMD_DRVNUM, (i));
     dev_base->units[i].regs_ptr = piscsi64_base_addr;
-    READSHORT(PISCSI64_CMD_DRVTYPE, drvtype_raw);
-    drvtype = piscsi64_normalize_drvtype(drvtype_raw);
-    dev_base->units[i].enabled = PISCSI64_DRVTYPE_IS_PRESENT(drvtype) ? 1 : 0;
-    dev_base->units[i].present = dev_base->units[i].enabled;
-    dev_base->units[i].valid = dev_base->units[i].enabled;
-    dev_base->units[i].read_only = PISCSI64_DRVTYPE_IS_READONLY(drvtype) ? 1 : 0;
-    dev_base->units[i].scsi_type = PISCSI64_DRVTYPE_SCSI_TYPE(drvtype);
+    dev_base->units[i].enabled = 0;
+    dev_base->units[i].present = 0;
+    dev_base->units[i].valid = 0;
+    dev_base->units[i].read_only = 0;
+    dev_base->units[i].scsi_type = PISCSI64_SCSI_TYPE_DIRECT_ACCESS;
     dev_base->units[i].unit_num = i;
     dev_base->units[i].scsi_num = i;
+    dev_base->units[i].change_num = 0;
+    piscsi64_refresh_unit_state(&dev_base->units[i]);
     if (dev_base->units[i].present) {
-      READLONG(PISCSI64_CMD_CYLS, dev_base->units[i].c);
-      READSHORT(PISCSI64_CMD_HEADS, dev_base->units[i].h);
-      READSHORT(PISCSI64_CMD_SECS, dev_base->units[i].s);
-
       debugval(PISCSI64_DBG_VAL1, dev_base->units[i].c);
       debugval(PISCSI64_DBG_VAL2, dev_base->units[i].h);
       debugval(PISCSI64_DBG_VAL3, dev_base->units[i].s);
       debug(PISCSI64_DBG_MSG, DBG_CHS);
     }
-    dev_base->units[i].change_num++;
   }
 
   return dev;
@@ -248,6 +294,7 @@ open(struct Library* dev asm("a6"), struct IOExtTD* iotd asm("a1"), uint32_t num
   debug(PISCSI64_DBG_MSG, DBG_OPENDEV);
 
   if (iotd && unit_num < PISCSI64_NUM_UNITS) {
+    piscsi64_refresh_unit_state(&dev_base->units[unit_num]);
     if (dev_base->units[unit_num].enabled && dev_base->units[unit_num].present) {
       io_err = 0;
       iotd->iotd_Req.io_Unit = (struct Unit*)&dev_base->units[unit_num].unit;
@@ -329,6 +376,10 @@ uint8_t piscsi64_rw(struct piscsi64_unit* u, struct IORequest* io) {
 
   WRITESHORT(PISCSI64_CMD_DRVNUMX, u->unit_num);
   READLONG(PISCSI64_CMD_BLOCKSIZE, block_size);
+  if (!u->present) {
+    iostd->io_Actual = 0;
+    return TDERR_DiskChanged;
+  }
 
   if (data == 0) {
     return IOERR_BADADDRESS;
@@ -593,6 +644,10 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
     WRITESHORT(PISCSI64_CMD_DRVNUM, (u->scsi_num));
     READLONG(PISCSI64_CMD_BLOCKS, maxblocks);
 
+    if (!u->present) {
+      err = HFERR_BadStatus;
+      break;
+    }
     if (write && (u->read_only || scsi_type == PISCSI64_SCSI_TYPE_CDROM)) {
       err = HFERR_BadStatus;
       break;
@@ -782,9 +837,17 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
   }
 
   case SCSICMD_START_STOP_UNIT:
-    // ISO-backed media currently behaves as always inserted/non-ejectable.
+    if (scsi->scsi_CmdLength >= 5) {
+      uint8_t loej = (scsi->scsi_Command[4] & 0x02) ? 1 : 0;
+      uint8_t start = (scsi->scsi_Command[4] & 0x01) ? 1 : 0;
+      if (loej && !start) {
+        piscsi64_media_control(u, PISCSI64_CMD_MEDIA_EJECT);
+      } else if (loej && start) {
+        piscsi64_media_control(u, PISCSI64_CMD_MEDIA_INSERT);
+      }
+    }
     scsi->scsi_Actual = 0;
-    err = 0;
+    err = (u->present || ((scsi->scsi_Command[4] & 0x02) && !(scsi->scsi_Command[4] & 0x01))) ? 0 : HFERR_BadStatus;
     break;
 
   case SCSICMD_READ_DEFECT_DATA_10:
@@ -819,6 +882,7 @@ uint16_t ns_support[] = {
     TD_CHANGESTATE,    TD_PROTSTATUS,
     TD_GETDRIVETYPE,   TD_GETGEOMETRY,
     TD_ADDCHANGEINT,   TD_REMCHANGEINT,
+    TD_EJECT,
     HD_SCSICMD,        NSCMD_TD_READ64,
     NSCMD_TD_WRITE64,  NSCMD_TD_SEEK64,
     NSCMD_TD_FORMAT64, 0,
@@ -837,15 +901,16 @@ uint8_t piscsi64_perform_io(struct piscsi64_unit* u, struct IORequest* io) {
   // uint32_t offset;
   uint8_t err = 0;
 
-  if (!u->enabled) {
-    return IOERR_OPENFAIL;
-  }
-
   // data = iotd->iotd_Req.io_Data;
   // len = iotd->iotd_Req.io_Length;
 
   if (io->io_Error == IOERR_ABORTED) {
     return io->io_Error;
+  }
+
+  piscsi64_refresh_unit_state(u);
+  if (!u->enabled) {
+    return IOERR_OPENFAIL;
   }
 
   debugval(PISCSI64_DBG_VAL1, io->io_Command);
@@ -872,15 +937,33 @@ uint8_t piscsi64_perform_io(struct piscsi64_unit* u, struct IORequest* io) {
   case CMD_UPDATE:
     /* Flush write buffer */
     DUMMYCMD;
-  case TD_PROTSTATUS:
+  case CMD_FLUSH:
     DUMMYCMD;
+  case CMD_STOP:
+    iostd->io_Actual = 0;
+    break;
+  case CMD_START:
+    piscsi64_media_control(u, PISCSI64_CMD_MEDIA_INSERT);
+    iostd->io_Actual = 0;
+    err = u->present ? 0 : TDERR_DiskChanged;
+    break;
+  case TD_PROTSTATUS:
+    iostd->io_Actual = u->read_only ? 1 : 0;
+    break;
   case TD_CHANGENUM:
     iostd->io_Actual = u->change_num;
     break;
   case TD_REMOVE:
-    DUMMYCMD;
+    /* Trackdisk semantics: wait/probe for removal. Do not eject media here. */
+    iostd->io_Actual = 0;
+    break;
   case TD_CHANGESTATE:
-    DUMMYCMD;
+    iostd->io_Actual = u->present ? 0 : 1;
+    break;
+  case TD_EJECT:
+    piscsi64_media_control(u, PISCSI64_CMD_MEDIA_EJECT);
+    iostd->io_Actual = 0;
+    break;
   case TD_GETDRIVETYPE:
     iostd->io_Actual = (u->scsi_type == PISCSI64_SCSI_TYPE_CDROM) ? DG_CDROM : DG_DIRECT_ACCESS;
     break;

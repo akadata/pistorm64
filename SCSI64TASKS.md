@@ -11,6 +11,7 @@ Track the staged migration of `piscsi64` to a backend-driven SCSI architecture, 
 ## Current Status
 - Step 1 backend scaffolding: implemented and builds.
 - Runtime validation for Step 1: pending user test.
+- Runtime media eject/reinsert on same unit: implemented (1:1 unit/spec model).
 
 ## Task Board
 
@@ -22,11 +23,11 @@ Track the staged migration of `piscsi64` to a backend-driven SCSI architecture, 
 - [ ] Runtime validation on hardware (boot/install/regression).
 
 ### Step 2: Local `BACKEND_BLOCK`
-- [ ] Implement block backend ops for `/dev/*` targets.
-- [ ] Support `/dev/disk/by-id`, `/dev/disk/by-uuid`, `/dev/disk/by-partuuid`, `/dev/disk/by-partlabel`, and raw `/dev/sdX` style nodes.
-- [ ] Default block backend to read-only.
-- [ ] Allow opt-in read/write only via explicit `mode=rw`.
-- [ ] Emit one loud warning log when opening block backend in RW.
+- [x] Implement block backend ops for `/dev/*` targets.
+- [x] Support `/dev/disk/by-id`, `/dev/disk/by-uuid`, `/dev/disk/by-partuuid`, `/dev/disk/by-partlabel`, and raw `/dev/sdX` style nodes (via `/dev/...` backend classification).
+- [x] Default block backend to read-only.
+- [x] Allow opt-in read/write only via explicit `mode=rw`.
+- [x] Emit one loud warning log when opening block backend in RW.
 - [ ] Return proper SCSI error/sense on backend I/O failures.
 
 ### Step 3: Config Prefix Parsing
@@ -49,6 +50,13 @@ Track the staged migration of `piscsi64` to a backend-driven SCSI architecture, 
 - [ ] `disk:/dev/disk/by-partuuid/...` works as single-disk target.
 - [ ] `cdrom:/path/to.iso` mounts via Amiga CD filesystem stack.
 - [ ] RW block mode only when explicitly requested.
+- [ ] Runtime eject/reinsert on same unit validated from Amiga tools (`TD_REMOVE`/`TD_EJECT`/SCSI START STOP UNIT).
+
+### Step 7: Runtime Media UX
+- [x] Add Pi-side media control commands for eject/insert.
+- [x] Wire Amiga driver `TD_REMOVE`/`TD_EJECT` and SCSI START STOP UNIT to media control.
+- [x] Preserve unit config for same-unit reinsertion.
+- [ ] Add optional per-unit media pool (multiple selectable sources per one SCSI ID).
 
 ### Step 6: Remote Backend Placeholder
 - [ ] Keep `BACKEND_REMOTE` enum and slot in vtable.

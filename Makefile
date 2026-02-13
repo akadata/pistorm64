@@ -667,12 +667,13 @@ install: all
 	$(INSTALL) -d $(INSTALL_DIR)/rtg
 	$(INSTALL) -m 644 src/platforms/amiga/rtg/*.shader $(INSTALL_DIR)/rtg/
 	[ -f pistorm.LICENSE ] && $(INSTALL) -m 644 pistorm.LICENSE $(INSTALL_DIR)/
-	if [ -f $(UDEV_RULES) ]; then \
-		$(INSTALL) -d /etc/udev/rules.d; \
-		$(INSTALL) -m 644 $(UDEV_RULES) /etc/udev/rules.d/99-pistorm.rules; \
-		udevadm control --reload >/dev/null 2>&1 || true; \
-		udevadm trigger --subsystem-match=misc --attr-match=dev=10:262 >/dev/null 2>&1 || true; \
-	fi
+		if [ -f $(UDEV_RULES) ]; then \
+			$(INSTALL) -d /etc/udev/rules.d; \
+			$(INSTALL) -m 644 $(UDEV_RULES) /etc/udev/rules.d/99-pistorm.rules; \
+			udevadm control --reload >/dev/null 2>&1 || true; \
+			udevadm trigger --subsystem-match=misc --attr-match=dev=10:262 >/dev/null 2>&1 || true; \
+			udevadm trigger --subsystem-match=block >/dev/null 2>&1 || true; \
+		fi
 	if [ -f $(LIMITS_CONF) ]; then \
 		$(INSTALL) -d /etc/security/limits.d; \
 		$(INSTALL) -m 644 $(LIMITS_CONF) /etc/security/limits.d/pistorm-rt.conf; \
@@ -794,7 +795,7 @@ endif
 	sudo cp -f etc/systemd/system/kernelpistorm64.service /etc/systemd/system/kernelpistorm64.service
 	# Reload systemd configurations
 	sudo systemctl daemon-reload
-	sudo udevadm control --reload-rules && sudo udevadm trigger
+	sudo udevadm control --reload-rules && sudo udevadm trigger --subsystem-match=misc --attr-match=dev=10:262 && sudo udevadm trigger --subsystem-match=block
 	# Apply sysctl settings (continue even if hugepages not supported)
 	sudo sysctl -p /etc/sysctl.d/10-hugepages.conf || echo "Note: Some hugepage settings may not be supported on this system"
 	# Enable and start the emulator service

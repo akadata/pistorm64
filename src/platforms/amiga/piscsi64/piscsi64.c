@@ -148,6 +148,8 @@ uint8_t piscsi64_num_fs = 0;
 
 #define FS_ALLOC_MAX_BYTES (512 * 1024)
 
+static void piscsi64_log_unit_summary(const char *reason);
+
 static int piscsi64_backend_file_close(struct piscsi64_dev *d)
 {
     if (!d || d->fd == -1) {
@@ -206,6 +208,16 @@ static int piscsi64_backend_file_sync(struct piscsi64_dev *d)
 
 static const struct piscsi64_backend_ops piscsi64_backend_file_ops = {
     .name = "file",
+    .close = piscsi64_backend_file_close,
+    .seek = piscsi64_backend_file_seek,
+    .read = piscsi64_backend_file_read,
+    .write = piscsi64_backend_file_write,
+    .pread = piscsi64_backend_file_pread,
+    .sync = piscsi64_backend_file_sync,
+};
+
+static const struct piscsi64_backend_ops piscsi64_backend_block_ops = {
+    .name = "block",
     .close = piscsi64_backend_file_close,
     .seek = piscsi64_backend_file_seek,
     .read = piscsi64_backend_file_read,
@@ -513,7 +525,59 @@ static enum piscsi64_media_kind piscsi64_parse_media_spec(const char *spec, cons
     return media_kind;
 }
 
-static void piscsi64_reset_dev(struct piscsi64_dev *d) {
+static void piscsi64_parse_mode_opt(const char *opt, int *mode_opt)
+{
+    if (!opt || !mode_opt) {
+        return;
+    }
+    if (strncasecmp(opt, "mode=", 5) != 0) {
+        return;
+    }
+
+    const char *mode = opt + 5;
+    if (strcasecmp(mode, "ro") == 0) {
+        *mode_opt = 0;
+    } else if (strcasecmp(mode, "rw") == 0) {
+        *mode_opt = 1;
+    } else {
+        LOG_WARN("[PISCSI64] Unknown mode option '%s' (expected mode=ro|mode=rw)\n", opt);
+    }
+}
+
+static int piscsi64_split_path_and_opts(const char *path_in, char *path_out, size_t path_out_sz,
+                                        int *mode_opt)
+{
+    if (!path_in || !path_out || path_out_sz == 0) {
+        return -1;
+    }
+
+    snprintf(path_out, path_out_sz, "%s", path_in);
+    if (mode_opt) {
+        *mode_opt = -1;
+    }
+
+    char *comma = strchr(path_out, ',');
+    if (!comma) {
+        return 0;
+    }
+
+    *comma = '\0';
+    char *tok = comma + 1;
+    while (tok && *tok) {
+        char *next = strchr(tok, ',');
+        if (next) {
+            *next = '\0';
+        }
+        if (mode_opt) {
+            piscsi64_parse_mode_opt(tok, mode_opt);
+        }
+        tok = next ? (next + 1) : NULL;
+    }
+    return 0;
+}
+
+static void piscsi64_clear_media_runtime(struct piscsi64_dev *d)
+{
     if (!d) {
         return;
     }
@@ -536,13 +600,22 @@ static void piscsi64_reset_dev(struct piscsi64_dev *d) {
     d->h = 0;
     d->s = 0;
     d->fs = 0;
-    d->backend_type = PISCSI64_BACKEND_NONE;
-    d->backend_ops = NULL;
-    d->backend_spec[0] = '\0';
     d->lba = 0;
     d->num_partitions = 0;
     d->fshd_offs = 0;
     d->block_size = 0;
+}
+
+static void piscsi64_reset_dev(struct piscsi64_dev *d) {
+    if (!d) {
+        return;
+    }
+
+    piscsi64_clear_media_runtime(d);
+    d->backend_type = PISCSI64_BACKEND_NONE;
+    d->backend_ops = NULL;
+    d->backend_spec[0] = '\0';
+    d->configured_spec[0] = '\0';
     d->media_kind = PISCSI64_MEDIA_NONE;
     d->read_only = 0;
 }
@@ -579,6 +652,7 @@ void piscsi64_init(void) {
         piscsi64_devs[i].backend_type = PISCSI64_BACKEND_NONE;
         piscsi64_devs[i].backend_ops = NULL;
         piscsi64_devs[i].backend_spec[0] = '\0';
+        piscsi64_devs[i].configured_spec[0] = '\0';
         piscsi64_devs[i].lba = 0;
         piscsi64_devs[i].num_partitions = 0;
         piscsi64_devs[i].fshd_offs = 0;
@@ -927,7 +1001,7 @@ struct piscsi64_dev *piscsi64_get_dev(uint8_t index) {
 
 int piscsi64_find_free_unit(void) {
     for (int i = 1; i < PISCSI64_NUM_UNITS; i++) {
-        if (piscsi64_devs[i].fd == -1) {
+        if (piscsi64_devs[i].fd == -1 && piscsi64_devs[i].configured_spec[0] == '\0') {
             return i;
         }
     }
@@ -936,29 +1010,53 @@ int piscsi64_find_free_unit(void) {
 
 void piscsi64_map_drive(const char *spec, uint8_t index) {
     if (index >= PISCSI64_NUM_UNITS) {
-        printf("[PISCSI64] Drive index %d out of range.\nUnable to map spec %s to drive.\n",
-               index, spec ? spec : "(null)");
+        LOG_ERROR("[PISCSI64] Drive index %d out of range. Unable to map spec %s to drive.\n",
+                  index, spec ? spec : "(null)");
         return;
     }
 
     if (!spec || spec[0] == '\0') {
-        printf("[PISCSI64] Empty drive spec for unit %d.\n", index);
+        LOG_ERROR("[PISCSI64] Empty drive spec for unit %d.\n", index);
         return;
     }
 
-    const char *path = NULL;
-    enum piscsi64_media_kind media_kind = piscsi64_parse_media_spec(spec, &path);
-    if (!path || path[0] == '\0') {
-        printf("[PISCSI64] Invalid drive spec '%s' for unit %d.\n", spec, index);
+    const char *path_spec = NULL;
+    char path[PATH_MAX];
+    int mode_opt = -1; /* -1 default, 0 ro, 1 rw */
+    enum piscsi64_backend_type backend_type = PISCSI64_BACKEND_FILE;
+    enum piscsi64_media_kind media_kind = piscsi64_parse_media_spec(spec, &path_spec);
+    if (piscsi64_split_path_and_opts(path_spec, path, sizeof(path), &mode_opt) != 0) {
+        LOG_ERROR("[PISCSI64] Invalid drive spec '%s' for unit %d.\n", spec, index);
+        return;
+    }
+    if (!path[0]) {
+        LOG_ERROR("[PISCSI64] Invalid drive spec '%s' for unit %d.\n", spec, index);
         return;
     }
 
-    int open_flags = (media_kind == PISCSI64_MEDIA_CDROM) ? O_RDONLY : O_RDWR;
+    if (strncmp(path, "/dev/", 5) == 0) {
+        backend_type = PISCSI64_BACKEND_BLOCK;
+    }
+
+    int open_flags;
+    if (media_kind == PISCSI64_MEDIA_CDROM) {
+        open_flags = O_RDONLY;
+    } else if (mode_opt == 0) {
+        open_flags = O_RDONLY;
+    } else if (mode_opt == 1) {
+        open_flags = O_RDWR;
+    } else if (backend_type == PISCSI64_BACKEND_BLOCK) {
+        /* Safety default for real block nodes. */
+        open_flags = O_RDONLY;
+    } else {
+        open_flags = O_RDWR;
+    }
     int read_only = (open_flags == O_RDONLY) ? 1 : 0;
     int32_t tmp_fd = open(path, open_flags);
     if (tmp_fd == -1) {
         int first_errno = errno;
-        if (media_kind == PISCSI64_MEDIA_DISK &&
+        if (backend_type == PISCSI64_BACKEND_FILE &&
+            media_kind == PISCSI64_MEDIA_DISK &&
             (first_errno == EACCES || first_errno == EPERM || first_errno == EROFS)) {
             tmp_fd = open(path, O_RDONLY);
             if (tmp_fd != -1) {
@@ -966,8 +1064,8 @@ void piscsi64_map_drive(const char *spec, uint8_t index) {
             }
         }
         if (tmp_fd == -1) {
-            printf("[PISCSI64] Failed to open %s, could not map drive %d (errno=%d).\n",
-                   path, index, first_errno);
+            LOG_ERROR("[PISCSI64] Failed to open %s, could not map drive %d (errno=%d).\n",
+                      path, index, first_errno);
             return;
         }
     }
@@ -986,16 +1084,23 @@ void piscsi64_map_drive(const char *spec, uint8_t index) {
 
     d->fs = file_size;
     d->fd = tmp_fd;
-    d->backend_type = PISCSI64_BACKEND_FILE;
-    d->backend_ops = &piscsi64_backend_file_ops;
+    d->backend_type = backend_type;
+    d->backend_ops = (backend_type == PISCSI64_BACKEND_BLOCK)
+        ? &piscsi64_backend_block_ops
+        : &piscsi64_backend_file_ops;
     snprintf(d->backend_spec, sizeof(d->backend_spec), "%s", path);
+    snprintf(d->configured_spec, sizeof(d->configured_spec), "%s", spec);
     d->media_kind = media_kind;
     d->read_only = (uint8_t)read_only;
-    printf("[PISCSI64] Map %d: [%s] (%s%s) - %lu bytes.\n",
-           index, path,
-           media_kind == PISCSI64_MEDIA_CDROM ? "cdrom" : "disk",
-           d->read_only ? ",ro" : ",rw",
-           (unsigned long)file_size);
+    LOG_INFO("[PISCSI64] Map %d: [%s] (%s%s,%s) - %lu bytes.\n",
+             index, path,
+             media_kind == PISCSI64_MEDIA_CDROM ? "cdrom" : "disk",
+             d->read_only ? ",ro" : ",rw",
+             (d->backend_ops && d->backend_ops->name) ? d->backend_ops->name : "unknown",
+             (unsigned long)file_size);
+    if (backend_type == PISCSI64_BACKEND_BLOCK && !d->read_only) {
+        LOG_WARN("[PISCSI64] Unit %d opened block device in RW mode: %s\n", index, path);
+    }
 
     if (media_kind == PISCSI64_MEDIA_CDROM) {
         uint64_t blocks = (file_size / 2048u);
@@ -1005,8 +1110,9 @@ void piscsi64_map_drive(const char *spec, uint8_t index) {
         d->c = (uint32_t)((blocks == 0) ? 1 : ((blocks > UINT32_MAX) ? UINT32_MAX : blocks));
         d->num_partitions = 0;
         d->fshd_offs = 0;
-        printf("[PISCSI64] Unit %d configured as CD-ROM (%llu blocks @ 2048 bytes).\n",
-               index, (unsigned long long)blocks);
+        LOG_INFO("[PISCSI64] Unit %d configured as CD-ROM (%llu blocks @ 2048 bytes).\n",
+                 index, (unsigned long long)blocks);
+        piscsi64_log_unit_summary("map");
         return;
     }
 
@@ -1050,6 +1156,7 @@ void piscsi64_map_drive(const char *spec, uint8_t index) {
     } else {
         printf("[PISCSI64-SELFTEST-SUCCESS] HDF validation passed for drive %d (%s)\n", index, path);
     }
+    piscsi64_log_unit_summary("map");
 }
 
 // HDF integrity validation function
@@ -1151,6 +1258,76 @@ void piscsi64_unmap_drive(uint8_t index) {
         DEBUG("[PISCSI64] Unmapped drive %d.\n", index);
     }
     piscsi64_reset_dev(&piscsi64_devs[index]);
+}
+
+static int piscsi64_media_eject(uint8_t index)
+{
+    if (index >= PISCSI64_NUM_UNITS) {
+        return -1;
+    }
+
+    struct piscsi64_dev *d = &piscsi64_devs[index];
+    if (d->fd == -1) {
+        return 0;
+    }
+
+    piscsi64_clear_media_runtime(d);
+    LOG_INFO("[PISCSI64] Media ejected from unit %u.\n", (unsigned int)index);
+    piscsi64_log_unit_summary("eject");
+    return 0;
+}
+
+static int piscsi64_media_insert(uint8_t index)
+{
+    if (index >= PISCSI64_NUM_UNITS) {
+        return -1;
+    }
+
+    struct piscsi64_dev *d = &piscsi64_devs[index];
+    if (d->fd != -1) {
+        return 0;
+    }
+    if (d->configured_spec[0] == '\0') {
+        LOG_WARN("[PISCSI64] Unit %u has no configured media spec; cannot insert.\n",
+                 (unsigned int)index);
+        return -1;
+    }
+
+    char spec[PISCSI64_MAX_SPEC];
+    snprintf(spec, sizeof(spec), "%s", d->configured_spec);
+    piscsi64_map_drive(spec, index);
+    if (piscsi64_devs[index].fd == -1) {
+        LOG_WARN("[PISCSI64] Failed to insert media for unit %u using spec '%s'.\n",
+                 (unsigned int)index, spec);
+        return -1;
+    }
+
+    LOG_INFO("[PISCSI64] Media inserted in unit %u: %s\n", (unsigned int)index, spec);
+    piscsi64_log_unit_summary("insert");
+    return 0;
+}
+
+static void piscsi64_log_unit_summary(const char *reason)
+{
+    int mapped = 0;
+    LOG_INFO("[PISCSI64] Unit summary (%s):\n", reason ? reason : "state");
+    for (int i = 1; i < PISCSI64_NUM_UNITS; i++) {
+        const struct piscsi64_dev *d = &piscsi64_devs[i];
+        if (d->configured_spec[0] == '\0') {
+            continue;
+        }
+        mapped = 1;
+        LOG_INFO("[PISCSI64]   unit=%d media=%s mode=%s backend=%s attached=%s spec=%s\n",
+                 i,
+                 (d->media_kind == PISCSI64_MEDIA_CDROM) ? "cdrom" : "disk",
+                 d->read_only ? "ro" : "rw",
+                 (d->backend_ops && d->backend_ops->name) ? d->backend_ops->name : "none",
+                 (d->fd >= 0) ? "yes" : "no",
+                 d->configured_spec);
+    }
+    if (!mapped) {
+        LOG_INFO("[PISCSI64]   (no units mapped)\n");
+    }
 }
 
 static __attribute__((unused)) const char *io_cmd_name(int index) {
@@ -1669,6 +1846,20 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
                 DEBUG("[PISCSI64] DRVNUMX: %d.\n", val);
             }
             break;
+        case PISCSI64_CMD_MEDIA_EJECT:
+            if (val >= PISCSI64_NUM_UNITS) {
+                DEBUG("[PISCSI64] MEDIA_EJECT out of range: %u.\n", val);
+                break;
+            }
+            (void)piscsi64_media_eject((uint8_t)val);
+            break;
+        case PISCSI64_CMD_MEDIA_INSERT:
+            if (val >= PISCSI64_NUM_UNITS) {
+                DEBUG("[PISCSI64] MEDIA_INSERT out of range: %u.\n", val);
+                break;
+            }
+            (void)piscsi64_media_insert((uint8_t)val);
+            break;
         case PISCSI64_CMD_DEBUGME:
             piscsi64_debugme(val);
             break;
@@ -2036,6 +2227,8 @@ uint32_t handle_piscsi64_read(uint32_t addr, uint8_t type) {
          */
         case PISCSI64_CMD_WRITE:
         case PISCSI64_CMD_READ:
+        case PISCSI64_CMD_MEDIA_EJECT:
+        case PISCSI64_CMD_MEDIA_INSERT:
             return open_bus;
         case PISCSI64_CMD_ADDR1: case PISCSI64_CMD_ADDR2: case PISCSI64_CMD_ADDR3: case PISCSI64_CMD_ADDR4: {
             int i = (cmd - PISCSI64_CMD_ADDR1) / 4;
