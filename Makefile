@@ -227,6 +227,7 @@ MAINFILES += src/platforms/dummy/dummy-registers.c
 
 MAINFILES += src/platforms/amiga/Gayle.c
 MAINFILES += src/platforms/amiga/hunk-reloc.c
+MAINFILES += src/platforms/amiga/fsid.c
 MAINFILES += src/platforms/amiga/cdtv-dmac.c
 
 MAINFILES += src/platforms/amiga/rtg/rtg.c

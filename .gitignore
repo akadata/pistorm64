@@ -47,6 +47,17 @@ core.*
 core
 core.*
 *.core
+
+# Runtime filesystem cache (auto-extracted by PiSCSI/PiSCSI64)
+data/fs/DOS.*
+data/fs/PFS.*
+data/fs/PDS.*
+data/fs/SFS.*
+data/fs/MSD.*
+data/fs/MSH.*
+data/fs/UNI.*
+data/fs/CFS.*
+
 src/platforms/amiga/rtg/_reference_
 captain-amygdala-pistorm/
 pistorm-atari/

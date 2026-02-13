@@ -15,7 +15,10 @@
 #include "log.h"
 #include "piscsi-enums.h"
 #include "piscsi.h"
+#include "platforms/amiga/fsid.h"
 #include "platforms/amiga/hunk-reloc.h"
+
+/* Legacy PiSCSI backend: maintenance mode compatibility path. */
 
 #define BE(val) be32toh(val)
 #define BE16(val) be16toh(val)
@@ -1464,20 +1467,28 @@ fs_found:;
             DEBUG("[PISCSI] Attempt to load file system for partition %d from disk.\n", rom_cur_partition);
             int32_t mapped_r = get_mapped_item_by_address(cfg, val);
             if (mapped_r != -1) {
-                char *dosID = (char *)&rom_partition_dostype[rom_cur_partition];
+                char dosID[4];
+                char dosID_str[16];
+                memset(dosID_str, 0x00, sizeof(dosID_str));
+                uint32_t raw_dostype = rom_partition_dostype[rom_cur_partition];
+                if (amiga_fsid_build_dosid(raw_dostype, dosID, dosID_str, sizeof(dosID_str)) != 0) {
+                    printf("[FSHD-Late] No mapping for DOSType 0x%08X\n", be32toh(raw_dostype));
+                    piscsi_u32[3] = 0xFFFFFFFF;
+                    break;
+                }
                 filesystems[piscsi_num_fs].binary_data = NULL;
                 filesystems[piscsi_num_fs].fhb = NULL;
-                filesystems[piscsi_num_fs].FS_ID = rom_partition_dostype[rom_cur_partition];
+                filesystems[piscsi_num_fs].FS_ID = raw_dostype;
                 filesystems[piscsi_num_fs].handler = 0;
                 filesystems[piscsi_num_fs].valid = 0;
                 if (load_fs(&filesystems[piscsi_num_fs], dosID) != -1) {
-                    printf("[FSHD-Late] Loaded file system %c%c%c/%d from fs storage.\n", dosID[0], dosID[1], dosID[2], dosID[3]);
+                    printf("[FSHD-Late] Loaded file system %s from fs storage.\n", dosID_str);
                     piscsi_u32[3] = piscsi_num_fs;
                     rom_cur_fs = piscsi_num_fs;
                     filesystems[piscsi_num_fs].valid = 1;
                     piscsi_num_fs++;
                 } else {
-                    printf("[FSHD-Late] Failed to load file system %c%c%c/%d from fs storage.\n", dosID[0], dosID[1], dosID[2], dosID[3]);
+                    printf("[FSHD-Late] Failed to load file system %s from fs storage.\n", dosID_str);
                     piscsi_u32[3] = 0xFFFFFFFF;
                 }
             }
