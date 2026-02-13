@@ -3,6 +3,8 @@
 PiSCSI64 is the newer SCSI backend for PiStorm64 on Amiga.  
 It presents host-backed storage to the Amiga as normal SCSI devices (hard disk, CD-ROM), with boot ROM support and direct `pi-scsi64.device` integration.
 
+Status: active development target. Legacy `PiSCSI` is compatibility/maintenance only.
+
 ## Why PiSCSI64 Exists (and Why PiSCSI Still Exists)
 
 PiSCSI64 is not just a rename of legacy PiSCSI.
@@ -27,6 +29,9 @@ Notes:
 - Unit `0` is reserved for controller identity.
 - Use units `1..15` for targets.
 - `cdrom:` media is read-only by design.
+- If you map `/dev/...` paths, the emulator process must have permission to open that block node.
+  - A common failure is `errno=13` (permission denied) when opening `/dev/disk/by-id/...`.
+  - Check the emulator stdout/stderr for `[PISCSI64] Failed to open ... (errno=13)`.
 
 ## HDToolBox: Use `pi-scsi64.device`
 
@@ -104,3 +109,39 @@ Planned/roadmap prefixes:
 - `usb:`
 
 Goal: expose these as normal SCSI devices/disks to Amiga software, instead of custom one-off interfaces.
+
+## Development Tracking
+
+The implementation checklist is tracked in:
+
+- `SCSI64TASKS.md`
+
+This is the source of truth for staged work (backend abstraction, block backend, config parsing, CD baseline, remote placeholder).
+
+## Current Implementation Status
+
+Implemented:
+
+- Shared DOSType/FS-name normalization used by both `piscsi64` and legacy `piscsi`.
+- Backend abstraction scaffolding in `piscsi64`:
+  - backend enum (`FILE`, `BLOCK`, `REMOTE`)
+  - per-unit backend metadata
+  - backend ops interface
+  - core I/O call sites routed through backend wrappers
+- Current runtime still uses `FILE` backend behavior, so existing configs keep working.
+
+Pending (next steps):
+
+- `BACKEND_BLOCK` for `/dev/disk/by-*` and raw `/dev/*` block nodes.
+- Config options for explicit mode control (`mode=ro` default, `mode=rw` explicit).
+- Remote backend placeholder wiring (implemented as controlled unsupported path until protocol lands).
+
+## Validation Flow (Each Step)
+
+1. Build:
+   - `make -j4 emulator`
+2. Boot with known-good config and verify:
+   - normal boot path
+   - mapped hard disks visible in HDToolBox via `pi-scsi64.device`
+   - existing ISO/CD path still mounts as before
+3. Check logs for new backend-layer regressions before moving to next task in `SCSI64TASKS.md`.

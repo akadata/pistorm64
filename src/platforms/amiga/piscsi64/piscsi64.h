@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <stdint.h>
+#include <sys/types.h>
 
 #include "platforms/amiga/hunk-reloc.h"
 
@@ -75,11 +76,32 @@ enum piscsi64_media_kind {
     PISCSI64_MEDIA_CDROM = 2,
 };
 
+enum piscsi64_backend_type {
+    PISCSI64_BACKEND_NONE = 0,
+    PISCSI64_BACKEND_FILE = 1,
+    PISCSI64_BACKEND_BLOCK = 2,
+    PISCSI64_BACKEND_REMOTE = 3,
+};
+
+struct piscsi64_dev;
+struct piscsi64_backend_ops {
+    const char *name;
+    int (*close)(struct piscsi64_dev *d);
+    off64_t (*seek)(struct piscsi64_dev *d, off64_t offset, int whence);
+    ssize_t (*read)(struct piscsi64_dev *d, void *buf, size_t count);
+    ssize_t (*write)(struct piscsi64_dev *d, const void *buf, size_t count);
+    ssize_t (*pread)(struct piscsi64_dev *d, void *buf, size_t count, off64_t offset);
+    int (*sync)(struct piscsi64_dev *d);
+};
+
 struct piscsi64_dev {
     uint32_t c;
     uint16_t h, s;
     uint64_t fs;
     int32_t fd;
+    enum piscsi64_backend_type backend_type;
+    const struct piscsi64_backend_ops *backend_ops;
+    char backend_spec[256];
     uint32_t lba;
     uint32_t num_partitions;
     uint32_t fshd_offs;

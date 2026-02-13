@@ -148,6 +148,136 @@ uint8_t piscsi64_num_fs = 0;
 
 #define FS_ALLOC_MAX_BYTES (512 * 1024)
 
+static int piscsi64_backend_file_close(struct piscsi64_dev *d)
+{
+    if (!d || d->fd == -1) {
+        return 0;
+    }
+    int rc = close(d->fd);
+    d->fd = -1;
+    return rc;
+}
+
+static off64_t piscsi64_backend_file_seek(struct piscsi64_dev *d, off64_t offset, int whence)
+{
+    if (!d || d->fd == -1) {
+        errno = EBADF;
+        return (off64_t)-1;
+    }
+    return lseek64(d->fd, offset, whence);
+}
+
+static ssize_t piscsi64_backend_file_read(struct piscsi64_dev *d, void *buf, size_t count)
+{
+    if (!d || d->fd == -1) {
+        errno = EBADF;
+        return -1;
+    }
+    return read(d->fd, buf, count);
+}
+
+static ssize_t piscsi64_backend_file_write(struct piscsi64_dev *d, const void *buf, size_t count)
+{
+    if (!d || d->fd == -1) {
+        errno = EBADF;
+        return -1;
+    }
+    return write(d->fd, buf, count);
+}
+
+static ssize_t piscsi64_backend_file_pread(struct piscsi64_dev *d, void *buf, size_t count,
+                                           off64_t offset)
+{
+    if (!d || d->fd == -1) {
+        errno = EBADF;
+        return -1;
+    }
+    return pread(d->fd, buf, count, offset);
+}
+
+static int piscsi64_backend_file_sync(struct piscsi64_dev *d)
+{
+    if (!d || d->fd == -1) {
+        errno = EBADF;
+        return -1;
+    }
+    return fsync(d->fd);
+}
+
+static const struct piscsi64_backend_ops piscsi64_backend_file_ops = {
+    .name = "file",
+    .close = piscsi64_backend_file_close,
+    .seek = piscsi64_backend_file_seek,
+    .read = piscsi64_backend_file_read,
+    .write = piscsi64_backend_file_write,
+    .pread = piscsi64_backend_file_pread,
+    .sync = piscsi64_backend_file_sync,
+};
+
+static off64_t piscsi64_dev_seek(struct piscsi64_dev *d, off64_t offset, int whence)
+{
+    if (d && d->backend_ops && d->backend_ops->seek) {
+        return d->backend_ops->seek(d, offset, whence);
+    }
+    if (!d || d->fd == -1) {
+        errno = EBADF;
+        return (off64_t)-1;
+    }
+    return lseek64(d->fd, offset, whence);
+}
+
+static ssize_t piscsi64_dev_read(struct piscsi64_dev *d, void *buf, size_t count)
+{
+    if (d && d->backend_ops && d->backend_ops->read) {
+        return d->backend_ops->read(d, buf, count);
+    }
+    if (!d || d->fd == -1) {
+        errno = EBADF;
+        return -1;
+    }
+    return read(d->fd, buf, count);
+}
+
+static ssize_t piscsi64_dev_write(struct piscsi64_dev *d, const void *buf, size_t count)
+{
+    if (d && d->backend_ops && d->backend_ops->write) {
+        return d->backend_ops->write(d, buf, count);
+    }
+    if (!d || d->fd == -1) {
+        errno = EBADF;
+        return -1;
+    }
+    return write(d->fd, buf, count);
+}
+
+static ssize_t piscsi64_dev_pread(struct piscsi64_dev *d, void *buf, size_t count, off64_t offset)
+{
+    if (d && d->backend_ops && d->backend_ops->pread) {
+        return d->backend_ops->pread(d, buf, count, offset);
+    }
+    if (!d || d->fd == -1) {
+        errno = EBADF;
+        return -1;
+    }
+    return pread(d->fd, buf, count, offset);
+}
+
+static int piscsi64_dev_close(struct piscsi64_dev *d)
+{
+    if (!d) {
+        return -1;
+    }
+    if (d->backend_ops && d->backend_ops->close) {
+        return d->backend_ops->close(d);
+    }
+    if (d->fd != -1) {
+        int rc = close(d->fd);
+        d->fd = -1;
+        return rc;
+    }
+    return 0;
+}
+
 static int fs_handler_valid(const struct piscsi64_fs *fs, uint32_t handler_addr, uint8_t partition,
                             const char *dosID) {
     if (!fs || !fs->valid) {
@@ -388,9 +518,7 @@ static void piscsi64_reset_dev(struct piscsi64_dev *d) {
         return;
     }
 
-    if (d->fd != -1) {
-        close(d->fd);
-    }
+    (void)piscsi64_dev_close(d);
     d->fd = -1;
 
     if (d->rdb) {
@@ -408,6 +536,9 @@ static void piscsi64_reset_dev(struct piscsi64_dev *d) {
     d->h = 0;
     d->s = 0;
     d->fs = 0;
+    d->backend_type = PISCSI64_BACKEND_NONE;
+    d->backend_ops = NULL;
+    d->backend_spec[0] = '\0';
     d->lba = 0;
     d->num_partitions = 0;
     d->fshd_offs = 0;
@@ -445,6 +576,9 @@ void piscsi64_init(void) {
         piscsi64_devs[i].s = 0;
         piscsi64_devs[i].fs = 0;
         piscsi64_devs[i].fd = -1;
+        piscsi64_devs[i].backend_type = PISCSI64_BACKEND_NONE;
+        piscsi64_devs[i].backend_ops = NULL;
+        piscsi64_devs[i].backend_spec[0] = '\0';
         piscsi64_devs[i].lba = 0;
         piscsi64_devs[i].num_partitions = 0;
         piscsi64_devs[i].fshd_offs = 0;
@@ -525,7 +659,6 @@ void piscsi64_shutdown(void) {
 }
 
 static void piscsi64_find_partitions(struct piscsi64_dev *d) {
-    int fd = d->fd;
     int cur_partition = 0;
     uint8_t tmp;
 
@@ -543,9 +676,9 @@ static void piscsi64_find_partitions(struct piscsi64_dev *d) {
 
     char *block = malloc(d->block_size);
 
-    lseek(fd, BE(d->rdb->rdb_PartitionList) * d->block_size, SEEK_SET);
+    piscsi64_dev_seek(d, BE(d->rdb->rdb_PartitionList) * d->block_size, SEEK_SET);
 next_partition:;
-    read(fd, block, d->block_size);
+    piscsi64_dev_read(d, block, d->block_size);
 
     uint32_t first_temp;
     memcpy(&first_temp, &block[0], sizeof(first_temp));
@@ -590,26 +723,25 @@ partition_renamed:
     if (d->pb[cur_partition]->pb_Next != 0xFFFFFFFF) {
         uint64_t next = be32toh(pb->pb_Next);
         block = malloc(d->block_size);
-        lseek64(fd, (off64_t)(next * d->block_size), SEEK_SET);
+        piscsi64_dev_seek(d, (off64_t)(next * d->block_size), SEEK_SET);
         cur_partition++;
         DEBUG("[PISCSI64] Next partition at block %d.\n", be32toh(pb->pb_Next));
         goto next_partition;
     }
     DEBUG("[PISCSI64] No more partitions on disk.\n");
     d->num_partitions = (uint8_t)(cur_partition + 1);
-    d->fshd_offs = (uint32_t)lseek64(fd, 0, SEEK_CUR);
+    d->fshd_offs = (uint32_t)piscsi64_dev_seek(d, 0, SEEK_CUR);
 
     return;
 }
 
 static int piscsi64_parse_rdb(struct piscsi64_dev *d) {
-    int fd = d->fd;
     int i = 0;
     uint8_t *block = malloc(PISCSI64_MAX_BLOCK_SIZE);
 
-    lseek(fd, 0, SEEK_SET);
+    piscsi64_dev_seek(d, 0, SEEK_SET);
     for (i = 0; i < RDB_BLOCK_LIMIT; i++) {
-        read(fd, block, PISCSI64_MAX_BLOCK_SIZE);
+        piscsi64_dev_read(d, block, PISCSI64_MAX_BLOCK_SIZE);
         uint32_t first_temp;
         memcpy(&first_temp, &block[0], sizeof(first_temp));
         uint32_t first = be32toh(first_temp);
@@ -694,7 +826,7 @@ void piscsi64_find_filesystems(struct piscsi64_dev *d) {
 
     uint8_t *fhb_block = malloc(d->block_size);
 
-    lseek64(d->fd, d->fshd_offs, SEEK_SET);
+    piscsi64_dev_seek(d, d->fshd_offs, SEEK_SET);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-align"
@@ -706,7 +838,7 @@ void piscsi64_find_filesystems(struct piscsi64_dev *d) {
      */
     struct FileSysHeaderBlock *fhb = (struct FileSysHeaderBlock *)((char *)fhb_block);
 #pragma GCC diagnostic pop
-    read(d->fd, fhb_block, d->block_size);
+    piscsi64_dev_read(d, fhb_block, d->block_size);
 
     while (BE(fhb->fhb_ID) == FS_IDENTIFIER) {
         char *dosID = (char *)&fhb->fhb_DosType;
@@ -765,7 +897,7 @@ void piscsi64_find_filesystems(struct piscsi64_dev *d) {
 
 skip_fs_load_lseg:;
         fs_found++;
-        lseek64(d->fd, BE(fhb->fhb_Next) * d->block_size, SEEK_SET);
+        piscsi64_dev_seek(d, BE(fhb->fhb_Next) * d->block_size, SEEK_SET);
         fhb_block = malloc(d->block_size);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-align"
@@ -777,7 +909,7 @@ skip_fs_load_lseg:;
          */
         fhb = (struct FileSysHeaderBlock *)((char *)fhb_block);
 #pragma GCC diagnostic pop
-        read(d->fd, fhb_block, d->block_size);
+        piscsi64_dev_read(d, fhb_block, d->block_size);
     }
 
     if (!fs_found) {
@@ -854,6 +986,9 @@ void piscsi64_map_drive(const char *spec, uint8_t index) {
 
     d->fs = file_size;
     d->fd = tmp_fd;
+    d->backend_type = PISCSI64_BACKEND_FILE;
+    d->backend_ops = &piscsi64_backend_file_ops;
+    snprintf(d->backend_spec, sizeof(d->backend_spec), "%s", path);
     d->media_kind = media_kind;
     d->read_only = (uint8_t)read_only;
     printf("[PISCSI64] Map %d: [%s] (%s%s) - %lu bytes.\n",
@@ -876,7 +1011,7 @@ void piscsi64_map_drive(const char *spec, uint8_t index) {
     }
 
     uint8_t hdfID[4] = {0};
-    ssize_t id_read = pread(tmp_fd, hdfID, sizeof(hdfID), 0);
+    ssize_t id_read = piscsi64_dev_pread(d, hdfID, sizeof(hdfID), 0);
     if (id_read == (ssize_t)sizeof(hdfID) &&
         (memcmp(hdfID, "DOS", 3) == 0 ||
          memcmp(hdfID, "PFS", 3) == 0 ||
@@ -926,12 +1061,12 @@ int piscsi64_validate_hdf(struct piscsi64_dev *d, const char *filename) {
 
     // Test 1: Read RDB block 0 (first 512 bytes)
     uint8_t rdb_block[512];
-    if (lseek(d->fd, 0, SEEK_SET) == (off_t)-1) {
+    if (piscsi64_dev_seek(d, 0, SEEK_SET) == (off64_t)-1) {
         printf("[PISCSI64-SELFTEST] ERROR: Cannot seek to RDB block 0 in %s\n", filename);
         return 0;
     }
 
-    ssize_t bytes_read = read(d->fd, rdb_block, 512);
+    ssize_t bytes_read = piscsi64_dev_read(d, rdb_block, 512);
     if (bytes_read < 512) {
         printf("[PISCSI64-SELFTEST] ERROR: Cannot read full RDB block 0 from %s (got %zd bytes)\n", filename, bytes_read);
         return 0;
@@ -951,12 +1086,12 @@ int piscsi64_validate_hdf(struct piscsi64_dev *d, const char *filename) {
 
         // Look for first partition block (usually at offset 1024 for standard Amiga HDFs)
         uint8_t boot_block[512];
-        if (lseek(d->fd, 1024, SEEK_SET) == (off_t)-1) {
+        if (piscsi64_dev_seek(d, 1024, SEEK_SET) == (off64_t)-1) {
             printf("[PISCSI64-SELFTEST] ERROR: Cannot seek to DH0 boot block in %s\n", filename);
             return 0;
         }
 
-        bytes_read = read(d->fd, boot_block, 512);
+        bytes_read = piscsi64_dev_read(d, boot_block, 512);
         if (bytes_read < 512) {
             printf("[PISCSI64-SELFTEST] ERROR: Cannot read DH0 boot block from %s (got %zd bytes)\n", filename, bytes_read);
             return 0;
@@ -972,7 +1107,7 @@ int piscsi64_validate_hdf(struct piscsi64_dev *d, const char *filename) {
     }
 
     // Test 3: Verify we can seek to end of file
-    off64_t file_end = lseek64(d->fd, 0, SEEK_END);
+    off64_t file_end = piscsi64_dev_seek(d, 0, SEEK_END);
     if (file_end == (off64_t)-1) {
         printf("[PISCSI64-SELFTEST] ERROR: Cannot seek to end of file %s\n", filename);
         return 0;
@@ -991,13 +1126,13 @@ int piscsi64_validate_hdf(struct piscsi64_dev *d, const char *filename) {
         }
 
         uint8_t test_block[512];
-        if (lseek64(d->fd, test_offset, SEEK_SET) == (off64_t)-1) {
+        if (piscsi64_dev_seek(d, test_offset, SEEK_SET) == (off64_t)-1) {
             printf("[PISCSI64-SELFTEST] ERROR: Cannot seek to test block at offset %lld in %s\n",
                    (long long)test_offset, filename);
             return 0;
         }
 
-        bytes_read = read(d->fd, test_block, 512);
+        bytes_read = piscsi64_dev_read(d, test_block, 512);
         if (bytes_read < 512) {
             printf("[PISCSI64-SELFTEST] ERROR: Cannot read test block at offset %lld from %s (got %zd bytes)\n",
                    (long long)test_offset, filename, bytes_read);
@@ -1283,21 +1418,21 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
                 uint32_t block = src / d->block_size;
                 d->lba = block;
                 DEBUG("[PISCSI64-IO] Unit:%d CMD:READBYTES io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%X to_addr:0x%.8X\n", val, src, piscsi64_u32[1], block, src, piscsi64_u32[2]);
-                lseek64(d->fd, (off64_t)src, SEEK_SET);
+                piscsi64_dev_seek(d, (off64_t)src, SEEK_SET);
             }
             else if (cmd == PISCSI64_CMD_READ) {
                 uint32_t block = piscsi64_u32[0];
                 uint64_t file_offset = (uint64_t)block * d->block_size;
                 d->lba = block;
                 DEBUG("[PISCSI64-IO] Unit:%d CMD:READ io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%llX to_addr:0x%.8X\n", val, block, piscsi64_u32[1], block, (unsigned long long)file_offset, piscsi64_u32[2]);
-                lseek64(d->fd, (off64_t)file_offset, SEEK_SET);
+                piscsi64_dev_seek(d, (off64_t)file_offset, SEEK_SET);
             }
             else {
                 uint64_t src = ((uint64_t)piscsi64_u32[3] << 32) | piscsi64_u32[0];
                 uint32_t block = (uint32_t)(src / d->block_size);
                 d->lba = block;
                 DEBUG("[PISCSI64-IO] Unit:%d CMD:READ64 io_Offset:0x%llX io_Length:%d LBA:0x%X file_offset:0x%llX to_addr:0x%.8X\n", val, (unsigned long long)src, piscsi64_u32[1], block, (unsigned long long)src, piscsi64_u32[2]);
-                lseek64(d->fd, (off64_t)src, SEEK_SET);
+                piscsi64_dev_seek(d, (off64_t)src, SEEK_SET);
             }
 
             uint32_t avail = 0;
@@ -1332,7 +1467,7 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
                             success = 0;
                             break;
                         }
-                        ssize_t bytes_read = read(d->fd, dma_buf, chunk);
+                        ssize_t bytes_read = piscsi64_dev_read(d, dma_buf, chunk);
                         if (bytes_read < 0) {
                             DEBUG("[PISCSI64-IO-ERROR] Unit:%d READ failed: bytes_requested=%u, bytes_read=%zd, errno=%d\n",
                                   val, chunk, bytes_read, errno);
@@ -1353,7 +1488,7 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
                         DEBUG("[PISCSI64-IO-SUCCESS] Unit:%d READ: %zd bytes OK\n", val, total_read);
                     }
                 } else {
-                    ssize_t bytes_read = read(d->fd, map, piscsi64_u32[1]);
+                    ssize_t bytes_read = piscsi64_dev_read(d, map, piscsi64_u32[1]);
                     if (bytes_read < 0) {
                         DEBUG("[PISCSI64-IO-ERROR] Unit:%d READ failed: bytes_requested=%d, bytes_read=%zd, errno=%d\n", val, piscsi64_u32[1], bytes_read, errno);
                     } else if (bytes_read != (ssize_t)piscsi64_u32[1]) {
@@ -1372,7 +1507,7 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
                 uint8_t c = 0;
                 int success = 1;
                 for (uint32_t i = 0; i < piscsi64_u32[1]; i++) {
-                    ssize_t result = read(d->fd, &c, 1);
+                    ssize_t result = piscsi64_dev_read(d, &c, 1);
                     if (result <= 0) {
                         DEBUG("[PISCSI64-IO-ERROR] Unit:%d BYTE READ failed at offset %d: result=%zd\n", val, i, result);
                         success = 0;
@@ -1407,21 +1542,21 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
                 uint32_t block = src / d->block_size;
                 d->lba = block;
                 DEBUG("[PISCSI64-IO] Unit:%d CMD:WRITEBYTES io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%X from_addr:0x%.8X\n", val, src, piscsi64_u32[1], block, src, piscsi64_u32[2]);
-                lseek64(d->fd, (off64_t)src, SEEK_SET);
+                piscsi64_dev_seek(d, (off64_t)src, SEEK_SET);
             }
             else if (cmd == PISCSI64_CMD_WRITE) {
                 uint32_t block = piscsi64_u32[0];
                 uint64_t file_offset = (uint64_t)block * d->block_size;
                 d->lba = block;
                 DEBUG("[PISCSI64-IO] Unit:%d CMD:WRITE io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%llX from_addr:0x%.8X\n", val, block, piscsi64_u32[1], block, (unsigned long long)file_offset, piscsi64_u32[2]);
-                lseek64(d->fd, (off64_t)file_offset, SEEK_SET);
+                piscsi64_dev_seek(d, (off64_t)file_offset, SEEK_SET);
             }
             else {
                 uint64_t src = ((uint64_t)piscsi64_u32[3] << 32) | piscsi64_u32[0];
                 uint32_t block = (uint32_t)(src / d->block_size);
                 d->lba = block;
                 DEBUG("[PISCSI64-IO] Unit:%d CMD:WRITE64 io_Offset:0x%llX io_Length:%d LBA:0x%X file_offset:0x%llX from_addr:0x%.8X\n", val, (unsigned long long)src, piscsi64_u32[1], block, (unsigned long long)src, piscsi64_u32[2]);
-                lseek64(d->fd, (off64_t)src, SEEK_SET);
+                piscsi64_dev_seek(d, (off64_t)src, SEEK_SET);
             }
 
             uint32_t avail_w = 0;
@@ -1457,7 +1592,7 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
                             break;
                         }
                         memcpy(dma_buf, src_ptr, chunk);
-                        ssize_t bytes_written = write(d->fd, dma_buf, chunk);
+                        ssize_t bytes_written = piscsi64_dev_write(d, dma_buf, chunk);
                         if (bytes_written < 0) {
                             DEBUG("[PISCSI64-IO-ERROR] Unit:%d WRITE failed: bytes_requested=%u, bytes_written=%zd, errno=%d\n",
                                   val, chunk, bytes_written, errno);
@@ -1477,7 +1612,7 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
                         DEBUG("[PISCSI64-IO-SUCCESS] Unit:%d WRITE: %zd bytes OK\n", val, total_written);
                     }
                 } else {
-                    ssize_t bytes_written = write(d->fd, map, piscsi64_u32[1]);
+                    ssize_t bytes_written = piscsi64_dev_write(d, map, piscsi64_u32[1]);
                     if (bytes_written < 0) {
                         DEBUG("[PISCSI64-IO-ERROR] Unit:%d WRITE failed: bytes_requested=%d, bytes_written=%zd, errno=%d\n", val, piscsi64_u32[1], bytes_written, errno);
                     } else if (bytes_written != (ssize_t)piscsi64_u32[1]) {
@@ -1497,7 +1632,7 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
                 int success = 1;
                 for (uint32_t i = 0; i < piscsi64_u32[1]; i++) {
                     c = (uint8_t)m68k_read_memory_8(piscsi64_u32[2] + i);
-                    ssize_t result = write(d->fd, &c, 1);
+                    ssize_t result = piscsi64_dev_write(d, &c, 1);
                     if (result <= 0) {
                         DEBUG("[PISCSI64-IO-ERROR] Unit:%d BYTE WRITE failed at offset %d: result=%zd\n", val, (int)i, result);
                         success = 0;
