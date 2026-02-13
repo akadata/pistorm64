@@ -105,6 +105,32 @@ static const char* rtg_resolve_shader_path(const char* filename, char* buf, size
     return filename;
 }
 
+static const char* rtg_resolve_splash_path(char* buf, size_t buf_len) {
+    const char* explicit_path = getenv("PISTORM_SPLASH");
+    const char* root = getenv("PISTORM_ROOT");
+
+    if (explicit_path && *explicit_path) {
+        snprintf(buf, buf_len, "%s", explicit_path);
+        if (access(buf, R_OK) == 0) {
+            return buf;
+        }
+    }
+
+    if (root && *root) {
+        snprintf(buf, buf_len, "%s/splash.png", root);
+        if (access(buf, R_OK) == 0) {
+            return buf;
+        }
+    }
+
+    snprintf(buf, buf_len, "splash.png");
+    if (access(buf, R_OK) == 0) {
+        return buf;
+    }
+
+    return NULL;
+}
+
 // Default configuration for VideoCore / TV service support (Raspberry Pi only).
 // Makefile can override with -DUSE_VC=1 when vc_tvservice is available.
 #ifndef USE_VC
@@ -571,6 +597,8 @@ void* rtgThread(void* args) {
   Texture raylib_texture = {0};
   Texture raylib_cursor_texture = {0};
   Texture raylib_clut_texture = {0};
+  Texture splash_texture = {0};
+  uint8_t splash_loaded = 0;
 
   Image raylib_fb = {0};
   Image raylib_cursor = {0};
@@ -634,6 +662,22 @@ void* rtgThread(void* args) {
   raylib_cursor.mipmaps = 1;
   raylib_cursor.data = cursor_data;
   raylib_cursor_texture = LoadTextureFromImage(raylib_cursor);
+
+  char splash_path[PATH_MAX];
+  const char* resolved_splash = rtg_resolve_splash_path(splash_path, sizeof(splash_path));
+  if (resolved_splash) {
+    splash_texture = LoadTexture(resolved_splash);
+    if (splash_texture.id != 0) {
+      splash_loaded = 1;
+      LOG_INFO("[RTG/RAYLIB] Loaded idle splash from %s (%dx%d)\n", resolved_splash,
+               splash_texture.width, splash_texture.height);
+    } else {
+      LOG_WARN("[RTG/RAYLIB] Failed to load idle splash from %s\n", resolved_splash);
+    }
+  } else {
+    LOG_INFO("[RTG/RAYLIB] No splash image found (set PISTORM_SPLASH or place splash.png in "
+             "PISTORM_ROOT/current dir).\n");
+  }
 
 reinit_raylib:;
   if(reinit) {
@@ -1219,7 +1263,19 @@ reinit_raylib:;
     } else {
       BeginDrawing();
       ClearBackground(bef);
-      // DrawText("RTG is currently sleeping.", 16, 16, 12, RAYWHITE);
+      if (splash_loaded && splash_texture.width > 0 && splash_texture.height > 0) {
+        float tex_w = (float)splash_texture.width;
+        float tex_h = (float)splash_texture.height;
+        float scale_x_s = (float)pi_screen_width / tex_w;
+        float scale_y_s = (float)pi_screen_height / tex_h;
+        float scale = fminf(scale_x_s, scale_y_s);
+        float draw_w = tex_w * scale;
+        float draw_h = tex_h * scale;
+        Rectangle splash_src = {0.0f, 0.0f, tex_w, tex_h};
+        Rectangle splash_dst = {(pi_screen_width - draw_w) * 0.5f,
+                                (pi_screen_height - draw_h) * 0.5f, draw_w, draw_h};
+        DrawTexturePro(splash_texture, splash_src, splash_dst, origin, 0.0f, RAYWHITE);
+      }
       EndDrawing();
     }
     if(pitch != *data->pitch || height != *data->height || width != *data->width ||
@@ -1259,6 +1315,9 @@ shutdown_raylib:;
     free(tight_buf);
   }
 
+  if (splash_loaded) {
+    UnloadTexture(splash_texture);
+  }
   UnloadTexture(raylib_texture);
   UnloadShader(clut_shader);
   UnloadShader(bgra_swizzle_shader);

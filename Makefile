@@ -232,6 +232,11 @@ MAINFILES += src/platforms/amiga/cdtv-dmac.c
 MAINFILES += src/platforms/amiga/rtg/rtg.c
 MAINFILES += src/platforms/amiga/rtg/rtg-output-raylib.c
 MAINFILES += src/platforms/amiga/rtg/rtg-gfx.c
+MAINFILES += src/platforms/amiga/rtg64/rtg64.c
+MAINFILES += src/platforms/amiga/rtg64/rtg64-vc6.c
+MAINFILES += src/platforms/amiga/rtg64/rtg64-transport.c
+MAINFILES += src/platforms/amiga/rtg64/rtg64-bench.c
+MAINFILES += src/platforms/amiga/rtg64/rtg64-zorro.c
 
 MAINFILES += src/platforms/amiga/piscsi/piscsi.c
 MAINFILES += src/platforms/amiga/piscsi64/piscsi64.c
@@ -734,6 +739,9 @@ amiga-piscsi64:
 amiga-rtg:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/rtg/rtg_driver_amiga
 
+amiga-rtg64:
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/rtg64/driver_amiga
+
 amiga-ahi:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/ahi/ahi_driver_amiga
 
@@ -743,13 +751,14 @@ amiga-pissa:
 amiga-pissl:
 	$(AMIGA_SUBMAKE) -C amiga/pissl
 
-amiga-all: amiga-net amiga-piscsi amiga-piscsi64 amiga-rtg amiga-pissa amiga-pissl
+amiga-all: amiga-net amiga-piscsi amiga-piscsi64 amiga-rtg amiga-rtg64 amiga-pissa amiga-pissl
 
 amiga-clean:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/net/net_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi/device_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi64/device_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/rtg/rtg_driver_amiga clean
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/rtg64/driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/ahi/ahi_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C amiga/pissa clean
 	$(AMIGA_SUBMAKE) -C amiga/pissl clean

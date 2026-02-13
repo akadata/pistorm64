@@ -1,0 +1,12 @@
+; RTG64 monitor placeholder
+; Copy this file to DEVS:Monitors/RTG64 (or use as template)
+; and ensure its icon tooltypes point at rtg64.card.
+;
+; Suggested Icon ToolTypes (edit in Workbench Icon Information):
+; BOARDNAME=RTG64
+; DEVICE=rtg64.card
+; CMPLENGTH=6
+; INTERRUPT=No
+;
+; This file is a scaffold placeholder while the full P96 monitor
+; binary and installer are being developed.

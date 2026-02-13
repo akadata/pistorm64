@@ -9,6 +9,7 @@
 #include "zorro/z2_rng/z2_rng.h"
 #include "zorro/serial_echo/serial_echo.h"
 #include "zorro/z3bus_demo/z3bus_demo.h"
+#include "rtg64/rtg64-zorro.h"
 #include "log.h"
 
 #define MAX_ZORRO_DEVICES AC_PIC_LIMIT
@@ -84,6 +85,8 @@ void zorro_setvar(struct emulator_config *cfg, const char *var, const char *val)
     z2_rng_register();
   } else if (strcmp(var, "zorro-pissa") == 0) {
     z2_pissa_register();
+  } else if (strcmp(var, "rtg64") == 0) {
+    rtg64_z2_register();
   }
 }
 

@@ -121,6 +121,7 @@ typedef enum pistorm_product_id {
   PISTORM_PROD_Z2_SERIAL     = 0x0020,
   PISTORM_PROD_Z2_RNG        = 0x0021,
   PISTORM_PROD_Z2_PISSA      = 0x0022,
+  PISTORM_PROD_RTG64_Z2      = 0x0042,
 
   PISTORM_PROD_PI_NET        = 0x0030,
   PISTORM_PROD_PI_AHI        = 0x0031,
