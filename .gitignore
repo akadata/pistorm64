@@ -65,3 +65,6 @@ src/platforms/amiga/rtg/_reference_
 captain-amygdala-pistorm/
 pistorm-atari/
 tools/piscsi64_remote/out/
+
+# Local Amiga NDK (not redistributed)
+NDK/
