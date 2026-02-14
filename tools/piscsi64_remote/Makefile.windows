@@ -1,0 +1,33 @@
+# PiSCSI64 remote utilities (Windows, MinGW-w64)
+#
+# Usage:
+#   mingw32-make -f Makefile.windows
+#
+# This currently builds the Windows probe client.
+# The remote server daemon is still Linux/macOS focused.
+
+OUT_DIR := out
+CC ?= x86_64-w64-mingw32-gcc
+CFLAGS ?= -O2 -Wall -Wextra
+LDFLAGS ?=
+OPENSSL_LIBS ?= -lcrypto -lws2_32
+
+CLIENT_WIN_SRC := piscsi64_remote_client_win.c
+CLIENT_WIN_BIN := $(OUT_DIR)/piscsi64-remote-client.exe
+CLIENT_WIN_ALIAS := $(OUT_DIR)/piscsi64-remote-client-win.exe
+
+all: $(CLIENT_WIN_BIN) $(CLIENT_WIN_ALIAS)
+
+$(OUT_DIR):
+	mkdir -p $(OUT_DIR)
+
+$(CLIENT_WIN_BIN): $(CLIENT_WIN_SRC) | $(OUT_DIR)
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS) $(OPENSSL_LIBS)
+
+$(CLIENT_WIN_ALIAS): $(CLIENT_WIN_BIN)
+	cp -f $(CLIENT_WIN_BIN) $(CLIENT_WIN_ALIAS)
+
+clean:
+	rm -rf $(OUT_DIR)
+
+.PHONY: all clean

@@ -5,11 +5,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include <stddef.h>
+#include <time.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <limits.h>
 #include <endian.h>
 #include <errno.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#ifdef __linux__
+#include <sys/ioctl.h>
+#include <linux/fs.h>
+#endif
+#include <openssl/evp.h>
+#include <openssl/rand.h>
 
 #include "m68k.h"
 #include "config_file/config_file.h"
@@ -149,6 +163,541 @@ uint8_t piscsi64_num_fs = 0;
 #define FS_ALLOC_MAX_BYTES (512 * 1024)
 
 static void piscsi64_log_unit_summary(const char *reason);
+static void piscsi64_clear_media_runtime(struct piscsi64_dev *d);
+
+#define PISCSI64_REMOTE_DEFAULT_PORT 4964
+#define PISCSI64_REMOTE_MAGIC_HELLO 0x50533634u /* "PS64" */
+#define PISCSI64_REMOTE_MAGIC_IOREQ 0x50533640u /* "PS6@" */
+#define PISCSI64_REMOTE_MAGIC_IORSP 0x50533641u /* "PS6A" */
+#define PISCSI64_REMOTE_VERSION 1u
+
+#define PISCSI64_REMOTE_FLAG_REQ_RW    (1u << 0)
+#define PISCSI64_REMOTE_FLAG_HINT_CD   (1u << 1)
+
+#define PISCSI64_REMOTE_OP_READ  1u
+#define PISCSI64_REMOTE_OP_WRITE 2u
+#define PISCSI64_REMOTE_OP_SYNC  3u
+#define PISCSI64_REMOTE_OP_CLOSE 4u
+#define PISCSI64_REMOTE_OP_PING  5u
+#define PISCSI64_REMOTE_SLOW_IO_MS 100u
+#define PISCSI64_REMOTE_SLOW_PING_MS 50u
+#define PISCSI64_FALLBACK_IO_CHUNK 4096u
+
+typedef struct __attribute__((packed)) piscsi64_remote_hello_req {
+    uint32_t magic_be;
+    uint16_t version_be;
+    uint16_t flags_be;
+    uint16_t token_len_be;
+    uint16_t export_len_be;
+    uint32_t reserved_be;
+    uint8_t client_nonce[16];
+} piscsi64_remote_hello_req_t;
+
+typedef struct __attribute__((packed)) piscsi64_remote_hello_rsp {
+    uint32_t magic_be;
+    uint16_t version_be;
+    uint16_t status_be;
+    uint64_t size_bytes_be;
+    uint32_t block_size_be;
+    uint8_t media_kind;
+    uint8_t read_only;
+    uint16_t reserved_be;
+    uint8_t server_nonce[16];
+} piscsi64_remote_hello_rsp_t;
+
+typedef struct __attribute__((packed)) piscsi64_remote_io_req {
+    uint32_t magic_be;
+    uint16_t version_be;
+    uint16_t op_be;
+    uint64_t offset_be;
+    uint32_t length_be;
+    uint32_t reserved_be;
+} piscsi64_remote_io_req_t;
+
+typedef struct __attribute__((packed)) piscsi64_remote_io_rsp {
+    uint32_t magic_be;
+    uint16_t version_be;
+    uint16_t status_be;
+    uint32_t length_be;
+    int32_t err_be;
+} piscsi64_remote_io_rsp_t;
+
+static int piscsi64_unit_index(const struct piscsi64_dev *d)
+{
+    if (!d) {
+        return -1;
+    }
+    ptrdiff_t idx = d - piscsi64_devs;
+    if (idx < 0 || idx >= (ptrdiff_t)PISCSI64_NUM_UNITS) {
+        return -1;
+    }
+    return (int)idx;
+}
+
+static const char *piscsi64_media_kind_name(uint8_t media_kind)
+{
+    switch (media_kind) {
+        case PISCSI64_MEDIA_DISK:
+            return "disk";
+        case PISCSI64_MEDIA_CDROM:
+            return "cdrom";
+        default:
+            return "unknown";
+    }
+}
+
+static const char *piscsi64_remote_status_name(uint16_t status)
+{
+    switch (status) {
+        case 0u:
+            return "ok";
+        case 1u:
+            return "auth";
+        case 2u:
+            return "export";
+        case 3u:
+            return "open";
+        case 4u:
+            return "badreq";
+        default:
+            return "unknown";
+    }
+}
+
+static int piscsi64_is_media_loss_errno(int errnum)
+{
+    switch (errnum) {
+        case ENODEV:
+        case ENXIO:
+        case ENOMEDIUM:
+        case EIO:
+        case ESTALE:
+        case EBADF:
+        case ENOTCONN:
+        case ECONNRESET:
+        case ECONNABORTED:
+        case EPIPE:
+        case ETIMEDOUT:
+        case EHOSTUNREACH:
+        case ENETDOWN:
+        case ENETUNREACH:
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+static uint64_t piscsi64_now_ms(void)
+{
+    struct timespec ts;
+    if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
+        return 0;
+    }
+    return ((uint64_t)ts.tv_sec * 1000ull) + (uint64_t)(ts.tv_nsec / 1000000ull);
+}
+
+static int piscsi64_remote_derive_crypto(const char *token,
+                                         const uint8_t client_nonce[16],
+                                         const uint8_t server_nonce[16],
+                                         uint8_t key_out[32],
+                                         uint8_t iv_out[16])
+{
+    if (!token || !token[0] || !client_nonce || !server_nonce || !key_out || !iv_out) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    EVP_MD_CTX *ctx = NULL;
+    unsigned int digest_len = 0;
+    uint8_t digest[32];
+
+    ctx = EVP_MD_CTX_new();
+    if (!ctx) {
+        errno = ENOMEM;
+        return -1;
+    }
+    if (EVP_DigestInit_ex(ctx, EVP_sha256(), NULL) != 1 ||
+        EVP_DigestUpdate(ctx, token, strlen(token)) != 1 ||
+        EVP_DigestUpdate(ctx, client_nonce, 16) != 1 ||
+        EVP_DigestUpdate(ctx, server_nonce, 16) != 1 ||
+        EVP_DigestFinal_ex(ctx, digest, &digest_len) != 1 ||
+        digest_len != sizeof(digest)) {
+        EVP_MD_CTX_free(ctx);
+        errno = EIO;
+        return -1;
+    }
+    EVP_MD_CTX_free(ctx);
+    memcpy(key_out, digest, 32);
+
+    ctx = EVP_MD_CTX_new();
+    if (!ctx) {
+        errno = ENOMEM;
+        return -1;
+    }
+    if (EVP_DigestInit_ex(ctx, EVP_sha256(), NULL) != 1 ||
+        EVP_DigestUpdate(ctx, server_nonce, 16) != 1 ||
+        EVP_DigestUpdate(ctx, client_nonce, 16) != 1 ||
+        EVP_DigestUpdate(ctx, token, strlen(token)) != 1 ||
+        EVP_DigestFinal_ex(ctx, digest, &digest_len) != 1 ||
+        digest_len != sizeof(digest)) {
+        EVP_MD_CTX_free(ctx);
+        errno = EIO;
+        return -1;
+    }
+    EVP_MD_CTX_free(ctx);
+    memcpy(iv_out, digest, 16);
+    return 0;
+}
+
+static int piscsi64_remote_crypt_ctr(const uint8_t key[32], const uint8_t iv_base[16],
+                                     uint64_t counter, const uint8_t *in, uint8_t *out,
+                                     uint32_t len)
+{
+    EVP_CIPHER_CTX *ctx = NULL;
+    uint8_t iv[16];
+    int outl = 0;
+    int finl = 0;
+    uint64_t ctr_be = htobe64(counter);
+
+    if (!key || !iv_base || !in || !out) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    memcpy(iv, iv_base, sizeof(iv));
+    memcpy(iv + 8, &ctr_be, sizeof(ctr_be));
+
+    ctx = EVP_CIPHER_CTX_new();
+    if (!ctx) {
+        errno = ENOMEM;
+        return -1;
+    }
+    if (EVP_EncryptInit_ex(ctx, EVP_aes_256_ctr(), NULL, key, iv) != 1 ||
+        EVP_EncryptUpdate(ctx, out, &outl, in, (int)len) != 1 ||
+        EVP_EncryptFinal_ex(ctx, out + outl, &finl) != 1) {
+        EVP_CIPHER_CTX_free(ctx);
+        errno = EIO;
+        return -1;
+    }
+    EVP_CIPHER_CTX_free(ctx);
+    return 0;
+}
+
+static int piscsi64_send_all(int fd, const void *buf, size_t len)
+{
+    const uint8_t *p = (const uint8_t *)buf;
+    while (len > 0) {
+        ssize_t n = send(fd, p, len, 0);
+        if (n < 0) {
+            if (errno == EINTR) {
+                continue;
+            }
+            return -1;
+        }
+        if (n == 0) {
+            errno = EPIPE;
+            return -1;
+        }
+        p += (size_t)n;
+        len -= (size_t)n;
+    }
+    return 0;
+}
+
+static int piscsi64_recv_all(int fd, void *buf, size_t len)
+{
+    uint8_t *p = (uint8_t *)buf;
+    while (len > 0) {
+        ssize_t n = recv(fd, p, len, 0);
+        if (n < 0) {
+            if (errno == EINTR) {
+                continue;
+            }
+            return -1;
+        }
+        if (n == 0) {
+            errno = ENOTCONN;
+            return -1;
+        }
+        p += (size_t)n;
+        len -= (size_t)n;
+    }
+    return 0;
+}
+
+static int piscsi64_parse_remote_endpoint(const char *spec,
+                                          char *token, size_t token_len,
+                                          char *host, size_t host_len,
+                                          uint16_t *port_out,
+                                          char *export_name, size_t export_len)
+{
+    if (!spec || !host || !port_out || !export_name) {
+        return -1;
+    }
+    if (token && token_len > 0) {
+        token[0] = '\0';
+    }
+
+    const char *raw = spec;
+    if (strncasecmp(raw, "remote:", 7) == 0) {
+        raw += 7;
+    }
+    if (!raw[0]) {
+        return -1;
+    }
+
+    char tmp[PISCSI64_MAX_SPEC];
+    size_t raw_len = strlen(raw);
+    if (raw_len == 0 || raw_len >= sizeof(tmp)) {
+        return -1;
+    }
+    memcpy(tmp, raw, raw_len + 1);
+
+    char *slash = strchr(tmp, '/');
+    char *hostpart = tmp;
+    if (slash) {
+        *slash = '\0';
+        size_t export_part_len = strlen(slash + 1);
+        if (export_len == 0 || export_part_len >= export_len) {
+            return -1;
+        }
+        memcpy(export_name, slash + 1, export_part_len + 1);
+    } else {
+        if (export_len < sizeof("default")) {
+            return -1;
+        }
+        memcpy(export_name, "default", sizeof("default"));
+    }
+
+    char *at = strchr(hostpart, '@');
+    if (at) {
+        *at = '\0';
+        if (token && token_len > 0) {
+            size_t token_part_len = strlen(hostpart);
+            if (token_part_len >= token_len) {
+                return -1;
+            }
+            memcpy(token, hostpart, token_part_len + 1);
+        }
+        hostpart = at + 1;
+    }
+
+    if (!hostpart[0]) {
+        return -1;
+    }
+
+    uint16_t port = PISCSI64_REMOTE_DEFAULT_PORT;
+    char *colon = strrchr(hostpart, ':');
+    if (colon) {
+        *colon = '\0';
+        long p = strtol(colon + 1, NULL, 10);
+        if (p <= 0 || p > 65535) {
+            return -1;
+        }
+        port = (uint16_t)p;
+    }
+
+    if (!hostpart[0]) {
+        return -1;
+    }
+
+    size_t host_part_len = strlen(hostpart);
+    if (host_len == 0 || host_part_len >= host_len) {
+        return -1;
+    }
+    memcpy(host, hostpart, host_part_len + 1);
+    *port_out = port;
+    return 0;
+}
+
+static int piscsi64_remote_send_req(struct piscsi64_dev *d, uint16_t op,
+                                    uint64_t offset, uint32_t length)
+{
+    piscsi64_remote_io_req_t req;
+    req.magic_be = htobe32(PISCSI64_REMOTE_MAGIC_IOREQ);
+    req.version_be = htobe16(PISCSI64_REMOTE_VERSION);
+    req.op_be = htobe16(op);
+    req.offset_be = htobe64(offset);
+    req.length_be = htobe32(length);
+    req.reserved_be = 0;
+    return piscsi64_send_all(d->remote_sock, &req, sizeof(req));
+}
+
+static int piscsi64_remote_recv_rsp(struct piscsi64_dev *d, piscsi64_remote_io_rsp_t *rsp)
+{
+    if (piscsi64_recv_all(d->remote_sock, rsp, sizeof(*rsp)) != 0) {
+        return -1;
+    }
+    if (be32toh(rsp->magic_be) != PISCSI64_REMOTE_MAGIC_IORSP ||
+        be16toh(rsp->version_be) != PISCSI64_REMOTE_VERSION) {
+        errno = EPROTO;
+        return -1;
+    }
+    return 0;
+}
+
+static int piscsi64_remote_connect(int unit_index, const char *spec, int req_rw,
+                                   enum piscsi64_media_kind hint_media,
+                                   int *sock_out, uint64_t *size_out,
+                                   uint32_t *block_size_out,
+                                   uint8_t *media_kind_out,
+                                   uint8_t *read_only_out,
+                                   uint8_t *key_out, uint8_t *iv_out)
+{
+    uint64_t t_start_ms = piscsi64_now_ms();
+    char token[128];
+    char host[128];
+    char export_name[128];
+    uint16_t port = PISCSI64_REMOTE_DEFAULT_PORT;
+    if (piscsi64_parse_remote_endpoint(spec, token, sizeof(token), host, sizeof(host),
+                                       &port, export_name, sizeof(export_name)) != 0) {
+        LOG_ERROR("[PISCSI64-REMOTE] Unit %d endpoint parse failed.\n", unit_index);
+        errno = EINVAL;
+        return -1;
+    }
+    if (!token[0]) {
+        LOG_ERROR("[PISCSI64-REMOTE] Unit %d token missing for %s:%u/%s.\n",
+                  unit_index, host, (unsigned int)port, export_name);
+        errno = EACCES;
+        return -1;
+    }
+    LOG_INFO("[PISCSI64-REMOTE] Unit %d connecting to %s:%u/%s (req=%s hint=%s).\n",
+             unit_index,
+             host,
+             (unsigned int)port,
+             export_name,
+             req_rw ? "rw" : "ro",
+             piscsi64_media_kind_name((uint8_t)hint_media));
+
+    char port_s[16];
+    snprintf(port_s, sizeof(port_s), "%u", (unsigned int)port);
+    struct addrinfo hints;
+    struct addrinfo *res = NULL;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+
+    int gai = getaddrinfo(host, port_s, &hints, &res);
+    if (gai != 0) {
+        LOG_ERROR("[PISCSI64-REMOTE] Unit %d DNS/connect lookup failed for %s:%u (%s).\n",
+                  unit_index, host, (unsigned int)port, gai_strerror(gai));
+        errno = ECONNREFUSED;
+        return -1;
+    }
+
+    int sock = -1;
+    for (struct addrinfo *ai = res; ai; ai = ai->ai_next) {
+        sock = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
+        if (sock < 0) {
+            continue;
+        }
+        if (connect(sock, ai->ai_addr, ai->ai_addrlen) == 0) {
+            break;
+        }
+        close(sock);
+        sock = -1;
+    }
+    freeaddrinfo(res);
+    if (sock < 0) {
+        LOG_ERROR("[PISCSI64-REMOTE] Unit %d TCP connect failed for %s:%u (errno=%d).\n",
+                  unit_index, host, (unsigned int)port, errno);
+        return -1;
+    }
+
+    struct timeval tv;
+    tv.tv_sec = 5;
+    tv.tv_usec = 0;
+    (void)setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+    (void)setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
+
+    piscsi64_remote_hello_req_t req;
+    memset(&req, 0, sizeof(req));
+    if (RAND_bytes(req.client_nonce, sizeof(req.client_nonce)) != 1) {
+        close(sock);
+        LOG_ERROR("[PISCSI64-REMOTE] Unit %d nonce generation failed.\n", unit_index);
+        errno = EIO;
+        return -1;
+    }
+    uint16_t flags = 0;
+    if (req_rw) {
+        flags |= PISCSI64_REMOTE_FLAG_REQ_RW;
+    }
+    if (hint_media == PISCSI64_MEDIA_CDROM) {
+        flags |= PISCSI64_REMOTE_FLAG_HINT_CD;
+    }
+    req.magic_be = htobe32(PISCSI64_REMOTE_MAGIC_HELLO);
+    req.version_be = htobe16(PISCSI64_REMOTE_VERSION);
+    req.flags_be = htobe16(flags);
+    req.token_len_be = htobe16((uint16_t)strlen(token));
+    req.export_len_be = htobe16((uint16_t)strlen(export_name));
+
+    if (piscsi64_send_all(sock, &req, sizeof(req)) != 0 ||
+        (token[0] && piscsi64_send_all(sock, token, strlen(token)) != 0) ||
+        (export_name[0] && piscsi64_send_all(sock, export_name, strlen(export_name)) != 0)) {
+        LOG_ERROR("[PISCSI64-REMOTE] Unit %d hello send failed (errno=%d).\n", unit_index, errno);
+        close(sock);
+        return -1;
+    }
+
+    piscsi64_remote_hello_rsp_t rsp;
+    if (piscsi64_recv_all(sock, &rsp, sizeof(rsp)) != 0) {
+        LOG_ERROR("[PISCSI64-REMOTE] Unit %d hello recv failed (errno=%d).\n", unit_index, errno);
+        close(sock);
+        return -1;
+    }
+    if (be32toh(rsp.magic_be) != PISCSI64_REMOTE_MAGIC_HELLO ||
+        be16toh(rsp.version_be) != PISCSI64_REMOTE_VERSION) {
+        LOG_ERROR("[PISCSI64-REMOTE] Unit %d hello protocol mismatch.\n", unit_index);
+        close(sock);
+        errno = EPROTO;
+        return -1;
+    }
+    uint16_t status = be16toh(rsp.status_be);
+    if (status != 0) {
+        LOG_ERROR("[PISCSI64-REMOTE] Unit %d hello rejected: status=%u (%s).\n",
+                  unit_index, (unsigned int)status, piscsi64_remote_status_name(status));
+        close(sock);
+        errno = EACCES;
+        return -1;
+    }
+
+    if (sock_out) {
+        *sock_out = sock;
+    } else {
+        close(sock);
+    }
+    if (size_out) {
+        *size_out = be64toh(rsp.size_bytes_be);
+    }
+    if (block_size_out) {
+        *block_size_out = be32toh(rsp.block_size_be);
+    }
+    if (media_kind_out) {
+        *media_kind_out = rsp.media_kind;
+    }
+    if (read_only_out) {
+        *read_only_out = rsp.read_only ? 1u : 0u;
+    }
+    if (key_out && iv_out) {
+        if (piscsi64_remote_derive_crypto(token, req.client_nonce, rsp.server_nonce,
+                                          key_out, iv_out) != 0) {
+            LOG_ERROR("[PISCSI64-REMOTE] Unit %d crypto setup failed.\n", unit_index);
+            close(sock);
+            return -1;
+        }
+    }
+    uint64_t t_done_ms = piscsi64_now_ms();
+    uint64_t elapsed_ms = (t_done_ms >= t_start_ms) ? (t_done_ms - t_start_ms) : 0;
+    LOG_INFO("[PISCSI64-REMOTE] Unit %d connected in %llums: size=%llu block=%u kind=%s mode=%s.\n",
+             unit_index,
+             (unsigned long long)elapsed_ms,
+             (unsigned long long)be64toh(rsp.size_bytes_be),
+             (unsigned int)be32toh(rsp.block_size_be),
+             piscsi64_media_kind_name(rsp.media_kind),
+             (rsp.read_only ? "ro" : "rw"));
+    return 0;
+}
 
 static int piscsi64_backend_file_close(struct piscsi64_dev *d)
 {
@@ -216,6 +765,248 @@ static const struct piscsi64_backend_ops piscsi64_backend_file_ops = {
     .sync = piscsi64_backend_file_sync,
 };
 
+static void piscsi64_mark_media_offline(struct piscsi64_dev *d, const char *op, int errnum)
+{
+    if (!d || d->fd == -1 || !piscsi64_is_media_loss_errno(errnum)) {
+        return;
+    }
+
+    int unit = (int)(d - piscsi64_devs);
+    LOG_WARN("[PISCSI64] Unit %d backend=%s went offline during %s (errno=%d).\n",
+             unit,
+             (d->backend_ops && d->backend_ops->name) ? d->backend_ops->name : "unknown",
+             op ? op : "io",
+             errnum);
+    piscsi64_clear_media_runtime(d);
+    piscsi64_log_unit_summary("offline");
+}
+
+static off64_t piscsi64_backend_remote_seek(struct piscsi64_dev *d, off64_t offset, int whence)
+{
+    uint64_t base = 0;
+    if (!d || d->remote_sock < 0) {
+        errno = EBADF;
+        return (off64_t)-1;
+    }
+
+    switch (whence) {
+        case SEEK_SET:
+            base = 0;
+            break;
+        case SEEK_CUR:
+            base = d->remote_pos;
+            break;
+        case SEEK_END:
+            base = d->fs;
+            break;
+        default:
+            errno = EINVAL;
+            return (off64_t)-1;
+    }
+
+    if (offset < 0 && (uint64_t)(-offset) > base) {
+        errno = EINVAL;
+        return (off64_t)-1;
+    }
+    d->remote_pos = (uint64_t)((int64_t)base + (int64_t)offset);
+    return (off64_t)d->remote_pos;
+}
+
+static ssize_t piscsi64_backend_remote_pread(struct piscsi64_dev *d, void *buf, size_t count,
+                                             off64_t offset)
+{
+    uint64_t t0_ms = piscsi64_now_ms();
+    int unit = piscsi64_unit_index(d);
+    if (!d || d->remote_sock < 0) {
+        errno = EBADF;
+        return -1;
+    }
+    if (count > UINT32_MAX) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if (piscsi64_remote_send_req(d, PISCSI64_REMOTE_OP_READ, (uint64_t)offset, (uint32_t)count) != 0) {
+        DEBUG("[PISCSI64-REMOTE] Unit:%d READ send failed off=0x%llX len=%u errno=%d\n",
+              unit, (unsigned long long)offset, (unsigned int)count, errno);
+        return -1;
+    }
+
+    piscsi64_remote_io_rsp_t rsp;
+    if (piscsi64_remote_recv_rsp(d, &rsp) != 0) {
+        DEBUG("[PISCSI64-REMOTE] Unit:%d READ rsp failed off=0x%llX len=%u errno=%d\n",
+              unit, (unsigned long long)offset, (unsigned int)count, errno);
+        return -1;
+    }
+    if (be16toh(rsp.status_be) != 0) {
+        int32_t remote_err = be32toh((uint32_t)rsp.err_be);
+        errno = remote_err > 0 ? remote_err : EIO;
+        DEBUG("[PISCSI64-REMOTE] Unit:%d READ remote error off=0x%llX len=%u err=%d\n",
+              unit, (unsigned long long)offset, (unsigned int)count, errno);
+        return -1;
+    }
+
+    uint32_t len = be32toh(rsp.length_be);
+    if (len != (uint32_t)count) {
+        errno = EPROTO;
+        return -1;
+    }
+    if (len && piscsi64_recv_all(d->remote_sock, buf, len) != 0) {
+        DEBUG("[PISCSI64-REMOTE] Unit:%d READ payload recv failed off=0x%llX len=%u errno=%d\n",
+              unit, (unsigned long long)offset, (unsigned int)len, errno);
+        return -1;
+    }
+    if (len && d->remote_crypto_enabled) {
+        if (piscsi64_remote_crypt_ctr(d->remote_key, d->remote_iv, d->remote_rx_ctr,
+                                      (const uint8_t *)buf, (uint8_t *)buf, len) != 0) {
+            return -1;
+        }
+        d->remote_rx_ctr++;
+    }
+    uint64_t t1_ms = piscsi64_now_ms();
+    uint64_t dt_ms = (t1_ms >= t0_ms) ? (t1_ms - t0_ms) : 0;
+    if (dt_ms >= PISCSI64_REMOTE_SLOW_IO_MS) {
+        DEBUG("[PISCSI64-REMOTE] Unit:%d READ slow off=0x%llX len=%u took=%llums\n",
+              unit, (unsigned long long)offset, (unsigned int)len, (unsigned long long)dt_ms);
+    }
+    return (ssize_t)len;
+}
+
+static ssize_t piscsi64_backend_remote_read(struct piscsi64_dev *d, void *buf, size_t count)
+{
+    ssize_t rc = piscsi64_backend_remote_pread(d, buf, count, (off64_t)d->remote_pos);
+    if (rc > 0) {
+        d->remote_pos += (uint64_t)rc;
+    }
+    return rc;
+}
+
+static ssize_t piscsi64_backend_remote_write(struct piscsi64_dev *d, const void *buf, size_t count)
+{
+    uint64_t t0_ms = piscsi64_now_ms();
+    uint8_t *enc_buf = NULL;
+    int send_rc = 0;
+    int unit = piscsi64_unit_index(d);
+
+    if (!d || d->remote_sock < 0) {
+        errno = EBADF;
+        return -1;
+    }
+    if (count > UINT32_MAX) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if (piscsi64_remote_send_req(d, PISCSI64_REMOTE_OP_WRITE, d->remote_pos, (uint32_t)count) != 0) {
+        DEBUG("[PISCSI64-REMOTE] Unit:%d WRITE send failed off=0x%llX len=%u errno=%d\n",
+              unit, (unsigned long long)d->remote_pos, (unsigned int)count, errno);
+        return -1;
+    }
+    if (count) {
+        const void *send_buf = buf;
+        if (d->remote_crypto_enabled) {
+            enc_buf = malloc(count);
+            if (!enc_buf) {
+                errno = ENOMEM;
+                return -1;
+            }
+            if (piscsi64_remote_crypt_ctr(d->remote_key, d->remote_iv, d->remote_tx_ctr,
+                                          (const uint8_t *)buf, enc_buf, (uint32_t)count) != 0) {
+                free(enc_buf);
+                return -1;
+            }
+            send_buf = enc_buf;
+        }
+        send_rc = piscsi64_send_all(d->remote_sock, send_buf, count);
+        if (enc_buf) {
+            free(enc_buf);
+            enc_buf = NULL;
+        }
+        if (send_rc != 0) {
+            DEBUG("[PISCSI64-REMOTE] Unit:%d WRITE payload send failed off=0x%llX len=%u errno=%d\n",
+                  unit, (unsigned long long)d->remote_pos, (unsigned int)count, errno);
+            return -1;
+        }
+        if (d->remote_crypto_enabled) {
+            d->remote_tx_ctr++;
+        }
+    }
+
+    piscsi64_remote_io_rsp_t rsp;
+    if (piscsi64_remote_recv_rsp(d, &rsp) != 0) {
+        DEBUG("[PISCSI64-REMOTE] Unit:%d WRITE rsp failed off=0x%llX len=%u errno=%d\n",
+              unit, (unsigned long long)d->remote_pos, (unsigned int)count, errno);
+        return -1;
+    }
+    if (be16toh(rsp.status_be) != 0) {
+        int32_t remote_err = be32toh((uint32_t)rsp.err_be);
+        errno = remote_err > 0 ? remote_err : EIO;
+        DEBUG("[PISCSI64-REMOTE] Unit:%d WRITE remote error off=0x%llX len=%u err=%d\n",
+              unit, (unsigned long long)d->remote_pos, (unsigned int)count, errno);
+        return -1;
+    }
+
+    uint32_t len = be32toh(rsp.length_be);
+    if (len > count) {
+        errno = EPROTO;
+        return -1;
+    }
+    d->remote_pos += (uint64_t)len;
+    uint64_t t1_ms = piscsi64_now_ms();
+    uint64_t dt_ms = (t1_ms >= t0_ms) ? (t1_ms - t0_ms) : 0;
+    if (dt_ms >= PISCSI64_REMOTE_SLOW_IO_MS) {
+        DEBUG("[PISCSI64-REMOTE] Unit:%d WRITE slow off=0x%llX len=%u took=%llums\n",
+              unit, (unsigned long long)(d->remote_pos - len), (unsigned int)len, (unsigned long long)dt_ms);
+    }
+    return (ssize_t)len;
+}
+
+static int piscsi64_backend_remote_sync(struct piscsi64_dev *d)
+{
+    uint64_t t0_ms = piscsi64_now_ms();
+    int unit = piscsi64_unit_index(d);
+    if (!d || d->remote_sock < 0) {
+        errno = EBADF;
+        return -1;
+    }
+
+    if (piscsi64_remote_send_req(d, PISCSI64_REMOTE_OP_SYNC, 0, 0) != 0) {
+        DEBUG("[PISCSI64-REMOTE] Unit:%d SYNC send failed errno=%d\n", unit, errno);
+        return -1;
+    }
+
+    piscsi64_remote_io_rsp_t rsp;
+    if (piscsi64_remote_recv_rsp(d, &rsp) != 0) {
+        DEBUG("[PISCSI64-REMOTE] Unit:%d SYNC rsp failed errno=%d\n", unit, errno);
+        return -1;
+    }
+    if (be16toh(rsp.status_be) != 0) {
+        int32_t remote_err = be32toh((uint32_t)rsp.err_be);
+        errno = remote_err > 0 ? remote_err : EIO;
+        DEBUG("[PISCSI64-REMOTE] Unit:%d SYNC remote error err=%d\n", unit, errno);
+        return -1;
+    }
+    uint64_t t1_ms = piscsi64_now_ms();
+    uint64_t dt_ms = (t1_ms >= t0_ms) ? (t1_ms - t0_ms) : 0;
+    if (dt_ms >= PISCSI64_REMOTE_SLOW_IO_MS) {
+        DEBUG("[PISCSI64-REMOTE] Unit:%d SYNC slow took=%llums\n",
+              unit, (unsigned long long)dt_ms);
+    }
+    return 0;
+}
+
+static int piscsi64_backend_remote_close(struct piscsi64_dev *d)
+{
+    if (!d || d->remote_sock < 0) {
+        return 0;
+    }
+    (void)piscsi64_remote_send_req(d, PISCSI64_REMOTE_OP_CLOSE, 0, 0);
+    close(d->remote_sock);
+    d->remote_sock = -1;
+    d->fd = -1;
+    return 0;
+}
+
 static const struct piscsi64_backend_ops piscsi64_backend_block_ops = {
     .name = "block",
     .close = piscsi64_backend_file_close,
@@ -226,10 +1017,24 @@ static const struct piscsi64_backend_ops piscsi64_backend_block_ops = {
     .sync = piscsi64_backend_file_sync,
 };
 
+static const struct piscsi64_backend_ops piscsi64_backend_remote_ops = {
+    .name = "remote",
+    .close = piscsi64_backend_remote_close,
+    .seek = piscsi64_backend_remote_seek,
+    .read = piscsi64_backend_remote_read,
+    .write = piscsi64_backend_remote_write,
+    .pread = piscsi64_backend_remote_pread,
+    .sync = piscsi64_backend_remote_sync,
+};
+
 static off64_t piscsi64_dev_seek(struct piscsi64_dev *d, off64_t offset, int whence)
 {
     if (d && d->backend_ops && d->backend_ops->seek) {
-        return d->backend_ops->seek(d, offset, whence);
+        off64_t rc = d->backend_ops->seek(d, offset, whence);
+        if (rc < 0) {
+            piscsi64_mark_media_offline(d, "seek", errno);
+        }
+        return rc;
     }
     if (!d || d->fd == -1) {
         errno = EBADF;
@@ -241,7 +1046,11 @@ static off64_t piscsi64_dev_seek(struct piscsi64_dev *d, off64_t offset, int whe
 static ssize_t piscsi64_dev_read(struct piscsi64_dev *d, void *buf, size_t count)
 {
     if (d && d->backend_ops && d->backend_ops->read) {
-        return d->backend_ops->read(d, buf, count);
+        ssize_t rc = d->backend_ops->read(d, buf, count);
+        if (rc < 0) {
+            piscsi64_mark_media_offline(d, "read", errno);
+        }
+        return rc;
     }
     if (!d || d->fd == -1) {
         errno = EBADF;
@@ -253,7 +1062,11 @@ static ssize_t piscsi64_dev_read(struct piscsi64_dev *d, void *buf, size_t count
 static ssize_t piscsi64_dev_write(struct piscsi64_dev *d, const void *buf, size_t count)
 {
     if (d && d->backend_ops && d->backend_ops->write) {
-        return d->backend_ops->write(d, buf, count);
+        ssize_t rc = d->backend_ops->write(d, buf, count);
+        if (rc < 0) {
+            piscsi64_mark_media_offline(d, "write", errno);
+        }
+        return rc;
     }
     if (!d || d->fd == -1) {
         errno = EBADF;
@@ -265,7 +1078,11 @@ static ssize_t piscsi64_dev_write(struct piscsi64_dev *d, const void *buf, size_
 static ssize_t piscsi64_dev_pread(struct piscsi64_dev *d, void *buf, size_t count, off64_t offset)
 {
     if (d && d->backend_ops && d->backend_ops->pread) {
-        return d->backend_ops->pread(d, buf, count, offset);
+        ssize_t rc = d->backend_ops->pread(d, buf, count, offset);
+        if (rc < 0) {
+            piscsi64_mark_media_offline(d, "pread", errno);
+        }
+        return rc;
     }
     if (!d || d->fd == -1) {
         errno = EBADF;
@@ -288,6 +1105,57 @@ static int piscsi64_dev_close(struct piscsi64_dev *d)
         return rc;
     }
     return 0;
+}
+
+static int piscsi64_probe_media_online(struct piscsi64_dev *d)
+{
+    if (!d || d->fd < 0) {
+        return 0;
+    }
+
+#ifdef __linux__
+    if (d->backend_type == PISCSI64_BACKEND_BLOCK) {
+        uint64_t bytes = 0;
+        if (ioctl(d->fd, BLKGETSIZE64, &bytes) == -1) {
+            piscsi64_mark_media_offline(d, "probe", errno);
+            return 0;
+        }
+        d->fs = bytes;
+    }
+#endif
+    if (d->backend_type == PISCSI64_BACKEND_REMOTE) {
+        const uint64_t now_ms = piscsi64_now_ms();
+        const uint64_t ping_start_ms = now_ms;
+        int unit = piscsi64_unit_index(d);
+        if (d->remote_last_probe_ms != 0 &&
+            now_ms > d->remote_last_probe_ms &&
+            (now_ms - d->remote_last_probe_ms) < 500) {
+            return (d->fd >= 0);
+        }
+
+        if (piscsi64_remote_send_req(d, PISCSI64_REMOTE_OP_PING, 0, 0) != 0) {
+            piscsi64_mark_media_offline(d, "probe-ping-send", errno);
+            return 0;
+        }
+        piscsi64_remote_io_rsp_t rsp;
+        if (piscsi64_remote_recv_rsp(d, &rsp) != 0) {
+            piscsi64_mark_media_offline(d, "probe-ping-recv", errno);
+            return 0;
+        }
+        if (be16toh(rsp.status_be) != 0) {
+            errno = EIO;
+            piscsi64_mark_media_offline(d, "probe-ping-status", errno);
+            return 0;
+        }
+        d->remote_last_probe_ms = now_ms;
+        uint64_t ping_end_ms = piscsi64_now_ms();
+        uint64_t ping_ms = (ping_end_ms >= ping_start_ms) ? (ping_end_ms - ping_start_ms) : 0;
+        if (ping_ms >= PISCSI64_REMOTE_SLOW_PING_MS) {
+            DEBUG("[PISCSI64-REMOTE] Unit:%d ping slow took=%llums\n",
+                  unit, (unsigned long long)ping_ms);
+        }
+    }
+    return (d->fd >= 0);
 }
 
 static int fs_handler_valid(const struct piscsi64_fs *fs, uint32_t handler_addr, uint8_t partition,
@@ -604,6 +1472,15 @@ static void piscsi64_clear_media_runtime(struct piscsi64_dev *d)
     d->num_partitions = 0;
     d->fshd_offs = 0;
     d->block_size = 0;
+    d->remote_pos = 0;
+    d->remote_last_probe_ms = 0;
+    d->remote_tx_ctr = 0;
+    d->remote_rx_ctr = 0;
+    d->remote_crypto_enabled = 0;
+    memset(d->remote_key, 0, sizeof(d->remote_key));
+    memset(d->remote_iv, 0, sizeof(d->remote_iv));
+    d->remote_block_size = 0;
+    d->remote_media_kind = PISCSI64_MEDIA_NONE;
 }
 
 static void piscsi64_reset_dev(struct piscsi64_dev *d) {
@@ -616,6 +1493,7 @@ static void piscsi64_reset_dev(struct piscsi64_dev *d) {
     d->backend_ops = NULL;
     d->backend_spec[0] = '\0';
     d->configured_spec[0] = '\0';
+    d->remote_sock = -1;
     d->media_kind = PISCSI64_MEDIA_NONE;
     d->read_only = 0;
 }
@@ -649,6 +1527,16 @@ void piscsi64_init(void) {
         piscsi64_devs[i].s = 0;
         piscsi64_devs[i].fs = 0;
         piscsi64_devs[i].fd = -1;
+        piscsi64_devs[i].remote_sock = -1;
+        piscsi64_devs[i].remote_pos = 0;
+        piscsi64_devs[i].remote_last_probe_ms = 0;
+        piscsi64_devs[i].remote_tx_ctr = 0;
+        piscsi64_devs[i].remote_rx_ctr = 0;
+        piscsi64_devs[i].remote_crypto_enabled = 0;
+        memset(piscsi64_devs[i].remote_key, 0, sizeof(piscsi64_devs[i].remote_key));
+        memset(piscsi64_devs[i].remote_iv, 0, sizeof(piscsi64_devs[i].remote_iv));
+        piscsi64_devs[i].remote_block_size = 0;
+        piscsi64_devs[i].remote_media_kind = PISCSI64_MEDIA_NONE;
         piscsi64_devs[i].backend_type = PISCSI64_BACKEND_NONE;
         piscsi64_devs[i].backend_ops = NULL;
         piscsi64_devs[i].backend_spec[0] = '\0';
@@ -887,12 +1775,18 @@ void piscsi64_refresh_drives(void) {
             piscsi64_devs[i].media_kind == PISCSI64_MEDIA_DISK) {
             piscsi64_parse_rdb(&piscsi64_devs[i]);
             piscsi64_find_partitions(&piscsi64_devs[i]);
-            piscsi64_find_filesystems(&piscsi64_devs[i]);
+            if (piscsi64_devs[i].backend_type != PISCSI64_BACKEND_REMOTE) {
+                piscsi64_find_filesystems(&piscsi64_devs[i]);
+            }
         }
     }
 }
 
 void piscsi64_find_filesystems(struct piscsi64_dev *d) {
+    if (d->backend_type == PISCSI64_BACKEND_REMOTE) {
+        DEBUG("[PISCSI64] Skipping FSHD extraction for remote unit (not yet supported).\n");
+        return;
+    }
     if (!d->num_partitions)
         return;
 
@@ -1034,7 +1928,9 @@ void piscsi64_map_drive(const char *spec, uint8_t index) {
         return;
     }
 
-    if (strncmp(path, "/dev/", 5) == 0) {
+    if (strncasecmp(path, "remote:", 7) == 0) {
+        backend_type = PISCSI64_BACKEND_REMOTE;
+    } else if (strncmp(path, "/dev/", 5) == 0) {
         backend_type = PISCSI64_BACKEND_BLOCK;
     }
 
@@ -1045,49 +1941,96 @@ void piscsi64_map_drive(const char *spec, uint8_t index) {
         open_flags = O_RDONLY;
     } else if (mode_opt == 1) {
         open_flags = O_RDWR;
-    } else if (backend_type == PISCSI64_BACKEND_BLOCK) {
-        /* Safety default for real block nodes. */
+    } else if (backend_type == PISCSI64_BACKEND_BLOCK ||
+               backend_type == PISCSI64_BACKEND_REMOTE) {
+        /* Safety default for real block nodes and remote exports. */
         open_flags = O_RDONLY;
     } else {
         open_flags = O_RDWR;
     }
     int read_only = (open_flags == O_RDONLY) ? 1 : 0;
-    int32_t tmp_fd = open(path, open_flags);
-    if (tmp_fd == -1) {
-        int first_errno = errno;
-        if (backend_type == PISCSI64_BACKEND_FILE &&
-            media_kind == PISCSI64_MEDIA_DISK &&
-            (first_errno == EACCES || first_errno == EPERM || first_errno == EROFS)) {
-            tmp_fd = open(path, O_RDONLY);
-            if (tmp_fd != -1) {
-                read_only = 1;
-            }
-        }
-        if (tmp_fd == -1) {
-            LOG_ERROR("[PISCSI64] Failed to open %s, could not map drive %d (errno=%d).\n",
-                      path, index, first_errno);
+    int32_t tmp_fd = -1;
+    uint64_t file_size = 0;
+    uint32_t remote_block_size = 0;
+    uint8_t remote_media_kind = PISCSI64_MEDIA_NONE;
+    uint8_t remote_read_only = 0;
+    uint8_t remote_key[32];
+    uint8_t remote_iv[16];
+    memset(remote_key, 0, sizeof(remote_key));
+    memset(remote_iv, 0, sizeof(remote_iv));
+
+    if (backend_type == PISCSI64_BACKEND_REMOTE) {
+        int req_rw = (media_kind != PISCSI64_MEDIA_CDROM && open_flags == O_RDWR) ? 1 : 0;
+        if (piscsi64_remote_connect(index, path, req_rw, media_kind, &tmp_fd, &file_size,
+                                    &remote_block_size, &remote_media_kind, &remote_read_only,
+                                    remote_key, remote_iv) != 0) {
+            LOG_ERROR("[PISCSI64] Failed to connect remote backend %s for drive %d (errno=%d).\n",
+                      path, index, errno);
             return;
         }
-    }
+        if (remote_media_kind == PISCSI64_MEDIA_CDROM) {
+            media_kind = PISCSI64_MEDIA_CDROM;
+        }
+        if (remote_read_only) {
+            read_only = 1;
+        }
+    } else {
+        tmp_fd = open(path, open_flags);
+        if (tmp_fd == -1) {
+            int first_errno = errno;
+            if (backend_type == PISCSI64_BACKEND_FILE &&
+                media_kind == PISCSI64_MEDIA_DISK &&
+                (first_errno == EACCES || first_errno == EPERM || first_errno == EROFS)) {
+                tmp_fd = open(path, O_RDONLY);
+                if (tmp_fd != -1) {
+                    read_only = 1;
+                }
+            }
+            if (tmp_fd == -1) {
+                LOG_ERROR("[PISCSI64] Failed to open %s, could not map drive %d (errno=%d).\n",
+                          path, index, first_errno);
+                return;
+            }
+        }
 
-    off64_t file_size_off = lseek64(tmp_fd, 0, SEEK_END);
-    if (file_size_off < 0) {
-        printf("[PISCSI64] Failed to determine size for %s (unit %d).\n", path, index);
-        close(tmp_fd);
-        return;
+        off64_t file_size_off = lseek64(tmp_fd, 0, SEEK_END);
+        if (file_size_off < 0) {
+            printf("[PISCSI64] Failed to determine size for %s (unit %d).\n", path, index);
+            close(tmp_fd);
+            return;
+        }
+        file_size = (uint64_t)file_size_off;
+        lseek64(tmp_fd, 0, SEEK_SET);
     }
-    uint64_t file_size = (uint64_t)file_size_off;
-    lseek64(tmp_fd, 0, SEEK_SET);
 
     struct piscsi64_dev *d = &piscsi64_devs[index];
     piscsi64_reset_dev(d);
 
     d->fs = file_size;
     d->fd = tmp_fd;
+    d->remote_sock = (backend_type == PISCSI64_BACKEND_REMOTE) ? tmp_fd : -1;
+    d->remote_pos = 0;
+    d->remote_last_probe_ms = 0;
+    d->remote_tx_ctr = 1;
+    d->remote_rx_ctr = 1;
+    d->remote_crypto_enabled = (backend_type == PISCSI64_BACKEND_REMOTE) ? 1u : 0u;
+    if (backend_type == PISCSI64_BACKEND_REMOTE) {
+        memcpy(d->remote_key, remote_key, sizeof(d->remote_key));
+        memcpy(d->remote_iv, remote_iv, sizeof(d->remote_iv));
+    } else {
+        memset(d->remote_key, 0, sizeof(d->remote_key));
+        memset(d->remote_iv, 0, sizeof(d->remote_iv));
+    }
+    d->remote_block_size = remote_block_size;
+    d->remote_media_kind = remote_media_kind;
     d->backend_type = backend_type;
-    d->backend_ops = (backend_type == PISCSI64_BACKEND_BLOCK)
-        ? &piscsi64_backend_block_ops
-        : &piscsi64_backend_file_ops;
+    if (backend_type == PISCSI64_BACKEND_BLOCK) {
+        d->backend_ops = &piscsi64_backend_block_ops;
+    } else if (backend_type == PISCSI64_BACKEND_REMOTE) {
+        d->backend_ops = &piscsi64_backend_remote_ops;
+    } else {
+        d->backend_ops = &piscsi64_backend_file_ops;
+    }
     snprintf(d->backend_spec, sizeof(d->backend_spec), "%s", path);
     snprintf(d->configured_spec, sizeof(d->configured_spec), "%s", spec);
     d->media_kind = media_kind;
@@ -1098,20 +2041,25 @@ void piscsi64_map_drive(const char *spec, uint8_t index) {
              d->read_only ? ",ro" : ",rw",
              (d->backend_ops && d->backend_ops->name) ? d->backend_ops->name : "unknown",
              (unsigned long)file_size);
-    if (backend_type == PISCSI64_BACKEND_BLOCK && !d->read_only) {
-        LOG_WARN("[PISCSI64] Unit %d opened block device in RW mode: %s\n", index, path);
+    if ((backend_type == PISCSI64_BACKEND_BLOCK || backend_type == PISCSI64_BACKEND_REMOTE) &&
+        !d->read_only) {
+        LOG_WARN("[PISCSI64] Unit %d opened %s backend in RW mode: %s\n",
+                 index,
+                 (backend_type == PISCSI64_BACKEND_REMOTE) ? "remote" : "block",
+                 path);
     }
 
     if (media_kind == PISCSI64_MEDIA_CDROM) {
-        uint64_t blocks = (file_size / 2048u);
-        d->block_size = 2048u;
+        uint32_t cd_block = (backend_type == PISCSI64_BACKEND_REMOTE && remote_block_size) ? remote_block_size : 2048u;
+        uint64_t blocks = (file_size / cd_block);
+        d->block_size = cd_block;
         d->h = 1;
         d->s = 1;
         d->c = (uint32_t)((blocks == 0) ? 1 : ((blocks > UINT32_MAX) ? UINT32_MAX : blocks));
         d->num_partitions = 0;
         d->fshd_offs = 0;
-        LOG_INFO("[PISCSI64] Unit %d configured as CD-ROM (%llu blocks @ 2048 bytes).\n",
-                 index, (unsigned long long)blocks);
+        LOG_INFO("[PISCSI64] Unit %d configured as CD-ROM (%llu blocks @ %u bytes).\n",
+                 index, (unsigned long long)blocks, cd_block);
         piscsi64_log_unit_summary("map");
         return;
     }
@@ -1136,17 +2084,24 @@ void piscsi64_map_drive(const char *spec, uint8_t index) {
 
     if (piscsi64_parse_rdb(d) == -1) {
         DEBUG("[PISCSI64] No RDB found on disk, making up some CHS values.\n");
+        uint32_t fallback_block = (backend_type == PISCSI64_BACKEND_REMOTE && remote_block_size)
+                                    ? remote_block_size
+                                    : 512u;
         d->h = 16;
         d->s = 63;
-        d->c = (uint32_t)((file_size / 512) / (d->s * d->h));
-        d->block_size = 512;
+        d->c = (uint32_t)((file_size / fallback_block) / (d->s * d->h));
+        d->block_size = fallback_block;
     }
     printf("[PISCSI64] CHS: %d %d %d\n", d->c, d->h, d->s);
 
     printf ("Finding partitions.\n");
     piscsi64_find_partitions(d);
     printf ("Finding file systems.\n");
-    piscsi64_find_filesystems(d);
+    if (backend_type != PISCSI64_BACKEND_REMOTE) {
+        piscsi64_find_filesystems(d);
+    } else {
+        printf("[PISCSI64] Skipping FSHD extraction for remote unit (not yet supported).\n");
+    }
     printf ("Done.\n");
 
     // Perform self-test to validate HDF integrity
@@ -1589,6 +2544,10 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
                 DEBUG("[!!!PISCSI64] BUG: Attempted read from unmapped drive %d.\n", val);
                 break;
             }
+            if (!piscsi64_probe_media_online(d)) {
+                DEBUG("[PISCSI64] READ refused: unit %d is offline.\n", val);
+                break;
+            }
 
             if (cmd == PISCSI64_CMD_READBYTES) {
                 uint32_t src = piscsi64_u32[0];
@@ -1681,19 +2640,36 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
             }
             else {
                 DEBUG_TRIVIAL("[PISCSI64-%d] No mapped range found for read.\n", val);
-                uint8_t c = 0;
+                uint8_t io_buf[PISCSI64_FALLBACK_IO_CHUNK];
                 int success = 1;
-                for (uint32_t i = 0; i < piscsi64_u32[1]; i++) {
-                    ssize_t result = piscsi64_dev_read(d, &c, 1);
-                    if (result <= 0) {
-                        DEBUG("[PISCSI64-IO-ERROR] Unit:%d BYTE READ failed at offset %d: result=%zd\n", val, i, result);
+                uint32_t remaining = piscsi64_u32[1];
+                uint32_t dst_addr = piscsi64_u32[2];
+                uint32_t total_read = 0;
+                while (remaining > 0) {
+                    uint32_t chunk = (remaining > PISCSI64_FALLBACK_IO_CHUNK)
+                                     ? PISCSI64_FALLBACK_IO_CHUNK
+                                     : remaining;
+                    ssize_t got = piscsi64_dev_read(d, io_buf, chunk);
+                    if (got <= 0) {
+                        DEBUG("[PISCSI64-IO-ERROR] Unit:%d FALLBACK READ failed at offset 0x%X: got=%zd errno=%d\n",
+                              val, dst_addr, got, errno);
                         success = 0;
                         break;
                     }
-                    m68k_write_memory_8(piscsi64_u32[2] + i, (uint32_t)c);
+                    for (uint32_t i = 0; i < (uint32_t)got; i++) {
+                        m68k_write_memory_8(dst_addr + i, (uint32_t)io_buf[i]);
+                    }
+                    dst_addr += (uint32_t)got;
+                    total_read += (uint32_t)got;
+                    remaining -= (uint32_t)got;
+                    if ((uint32_t)got != chunk) {
+                        DEBUG("[PISCSI64-IO-WARN] Unit:%d FALLBACK PARTIAL READ: requested=%u actual=%zd\n",
+                              val, chunk, got);
+                        break;
+                    }
                 }
                 if (success) {
-                    DEBUG("[PISCSI64-IO-SUCCESS] Unit:%d BYTE READ: %d bytes OK\n", val, piscsi64_u32[1]);
+                    DEBUG("[PISCSI64-IO-SUCCESS] Unit:%d FALLBACK READ: %u bytes OK\n", val, total_read);
                 }
             }
             break;
@@ -1707,6 +2683,10 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
             d = &piscsi64_devs[val];
             if (d->fd == -1) {
                 DEBUG ("[PISCSI64] BUG: Attempted write to unmapped drive %d.\n", val);
+                break;
+            }
+            if (!piscsi64_probe_media_online(d)) {
+                DEBUG("[PISCSI64] WRITE refused: unit %d is offline.\n", val);
                 break;
             }
             if (d->read_only) {
@@ -1805,19 +2785,36 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
             }
             else {
                 DEBUG_TRIVIAL("[PISCSI64-%d] No mapped range found for write.\n", val);
-                uint8_t c = 0;
+                uint8_t io_buf[PISCSI64_FALLBACK_IO_CHUNK];
                 int success = 1;
-                for (uint32_t i = 0; i < piscsi64_u32[1]; i++) {
-                    c = (uint8_t)m68k_read_memory_8(piscsi64_u32[2] + i);
-                    ssize_t result = piscsi64_dev_write(d, &c, 1);
-                    if (result <= 0) {
-                        DEBUG("[PISCSI64-IO-ERROR] Unit:%d BYTE WRITE failed at offset %d: result=%zd\n", val, (int)i, result);
+                uint32_t remaining = piscsi64_u32[1];
+                uint32_t src_addr = piscsi64_u32[2];
+                uint32_t total_written = 0;
+                while (remaining > 0) {
+                    uint32_t chunk = (remaining > PISCSI64_FALLBACK_IO_CHUNK)
+                                     ? PISCSI64_FALLBACK_IO_CHUNK
+                                     : remaining;
+                    for (uint32_t i = 0; i < chunk; i++) {
+                        io_buf[i] = (uint8_t)m68k_read_memory_8(src_addr + i);
+                    }
+                    ssize_t wrote = piscsi64_dev_write(d, io_buf, chunk);
+                    if (wrote <= 0) {
+                        DEBUG("[PISCSI64-IO-ERROR] Unit:%d FALLBACK WRITE failed at offset 0x%X: wrote=%zd errno=%d\n",
+                              val, src_addr, wrote, errno);
                         success = 0;
+                        break;
+                    }
+                    src_addr += (uint32_t)wrote;
+                    total_written += (uint32_t)wrote;
+                    remaining -= (uint32_t)wrote;
+                    if ((uint32_t)wrote != chunk) {
+                        DEBUG("[PISCSI64-IO-WARN] Unit:%d FALLBACK PARTIAL WRITE: requested=%u actual=%zd\n",
+                              val, chunk, wrote);
                         break;
                     }
                 }
                 if (success) {
-                    DEBUG("[PISCSI64-IO-SUCCESS] Unit:%d BYTE WRITE: %d bytes OK\n", val, piscsi64_u32[1]);
+                    DEBUG("[PISCSI64-IO-SUCCESS] Unit:%d FALLBACK WRITE: %u bytes OK\n", val, total_written);
                 }
             }
             break;
@@ -2236,6 +3233,7 @@ uint32_t handle_piscsi64_read(uint32_t addr, uint8_t type) {
             break;
         }
         case PISCSI64_CMD_DRVTYPE:
+            (void)piscsi64_probe_media_online(&piscsi64_devs[piscsi64_cur_drive]);
             if (piscsi64_devs[piscsi64_cur_drive].fd == -1) {
                 DEBUG("[PISCSI64] %s Read from DRVTYPE %d, drive not attached.\n", op_type_names[type], piscsi64_cur_drive);
                 return 0;
@@ -2252,18 +3250,34 @@ uint32_t handle_piscsi64_read(uint32_t addr, uint8_t type) {
             return piscsi64_cur_drive;
             break;
         case PISCSI64_CMD_CYLS:
+            (void)piscsi64_probe_media_online(&piscsi64_devs[piscsi64_cur_drive]);
+            if (piscsi64_devs[piscsi64_cur_drive].fd == -1) {
+                return 0;
+            }
             DEBUG("[PISCSI64] %s Read from CYLS %d: %d\n", op_type_names[type], piscsi64_cur_drive, piscsi64_devs[piscsi64_cur_drive].c);
             return piscsi64_devs[piscsi64_cur_drive].c;
             break;
         case PISCSI64_CMD_HEADS:
+            (void)piscsi64_probe_media_online(&piscsi64_devs[piscsi64_cur_drive]);
+            if (piscsi64_devs[piscsi64_cur_drive].fd == -1) {
+                return 0;
+            }
             DEBUG("[PISCSI64] %s Read from HEADS %d: %d\n", op_type_names[type], piscsi64_cur_drive, piscsi64_devs[piscsi64_cur_drive].h);
             return piscsi64_devs[piscsi64_cur_drive].h;
             break;
         case PISCSI64_CMD_SECS:
+            (void)piscsi64_probe_media_online(&piscsi64_devs[piscsi64_cur_drive]);
+            if (piscsi64_devs[piscsi64_cur_drive].fd == -1) {
+                return 0;
+            }
             DEBUG("[PISCSI64] %s Read from SECS %d: %d\n", op_type_names[type], piscsi64_cur_drive, piscsi64_devs[piscsi64_cur_drive].s);
             return piscsi64_devs[piscsi64_cur_drive].s;
             break;
         case PISCSI64_CMD_BLOCKS: {
+            (void)piscsi64_probe_media_online(&piscsi64_devs[piscsi64_cur_drive]);
+            if (piscsi64_devs[piscsi64_cur_drive].fd == -1) {
+                return 0;
+            }
             if (piscsi64_devs[piscsi64_cur_drive].block_size == 0) {
                 return 0;
             }
@@ -2304,6 +3318,10 @@ uint32_t handle_piscsi64_read(uint32_t addr, uint8_t type) {
             DEBUG("[PISCSI64] Get alloc size of loaded file system: %d\n", piscsi64_filesystems[piscsi64_rom_cur_fs].h_info.alloc_size);
             return piscsi64_filesystems[piscsi64_rom_cur_fs].h_info.alloc_size;
         case PISCSI64_CMD_BLOCKSIZE:
+            (void)piscsi64_probe_media_online(&piscsi64_devs[piscsi64_cur_drive]);
+            if (piscsi64_devs[piscsi64_cur_drive].fd == -1) {
+                return 0;
+            }
             DEBUG("[PISCSI64] Get block size of drive %d: %d\n", piscsi64_cur_drive, piscsi64_devs[piscsi64_cur_drive].block_size);
             return piscsi64_devs[piscsi64_cur_drive].block_size;
         case PISCSI64_CMD_GET_FS_INFO: {

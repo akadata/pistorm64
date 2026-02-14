@@ -23,6 +23,7 @@ setvar piscsi64
 setvar piscsi64_1 /opt/Amiga/hdf/KernelPiStormBench.hdf
 setvar piscsi64_3 cdrom:../AmigaOS39.iso
 setvar piscsi64_5 disk:/dev/disk/by-id/usb-EXAMPLE,mode=ro
+setvar piscsi64_6 remote:token@192.168.1.50:4964/workbench,mode=ro
 ```
 
 Notes:
@@ -41,6 +42,12 @@ Notes:
 - Current runtime model is one media spec per SCSI unit (1:1).
   - No per-LUN media pool/playlist yet.
   - For different simultaneous devices, use different units (`piscsi64_1..piscsi64_15`).
+
+## Hot-Unplug Behavior
+
+- Local block media unplug is now detected and unit state is forced offline (`DRVTYPE` no-present).
+- On backend I/O or probe errors (`ENODEV`/`ENOMEDIUM`/disconnect classes), PiSCSI64 drops runtime media and keeps only the configured spec.
+- Amiga-side `TD_CHANGESTATE`/`TEST UNIT READY` then report the unit as removed until reinsert/remap.
 
 ## Runtime Eject/Reinsert (Same Unit)
 
@@ -123,6 +130,7 @@ Current prefixes:
 
 - `disk:` force hard-disk behavior
 - `cdrom:` force CD-ROM behavior
+- `remote:` use TCP remote backend export
 - `file:` treat as file-backed media (default when no prefix is given)
 
 Current mode option:
@@ -136,6 +144,77 @@ Current mode option:
 Current convenience behavior:
 
 - `.iso` paths are treated as CD-ROM media automatically.
+
+### Remote Prefix
+
+Format:
+
+- `remote:token@host:port/export`
+- token is required; port defaults to `4964` if omitted.
+
+Examples:
+
+- `setvar piscsi64_6 remote:token@192.168.1.50:4964/workbench,mode=ro`
+- `setvar piscsi64_7 cdrom:remote:token@192.168.1.50:4964/os39iso`
+
+Notes:
+
+- Remote defaults to `mode=ro` unless explicitly `,mode=rw`.
+- `cdrom:` remains effectively read-only.
+- Remote FSHD extraction from backing media is not enabled yet; existing fs handler flow is unchanged.
+- Remote liveness is probe-polled (PING) and offline is forced on disconnect-class failures.
+- Remote READ/WRITE payloads are AES-encrypted using a key derived from token + handshake nonces.
+
+## Remote Boot Milestone
+
+Validated result:
+
+- Remote disk exported from another machine (`piscsi64-remote`) over wired 1Gb Ethernet.
+- PiStorm64 mapped that export as a normal PiSCSI64 unit.
+- Amiga initialized/partitioned/formatted the remote disk, copied system data, and booted from it.
+- Example proven size: 8GB (`16777216` blocks @ `512` bytes).
+
+Verified test example:
+
+Server (remote host):
+
+```sh
+sudo ./out/piscsi64-remote \
+  --listen 172.16.0.2:4964 \
+  --export remotewb \
+  --path /dev/zvol/tank/piscsi64remotedisk \
+  --token 12345678 \
+  --mode rw
+```
+
+PiStorm64 config:
+
+```ini
+setvar piscsi64
+setvar piscsi64_6 remote:12345678@172.16.0.2:4964/remotewb,mode=rw
+```
+
+## nftables (Secure Remote Port)
+
+To keep remote SCSI exposure local, restrict TCP `4964` to trusted LAN interfaces/subnets.
+
+Repository template (`etc/nftables.conf`) now includes:
+
+- `iifname "end0"`/`"wlan0"` + RFC1918 source ranges for allow
+- Explicit drop for all other traffic to `tcp dport 4964`
+
+Apply/reload:
+
+```sh
+sudo nft -f /etc/nftables.conf
+sudo nft list ruleset
+```
+
+Security notes:
+
+- Replace RFC1918-wide ranges with your exact subnet where possible (example: `172.16.0.0/24`).
+- Adjust interface names for your host (`end0`, `eth0`, `wlan0`, etc.).
+- Firewall rules complement, but do not replace, local block-device permissions.
 
 Planned/roadmap prefixes:
 
@@ -152,7 +231,7 @@ The implementation checklist is tracked in:
 
 - `SCSI64TASKS.md`
 
-This is the source of truth for staged work (backend abstraction, block backend, config parsing, CD baseline, remote placeholder).
+This is the source of truth for staged work (backend abstraction, block backend, config parsing, CD baseline, remote phase-1 and hardening tasks).
 
 ## Current Implementation Status
 
@@ -171,9 +250,44 @@ Implemented:
 
 Pending (next steps):
 
-- Remote backend placeholder wiring (implemented as controlled unsupported path until protocol lands).
 - Return richer SCSI sense/error codes on backend I/O failures.
+- Remote multi-export management and auth hardening.
 - Optional per-unit media pool / source cycling (future feature).
+
+## Remote Utilities
+
+Built from repo root:
+
+- `make piscsi64-remote`
+- `make piscsi64-remote-server`
+- `make piscsi64-remote-client`
+
+Server example (Linux/Unix):
+
+```sh
+./piscsi64-remote \
+  --listen 0.0.0.0:4964 \
+  --export workbench \
+  --path /dev/disk/by-id/usb-EXAMPLE \
+  --token YOUR_SHARED_TOKEN \
+  --mode ro
+```
+
+Client probe example:
+
+```sh
+./piscsi64-remote-client 192.168.1.50:4964 workbench token 0 512
+```
+
+Probe client is optional and only for diagnostics; normal operation only needs the remote service plus `remote:...` mapping in Pi config.
+
+Windows utility path:
+
+- Native Windows probe client source:
+  - `tools/piscsi64_remote/piscsi64_remote_client_win.c`
+- Build with MSVC:
+  - `cl /O2 /W3 tools\\piscsi64_remote\\piscsi64_remote_client_win.c ws2_32.lib libcrypto.lib`
+- Native Windows daemon/service support is planned as a follow-on phase.
 
 ## Validation Flow (Each Step)
 

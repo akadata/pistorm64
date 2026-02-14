@@ -39,6 +39,9 @@ build/dumpdisk
 regtool
 ioharness
 dumpdisk
+piscsi64-remote-server
+piscsi64-remote-client
+piscsi64-remote
 
 # build logs
 clang.log
@@ -61,3 +64,4 @@ data/fs/CFS.*
 src/platforms/amiga/rtg/_reference_
 captain-amygdala-pistorm/
 pistorm-atari/
+tools/piscsi64_remote/out/

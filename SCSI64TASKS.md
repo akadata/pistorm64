@@ -12,6 +12,8 @@ Track the staged migration of `piscsi64` to a backend-driven SCSI architecture, 
 - Step 1 backend scaffolding: implemented and builds.
 - Runtime validation for Step 1: pending user test.
 - Runtime media eject/reinsert on same unit: implemented (1:1 unit/spec model).
+- Runtime unplug -> offline transition: implemented for block/remote backend errors, block probe path, and remote ping probe path.
+- Remote backend (phase 1): implemented (`remote:` mapping + TCP backend + server/client utilities).
 
 ## Task Board
 
@@ -31,11 +33,12 @@ Track the staged migration of `piscsi64` to a backend-driven SCSI architecture, 
 - [ ] Return proper SCSI error/sense on backend I/O failures.
 
 ### Step 3: Config Prefix Parsing
-- [ ] Add typed source parsing for `disk:` and `cdrom:`.
-- [ ] Keep no-prefix behavior as compatibility fallback (file backend).
-- [ ] `disk:/dev/...` -> `BACKEND_BLOCK`, `disk:/path/file` -> `BACKEND_FILE`.
-- [ ] `cdrom:` uses same backend selection but forces CD semantics.
-- [ ] Add `mode=ro|rw` parsing (default `ro` for block, implicit `ro` for `cdrom:`).
+- [x] Add typed source parsing for `disk:` and `cdrom:`.
+- [x] Keep no-prefix behavior as compatibility fallback (file backend).
+- [x] `disk:/dev/...` -> `BACKEND_BLOCK`, `disk:/path/file` -> `BACKEND_FILE`.
+- [x] `cdrom:` uses same backend selection but forces CD semantics.
+- [x] Add `mode=ro|rw` parsing (default `ro` for block/remote, implicit `ro` for `cdrom:`).
+- [x] Add `remote:` backend prefix parsing (`remote:token@host:port/export`).
 
 ### Step 4: Minimal CD-ROM Semantics
 - [ ] INQUIRY peripheral type `0x05`, removable set.
@@ -51,6 +54,7 @@ Track the staged migration of `piscsi64` to a backend-driven SCSI architecture, 
 - [ ] `cdrom:/path/to.iso` mounts via Amiga CD filesystem stack.
 - [ ] RW block mode only when explicitly requested.
 - [ ] Runtime eject/reinsert on same unit validated from Amiga tools (`TD_REMOVE`/`TD_EJECT`/SCSI START STOP UNIT).
+- [ ] Runtime unplug/offline path validated on hardware (USB pull + reinsert/remap).
 
 ### Step 7: Runtime Media UX
 - [x] Add Pi-side media control commands for eject/insert.
@@ -59,9 +63,14 @@ Track the staged migration of `piscsi64` to a backend-driven SCSI architecture, 
 - [ ] Add optional per-unit media pool (multiple selectable sources per one SCSI ID).
 
 ### Step 6: Remote Backend Placeholder
-- [ ] Keep `BACKEND_REMOTE` enum and slot in vtable.
-- [ ] Fail setup cleanly if `REMOTE` requested before implementation.
-- [ ] Defer TCP protocol implementation until Steps 1-5 are green.
+- [x] Keep `BACKEND_REMOTE` enum and slot in vtable.
+- [x] Implement initial TCP protocol and `remote:` backend mapping.
+- [x] Add utilities: `piscsi64-remote-server` + `piscsi64-remote-client`.
+- [x] Add native Windows probe-client source (`piscsi64_remote_client_win.c`).
+- [x] Add token-based payload encryption for remote READ/WRITE path (AES session derived from token + nonces).
+- [ ] Multi-export config file support and per-export ACLs/tokens.
+- [ ] Windows-native server implementation (service model).
+- [ ] Strong auth/TLS transport hardening.
 
 ## Config Examples (target state)
 - `setvar piscsi64_0 disk:../disks/system.hdf`

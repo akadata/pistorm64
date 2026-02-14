@@ -100,6 +100,16 @@ struct piscsi64_dev {
     uint16_t h, s;
     uint64_t fs;
     int32_t fd;
+    int32_t remote_sock;
+    uint64_t remote_pos;
+    uint64_t remote_last_probe_ms;
+    uint64_t remote_tx_ctr;
+    uint64_t remote_rx_ctr;
+    uint8_t remote_crypto_enabled;
+    uint8_t remote_key[32];
+    uint8_t remote_iv[16];
+    uint32_t remote_block_size;
+    uint8_t remote_media_kind;
     enum piscsi64_backend_type backend_type;
     const struct piscsi64_backend_ops *backend_ops;
     char backend_spec[256];
