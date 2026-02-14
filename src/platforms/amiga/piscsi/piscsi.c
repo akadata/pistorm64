@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <endian.h>
@@ -45,6 +46,25 @@ static const char *op_type_names[4] = {
 extern unsigned int cpu_type;
 static __thread char piscsi_disasm_buf[256];
 
+static void piscsi_appendf(char *buf, size_t buf_sz, int *off, const char *fmt, ...)
+{
+    if (!buf || !off || *off < 0 || (size_t)*off >= buf_sz) {
+        return;
+    }
+    va_list ap;
+    va_start(ap, fmt);
+    int n = vsnprintf(buf + *off, buf_sz - (size_t)*off, fmt, ap);
+    va_end(ap);
+    if (n < 0) {
+        return;
+    }
+    if ((size_t)n >= buf_sz - (size_t)*off) {
+        *off = (int)buf_sz - 1;
+        return;
+    }
+    *off += n;
+}
+
 static void piscsi_dump_cpu_state(const char *tag) {
     if (log_get_level() < LOG_LEVEL_DEBUG) {
         return;
@@ -84,9 +104,9 @@ static void piscsi_dump_cpu_state(const char *tag) {
     }
     char pc_line[128];
     int pc_off = 0;
-    pc_off += snprintf(pc_line + pc_off, sizeof(pc_line) - (size_t)pc_off, "[PISCSI-CPU] PC bytes:");
+    piscsi_appendf(pc_line, sizeof(pc_line), &pc_off, "[PISCSI-CPU] PC bytes:");
     for (int i = 0; i < 18; i++) {
-        pc_off += snprintf(pc_line + pc_off, sizeof(pc_line) - (size_t)pc_off, " %.2X", pc_bytes[i]);
+        piscsi_appendf(pc_line, sizeof(pc_line), &pc_off, " %.2X", pc_bytes[i]);
     }
     LOG_DEBUG("%s\n", pc_line);
 

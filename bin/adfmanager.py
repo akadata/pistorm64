@@ -139,12 +139,23 @@ def xdftool_path() -> str | None:
     return shutil.which("xdftool") or (DEFAULT_XDFTOOL if os.path.exists(DEFAULT_XDFTOOL) else None)
 
 
-def run_cmd(args: list[str]) -> tuple[int, str]:
-    res = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, check=False)
+def run_xdftool(tool: str, args: list[str]) -> tuple[int, str]:
+    try:
+        tool_real = str(Path(tool).resolve(strict=True))
+    except FileNotFoundError:
+        return 127, "xdftool not found"
+    if os.path.basename(tool_real) != "xdftool" or not os.access(tool_real, os.X_OK):
+        return 127, "invalid xdftool executable"
+    res = subprocess.run([tool_real, *args], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, check=False)
     return res.returncode, res.stdout.strip()
 
 
 def create_blank_adf(dest: Path, volume: str = "BLANK", force: bool = False) -> tuple[bool, str]:
+    if safe_image_name(dest.name, allow_adf=True, allow_hdf=False) is None:
+        return False, "invalid image name (.adf required, no path separators)"
+    safe_volume = safe_volume_name(volume)
+    if safe_volume is None:
+        return False, "invalid volume label"
     if dest.exists() and not force:
         return False, f"exists: {dest}"
     tool = xdftool_path()
@@ -152,16 +163,20 @@ def create_blank_adf(dest: Path, volume: str = "BLANK", force: bool = False) -> 
         return False, "xdftool not found"
     if dest.exists() and force:
         dest.unlink()
-    code, out = run_cmd([tool, str(dest), "create"])
+    code, out = run_xdftool(tool, [str(dest), "create"])
     if code != 0:
         return False, out or "xdftool create failed"
-    code, out = run_cmd([tool, str(dest), "format", volume])
+    code, out = run_xdftool(tool, [str(dest), "format", safe_volume])
     if code != 0:
         return False, out or "xdftool format failed"
     return True, f"created {dest}"
 
 
 def clone_image(src: Path, dest: Path, force: bool = False) -> tuple[bool, str]:
+    if safe_image_name(src.name, allow_adf=True, allow_hdf=True) is None:
+        return False, "invalid source image name"
+    if safe_image_name(dest.name, allow_adf=True, allow_hdf=True) is None:
+        return False, "invalid destination image name"
     if not src.exists():
         return False, f"not found: {src}"
     if dest.exists() and not force:
@@ -192,6 +207,46 @@ def safe_cfg_name(name: str) -> str | None:
     if base != name or not base.endswith(".cfg"):
         return None
     return base
+
+
+SAFE_IMAGE_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+SAFE_VOLUME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 _.-]{0,30}$")
+
+
+def safe_image_name(name: str, *, allow_adf: bool = True, allow_hdf: bool = True) -> str | None:
+    raw = (name or "").strip()
+    base = os.path.basename(raw)
+    if not base or base != raw:
+        return None
+    if not SAFE_IMAGE_NAME_RE.fullmatch(base):
+        return None
+    ext = Path(base).suffix.lower()
+    allowed = set()
+    if allow_adf:
+        allowed.add(".adf")
+    if allow_hdf:
+        allowed.add(".hdf")
+    if ext not in allowed:
+        return None
+    return base
+
+
+def safe_volume_name(name: str) -> str | None:
+    raw = (name or "").strip()
+    if not raw:
+        return None
+    if not SAFE_VOLUME_RE.fullmatch(raw):
+        return None
+    return raw
+
+
+def path_within_dir(base_dir: Path, target: Path) -> bool:
+    base = base_dir.resolve()
+    tgt = target.resolve(strict=False)
+    try:
+        return os.path.commonpath([str(base), str(tgt)]) == str(base)
+    except ValueError:
+        return False
 
 
 CPU_RE = re.compile(r"^\s*cpu\s+(\S+)", re.IGNORECASE)
@@ -833,7 +888,14 @@ def cmd_status(args) -> int:
 
 
 def cmd_create(args) -> int:
-    dest = Path(args.dir) / args.name
+    safe_name = safe_image_name(args.name, allow_adf=True, allow_hdf=False)
+    if not safe_name:
+        print("error: invalid name (.adf required)", file=sys.stderr)
+        return 2
+    dest = Path(args.dir) / safe_name
+    if not path_within_dir(Path(args.dir), dest):
+        print("error: invalid destination path", file=sys.stderr)
+        return 2
     ok, msg = create_blank_adf(dest, volume=args.volume, force=args.force)
     if not ok:
         print(f"error: {msg}", file=sys.stderr)
@@ -843,10 +905,16 @@ def cmd_create(args) -> int:
 
 
 def cmd_clone(args) -> int:
-    src = Path(args.src)
-    if not src.is_absolute():
-        src = Path(args.dir) / src
-    dest = Path(args.dir) / args.dest
+    safe_src = safe_image_name(args.src, allow_adf=True, allow_hdf=True)
+    safe_dest = safe_image_name(args.dest, allow_adf=True, allow_hdf=True)
+    if not safe_src or not safe_dest:
+        print("error: invalid src/dest image name", file=sys.stderr)
+        return 2
+    src = Path(args.dir) / safe_src
+    dest = Path(args.dir) / safe_dest
+    if not path_within_dir(Path(args.dir), src) or not path_within_dir(Path(args.dir), dest):
+        print("error: invalid src/dest path", file=sys.stderr)
+        return 2
     ok, msg = clone_image(src, dest, force=args.force)
     if not ok:
         print(f"error: {msg}", file=sys.stderr)
@@ -1636,6 +1704,8 @@ class Handler(BaseHTTPRequestHandler):
             p = Path(path)
             if not p.exists():
                 return self._json({"error": f"not found: {p}"}, code=400)
+            if not path_within_dir(Path(self.cfg["dir"]), p):
+                return self._json({"error": "path must be inside image directory"}, code=400)
             status = get_status(self.cfg["host"], self.cfg["port"])
             preferred = int(unit_raw) if unit_raw.isdigit() else None
             unit = pick_unit(preferred, status)
@@ -1648,9 +1718,12 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == "/api/create":
             name = param("name", "").strip()
             volume = param("volume", "BLANK").strip() or "BLANK"
-            if not name:
-                return self._json({"error": "name required"}, code=400)
-            dest = Path(self.cfg["dir"]) / name
+            safe_name = safe_image_name(name, allow_adf=True, allow_hdf=False)
+            if not safe_name:
+                return self._json({"error": "invalid name (.adf required)"}, code=400)
+            dest = Path(self.cfg["dir"]) / safe_name
+            if not path_within_dir(Path(self.cfg["dir"]), dest):
+                return self._json({"error": "invalid destination path"}, code=400)
             ok, msg = create_blank_adf(dest, volume=volume, force=False)
             if not ok:
                 return self._json({"error": msg}, code=400)
@@ -1659,12 +1732,14 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == "/api/clone":
             src = param("src", "").strip()
             dest = param("dest", "").strip()
-            if not src or not dest:
-                return self._json({"error": "src and dest required"}, code=400)
-            src_path = Path(src)
-            if not src_path.is_absolute():
-                src_path = Path(self.cfg["dir"]) / src
-            dest_path = Path(self.cfg["dir"]) / dest
+            safe_src = safe_image_name(src, allow_adf=True, allow_hdf=True)
+            safe_dest = safe_image_name(dest, allow_adf=True, allow_hdf=True)
+            if not safe_src or not safe_dest:
+                return self._json({"error": "invalid src/dest image name"}, code=400)
+            src_path = Path(self.cfg["dir"]) / safe_src
+            dest_path = Path(self.cfg["dir"]) / safe_dest
+            if not path_within_dir(Path(self.cfg["dir"]), src_path) or not path_within_dir(Path(self.cfg["dir"]), dest_path):
+                return self._json({"error": "invalid src/dest path"}, code=400)
             ok, msg = clone_image(src_path, dest_path, force=False)
             if not ok:
                 return self._json({"error": msg}, code=400)
@@ -1676,6 +1751,8 @@ class Handler(BaseHTTPRequestHandler):
             if not safe:
                 return self._json({"error": "invalid config name"}, code=400)
             cfg_path = Path(self.cfg["cfg_dir"]) / safe
+            if not path_within_dir(Path(self.cfg["cfg_dir"]), cfg_path):
+                return self._json({"error": "invalid config path"}, code=400)
             if not cfg_path.exists():
                 return self._json({"error": f"not found: {cfg_path}"}, code=404)
             self.cfg["cfg"] = str(cfg_path)
@@ -1702,6 +1779,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"error": "invalid base config"}, code=400)
             dest = Path(self.cfg["cfg_dir"]) / safe
             src = Path(self.cfg["cfg_dir"]) / safe_base
+            if not path_within_dir(Path(self.cfg["cfg_dir"]), dest) or not path_within_dir(Path(self.cfg["cfg_dir"]), src):
+                return self._json({"error": "invalid config path"}, code=400)
             if dest.exists():
                 return self._json({"error": f"exists: {dest}"}, code=400)
             if src.exists():
@@ -1716,9 +1795,13 @@ class Handler(BaseHTTPRequestHandler):
             if not safe:
                 return self._json({"error": "invalid config name"}, code=400)
             src = Path(self.cfg["cfg_dir"]) / safe
+            if not path_within_dir(Path(self.cfg["cfg_dir"]), src):
+                return self._json({"error": "invalid config path"}, code=400)
             if not src.exists():
                 return self._json({"error": f"not found: {src}"}, code=404)
             dest = Path(self.cfg["default_cfg"])
+            if not path_within_dir(Path(self.cfg["default_cfg"]).parent, dest):
+                return self._json({"error": "invalid default config path"}, code=400)
             if src.resolve() != dest.resolve():
                 shutil.copy2(src, dest)
             return self._json({"response": f"activated {safe}"})

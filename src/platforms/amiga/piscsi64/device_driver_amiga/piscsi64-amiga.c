@@ -57,6 +57,9 @@ struct piscsi64_base {
     uint32_t c;
 
     uint32_t change_num;
+    uint8_t sense_key;
+    uint8_t sense_asc;
+    uint8_t sense_ascq;
   } units[PISCSI64_NUM_UNITS];
 };
 
@@ -98,6 +101,7 @@ char device_id_string[] = DEVICE_ID_STRING;
 uint8_t piscsi64_perform_io(struct piscsi64_unit* u, struct IORequest* io);
 uint8_t piscsi64_rw(struct piscsi64_unit* u, struct IORequest* io);
 uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io);
+static void piscsi64_clear_sense(struct piscsi64_unit* u);
 
 //#define uint32_t unsigned int
 //#define uint16_t unsigned short
@@ -256,6 +260,7 @@ static struct Library __attribute__((used)) *
     dev_base->units[i].unit_num = i;
     dev_base->units[i].scsi_num = i;
     dev_base->units[i].change_num = 0;
+    piscsi64_clear_sense(&dev_base->units[i]);
     piscsi64_refresh_unit_state(&dev_base->units[i]);
     if (dev_base->units[i].present) {
       debugval(PISCSI64_DBG_VAL1, dev_base->units[i].c);
@@ -454,6 +459,39 @@ uint8_t piscsi64_rw(struct piscsi64_unit* u, struct IORequest* io) {
 #define PISCSI64_CD_PRODID   "Virtual CD-ROM  "
 #define PISCSI64_REV_ID      "1.0 "
 
+#define PISCSI64_SENSE_NO_SENSE        0x00u
+#define PISCSI64_SENSE_NOT_READY       0x02u
+#define PISCSI64_SENSE_MEDIUM_ERROR    0x03u
+#define PISCSI64_SENSE_ILLEGAL_REQUEST 0x05u
+#define PISCSI64_SENSE_DATA_PROTECT    0x07u
+#define PISCSI64_SENSE_HARDWARE_ERROR  0x04u
+
+#define PISCSI64_ASC_MEDIUM_NOT_PRESENT 0x3Au
+#define PISCSI64_ASC_WRITE_PROTECTED    0x27u
+#define PISCSI64_ASC_INVALID_COMMAND    0x20u
+#define PISCSI64_ASC_INVALID_CDB_FIELD  0x24u
+#define PISCSI64_ASC_LBA_OUT_OF_RANGE   0x21u
+#define PISCSI64_ASC_UNRECOVERED_READ   0x11u
+#define PISCSI64_ASC_INTERNAL_TARGET    0x44u
+
+static void piscsi64_set_sense(struct piscsi64_unit* u, uint8_t key, uint8_t asc, uint8_t ascq) {
+  if (!u) {
+    return;
+  }
+  u->sense_key = key;
+  u->sense_asc = asc;
+  u->sense_ascq = ascq;
+}
+
+static void piscsi64_clear_sense(struct piscsi64_unit* u) {
+  piscsi64_set_sense(u, PISCSI64_SENSE_NO_SENSE, 0, 0);
+}
+
+static uint8_t piscsi64_scsi_fail(struct piscsi64_unit* u, uint8_t ioerr, uint8_t key, uint8_t asc, uint8_t ascq) {
+  piscsi64_set_sense(u, key, asc, ascq);
+  return ioerr;
+}
+
 static void piscsi64_store_be16(uint8_t* dst, uint16_t value) {
   dst[0] = (uint8_t)((value >> 8) & 0xFF);
   dst[1] = (uint8_t)(value & 0xFF);
@@ -530,7 +568,12 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
 
   switch (scsi->scsi_Command[0]) {
   case SCSICMD_TEST_UNIT_READY:
-    err = u->present ? 0 : HFERR_BadStatus;
+    if (u->present) {
+      piscsi64_clear_sense(u);
+      err = 0;
+    } else {
+      err = piscsi64_scsi_fail(u, HFERR_BadStatus, PISCSI64_SENSE_NOT_READY, PISCSI64_ASC_MEDIUM_NOT_PRESENT, 0);
+    }
     break;
 
   case SCSICMD_REQUEST_SENSE: {
@@ -547,12 +590,19 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
       data[0] = 0x70; // current errors, fixed format
     }
     if (sense_len > 2) {
-      data[2] = 0x00; // NO SENSE
+      data[2] = u->sense_key & 0x0F;
     }
     if (sense_len > 7) {
       data[7] = 10;   // additional sense length
     }
+    if (sense_len > 12) {
+      data[12] = u->sense_asc;
+    }
+    if (sense_len > 13) {
+      data[13] = u->sense_ascq;
+    }
     scsi->scsi_Actual = sense_len;
+    piscsi64_clear_sense(u);
     err = 0;
     break;
   }
@@ -594,6 +644,7 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
       piscsi64_copy_ascii_field(&data[32], 4, PISCSI64_REV_ID);
     }
     scsi->scsi_Actual = piscsi64_min_u32(scsi->scsi_Length, 36u);
+    piscsi64_clear_sense(u);
     err = 0;
     break;
   }
@@ -645,34 +696,35 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
     READLONG(PISCSI64_CMD_BLOCKS, maxblocks);
 
     if (!u->present) {
-      err = HFERR_BadStatus;
+      err = piscsi64_scsi_fail(u, HFERR_BadStatus, PISCSI64_SENSE_NOT_READY, PISCSI64_ASC_MEDIUM_NOT_PRESENT, 0);
       break;
     }
     if (write && (u->read_only || scsi_type == PISCSI64_SCSI_TYPE_CDROM)) {
-      err = HFERR_BadStatus;
+      err = piscsi64_scsi_fail(u, HFERR_BadStatus, PISCSI64_SENSE_DATA_PROTECT, PISCSI64_ASC_WRITE_PROTECTED, 0);
       break;
     }
     if (!rw_is_6byte && blocks == 0) {
       // READ/WRITE(10/12) with transfer length 0 means no data.
       scsi->scsi_Actual = 0;
+      piscsi64_clear_sense(u);
       err = 0;
       break;
     }
     if (!data) {
-      err = IOERR_BADADDRESS;
+      err = piscsi64_scsi_fail(u, IOERR_BADADDRESS, PISCSI64_SENSE_ILLEGAL_REQUEST, PISCSI64_ASC_INVALID_CDB_FIELD, 0);
       break;
     }
     if (block >= maxblocks || blocks > (maxblocks - block)) {
-      err = IOERR_BADADDRESS;
+      err = piscsi64_scsi_fail(u, IOERR_BADADDRESS, PISCSI64_SENSE_ILLEGAL_REQUEST, PISCSI64_ASC_LBA_OUT_OF_RANGE, 0);
       break;
     }
     if (blocks > (0xFFFFFFFFu / block_size)) {
-      err = IOERR_BADLENGTH;
+      err = piscsi64_scsi_fail(u, IOERR_BADLENGTH, PISCSI64_SENSE_ILLEGAL_REQUEST, PISCSI64_ASC_INVALID_CDB_FIELD, 0);
       break;
     }
     bytes = blocks * block_size;
     if (bytes > scsi->scsi_Length) {
-      err = IOERR_BADLENGTH;
+      err = piscsi64_scsi_fail(u, IOERR_BADLENGTH, PISCSI64_SENSE_ILLEGAL_REQUEST, PISCSI64_ASC_INVALID_CDB_FIELD, 0);
       break;
     }
 
@@ -686,17 +738,22 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
     }
 
     scsi->scsi_Actual = bytes;
+    piscsi64_clear_sense(u);
     err = 0;
     break;
   }
 
   case SCSICMD_READ_CAPACITY_10:
     if (scsi->scsi_CmdLength < 10) {
-      err = HFERR_BadStatus;
+      err = piscsi64_scsi_fail(u, HFERR_BadStatus, PISCSI64_SENSE_ILLEGAL_REQUEST, PISCSI64_ASC_INVALID_CDB_FIELD, 0);
       break;
     }
     if (!data || scsi->scsi_Length < 8) {
-      err = IOERR_BADLENGTH;
+      err = piscsi64_scsi_fail(u, IOERR_BADLENGTH, PISCSI64_SENSE_ILLEGAL_REQUEST, PISCSI64_ASC_INVALID_CDB_FIELD, 0);
+      break;
+    }
+    if (!u->present) {
+      err = piscsi64_scsi_fail(u, HFERR_BadStatus, PISCSI64_SENSE_NOT_READY, PISCSI64_ASC_MEDIUM_NOT_PRESENT, 0);
       break;
     }
     WRITESHORT(PISCSI64_CMD_DRVNUM, (u->scsi_num));
@@ -704,12 +761,13 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
     piscsi64_store_be32(&data[0], (blocks == 0) ? 0 : (blocks - 1));
     piscsi64_store_be32(&data[4], block_size);
     scsi->scsi_Actual = 8;
+    piscsi64_clear_sense(u);
     err = 0;
     break;
 
   case SCSICMD_MODE_SENSE_6:
     if (!data || scsi->scsi_Length < 4) {
-      err = IOERR_BADLENGTH;
+      err = piscsi64_scsi_fail(u, IOERR_BADLENGTH, PISCSI64_SENSE_ILLEGAL_REQUEST, PISCSI64_ASC_INVALID_CDB_FIELD, 0);
       break;
     }
     if (scsi_type == PISCSI64_SCSI_TYPE_CDROM) {
@@ -718,6 +776,7 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
       data[2] = 0x80; // write protected
       data[3] = 0;
       scsi->scsi_Actual = 4;
+      piscsi64_clear_sense(u);
       err = 0;
       break;
     }
@@ -755,6 +814,7 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
       datext[20] = 0x80;
 
       scsi->scsi_Actual = data[0] + 1;
+      piscsi64_clear_sense(u);
       err = 0;
       break;
     }
@@ -778,13 +838,14 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
       piscsi64_store_be16(&datext[20], 5400);
 
       scsi->scsi_Actual = data[0] + 1;
+      piscsi64_clear_sense(u);
       err = 0;
       break;
     }
     default:
       debugval(PISCSI64_DBG_VAL1, (((UWORD)scsi->scsi_Command[2] << 8) | scsi->scsi_Command[3]));
       debug(PISCSI64_DBG_MSG, DBG_SCSI_UNKNOWN_MODESENSE);
-      err = HFERR_BadStatus;
+      err = piscsi64_scsi_fail(u, HFERR_BadStatus, PISCSI64_SENSE_ILLEGAL_REQUEST, PISCSI64_ASC_INVALID_CDB_FIELD, 0);
       break;
     }
     break;
@@ -792,11 +853,11 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
   case SCSICMD_READ_TOC_PMA_ATIP: {
     uint8_t use_msf = (scsi->scsi_Command[1] & 0x02) ? 1 : 0;
     if (scsi_type != PISCSI64_SCSI_TYPE_CDROM) {
-      err = HFERR_BadStatus;
+      err = piscsi64_scsi_fail(u, HFERR_BadStatus, PISCSI64_SENSE_ILLEGAL_REQUEST, PISCSI64_ASC_INVALID_CDB_FIELD, 0);
       break;
     }
     if (!data || scsi->scsi_Length < 4) {
-      err = IOERR_BADLENGTH;
+      err = piscsi64_scsi_fail(u, IOERR_BADLENGTH, PISCSI64_SENSE_ILLEGAL_REQUEST, PISCSI64_ASC_INVALID_CDB_FIELD, 0);
       break;
     }
     WRITESHORT(PISCSI64_CMD_DRVNUM, (u->scsi_num));
@@ -831,6 +892,7 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
         }
       }
       scsi->scsi_Actual = out_len;
+      piscsi64_clear_sense(u);
       err = 0;
     }
     break;
@@ -847,18 +909,24 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
       }
     }
     scsi->scsi_Actual = 0;
-    err = (u->present || ((scsi->scsi_Command[4] & 0x02) && !(scsi->scsi_Command[4] & 0x01))) ? 0 : HFERR_BadStatus;
+    if (u->present || ((scsi->scsi_Command[4] & 0x02) && !(scsi->scsi_Command[4] & 0x01))) {
+      piscsi64_clear_sense(u);
+      err = 0;
+    } else {
+      err = piscsi64_scsi_fail(u, HFERR_BadStatus, PISCSI64_SENSE_NOT_READY, PISCSI64_ASC_MEDIUM_NOT_PRESENT, 0);
+    }
     break;
 
   case SCSICMD_READ_DEFECT_DATA_10:
   case SCSICMD_CHANGE_DEFINITION:
+    piscsi64_clear_sense(u);
     err = 0;
     break;
 
   default:
     debugval(PISCSI64_DBG_VAL1, scsi->scsi_Command[0]);
     debug(PISCSI64_DBG_MSG, DBG_SCSI_UNKNOWN_COMMAND);
-    err = HFERR_BadStatus;
+    err = piscsi64_scsi_fail(u, HFERR_BadStatus, PISCSI64_SENSE_ILLEGAL_REQUEST, PISCSI64_ASC_INVALID_COMMAND, 0);
     break;
   }
 

@@ -80,6 +80,8 @@ unsigned char ac_piscsi64_rom[] = {
     0x0, 0x0, // 1c/1e
     0x0, 0x0, // 20/22
     0x0, 0x0, // 24/26
+    0x0, 0x0, // 28/2a
+    0x0, 0x0, // 2c/2e optional BOOT ROM vector storage
 };
 
 // PiStorm Device Interaction ROM

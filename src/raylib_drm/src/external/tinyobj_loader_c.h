@@ -1256,7 +1256,7 @@ int tinyobj_parse_obj(tinyobj_attrib_t *attrib, tinyobj_shape_t **shapes,
      * ending character so add an extra line if there
      * are more characters after the last line ending
      * that was found. */
-    if (end_idx - last_line_ending > 0) {
+    if (end_idx > 0 && !is_line_ending(buf, end_idx - 1, end_idx)) {
         num_lines++;
     }
 
@@ -1278,7 +1278,7 @@ int tinyobj_parse_obj(tinyobj_attrib_t *attrib, tinyobj_shape_t **shapes,
         line_no++;
       }
     }
-    if (end_idx - last_line_ending > 0) {
+    if (end_idx > 0 && !is_line_ending(buf, end_idx - 1, end_idx)) {
       line_infos[line_no].pos = prev_pos;
       line_infos[line_no].len = end_idx - 1 - last_line_ending;
     }

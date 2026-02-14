@@ -77,10 +77,15 @@ setvar piscsi64_8 cdrom:remote:token@192.168.1.50:4964/os39iso
 
 - Native Windows probe client source is included:
   - `tools/piscsi64_remote/piscsi64_remote_client_win.c`
+- WSL2 cross-build path (recommended):
+  - `sudo apt install mingw-w64`
+  - `cd tools/piscsi64_remote`
+  - `make -f Makefile.windows`
+  - output: `out/piscsi64-remote-client.exe`
 - Build example with MSVC Developer Prompt:
-  - `cl /O2 /W3 tools\\piscsi64_remote\\piscsi64_remote_client_win.c ws2_32.lib libcrypto.lib`
+  - `cl /O2 /W3 tools\\piscsi64_remote\\piscsi64_remote_client_win.c ws2_32.lib libssl.lib libcrypto.lib`
 - Usage:
-  - `piscsi64_remote_client_win.exe 192.168.1.50 workbench token 0 512`
-- The Windows probe source currently targets the pre-TLS protocol and needs updating for TLS-PSK endpoints.
+  - `piscsi64_remote_client_win.exe 192.168.1.50:4964 workbench token 0 512`
+- Windows probe now uses the same TLS-PSK handshake/protocol as Linux/macOS probe.
 
 Windows-native remote server/service support is still a planned follow-on phase.

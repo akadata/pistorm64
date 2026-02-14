@@ -7,10 +7,12 @@
 # The remote server daemon is still Linux/macOS focused.
 
 OUT_DIR := out
-CC ?= x86_64-w64-mingw32-gcc
+ifeq ($(origin CC), default)
+CC := x86_64-w64-mingw32-gcc
+endif
 CFLAGS ?= -O2 -Wall -Wextra
 LDFLAGS ?=
-OPENSSL_LIBS ?= -lcrypto -lws2_32
+OPENSSL_LIBS ?= -lssl -lcrypto -lws2_32
 
 CLIENT_WIN_SRC := piscsi64_remote_client_win.c
 CLIENT_WIN_BIN := $(OUT_DIR)/piscsi64-remote-client.exe

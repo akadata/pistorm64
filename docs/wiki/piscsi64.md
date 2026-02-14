@@ -251,8 +251,7 @@ Implemented:
 
 Pending (next steps):
 
-- Return richer SCSI sense/error codes on backend I/O failures.
-- Remote multi-export management and auth hardening.
+- Remote multi-export management and per-export ACL/token policy.
 - Optional per-unit media pool / source cycling (future feature).
 
 ## Remote Utilities
@@ -291,9 +290,13 @@ Windows utility path:
 
 - Native Windows probe client source:
   - `tools/piscsi64_remote/piscsi64_remote_client_win.c`
+- WSL2 cross-build:
+  - `sudo apt install mingw-w64`
+  - `make -f tools/piscsi64_remote/Makefile.windows`
+  - output: `tools/piscsi64_remote/out/piscsi64-remote-client.exe`
 - Build with MSVC:
-  - `cl /O2 /W3 tools\\piscsi64_remote\\piscsi64_remote_client_win.c ws2_32.lib libcrypto.lib`
-- Windows probe source currently targets the pre-TLS protocol and needs TLS-PSK update.
+  - `cl /O2 /W3 tools\\piscsi64_remote\\piscsi64_remote_client_win.c ws2_32.lib libssl.lib libcrypto.lib`
+- Windows probe now uses the same TLS-PSK protocol as Linux/macOS client probe.
 - Native Windows daemon/service support is planned as a follow-on phase.
 
 ## Validation Flow (Each Step)

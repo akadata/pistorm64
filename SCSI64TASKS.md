@@ -10,10 +10,11 @@ Track the staged migration of `piscsi64` to a backend-driven SCSI architecture, 
 
 ## Current Status
 - Step 1 backend scaffolding: implemented and builds.
-- Runtime validation for Step 1: pending user test.
+- Runtime validation for Step 1: validated on hardware (boot/install/regression).
 - Runtime media eject/reinsert on same unit: implemented (1:1 unit/spec model).
 - Runtime unplug -> offline transition: implemented for block/remote backend errors, block probe path, and remote ping probe path.
-- Remote backend (phase 1): implemented (`remote:` mapping + TCP backend + server/client utilities).
+- Remote backend (phase 1): implemented (`remote:` mapping + TLS-PSK transport + server/client utilities).
+- Remote utility builds: Linux + mac makefiles verified; Windows probe build path provided via MinGW/WSL2.
 
 ## Task Board
 
@@ -30,7 +31,7 @@ Track the staged migration of `piscsi64` to a backend-driven SCSI architecture, 
 - [x] Default block backend to read-only.
 - [x] Allow opt-in read/write only via explicit `mode=rw`.
 - [x] Emit one loud warning log when opening block backend in RW.
-- [ ] Return proper SCSI error/sense on backend I/O failures.
+- [x] Return proper SCSI error/sense on backend I/O failures.
 
 ### Step 3: Config Prefix Parsing
 - [x] Add typed source parsing for `disk:` and `cdrom:`.
@@ -41,19 +42,19 @@ Track the staged migration of `piscsi64` to a backend-driven SCSI architecture, 
 - [x] Add `remote:` backend prefix parsing (`remote:token@host:port/export`).
 
 ### Step 4: Minimal CD-ROM Semantics
-- [ ] INQUIRY peripheral type `0x05`, removable set.
-- [ ] READ CAPACITY(10) reports 2048-byte logical blocks.
-- [ ] READ(10) serves 2048-byte LBAs.
-- [ ] TEST UNIT READY reflects media presence/open state.
-- [ ] Keep baseline only (no audio/multisession yet).
+- [x] INQUIRY peripheral type `0x05`, removable set.
+- [x] READ CAPACITY(10) reports 2048-byte logical blocks.
+- [x] READ(10) serves 2048-byte LBAs.
+- [x] TEST UNIT READY reflects media presence/open state.
+- [x] Keep baseline only (no audio/multisession yet).
 
 ### Step 5: Regression and Acceptance
 - [ ] Existing unprefixed configs behave exactly as before.
-- [ ] `disk:/dev/disk/by-id/...` works and is visible as SCSI disk.
+- [x] `disk:/dev/disk/by-id/...` works and is visible as SCSI disk.
 - [ ] `disk:/dev/disk/by-partuuid/...` works as single-disk target.
-- [ ] `cdrom:/path/to.iso` mounts via Amiga CD filesystem stack.
-- [ ] RW block mode only when explicitly requested.
-- [ ] Runtime eject/reinsert on same unit validated from Amiga tools (`TD_REMOVE`/`TD_EJECT`/SCSI START STOP UNIT).
+- [x] `cdrom:/path/to.iso` mounts via Amiga CD filesystem stack.
+- [x] RW block mode only when explicitly requested.
+- [x] Runtime eject/reinsert on same unit validated from Amiga tools (`TD_REMOVE`/`TD_EJECT`/SCSI START STOP UNIT).
 - [ ] Runtime unplug/offline path validated on hardware (USB pull + reinsert/remap).
 
 ### Step 7: Runtime Media UX
@@ -67,10 +68,10 @@ Track the staged migration of `piscsi64` to a backend-driven SCSI architecture, 
 - [x] Implement initial TCP protocol and `remote:` backend mapping.
 - [x] Add utilities: `piscsi64-remote-server` + `piscsi64-remote-client`.
 - [x] Add native Windows probe-client source (`piscsi64_remote_client_win.c`).
-- [x] Add token-based payload encryption for remote READ/WRITE path (AES session derived from token + nonces).
+- [x] Add TLS-PSK encrypted transport for remote control and data path.
 - [ ] Multi-export config file support and per-export ACLs/tokens.
 - [ ] Windows-native server implementation (service model).
-- [ ] Strong auth/TLS transport hardening.
+- [x] Strong auth/TLS transport hardening.
 
 ## Config Examples (target state)
 - `setvar piscsi64_0 disk:../disks/system.hdf`
