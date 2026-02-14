@@ -95,6 +95,72 @@ Boot priority warning:
 - If a new disk has higher boot priority than your expected system disk, the Amiga may boot from the wrong target or appear to boot-loop.
 - Keep data/test/USB media non-bootable, or set their boot priority lower than your primary system disk.
 
+## Known Issue: Large Disk Geometry in Legacy Amiga Tools
+
+PiSCSI64 can expose large disks correctly (including remote exports), but classic Amiga tooling can still mis-handle geometry on large targets after "Install" in HDToolBox.
+
+Observed behavior:
+
+- First screen can show full size, then second screen can show a much smaller size (or even `0` for some exact capacities).
+- This is typically a legacy CHS/display/math limitation in old tooling, not a PiSCSI64 block backend size bug.
+
+Practical policy (recommended):
+
+- For predictable setup, keep partitions at or below `16GB`.
+- Over `16GB`, split media into multiple partitions of max `16GB` each.
+- For remote media, prefer exporting a specific partition path instead of a huge whole-disk target when using legacy setup tools.
+- Field-tested behavior: partition-backed targets are reliable; very large whole-raw-disk targets can still trigger legacy geometry/tooling misreporting.
+- Empirical legacy-tool threshold (auto geometry): around `48GB` can work cleanly without manual geometry edits; above this, classic tools often need manual intervention.
+
+Example (remote, partition node):
+
+```ini
+setvar piscsi64_5 remote:token@192.168.1.50:4964/workbench_part3,mode=rw
+```
+
+On remote host, map that export to a partition path (example):
+
+```sh
+sudo piscsi64-remote \
+  --listen 0.0.0.0:4964 \
+  --export workbench_part3 \
+  --path /dev/disk/by-id/usb-EXAMPLE-0:0-part3 \
+  --token token \
+  --mode rw
+```
+
+### Manual CHS/LBA Math
+
+If you need to sanity-check values manually:
+
+```text
+total_blocks = bytes / sector_size
+cylinders    = floor(total_blocks / (heads * sectors_per_track))
+chs_blocks   = cylinders * heads * sectors_per_track
+usable_bytes = chs_blocks * sector_size
+```
+
+LBA to CHS (for fixed geometry):
+
+```text
+C = floor(LBA / (H * S))
+tmp = LBA % (H * S)
+Hn = floor(tmp / S)
+Sn = (tmp % S) + 1
+```
+
+Notes:
+
+- `BLOCKS` from PiSCSI64 is LBA-based capacity and is the authoritative value.
+- `CHS` is compatibility geometry for older tools and may not represent every last sector exactly.
+- Large-capacity values shown in first detection screens can be reduced on later "Install Drive" screens by legacy geometry fallback logic in old tools.
+
+### About >104G and PFS3
+
+- `pfs3aio` includes experimental `>104G` partition support and may warn accordingly during format.
+- Large media can work (including tested 128GB scenarios), but for reliable day-to-day setup on classic tools, keep partition sizes sane (`<=16GB` each).
+- Historical context matters: classic Amiga workflows were designed in an era where `30MB` was considered a large hard drive on an Amiga 500 (circa 1989).
+
 ## CD-ROM via ISO (CD0:)
 
 `HDToolBox` is for hard disks and will correctly report CD-ROM targets as unsupported.  
@@ -156,6 +222,19 @@ Current mode option:
   - `disk:/dev/disk/by-id/usb-EXAMPLE,mode=ro`
   - `disk:/dev/disk/by-id/usb-EXAMPLE,mode=rw`
   - `./somefile.hdf,mode=ro`
+
+Current block-size option (disk/file backends):
+
+- append `,blocksize=N` (or `,bs=N`)
+- supported values: `512` or `4096`
+- examples:
+  - `disk:/dev/disk/by-id/usb-EXAMPLE,mode=rw,blocksize=4096`
+  - `file:/opt/Amiga/test.hdf,bs=4096`
+
+Notes:
+
+- `cdrom:` uses fixed 2048-byte blocks.
+- `remote:` uses the server-advertised block size (`--block-size` on `piscsi64-remote`), local `blocksize=` is ignored for remote specs.
 
 Current convenience behavior:
 

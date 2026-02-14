@@ -32,10 +32,10 @@
 #define XSTR(s) STR(s)
 
 #define DEVICE_NAME "pi-scsi64.device"
-#define DEVICE_DATE "(3 Feb 2021)"
+#define DEVICE_DATE "(14 Feb 2026)"
 #define DEVICE_ID_STRING "PiSCSI64 " XSTR(DEVICE_VERSION) "." XSTR(DEVICE_REVISION) " " DEVICE_DATE
-#define DEVICE_VERSION 43
-#define DEVICE_REVISION 20
+#define DEVICE_VERSION 44
+#define DEVICE_REVISION 0
 #define DEVICE_PRIORITY 0
 
 #pragma pack(4)
@@ -508,6 +508,26 @@ static uint32_t piscsi64_min_u32(uint32_t a, uint32_t b) {
   return (a < b) ? a : b;
 }
 
+/*
+ * Some legacy Amiga tools multiply TotalSectors*SectorSize in 32-bit and
+ * display 0 for exact wrap points (common with 32/64/128GiB media at 512B).
+ * Report one sector less in those edge cases to keep UI math non-zero.
+ */
+static uint32_t piscsi64_report_blocks_compat(uint32_t blocks, uint32_t block_size) {
+  uint64_t bytes;
+  if (blocks <= 1) {
+    return blocks;
+  }
+  if (block_size == 0) {
+    block_size = 512;
+  }
+  bytes = ((uint64_t)blocks) * ((uint64_t)block_size);
+  if ((bytes & 0xFFFFFFFFULL) == 0ULL) {
+    return blocks - 1u;
+  }
+  return blocks;
+}
+
 static void piscsi64_copy_ascii_field(uint8_t* dst, uint32_t len, const char* src) {
   uint32_t i = 0;
   for (i = 0; i < len; i++) {
@@ -758,6 +778,7 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
     }
     WRITESHORT(PISCSI64_CMD_DRVNUM, (u->scsi_num));
     READLONG(PISCSI64_CMD_BLOCKS, blocks);
+    blocks = piscsi64_report_blocks_compat(blocks, block_size);
     piscsi64_store_be32(&data[0], (blocks == 0) ? 0 : (blocks - 1));
     piscsi64_store_be32(&data[4], block_size);
     scsi->scsi_Actual = 8;
@@ -781,24 +802,41 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
       break;
     }
 
-    data[0] = 3 + 8 + 0x16;
-    data[1] = 0;
-    data[2] = 0;
-    data[3] = 8;
-
     debugval(PISCSI64_DBG_VAL1, ((uint32_t)scsi->scsi_Command));
     debug(PISCSI64_DBG_MSG, DBG_SCSI_DEBUG_MODESENSE_6);
 
     WRITESHORT(PISCSI64_CMD_DRVNUM, (u->scsi_num));
     READLONG(PISCSI64_CMD_BLOCKS, maxblocks);
-    blocks = (maxblocks == 0) ? 0 : ((maxblocks - 1) & 0xFFFFFFu);
+    maxblocks = piscsi64_report_blocks_compat(maxblocks, block_size);
+    {
+      uint8_t block_desc_len = (maxblocks > 0xFFFFFFu) ? 0 : 8;
+      uint32_t blocks24 = (maxblocks == 0) ? 0 : (maxblocks - 1);
 
-    piscsi64_store_be32(&data[4], blocks);
-    piscsi64_store_be32(&data[8], block_size);
+      /*
+       * MODE SENSE(6) short block descriptor has only 24-bit block count.
+       * For larger media, omit descriptor entirely so tools use READ CAPACITY
+       * / geometry page values instead of truncating to ~8GB-scale numbers.
+       */
+      data[0] = (uint8_t)(3 + block_desc_len + 0x18);
+      data[1] = 0;
+      data[2] = 0;
+      data[3] = block_desc_len;
+
+      if (block_desc_len == 8) {
+        data[4] = 0x00; /* density code */
+        data[5] = (uint8_t)((blocks24 >> 16) & 0xFF);
+        data[6] = (uint8_t)((blocks24 >> 8) & 0xFF);
+        data[7] = (uint8_t)(blocks24 & 0xFF);
+        data[8] = 0x00; /* reserved */
+        data[9] = (uint8_t)((block_size >> 16) & 0xFF);
+        data[10] = (uint8_t)((block_size >> 8) & 0xFF);
+        data[11] = (uint8_t)(block_size & 0xFF);
+      }
+    }
 
     switch (((UWORD)scsi->scsi_Command[2] << 8) | scsi->scsi_Command[3]) {
     case 0x0300: { // Format Device Mode
-      uint8_t* datext = data + 12;
+      uint8_t* datext = data + 4 + data[3];
       debug(PISCSI64_DBG_MSG, DBG_SCSI_FORMATDEVICE);
       datext[0] = 0x03;
       datext[1] = 0x16;
@@ -819,7 +857,7 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
       break;
     }
     case 0x0400: { // Rigid Drive Geometry
-      uint8_t* datext = data + 12;
+      uint8_t* datext = data + 4 + data[3];
       debug(PISCSI64_DBG_MSG, DBG_SCSI_RDG);
       datext[0] = 0x04;
       datext[1] = 0x16;
@@ -1044,6 +1082,7 @@ uint8_t piscsi64_perform_io(struct piscsi64_unit* u, struct IORequest* io) {
     WRITESHORT(PISCSI64_CMD_DRVNUMX, u->unit_num);
     READLONG(PISCSI64_CMD_BLOCKSIZE, res->dg_SectorSize);
     READLONG(PISCSI64_CMD_BLOCKS, res->dg_TotalSectors);
+    res->dg_TotalSectors = piscsi64_report_blocks_compat(res->dg_TotalSectors, res->dg_SectorSize);
     res->dg_Cylinders = u->c;
     res->dg_CylSectors = u->s * u->h;
     res->dg_Heads = u->h;

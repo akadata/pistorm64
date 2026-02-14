@@ -8,7 +8,7 @@ VBCC ?=
 AMIGA_NDK_C_INCLUDE ?=
 AMIGA_NDK_ASM_INCLUDE ?=
 
-CPU ?= 020
+CPU ?= 030
 
 ifeq ($(CPU),000)
 DEVICE_TARGET = pi-scsi64.device

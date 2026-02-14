@@ -140,7 +140,7 @@ rt_Init:    dc.l    Init-RomStart      ; APTR  RT_INIT
 
 ******* Strings referenced in Diag Copy area  ************************
 DevName:    dc.b    'pi-scsi64.device',0,0                      ; Name string
-IdString    dc.b    'PiSCSI64 v0.1',0   ; Id string
+IdString    dc.b    'PiSCSI64 ROM 44.0',0   ; Id string
 
 DosName:        dc.b    'dos.library',0                ; DOS library name
 ExpansionName:  dc.b    "expansion.library",0

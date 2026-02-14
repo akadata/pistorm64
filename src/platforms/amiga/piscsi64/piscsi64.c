@@ -47,19 +47,19 @@ extern struct emulator_config *cfg;
 // Debug output is controlled at runtime via --log-level debug.
 #define PISCSI64_DEBUG
 
-#ifdef PISCSI64_DEBUG
-#define DEBUG LOG_DEBUG
-#define DEBUG_TRIVIAL LOG_DEBUG
-
-//extern void stop_cpu_emulation(uint8_t disasm_cur);
-#define stop_cpu_emulation(...)
-
 static const char *op_type_names[4] = {
     "BYTE",
     "WORD",
     "LONGWORD",
     "MEM",
 };
+
+#ifdef PISCSI64_DEBUG
+#define DEBUG LOG_DEBUG
+#define DEBUG_TRIVIAL LOG_DEBUG
+
+//extern void stop_cpu_emulation(uint8_t disasm_cur);
+#define stop_cpu_emulation(...)
 
 extern unsigned int cpu_type;
 static __thread char piscsi64_disasm_buf[256];
@@ -715,13 +715,31 @@ static int piscsi64_remote_connect(int unit_index, const char *spec, int req_rw,
     }
     uint16_t status = be16toh(rsp.status_be);
     if (status != 0) {
-        LOG_ERROR("[PISCSI64-REMOTE] Unit %d hello rejected: status=%u (%s).\n",
-                  unit_index, (unsigned int)status, piscsi64_remote_status_name(status));
+        LOG_ERROR("[PISCSI64-REMOTE] Unit %d hello rejected: status=%u (%s) export=%s.\n",
+                  unit_index, (unsigned int)status, piscsi64_remote_status_name(status), export_name);
         SSL_shutdown(ssl);
         SSL_free(ssl);
         SSL_CTX_free(tls_ctx);
         close(sock);
-        errno = EACCES;
+        switch (status) {
+            case 1u: /* auth */
+                errno = EACCES;
+                break;
+            case 2u: /* export */
+                errno = ENOENT;
+                break;
+            case 3u: /* open: media missing/not accessible */
+                errno = ENODEV;
+                LOG_ERROR("[PISCSI64-REMOTE] Unit %d remote media missing or cannot be opened: %s:%u/%s\n",
+                          unit_index, host, (unsigned int)port, export_name);
+                break;
+            case 4u: /* bad request/protocol mismatch */
+                errno = EPROTO;
+                break;
+            default:
+                errno = EIO;
+                break;
+        }
         return -1;
     }
 
@@ -1456,8 +1474,46 @@ static void piscsi64_parse_mode_opt(const char *opt, int *mode_opt)
     }
 }
 
+static int piscsi64_block_size_supported(uint32_t bs)
+{
+    switch (bs) {
+        case 512u:
+        case 4096u:
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+static void piscsi64_parse_block_size_opt(const char *opt, uint32_t *block_size_opt)
+{
+    if (!opt || !block_size_opt) {
+        return;
+    }
+    if (strncasecmp(opt, "blocksize=", 10) != 0 && strncasecmp(opt, "bs=", 3) != 0) {
+        return;
+    }
+
+    const char *arg = (strncasecmp(opt, "bs=", 3) == 0) ? (opt + 3) : (opt + 10);
+    char *endp = NULL;
+    errno = 0;
+    unsigned long v = strtoul(arg, &endp, 10);
+    if (errno != 0 || endp == arg || (endp && *endp != '\0') || v > UINT32_MAX) {
+        LOG_WARN("[PISCSI64] Invalid block size option '%s' (expected integer bytes)\n", opt);
+        return;
+    }
+
+    uint32_t bs = (uint32_t)v;
+    if (!piscsi64_block_size_supported(bs)) {
+        LOG_WARN("[PISCSI64] Unsupported block size %u in '%s'. Supported: 512 or 4096\n",
+                 bs, opt);
+        return;
+    }
+    *block_size_opt = bs;
+}
+
 static int piscsi64_split_path_and_opts(const char *path_in, char *path_out, size_t path_out_sz,
-                                        int *mode_opt)
+                                        int *mode_opt, uint32_t *block_size_opt)
 {
     if (!path_in || !path_out || path_out_sz == 0) {
         return -1;
@@ -1466,6 +1522,9 @@ static int piscsi64_split_path_and_opts(const char *path_in, char *path_out, siz
     snprintf(path_out, path_out_sz, "%s", path_in);
     if (mode_opt) {
         *mode_opt = -1;
+    }
+    if (block_size_opt) {
+        *block_size_opt = 0;
     }
 
     char *comma = strchr(path_out, ',');
@@ -1483,9 +1542,118 @@ static int piscsi64_split_path_and_opts(const char *path_in, char *path_out, siz
         if (mode_opt) {
             piscsi64_parse_mode_opt(tok, mode_opt);
         }
+        if (block_size_opt) {
+            piscsi64_parse_block_size_opt(tok, block_size_opt);
+        }
         tok = next ? (next + 1) : NULL;
     }
     return 0;
+}
+
+static int piscsi64_path_is_partition_node(const char *path)
+{
+    if (!path || !path[0]) {
+        return 0;
+    }
+
+    /* by-id links commonly use "...-partN". */
+    if (strstr(path, "-part") != NULL) {
+        return 1;
+    }
+
+    const char *base = strrchr(path, '/');
+    base = base ? (base + 1) : path;
+    size_t len = strlen(base);
+    if (len == 0) {
+        return 0;
+    }
+
+    /* mmcblk0p2 / nvme0n1p2 style partition names. */
+    if (strncmp(base, "mmcblk", 6) == 0 || strncmp(base, "nvme", 4) == 0) {
+        const char *p = strrchr(base, 'p');
+        if (p && p[1] >= '0' && p[1] <= '9') {
+            return 1;
+        }
+    }
+
+    /* sdXN style partition names. */
+    if (len >= 4 &&
+        base[0] == 's' && base[1] == 'd' &&
+        ((base[2] >= 'a' && base[2] <= 'z') || (base[2] >= 'A' && base[2] <= 'Z')) &&
+        (base[3] >= '0' && base[3] <= '9')) {
+        return 1;
+    }
+
+    return 0;
+}
+
+static void piscsi64_set_synth_chs(struct piscsi64_dev *d, uint32_t block_size)
+{
+    if (!d) {
+        return;
+    }
+
+    if (block_size == 0) {
+        block_size = 512u;
+    }
+
+    uint64_t total_blocks = d->fs / block_size;
+    uint32_t heads = 16;
+    uint32_t secs = 63;
+    uint64_t cyls = 0;
+
+    if (total_blocks == 0) {
+        d->h = 1;
+        d->s = 1;
+        d->c = 1;
+        d->block_size = block_size;
+        return;
+    }
+
+    /*
+     * Keep cylinders within 16-bit range for older tooling that truncates
+     * CHS fields, by scaling sectors first (up to 255) and only then heads.
+     */
+    cyls = total_blocks / (uint64_t)(heads * secs);
+    if (cyls > 65535u) {
+        uint64_t need_secs = (total_blocks + ((uint64_t)65535u * heads) - 1u) /
+                             ((uint64_t)65535u * heads);
+        if (need_secs > secs) {
+            if (need_secs > 255u) {
+                secs = 255u;
+            } else {
+                secs = (uint32_t)need_secs;
+            }
+        }
+        cyls = total_blocks / (uint64_t)(heads * secs);
+    }
+    if (cyls > 65535u) {
+        uint64_t need_heads = (total_blocks + ((uint64_t)65535u * secs) - 1u) /
+                              ((uint64_t)65535u * secs);
+        if (need_heads > heads) {
+            if (need_heads > 255u) {
+                heads = 255u;
+            } else {
+                heads = (uint32_t)need_heads;
+            }
+        }
+        cyls = total_blocks / (uint64_t)(heads * secs);
+    }
+
+    if (cyls == 0) {
+        cyls = 1;
+    }
+    if (cyls > 0x00FFFFFFu) {
+        cyls = 0x00FFFFFFu;
+    }
+    if (cyls > UINT32_MAX) {
+        cyls = UINT32_MAX;
+    }
+
+    d->h = (uint16_t)heads;
+    d->s = (uint16_t)secs;
+    d->c = (uint32_t)cyls;
+    d->block_size = block_size;
 }
 
 static void piscsi64_clear_media_runtime(struct piscsi64_dev *d)
@@ -1967,9 +2135,10 @@ void piscsi64_map_drive(const char *spec, uint8_t index) {
     const char *path_spec = NULL;
     char path[PATH_MAX];
     int mode_opt = -1; /* -1 default, 0 ro, 1 rw */
+    uint32_t block_size_opt = 0;
     enum piscsi64_backend_type backend_type = PISCSI64_BACKEND_FILE;
     enum piscsi64_media_kind media_kind = piscsi64_parse_media_spec(spec, &path_spec);
-    if (piscsi64_split_path_and_opts(path_spec, path, sizeof(path), &mode_opt) != 0) {
+    if (piscsi64_split_path_and_opts(path_spec, path, sizeof(path), &mode_opt, &block_size_opt) != 0) {
         LOG_ERROR("[PISCSI64] Invalid drive spec '%s' for unit %d.\n", spec, index);
         return;
     }
@@ -2008,6 +2177,10 @@ void piscsi64_map_drive(const char *spec, uint8_t index) {
     void *remote_tls = NULL;
 
     if (backend_type == PISCSI64_BACKEND_REMOTE) {
+        if (block_size_opt != 0) {
+            LOG_WARN("[PISCSI64] Unit %d ignores blocksize=%u for remote backend (server defines block size).\n",
+                     index, block_size_opt);
+        }
         int req_rw = (media_kind != PISCSI64_MEDIA_CDROM && open_flags == O_RDWR) ? 1 : 0;
         if (piscsi64_remote_connect(index, path, req_rw, media_kind, &tmp_fd, &file_size,
                                     &remote_block_size, &remote_media_kind, &remote_read_only,
@@ -2100,6 +2273,10 @@ void piscsi64_map_drive(const char *spec, uint8_t index) {
     }
 
     if (media_kind == PISCSI64_MEDIA_CDROM) {
+        if (block_size_opt != 0 && block_size_opt != 2048u) {
+            LOG_WARN("[PISCSI64] Unit %d ignores blocksize=%u for CD-ROM media (fixed 2048 bytes).\n",
+                     index, block_size_opt);
+        }
         uint32_t cd_block = (backend_type == PISCSI64_BACKEND_REMOTE && remote_block_size) ? remote_block_size : 2048u;
         uint64_t blocks = (file_size / cd_block);
         d->block_size = cd_block;
@@ -2132,15 +2309,58 @@ void piscsi64_map_drive(const char *spec, uint8_t index) {
         printf("[!!!PISCSI64] If this is merely an empty or placeholder file you've created to partition and format on the Amiga, please disregard this warning message.\n");
     }
 
-    if (piscsi64_parse_rdb(d) == -1) {
+    uint32_t fallback_block = 512u;
+    if (backend_type == PISCSI64_BACKEND_REMOTE && remote_block_size) {
+        fallback_block = remote_block_size;
+    } else if (block_size_opt != 0) {
+        fallback_block = block_size_opt;
+    }
+    int parsed_rdb = piscsi64_parse_rdb(d);
+    int part_node = (backend_type == PISCSI64_BACKEND_BLOCK) && piscsi64_path_is_partition_node(path);
+
+    if (parsed_rdb == -1) {
         DEBUG("[PISCSI64] No RDB found on disk, making up some CHS values.\n");
-        uint32_t fallback_block = (backend_type == PISCSI64_BACKEND_REMOTE && remote_block_size)
-                                    ? remote_block_size
-                                    : 512u;
-        d->h = 16;
-        d->s = 63;
-        d->c = (uint32_t)((file_size / fallback_block) / (d->s * d->h));
+        piscsi64_set_synth_chs(d, fallback_block);
+    } else if (part_node) {
+        /*
+         * Linux partition nodes often contain arbitrary filesystem data at LBA0 from the
+         * partition's perspective. If those bytes look like stale/foreign RDB metadata,
+         * HDToolBox can pick unusable tiny CHS values (e.g. a few hundred cylinders on
+         * multi-GB media). Treat partition nodes as raw block extents and synthesize CHS
+         * from actual size instead of trusting on-media RDB at partition start.
+         */
+        LOG_WARN("[PISCSI64] %s appears to be a partition node; ignoring on-media RDB geometry and using synthetic CHS.\n",
+                 path);
+        if (d->rdb) {
+            free(d->rdb);
+            d->rdb = NULL;
+        }
+        d->num_partitions = 0;
+        piscsi64_set_synth_chs(d, fallback_block);
+    }
+
+    /*
+     * Guardrail for stale/foreign RDB geometry: if CHS-derived capacity is far below
+     * real medium size, HDToolBox reports tiny disks (for example ~30G on 400G+ media).
+     * Fall back to synthetic CHS from actual size.
+     */
+    if (d->block_size == 0) {
         d->block_size = fallback_block;
+    }
+    if (d->block_size > 0) {
+        uint64_t total_blocks = d->fs / d->block_size;
+        uint64_t geo_blocks = (uint64_t)d->c * (uint64_t)d->h * (uint64_t)d->s;
+        if (total_blocks >= 2 && (geo_blocks == 0 || geo_blocks < (total_blocks / 2))) {
+            LOG_WARN("[PISCSI64] Geometry CHS=%u/%u/%u covers %llu blocks, media has %llu blocks; using synthetic CHS.\n",
+                     (unsigned)d->c, (unsigned)d->h, (unsigned)d->s,
+                     (unsigned long long)geo_blocks, (unsigned long long)total_blocks);
+            if (d->rdb) {
+                free(d->rdb);
+                d->rdb = NULL;
+            }
+            d->num_partitions = 0;
+            piscsi64_set_synth_chs(d, d->block_size);
+        }
     }
     printf("[PISCSI64] CHS: %d %d %d\n", d->c, d->h, d->s);
 
@@ -2496,7 +2716,7 @@ static __attribute__((unused)) void print_piscsi64_debug_message(int index) {
 
 static void piscsi64_debugme(uint32_t index) {
         if (index != last_debugme_idx) {
-        LOG_INFO("[PISCSI64-DEBUGME] idx=%u\n", index);
+        LOG_DEBUG("[PISCSI64-DEBUGME] idx=%u\n", index);
         last_debugme_idx = index;
         if (index >= 30 && index <= 41) {
             #ifdef PISCSI64_DEBUG
