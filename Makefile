@@ -493,6 +493,8 @@ UDEV_RULES := etc/udev/99-pistorm.rules
 LIMITS_CONF := etc/security/limits.d/pistorm-rt.conf
 MODULES_LOAD := etc/modules-load.d/pistorm.conf
 MODPROBE_CONF := etc/modprobe.d/pistorm.conf
+BOOT_FIRMWARE_DIR ?= /boot/firmware
+INSTALL_BOOT_FIRMWARE ?= 0
 HELP_TARGETS = \
 	"make"                             "Build emulator (kmod backend default)" \
 	"make PISTORM_KMOD=0"             "Build emulator with legacy userspace GPIO" \
@@ -511,6 +513,7 @@ HELP_TARGETS = \
 	"make piscsi64-remote-server"     "Build PiSCSI64 remote export daemon alias (Linux/Unix)" \
 	"make piscsi64-remote-client"     "Build PiSCSI64 remote probe client" \
 	"make install [PREFIX=… DESTDIR=…]" "Install emulator, data/, configs, piscsi.rom + piscsi64.rom, a314 files" \
+	"make install-boot-firmware"      "Safely install boot/firmware config+cmdline (preserves current root=, rootfstype=)" \
 	"make uninstall [PREFIX=… DESTDIR=…]" "Remove installed tree" \
 	"make kernel_module"              "Build pistorm.ko + z3bus.ko (out-of-tree)" \
 	"make kernel_module_pistorm"      "Build pistorm.ko only (out-of-tree)" \
@@ -699,6 +702,82 @@ install: all
 		$(INSTALL) -d /etc/modprobe.d; \
 		$(INSTALL) -m 644 $(MODPROBE_CONF) /etc/modprobe.d/pistorm.conf; \
 	fi
+	@if [ "$(INSTALL_BOOT_FIRMWARE)" = "1" ]; then \
+		$(MAKE) BOOT_FIRMWARE_DIR="$(BOOT_FIRMWARE_DIR)" install-boot-firmware; \
+	else \
+		echo "Skipping /boot/firmware update (INSTALL_BOOT_FIRMWARE=0)."; \
+	fi
+
+install-boot-firmware:
+	@if [ "$$(id -u)" -ne 0 ]; then \
+		echo "ERROR: install-boot-firmware requires root."; \
+		echo "       Run: sudo make install-boot-firmware"; \
+		exit 1; \
+	fi
+	@set -e; \
+	src_cfg="boot/firmware/config.txt"; \
+	src_cmd="boot/firmware/cmdline.txt"; \
+	dst_cfg="$(BOOT_FIRMWARE_DIR)/config.txt"; \
+	dst_cmd="$(BOOT_FIRMWARE_DIR)/cmdline.txt"; \
+	if [ ! -f "$$src_cfg" ] || [ ! -f "$$src_cmd" ]; then \
+		echo "ERROR: Missing boot firmware source files in repo."; \
+		exit 1; \
+	fi; \
+	root_arg=""; \
+	rootfs_arg=""; \
+	root_dev="$$(findmnt -n -o SOURCE / 2>/dev/null || true)"; \
+	if [ -n "$$root_dev" ] && [ -e "$$root_dev" ]; then \
+		root_dev="$$(readlink -f "$$root_dev" 2>/dev/null || echo "$$root_dev")"; \
+	fi; \
+	root_partuuid=""; root_label=""; root_uuid=""; \
+	if [ -n "$$root_dev" ] && [ -b "$$root_dev" ]; then \
+		root_partuuid="$$(blkid -s PARTUUID -o value "$$root_dev" 2>/dev/null || true)"; \
+		root_label="$$(blkid -s LABEL -o value "$$root_dev" 2>/dev/null || true)"; \
+		root_uuid="$$(blkid -s UUID -o value "$$root_dev" 2>/dev/null || true)"; \
+	fi; \
+	if [ -n "$$root_partuuid" ]; then \
+		root_arg="root=PARTUUID=$$root_partuuid"; \
+	elif [ -n "$$root_label" ] && ! printf '%s' "$$root_label" | grep -q '[[:space:]]'; then \
+		root_arg="root=LABEL=$$root_label"; \
+	elif [ -n "$$root_uuid" ]; then \
+		root_arg="root=UUID=$$root_uuid"; \
+	fi; \
+	rootfs_raw="$$(findmnt -n -o FSTYPE / 2>/dev/null || true)"; \
+	if [ -n "$$rootfs_raw" ]; then \
+		rootfs_arg="rootfstype=$$rootfs_raw"; \
+	fi; \
+	if [ -z "$$root_arg" ]; then \
+		root_arg="$$(awk '{for(i=1;i<=NF;i++) if($$i ~ /^root=/){print $$i; exit}}' /proc/cmdline)"; \
+	fi; \
+	if [ -z "$$rootfs_arg" ]; then \
+		rootfs_arg="$$(awk '{for(i=1;i<=NF;i++) if($$i ~ /^rootfstype=/){print $$i; exit}}' /proc/cmdline)"; \
+	fi; \
+	if [ -z "$$root_arg" ] && [ -f "$$dst_cmd" ]; then \
+		root_arg="$$(awk '{for(i=1;i<=NF;i++) if($$i ~ /^root=/){print $$i; exit}}' "$$dst_cmd")"; \
+	fi; \
+	if [ -z "$$rootfs_arg" ] && [ -f "$$dst_cmd" ]; then \
+		rootfs_arg="$$(awk '{for(i=1;i<=NF;i++) if($$i ~ /^rootfstype=/){print $$i; exit}}' "$$dst_cmd")"; \
+	fi; \
+	if [ -z "$$root_arg" ]; then \
+		echo "ERROR: Could not determine root= parameter from /proc/cmdline or existing cmdline.txt."; \
+		exit 1; \
+	fi; \
+	if [ -z "$$rootfs_arg" ]; then \
+		rootfs_arg="rootfstype=ext4"; \
+	fi; \
+	tmp_cmd="$$(mktemp)"; \
+	awk -v root="$$root_arg" -v rootfs="$$rootfs_arg" '{ \
+		for (i=1; i<=NF; i++) { \
+			if ($$i ~ /^root=/) $$i = root; \
+			else if ($$i ~ /^rootfstype=/) $$i = rootfs; \
+		} \
+		print; \
+	}' "$$src_cmd" > "$$tmp_cmd"; \
+	$(INSTALL) -d "$(BOOT_FIRMWARE_DIR)"; \
+	$(INSTALL) -m 644 "$$src_cfg" "$$dst_cfg"; \
+	$(INSTALL) -m 644 "$$tmp_cmd" "$$dst_cmd"; \
+	rm -f "$$tmp_cmd"; \
+	echo "Installed boot firmware config safely to $(BOOT_FIRMWARE_DIR) using $$root_arg $$rootfs_arg (source=$$root_dev)"
 
 uninstall:
 	rm -rf $(INSTALL_DIR)
@@ -794,10 +873,7 @@ endif
 	$(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD)
 	$(MAKE) kernel_module
 	sudo $(MAKE) kernel_install
-	sudo $(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD) install
-	# Copy boot configuration files
-	#sudo cp -f boot/firmware/config.txt /boot/firmware/config.txt
-	#sudo cp -f boot/firmware/cmdline.txt /boot/firmware/cmdline.txt
+	sudo $(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD) INSTALL_BOOT_FIRMWARE=$(INSTALL_BOOT_FIRMWARE) BOOT_FIRMWARE_DIR="$(BOOT_FIRMWARE_DIR)" install
 	# Copy system configuration files
 	#sudo cp -f 10-hugepages.conf /etc/sysctl.d/10-hugepages.conf
 	sudo cp -f etc/modules-load.d/pistorm.conf /etc/modules-load.d/pistorm.conf
@@ -823,4 +899,4 @@ help:
 
 -include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d tools/piscsi64_remote/piscsi64_remote_server.d tools/piscsi64_remote/piscsi64_remote_client.d $(UAE_OBJS:%.o=%.d)
 
-.PHONY: all clean buptest pistorm_truth_test  install uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-net64 amiga-piscsi amiga-piscsi64 amiga-rtg amiga-ahi amiga-all amiga-clean
+.PHONY: all clean buptest pistorm_truth_test install install-boot-firmware uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-net64 amiga-piscsi amiga-piscsi64 amiga-rtg amiga-ahi amiga-all amiga-clean

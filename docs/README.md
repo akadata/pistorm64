@@ -73,3 +73,10 @@ If a specific board needs a slower clock for stability testing, adjust `gpclk_di
 - Finish documentation alignment, then merge.
 - Continue RTG stabilization work (window decorations and related polish).
 - Continue UAE JIT bring-up behind explicit experimental flags.
+
+## Third-Party Materials and Media Policy
+
+- `amiga.dev/` and `NDK/` are third-party development/support materials; see:
+  - `amiga.dev/README.md`
+  - `NDK/README.md`
+- This repository does **not** ship Amiga ROM images or Amiga Workbench images.

@@ -41,6 +41,19 @@ Repository attribution file:
 
 - `DiagROMV2/README.md`
 
+## Third-Party Development Materials
+
+- `amiga.dev/` contains development header/assets integration notes (including
+  Picasso96 develop materials). See `amiga.dev/README.md`.
+- `NDK/` contains AmigaOS NDK development materials. See `NDK/README.md`.
+
+These are third-party development resources; rights remain with their original
+authors/owners.
+
+## ROM/Workbench Media Policy
+
+This repository does **not** ship Amiga ROM images or Amiga Workbench system images.
+
 ## Kernel Module Clock Defaults
 
 Use:
