@@ -223,11 +223,11 @@ POST /api/v1/ai/chat (server-side proxy to Ollama/OpenAI; never expose keys to b
 4) File roots + project structure (so “packages” are clean)
 Define safe roots
 
-WORK_ROOT=/home/smalley/pistorm64/work
+WORK_ROOT=$HOME/pistorm64/work
 
-ADF_ROOT=/home/smalley/pistorm64/data/adfs
+ADF_ROOT=$HOME/pistorm64/data/adfs
 
-SHARED=/home/smalley/pistorm64/data/a314-shared
+SHARED=$HOME/pistorm64/data/a314-shared
 
 Backend must refuse access outside these roots.
 

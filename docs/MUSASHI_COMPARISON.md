@@ -1,7 +1,7 @@
 # Musashi vs PiStorm 68k Core: Investigation Notes
 
 Scope
-- Compared `/home/smalley/pistorm` (PiStorm fork) to `/home/smalley/Musashi` (upstream) and `/home/smalley/captain-amygdala/pistorm`.
+- Compared `$HOME/pistorm` (PiStorm fork) to `$HOME/Musashi` (upstream) and `$HOME/captain-amygdala/pistorm`.
 - Focused on 68k core sources: `m68kconf.h`, `m68k.h`, `m68kcpu.c`, `m68kcpu.h`, `m68kdasm.c`, `m68kfpu.c`, `m68kmmu.h`, `m68k_in.c`, `m68kmake.c`.
 - Goal is to identify “missing” 68040/PMMU behaviors, while preserving PiStorm host hooks and stability.
 

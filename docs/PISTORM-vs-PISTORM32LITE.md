@@ -1,7 +1,7 @@
 # PiStorm vs PiStorm32-Lite: 68k Core Comparison
 
 Scope
-- Compared m68k* sources in `/home/smalley/pistorm` (branch `akadata/checkm68k`) against `/home/smalley/pistorm32-lite` (branch `pistorm32-lite`).
+- Compared m68k* sources in `$HOME/pistorm` (branch `akadata/checkm68k`) against `$HOME/pistorm32-lite` (branch `pistorm32-lite`).
 - Files checked: `m68kconf.h`, `m68k.h`, `m68kcpu.c`, `m68kcpu.h`, `m68kdasm.c`, `m68kfpu.c`, `m68kmmu.h`, `m68k_in.c`, `m68kmake.c`.
 
 Valid CPU Types (both repos)
@@ -17,7 +17,7 @@ Valid CPU Types (both repos)
 - `M68K_CPU_TYPE_SCC68070`
 
 68k Core Differences
-- `m68kcpu.h`: `m68ki_ic_clear` is `static inline` in `/home/smalley/pistorm/m68kcpu.h` but plain `inline` in `/home/smalley/pistorm32-lite/m68kcpu.h`. This matters for `-Os` builds (linker undefined reference issue), so the PiStorm variant is safer for size-optimized builds.
+- `m68kcpu.h`: `m68ki_ic_clear` is `static inline` in `$HOME/pistorm/m68kcpu.h` but plain `inline` in `$HOME/pistorm32-lite/m68kcpu.h`. This matters for `-Os` builds (linker undefined reference issue), so the PiStorm variant is safer for size-optimized builds.
 
 Identical 68k Core Files
 - `m68kconf.h`
@@ -30,7 +30,7 @@ Identical 68k Core Files
 - `m68kmake.c`
 
 Other 68k-Related Observations
-- `/home/smalley/pistorm` contains generated `m68kops.c`/`m68kops.h` in the tree; `/home/smalley/pistorm32-lite` does not. This is a build artifact difference, not a source divergence.
+- `$HOME/pistorm` contains generated `m68kops.c`/`m68kops.h` in the tree; `$HOME/pistorm32-lite` does not. This is a build artifact difference, not a source divergence.
 
 Notes for 68EC040
 - The CPU type is present in both repos and is configured in the core as a 68040 variant without PMMU (in `m68kcpu.c`). The core logic is identical between repos, so any PMMU-related behavioral differences should not come from code divergence between these two trees.

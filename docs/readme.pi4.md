@@ -1,23 +1,19 @@
 
 ## How to load on Pi 4 with tuning
 
-Default (src=5 div=6):
+Known-good default:
 
 ```sh
-sudo insmod pistorm.ko
+sudo insmod pistorm.ko gpclk_src=5 gpclk_div=6
 ```
 
-Try a slower GPCLK if the CPLD/bus wiring is marginal (example div=12):
+If you are debugging a marginal board, only adjust the divider first:
 
 ```sh
-sudo insmod pistorm.ko gpclk_div=12
+sudo insmod pistorm.ko gpclk_src=5 gpclk_div=12
 ```
 
-Try different source if needed (example src=6):
-
-```sh
-sudo insmod pistorm.ko gpclk_src=6 gpclk_div=12
-```
+Do not change `gpclk_src` away from `5` for normal operation.
 
 ---
 
@@ -35,4 +31,3 @@ After building and loading:
 dmesg | tail -120
 ls -l /dev/pistorm
 ```
-

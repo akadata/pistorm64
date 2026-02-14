@@ -7,7 +7,7 @@
 make
 ```
 
-- UAE JIT backend (experimental):
+- UAE JIT backend (bring-up/developer use only):
 ```
 make USE_UAE_JIT=1 uae-jit
 ```
@@ -50,3 +50,8 @@ The emulator sets the following before starting A314 services:
 - recommended: `A314_CONF`, `A314_FS_CONF`
 
 All Python services must use env-based paths (no `~` or hard-coded `/opt`).
+
+## Runtime recommendation
+
+- Use Musashi/non-JIT for normal operation.
+- JIT remains under active bring-up and is not yet a stable production path.

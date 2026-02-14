@@ -23,4 +23,4 @@ Smoke and regression tests stem from `tools/pistorm_smoke.c`, which produces `pi
 Follow the branching plan in `docs/COMMIT_PLAN.md`: create a `feature/*` branch per change, keep commits focused, and describe them in short phrases (e.g., “fix gpclk tuning”). Each PR should document which hardware or smoke tests ran, cite related docs/issues, and ideally stay narrow so the maintainers can review quickly.
 
 ## Kernel Module & Hardware Notes
-`kernel_module/Makefile` intentionally refuses root builds to prevent dirty `.d` files; compile as your normal user. After `sudo insmod pistorm.ko` you can adjust clock tuning (`gpclk_div=12` or `gpclk_src=6`) to stabilize the CPLD path, then chmod `/dev/pistorm` for the emulator. Log these parameters in your PR description when they matter.
+`kernel_module/Makefile` intentionally refuses root builds to prevent dirty `.d` files; compile as your normal user. Use `gpclk_src=5` as the baseline source and only adjust `gpclk_div` if you are diagnosing board-specific timing stability, then chmod `/dev/pistorm` for the emulator. Log any non-default clock parameters in your PR description when they matter.

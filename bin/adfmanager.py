@@ -1291,7 +1291,7 @@ CONFIG_HTML = """<!doctype html>
     <div class="row">
       <label><input type="checkbox" id="a314" disabled> enable A314</label>
       <label>A314 conf:
-        <input id="a314_conf" placeholder="/home/smalley/pistorm64/src/a314/files_pi/a314d.conf" disabled/>
+        <input id="a314_conf" placeholder="$HOME/pistorm64/src/a314/files_pi/a314d.conf" disabled/>
       </label>
     </div>
   </section>

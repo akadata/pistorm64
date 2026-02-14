@@ -1,8 +1,12 @@
 DiagROM MOD Player Notes (for regtool/A314 integration)
 
+Attribution:
+- **DiagROM is authored by John "Chucky" Hertell.**
+- **All credit belongs to Chucky and the official DiagROM project: https://www.diagrom.com**
+
 DiagROM ships a ProTracker replay and a test module:
-- `external/DiagROM/Music.MOD`
-- Replay routine in `external/DiagROM/DiagROM.s`:
+- `DiagROMV2/` assets in this repository
+- Replay routine in DiagROM source (see official project/source releases):
   - `MT_Init` (init)
   - `MT_Music` (per‑frame tick)
   - `MT_End` (stop)

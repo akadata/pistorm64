@@ -5,6 +5,11 @@ It presents host-backed storage to the Amiga as normal SCSI devices (hard disk, 
 
 Status: active development target. Legacy `PiSCSI` is compatibility/maintenance only.
 
+Validation status:
+
+- Linux host path (local disk, block devices, remote server, and CD-ROM ISO) is validated.
+- Windows/macOS remote client builds are present, but full runtime validation is still pending.
+
 ## Why PiSCSI64 Exists (and Why PiSCSI Still Exists)
 
 PiSCSI64 is not just a rename of legacy PiSCSI.
@@ -298,6 +303,11 @@ Windows utility path:
   - `cl /O2 /W3 tools\\piscsi64_remote\\piscsi64_remote_client_win.c ws2_32.lib libssl.lib libcrypto.lib`
 - Windows probe now uses the same TLS-PSK protocol as Linux/macOS client probe.
 - Native Windows daemon/service support is planned as a follow-on phase.
+
+macOS note:
+
+- macOS client/server build support is present in tooling targets.
+- Full macOS runtime validation is pending.
 
 ## Validation Flow (Each Step)
 

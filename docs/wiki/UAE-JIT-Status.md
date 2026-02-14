@@ -3,6 +3,12 @@
 This page tracks the current bring-up state of the optional UAE JIT backend in
 `pistorm64`.
 
+Current headline status:
+
+- JIT integration work is in progress.
+- It is not yet a stable/reliable normal runtime path.
+- Use Musashi (non-JIT) for production/regular operation.
+
 ## Scope
 
 - This is a CPU backend integration, not a full UAE/Amiberry frontend port.

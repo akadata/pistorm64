@@ -156,8 +156,8 @@ Scheduling:
 RT priorities require either `sudo` or appropriate `rtprio` limits in `/etc/security/limits.conf`:
 
 ```text
-smalley   soft   rtprio   95
-smalley   hard   rtprio   95
+$USER    soft   rtprio   95
+$USER    hard   rtprio   95
 ```
 
 ---

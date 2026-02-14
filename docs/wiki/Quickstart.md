@@ -17,7 +17,7 @@ make
 ./emulator --config amiga.cfg
 ```
 
-4) Optional: UAE JIT (experimental)
+4) Optional: UAE JIT bring-up (developer-only)
 ```
 make USE_UAE_JIT=1 uae-jit
 PISTORM_ENABLE_QUEUE=0 ./emulator --jit
@@ -33,3 +33,4 @@ Notes:
 - For legacy userspace GPIO, build with `make PISTORM_KMOD=0`.
 - Use `--log` and `--debug-level` for verbose tracing.
 - If you modify A314 files under `a314/`, re-install the A314 services to `/opt/pistorm64/a314/`.
+- JIT is currently work-in-progress and not yet a reliable daily-use runtime mode.

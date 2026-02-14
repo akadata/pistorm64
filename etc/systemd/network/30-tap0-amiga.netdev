@@ -3,6 +3,7 @@ Name=tap0
 Kind=tap
 
 [TAP]
-User=smalley
-Group=smalley
-
+# Default service account for PiStorm network tap ownership.
+# Override these values locally if your deployment uses a different account.
+User=pistorm
+Group=pistorm

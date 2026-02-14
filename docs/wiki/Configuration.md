@@ -69,6 +69,7 @@ These config commands set up keyboard/mouse forwarding:
 - **UAE JIT (experimental)**: build with `make USE_UAE_JIT=1 uae-jit` and run
   `./emulator --jit` (`--jit-fpu` for the FPU JIT). See `UAE-JIT-Status.md` for
   the current bring-up state.
+- Current recommendation: keep JIT disabled for normal use; use it only for bring-up/debug work.
 
 ## Platform variables (setvar)
 

@@ -9,4 +9,4 @@ Use this page to record integration notes:
 - Any autoconfig device IDs used for the Janus bus.
 - Host-side services (if any) that depend on Janus messages.
 
-If the Janus engine is being maintained in another repo (e.g. `/home/smalley/janus-misc`), document the exact commit and the build/install steps here.
+If the Janus engine is being maintained in another repo (e.g. `$HOME/janus-misc`), document the exact commit and the build/install steps here.

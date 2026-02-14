@@ -10,3 +10,7 @@ Build flags:
 - `make USE_RAYLIB=0` to disable RTG/raylib.
 
 RTG memory is typically mapped into a high address space region (e.g. `0x70010000+`).
+
+Current note:
+
+- RTG is working, but there is a known window-decoration issue still being resolved.

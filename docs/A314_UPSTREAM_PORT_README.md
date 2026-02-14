@@ -1,6 +1,6 @@
 # A314 Upstream Services (PiStorm64) Build and Test
 
-This README covers how to build the Amiga-side binaries with `/opt/amiga/bin/m68k-amigaos-gcc`, run the Pi-side services, and test disk/remotewb/libremote. Paths below assume the repo root is `/home/smalley/pistorm64`.
+This README covers how to build the Amiga-side binaries with `/opt/amiga/bin/m68k-amigaos-gcc`, run the Pi-side services, and test disk/remotewb/libremote. Paths below assume the repo root is `$HOME/pistorm64`.
 
 ## Toolchain Prereqs
 - `/opt/amiga/bin/m68k-amigaos-gcc`
@@ -48,9 +48,9 @@ Install on Amiga:
 ## Pi-side services
 Enable services by adding entries to `src/a314/files_pi/a314d.conf` (not enabled by default). Example lines:
 ```
-disk       python3 /home/smalley/pistorm64/src/a314/files_pi/disk.py
-remotewb   python3 /home/smalley/pistorm64/src/a314/files_pi/remotewb.py
-bsl        python3 /home/smalley/pistorm64/src/a314/files_pi/bsdsocket.py
+disk       python3 $HOME/pistorm64/src/a314/files_pi/disk.py
+remotewb   python3 $HOME/pistorm64/src/a314/files_pi/remotewb.py
+bsl        python3 $HOME/pistorm64/src/a314/files_pi/bsdsocket.py
 ```
 
 Optional dependency for RemoteWB:
