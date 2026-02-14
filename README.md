@@ -45,7 +45,8 @@ Repository attribution file:
 
 - `amiga.dev/` contains development header/assets integration notes (including
   Picasso96 develop materials). See `amiga.dev/README.md`.
-- `NDK/` contains AmigaOS NDK development materials. See `NDK/README.md`.
+- AmigaOS NDK is **not** shipped in this repository; obtain it from official
+  distribution channels and install it locally in your toolchain path.
 
 These are third-party development resources; rights remain with their original
 authors/owners.
