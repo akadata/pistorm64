@@ -137,6 +137,20 @@ static int tls_recv_all(SSL *ssl, void *buf, size_t len)
     return 0;
 }
 
+static int parse_port_u16(const char *s, uint16_t *port_out)
+{
+    if (!s || !*s || !port_out) {
+        return -1;
+    }
+    char *endp = NULL;
+    unsigned long p = strtoul(s, &endp, 10);
+    if (!endp || *endp != '\0' || p == 0 || p > 65535ul) {
+        return -1;
+    }
+    *port_out = (uint16_t)p;
+    return 0;
+}
+
 static int parse_host_port(const char *in, char *host, size_t host_len, uint16_t *port)
 {
     char tmp[256];
@@ -145,27 +159,49 @@ static int parse_host_port(const char *in, char *host, size_t host_len, uint16_t
         return -1;
     }
     memcpy(tmp, in, in_len + 1);
-    char *colon = strrchr(tmp, ':');
-    if (!colon) {
-        size_t host_part_len = strlen(tmp);
+    *port = PS64_REMOTE_DEFAULT_PORT;
+
+    if (tmp[0] == '[') {
+        char *rb = strchr(tmp + 1, ']');
+        if (!rb) {
+            return -1;
+        }
+        *rb = '\0';
+        size_t host_part_len = strlen(tmp + 1);
         if (host_part_len == 0 || host_part_len >= host_len) {
             return -1;
         }
-        memcpy(host, tmp, host_part_len + 1);
-        *port = PS64_REMOTE_DEFAULT_PORT;
-        return 0;
+        memcpy(host, tmp + 1, host_part_len + 1);
+        if (rb[1] == '\0') {
+            return 0;
+        }
+        if (rb[1] != ':') {
+            return -1;
+        }
+        return parse_port_u16(rb + 2, port);
     }
-    *colon = '\0';
-    long p = strtol(colon + 1, NULL, 10);
-    if (p <= 0 || p > 65535) {
-        return -1;
+
+    int colon_count = 0;
+    for (char *p = tmp; *p; ++p) {
+        if (*p == ':') {
+            colon_count++;
+        }
     }
+    if (colon_count == 1) {
+        char *colon = strrchr(tmp, ':');
+        *colon = '\0';
+        if (parse_port_u16(colon + 1, port) != 0) {
+            return -1;
+        }
+    } else if (colon_count > 1) {
+        /* Bare IPv6 literal with default port. */
+    }
+
     size_t host_part_len = strlen(tmp);
     if (host_part_len == 0 || host_part_len >= host_len) {
         return -1;
     }
     memcpy(host, tmp, host_part_len + 1);
-    *port = (uint16_t)p;
     return 0;
 }
 
@@ -186,8 +222,9 @@ static void usage(const char *argv0)
 {
     fprintf(stderr,
             "Usage: %s HOST[:PORT] EXPORT TOKEN [OFFSET LENGTH]\n"
-            "Example: %s 192.168.1.2:4964 workbench s3cr3t 0 512\n",
-            argv0, argv0);
+            "Example: %s 192.168.1.2:4964 workbench s3cr3t 0 512\n"
+            "IPv6:    %s [2001:db8::10]:4964 workbench s3cr3t 0 512\n",
+            argv0, argv0, argv0);
 }
 
 int main(int argc, char **argv)

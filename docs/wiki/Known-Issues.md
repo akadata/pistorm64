@@ -6,6 +6,9 @@
 
 - Some Amiga utilities make assumptions about 24-bit addresses or cache behavior and can misbehave on 68020+ setups. See Amiga developer guidelines on 680x0 compatibility.
 - RTG has a known window-decoration issue (display polish/usability), currently under active work.
+- HDToolBox scan behavior can be limited to SCSI IDs `0..6` on some versions/tooltype setups.
+  - PiSCSI64 itself supports units `1..15`; IDs above 6 are usable once prepared/mounted.
+  - Treat this as an Amiga tool limitation, not a PiSCSI64 backend/controller limit.
 
 Add new issues here as they are discovered.
 

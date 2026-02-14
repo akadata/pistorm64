@@ -9,6 +9,7 @@ Validation status:
 
 - Linux host path (local disk, block devices, remote server, and CD-ROM ISO) is validated.
 - Windows/macOS remote client builds are present, but full runtime validation is still pending.
+- Native dual-stack endpoint support is validated (IPv4 and true IPv6 addressing on Pi and remote endpoint).
 
 ## Why PiSCSI64 Exists (and Why PiSCSI Still Exists)
 
@@ -29,12 +30,15 @@ setvar piscsi64_1 /opt/Amiga/hdf/KernelPiStormBench.hdf
 setvar piscsi64_3 cdrom:../AmigaOS39.iso
 setvar piscsi64_5 disk:/dev/disk/by-id/usb-EXAMPLE,mode=ro
 setvar piscsi64_6 remote:token@192.168.1.50:4964/workbench,mode=ro
+setvar piscsi64_7 remote:token@[2001:db8::10]:4964/workbench,mode=ro
 ```
 
 Notes:
 
 - Unit `0` is reserved for controller identity.
 - Use units `1..15` for targets.
+- PiSCSI64 supports units/SCSI IDs `1..15`.
+- Practical tool note: some HDToolBox versions only scan IDs `0..6` even when the device itself supports wider IDs.
 - `cdrom:` media is read-only by design.
 - If you map `/dev/...` paths, the emulator process must have permission to open that block node.
   - A common failure is `errno=13` (permission denied) when opening `/dev/disk/by-id/...`.
@@ -77,6 +81,13 @@ Typical method:
 2. Open `Icon > Information`.
 3. In tool types, change the SCSI device from `scsi.device` to `pi-scsi64.device`.
 4. Save and run HDToolBox again.
+
+Important scan-range behavior:
+
+- HDToolBox may only probe SCSI IDs `0..6` depending on version/tooltype behavior.
+- This is an Amiga tooling limitation, not a PiSCSI64 unit limit.
+- PiSCSI64 units above 6 (for example ID 14) are valid and can be used once prepared/mounted.
+- If you need to prepare a high ID disk, initialize it on a lower ID first, then move it to the target high ID.
 
 Boot priority warning:
 
@@ -156,11 +167,15 @@ Format:
 
 - `remote:token@host:port/export`
 - token is required; port defaults to `4964` if omitted.
+- IPv6 literals are supported:
+  - with explicit port: `remote:token@[2001:db8::10]:4964/export`
+  - default port: `remote:token@2001:db8::10/export`
 
 Examples:
 
 - `setvar piscsi64_6 remote:token@192.168.1.50:4964/workbench,mode=ro`
 - `setvar piscsi64_7 cdrom:remote:token@192.168.1.50:4964/os39iso`
+- `setvar piscsi64_8 remote:token@[2001:db8::10]:4964/workbench,mode=rw`
 
 Notes:
 
@@ -170,6 +185,9 @@ Notes:
 - Remote liveness is probe-polled (PING) and offline is forced on disconnect-class failures.
 - Remote transport is TLS-PSK encrypted end-to-end (headers + payload, current implementation using TLS 1.2 PSK ciphers).
 - Token is used as PSK material and is not sent in clear in protocol payload.
+- Fail-closed behavior:
+  - If endpoint is unreachable/not started, emulator continues and unit stays offline.
+  - Wrong port/export/token does not silently attach to media.
 
 ## Remote Boot Milestone
 
@@ -191,6 +209,14 @@ sudo ./out/piscsi64-remote \
   --path /dev/zvol/tank/piscsi64remotedisk \
   --token 12345678 \
   --mode rw
+
+# IPv6 listen + export
+sudo ./out/piscsi64-remote \
+  --listen [::]:4964 \
+  --export remotewb \
+  --path /dev/zvol/tank/piscsi64remotedisk \
+  --token 12345678 \
+  --mode rw
 ```
 
 PiStorm64 config:
@@ -198,6 +224,7 @@ PiStorm64 config:
 ```ini
 setvar piscsi64
 setvar piscsi64_6 remote:12345678@172.16.0.2:4964/remotewb,mode=rw
+setvar piscsi64_7 remote:12345678@[2001:db8::10]:4964/remotewb,mode=rw
 ```
 
 ## nftables (Secure Remote Port)
@@ -208,6 +235,7 @@ Repository template (`etc/nftables.conf`) now includes:
 
 - `iifname "end0"`/`"wlan0"` + RFC1918 source ranges for allow
 - Explicit drop for all other traffic to `tcp dport 4964`
+- IPv6 source filtering examples (`ip6 saddr`) and port-set examples for multiple remote instances
 
 Apply/reload:
 
@@ -219,8 +247,17 @@ sudo nft list ruleset
 Security notes:
 
 - Replace RFC1918-wide ranges with your exact subnet where possible (example: `172.16.0.0/24`).
+- Replace IPv6 examples with your exact prefix (example: `2a02:8012:bc57:1::/64`).
 - Adjust interface names for your host (`end0`, `eth0`, `wlan0`, etc.).
 - Firewall rules complement, but do not replace, local block-device permissions.
+
+Multiple remote services:
+
+- Each `piscsi64-remote` instance must use a unique listen port.
+- Example:
+  - instance A: `--listen [::]:4964 --export workbench ...`
+  - instance B: `--listen [::]:4965 --export games ...`
+- Open those exact ports in nftables (prefer allow-list, then explicit drop).
 
 Planned/roadmap prefixes:
 
@@ -258,6 +295,7 @@ Pending (next steps):
 
 - Remote multi-export management and per-export ACL/token policy.
 - Optional per-unit media pool / source cycling (future feature).
+- Documented HDToolBox scan-range limitation (`0..6`) alongside PiSCSI64 wide-ID support (`1..15`).
 
 ## Remote Utilities
 
@@ -276,12 +314,20 @@ Server example (Linux/Unix):
   --path /dev/disk/by-id/usb-EXAMPLE \
   --token YOUR_SHARED_TOKEN \
   --mode ro
+
+./out/piscsi64-remote \
+  --listen [::]:4964 \
+  --export workbench \
+  --path /dev/disk/by-id/usb-EXAMPLE \
+  --token YOUR_SHARED_TOKEN \
+  --mode ro
 ```
 
 Client probe example:
 
 ```sh
 ./out/piscsi64-remote-client 192.168.1.50:4964 workbench token 0 512
+./out/piscsi64-remote-client [2001:db8::10]:4964 workbench token 0 512
 ```
 
 Probe client is optional and only for diagnostics; normal operation only needs the remote service plus `remote:...` mapping in Pi config.

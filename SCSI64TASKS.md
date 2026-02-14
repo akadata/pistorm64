@@ -15,6 +15,8 @@ Track the staged migration of `piscsi64` to a backend-driven SCSI architecture, 
 - Runtime unplug -> offline transition: implemented for block/remote backend errors, block probe path, and remote ping probe path.
 - Remote backend (phase 1): implemented (`remote:` mapping + TLS-PSK transport + server/client utilities).
 - Remote utility builds: Linux + mac makefiles verified; Windows probe build path provided via MinGW/WSL2.
+- Remote endpoint parser: IPv4 + native IPv6 endpoint syntax supported across Pi/backend + Linux/macOS/Windows probe clients.
+- Remote failure behavior: fail-closed validated (offline unit on unreachable/wrong endpoint; emulator stays up).
 
 ## Task Board
 
@@ -69,9 +71,14 @@ Track the staged migration of `piscsi64` to a backend-driven SCSI architecture, 
 - [x] Add utilities: `piscsi64-remote-server` + `piscsi64-remote-client`.
 - [x] Add native Windows probe-client source (`piscsi64_remote_client_win.c`).
 - [x] Add TLS-PSK encrypted transport for remote control and data path.
+- [x] Add native IPv6 endpoint support in remote parser and tools.
 - [ ] Multi-export config file support and per-export ACLs/tokens.
 - [ ] Windows-native server implementation (service model).
 - [x] Strong auth/TLS transport hardening.
+
+### Step 8: Unit/LUN Scaling
+- [ ] Investigate and resolve SCSI ID `>=7` access limitations on current branch (`hotfix/fixpiscsi64_id_issue`).
+- [ ] If unresolved by unit-ID path, implement multiple-LUN exposure strategy per SCSI ID.
 
 ## Config Examples (target state)
 - `setvar piscsi64_0 disk:../disks/system.hdf`

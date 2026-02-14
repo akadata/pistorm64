@@ -27,6 +27,14 @@ Supported backend forms:
   - `setvar piscsi64_3 cdrom:../AmigaOS39.iso`
 - Remote:
   - `setvar piscsi64_6 remote:token@172.16.0.2:4964/remotewb,mode=rw`
+  - `setvar piscsi64_7 remote:token@[2001:db8::10]:4964/remotewb,mode=rw`
+
+IPv6 note:
+
+- If a port is specified with an IPv6 literal, use bracket form:
+  - `remote:token@[2001:db8::10]:4964/export`
+- Without explicit port (defaults to `4964`), bare IPv6 is accepted:
+  - `remote:token@2001:db8::10/export`
 
 Mode option:
 
@@ -44,6 +52,13 @@ Remote backend now uses TLS-PSK transport.
 - Token is not sent in protocol payload.
 
 Current implementation uses TLS 1.2 PSK ciphers.
+
+Operational notes:
+
+- Native dual-stack endpoint support is available (IPv4 + IPv6).
+- If a remote endpoint is down/misconfigured, the emulator continues and the unit remains offline.
+- Wrong token/export/port will fail-closed (no accidental media attach).
+- If running multiple `piscsi64-remote` instances, each must use a distinct port and matching Pi config spec.
 
 Expected logs:
 

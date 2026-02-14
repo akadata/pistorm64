@@ -444,25 +444,63 @@ static int piscsi64_parse_remote_endpoint(const char *spec,
     }
 
     uint16_t port = PISCSI64_REMOTE_DEFAULT_PORT;
-    char *colon = strrchr(hostpart, ':');
-    if (colon) {
-        *colon = '\0';
-        long p = strtol(colon + 1, NULL, 10);
-        if (p <= 0 || p > 65535) {
+    char hostbuf[128];
+    hostbuf[0] = '\0';
+
+    if (hostpart[0] == '[') {
+        char *rb = strchr(hostpart + 1, ']');
+        if (!rb) {
             return -1;
         }
-        port = (uint16_t)p;
+        *rb = '\0';
+        size_t host_part_len = strlen(hostpart + 1);
+        if (host_part_len == 0 || host_part_len >= sizeof(hostbuf)) {
+            return -1;
+        }
+        memcpy(hostbuf, hostpart + 1, host_part_len + 1);
+        if (rb[1] != '\0') {
+            if (rb[1] != ':') {
+                return -1;
+            }
+            char *endp = NULL;
+            unsigned long p = strtoul(rb + 2, &endp, 10);
+            if (!endp || *endp != '\0' || p == 0 || p > 65535ul) {
+                return -1;
+            }
+            port = (uint16_t)p;
+        }
+    } else {
+        int colon_count = 0;
+        for (char *p = hostpart; *p; ++p) {
+            if (*p == ':') {
+                colon_count++;
+            }
+        }
+        if (colon_count == 1) {
+            char *colon = strrchr(hostpart, ':');
+            *colon = '\0';
+            char *endp = NULL;
+            unsigned long p = strtoul(colon + 1, &endp, 10);
+            if (!endp || *endp != '\0' || p == 0 || p > 65535ul) {
+                return -1;
+            }
+            port = (uint16_t)p;
+        } else if (colon_count > 1) {
+            /* Bare IPv6 literal with default port. */
+        }
+
+        size_t host_part_len = strlen(hostpart);
+        if (host_part_len == 0 || host_part_len >= sizeof(hostbuf)) {
+            return -1;
+        }
+        memcpy(hostbuf, hostpart, host_part_len + 1);
     }
 
-    if (!hostpart[0]) {
-        return -1;
-    }
-
-    size_t host_part_len = strlen(hostpart);
+    size_t host_part_len = strlen(hostbuf);
     if (host_len == 0 || host_part_len >= host_len) {
         return -1;
     }
-    memcpy(host, hostpart, host_part_len + 1);
+    memcpy(host, hostbuf, host_part_len + 1);
     *port_out = port;
     return 0;
 }

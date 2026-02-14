@@ -6,6 +6,7 @@ This page is the top-level documentation entry for this repository.
 
 - PiSCSI64 is live and is now the active storage path.
 - Remote PiSCSI64 mount and boot over 1Gb Ethernet is validated.
+- PiSCSI64 remote endpoints are validated on native IPv4 and native IPv6.
 - PiSCSI64 CD-ROM mounts from ISO are validated (`cdrom:` + `pi-scsi64.device` + `CDFileSystem`).
 - Dhrystone performance has passed the 64,000 mark on the validated Pi4 path.
 - RTG is usable, but there is a known window-decoration issue still being worked.

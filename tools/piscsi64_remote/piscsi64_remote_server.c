@@ -140,9 +140,16 @@ static void peer_to_string(int fd, char *out, size_t out_len)
         return;
     }
     size_t pos = 0;
+    int host_has_colon = strchr(host, ':') != NULL;
+    if (host_has_colon && (pos + 1) < out_len) {
+        out[pos++] = '[';
+    }
     const char *src = host;
     while (*src && (pos + 1) < out_len) {
         out[pos++] = *src++;
+    }
+    if (host_has_colon && (pos + 1) < out_len) {
+        out[pos++] = ']';
     }
     if ((pos + 1) < out_len) {
         out[pos++] = ':';
@@ -266,6 +273,20 @@ static uint64_t detect_size_bytes(int fd)
     return 0;
 }
 
+static int parse_port_u16(const char *s, uint16_t *port_out)
+{
+    if (!s || !*s || !port_out) {
+        return -1;
+    }
+    char *endp = NULL;
+    unsigned long p = strtoul(s, &endp, 10);
+    if (!endp || *endp != '\0' || p == 0 || p > 65535ul) {
+        return -1;
+    }
+    *port_out = (uint16_t)p;
+    return 0;
+}
+
 static int parse_host_port(const char *in, char *host, size_t host_len, uint16_t *port)
 {
     if (!in || !host || !port) {
@@ -278,28 +299,49 @@ static int parse_host_port(const char *in, char *host, size_t host_len, uint16_t
         return -1;
     }
     memcpy(tmp, in, in_len + 1);
-    char *colon = strrchr(tmp, ':');
-    if (!colon) {
-        size_t host_part_len = strlen(tmp);
+    *port = PS64_REMOTE_DEFAULT_PORT;
+
+    if (tmp[0] == '[') {
+        char *rb = strchr(tmp + 1, ']');
+        if (!rb) {
+            return -1;
+        }
+        *rb = '\0';
+        size_t host_part_len = strlen(tmp + 1);
         if (host_part_len == 0 || host_part_len >= host_len) {
             return -1;
         }
-        memcpy(host, tmp, host_part_len + 1);
-        *port = PS64_REMOTE_DEFAULT_PORT;
-        return 0;
+        memcpy(host, tmp + 1, host_part_len + 1);
+        if (rb[1] == '\0') {
+            return 0;
+        }
+        if (rb[1] != ':') {
+            return -1;
+        }
+        return parse_port_u16(rb + 2, port);
     }
 
-    *colon = '\0';
-    long p = strtol(colon + 1, NULL, 10);
-    if (p <= 0 || p > 65535) {
-        return -1;
+    int colon_count = 0;
+    for (char *p = tmp; *p; ++p) {
+        if (*p == ':') {
+            colon_count++;
+        }
     }
+    if (colon_count == 1) {
+        char *colon = strrchr(tmp, ':');
+        *colon = '\0';
+        if (parse_port_u16(colon + 1, port) != 0) {
+            return -1;
+        }
+    } else if (colon_count > 1) {
+        /* Bare IPv6 literal with default port. */
+    }
+
     size_t host_part_len = strlen(tmp);
     if (host_part_len == 0 || host_part_len >= host_len) {
         return -1;
     }
     memcpy(host, tmp, host_part_len + 1);
-    *port = (uint16_t)p;
     return 0;
 }
 
@@ -370,7 +412,7 @@ static int parse_args(int argc, char **argv, server_cfg_t *cfg)
 static void usage(const char *argv0)
 {
     fprintf(stderr,
-            "Usage: %s --export NAME --path PATH --token TOKEN [--listen HOST:PORT] [--mode ro|rw] [--kind disk|cdrom] [--block-size N]\n",
+            "Usage: %s --export NAME --path PATH --token TOKEN [--listen HOST[:PORT]|[IPv6]:PORT] [--mode ro|rw] [--kind disk|cdrom] [--block-size N]\n",
             argv0);
 }
 
@@ -709,8 +751,11 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    printf("[piscsi64-remote] listen=%s:%u export=%s path=%s mode=%s kind=%s block=%u\n",
+    int host_has_colon = strchr(cfg.listen_host, ':') != NULL;
+    printf("[piscsi64-remote] listen=%s%s%s:%u export=%s path=%s mode=%s kind=%s block=%u\n",
+           host_has_colon ? "[" : "",
            cfg.listen_host,
+           host_has_colon ? "]" : "",
            (unsigned int)cfg.listen_port,
            cfg.export_name,
            cfg.path,
