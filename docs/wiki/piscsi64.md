@@ -163,7 +163,8 @@ Notes:
 - `cdrom:` remains effectively read-only.
 - Remote FSHD extraction from backing media is not enabled yet; existing fs handler flow is unchanged.
 - Remote liveness is probe-polled (PING) and offline is forced on disconnect-class failures.
-- Remote READ/WRITE payloads are AES-encrypted using a key derived from token + handshake nonces.
+- Remote transport is TLS-PSK encrypted end-to-end (headers + payload, current implementation using TLS 1.2 PSK ciphers).
+- Token is used as PSK material and is not sent in clear in protocol payload.
 
 ## Remote Boot Milestone
 
@@ -265,7 +266,7 @@ Built from repo root:
 Server example (Linux/Unix):
 
 ```sh
-./piscsi64-remote \
+./out/piscsi64-remote \
   --listen 0.0.0.0:4964 \
   --export workbench \
   --path /dev/disk/by-id/usb-EXAMPLE \
@@ -276,10 +277,15 @@ Server example (Linux/Unix):
 Client probe example:
 
 ```sh
-./piscsi64-remote-client 192.168.1.50:4964 workbench token 0 512
+./out/piscsi64-remote-client 192.168.1.50:4964 workbench token 0 512
 ```
 
 Probe client is optional and only for diagnostics; normal operation only needs the remote service plus `remote:...` mapping in Pi config.
+
+Transport security note:
+
+- Remote connection is TLS-PSK encrypted.
+- Token is used for PSK authentication and not sent in protocol payload.
 
 Windows utility path:
 
@@ -287,6 +293,7 @@ Windows utility path:
   - `tools/piscsi64_remote/piscsi64_remote_client_win.c`
 - Build with MSVC:
   - `cl /O2 /W3 tools\\piscsi64_remote\\piscsi64_remote_client_win.c ws2_32.lib libcrypto.lib`
+- Windows probe source currently targets the pre-TLS protocol and needs TLS-PSK update.
 - Native Windows daemon/service support is planned as a follow-on phase.
 
 ## Validation Flow (Each Step)

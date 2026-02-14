@@ -50,11 +50,11 @@ CD-ROM export example:
   --kind cdrom
 ```
 
-Remote payload encryption:
+Remote transport security:
 
 - Token is required (`--token`) for the server and for `remote:token@host:port/export` on Pi side.
-- Data payloads for READ/WRITE are AES-CTR encrypted with a session key derived from token + handshake nonces.
-- Without the token, wire payloads are not readable.
+- Connection uses TLS-PSK (current implementation: TLS 1.2 PSK ciphers); protocol headers and payload are encrypted in transit.
+- Token is used for PSK authentication and is not sent in protocol payload.
 
 ## Client Probe
 
@@ -81,5 +81,6 @@ setvar piscsi64_8 cdrom:remote:token@192.168.1.50:4964/os39iso
   - `cl /O2 /W3 tools\\piscsi64_remote\\piscsi64_remote_client_win.c ws2_32.lib libcrypto.lib`
 - Usage:
   - `piscsi64_remote_client_win.exe 192.168.1.50 workbench token 0 512`
+- The Windows probe source currently targets the pre-TLS protocol and needs updating for TLS-PSK endpoints.
 
 Windows-native remote server/service support is still a planned follow-on phase.

@@ -1,89 +1,131 @@
-# PiSCSI Interface/Device driver for Amiga
+# PiSCSI64 (Current)
 
-A high performance replacement for scsi.device, allowing automatic booting and mounting of raw hard disk (RDB/RDSK) images.
+This directory contains the active PiSCSI64 backend and Amiga boot/device components for PiStorm64.
 
-While this driver is considered mostly stable, you should not use it in conjunction with any critical one of a kind data that you need to survive.
+PiSCSI64 is the current storage path. Legacy `piscsi` remains for compatibility/maintenance only.
 
-# Compatibility
+## Core Model
 
-* PiSCSI **requires** some Fast RAM to be mapped on your PiStorm to work.
-  * This may change at some point, but for now make sure that you configure at the very least a few megabytes of Fast RAM so that the boot ROM can load and initialize properly.
-* PiSCSI **requires** emulation of a 32-bit CPU to be used. It will not work when using 68000, 68010 or 68EC020 emulation.
-* Theoretically, PiSCSI should now be compatible with any block size up to 64KB, but this is not very thoroughly tested when you are reading this particular piece of text.
-* Autobooting, Kickstart 2.0 and up
-  * PiSCSI does NOT work with Kickstart 1.3 yet, as it is missing some code needed to properly add boot nodes with old Kickstarts.
-  * Enabling PiSCSI without mapping any drives on 1.3 will however give you 128MB of Fast RAM, as long as you leave the default Z3 Fast RAM mapping enabled.
-* Mounting RDSK/RDB disk images, physical devices with a file system the Amiga can use
-  * PiSCSI **does NOT** work with **specifically UAE single partition** disk images prepared and formatted using WinUAE yet. You can check what type the disk image is using a hex editor, if it starts with `RDSK`, it is a full drive RDSK/RDB image, if it starts with `DOS` it is most likely a UAE single partition disk image.
-  * It **does** however work with any UAE disk image prepared using the **Full drive/RDB mode** selected in the Hardfile settings. Using **Full drive/RDB mode** in for instance WinUAE requires you to click the button labeled with this exact piece of text.
-  * When mounting a physical drive for use with PiSCSI, please read the `A big word of caution` at the bottom of this page
-* TrackDisk, TrackDisk64 and Direct SCSI
+- Controller: `setvar piscsi64`
+- Units: `piscsi64_1` to `piscsi64_15` (`piscsi64_0` is reserved for controller identity)
+- Amiga device name: `pi-scsi64.device`
+- Boot ROM: `src/platforms/amiga/piscsi64/piscsi64.rom`
 
-# Instructions
+Amiga sees normal SCSI-style devices. Pi side chooses backend type per unit.
 
-To use the PiSCSI64 interface, enable it with `setvar piscsi64` in your config file.
+## Backends and Spec Prefixes
 
-Add disk images with `setvar piscsi64_1 ...` through `setvar piscsi64_15 ...` and point each entry to the image you want to use.
+Supported backend forms:
 
-Physical drives can also be mounted using their mount point files on Linux, such as `/dev/sda` for a USB stick, but keep in mind that this is dangerous as it can destroy the contents of the disk if you're unluck or you repartition it.
+- File-backed image (default):
+  - `setvar piscsi64_1 /opt/Amiga/hdf/workbench.hdf`
+- Forced disk semantics:
+  - `setvar piscsi64_2 disk:/opt/Amiga/hdf/data.hdf`
+- Block node:
+  - `setvar piscsi64_5 disk:/dev/disk/by-id/usb-EXAMPLE`
+- CD-ROM:
+  - `setvar piscsi64_3 cdrom:../AmigaOS39.iso`
+- Remote:
+  - `setvar piscsi64_6 remote:token@172.16.0.2:4964/remotewb,mode=rw`
 
-You can mount up to 15 disk images with `piscsi64_1` through `piscsi64_15` (`piscsi64_0` is reserved for controller identity).
+Mode option:
 
-For preparing a disk image **on your Amiga with a PiStorm connected**, you can for instance make a copy of the Workbench tool `HDToolBox`, and then edit the tooltypes (`Icon -> Information` menu) to use `pi-scsi64.device` instead of `scsi.device`.
+- Append `,mode=ro` or `,mode=rw`
+- Safety defaults:
+  - block and remote default to `ro`
+  - `cdrom:` is read-only
 
-**No copying of the pi-scsi64.device driver to `DEVS:` or anything like that is necessary, as the driver is loaded from ROM on boot/config time.**
+## Remote Transport Security
 
-If you want EVEN MORE speed, either adjust the size of your hard drive image so that it gets properly detected with 16 heads in HDToolBox or manually edit the Cylinders/Heads settings when setting up your drive. Creating a disk image that is a multiple of **504 megabytes** seems suitable for this purpose.
+Remote backend now uses TLS-PSK transport.
 
-(The trackdisk device on the Amiga seems to enable transfers bigger than 512 bytes (one sector) only if the drive is identified as having more than one drive head/surface.)
+- Protocol headers and payload are encrypted in transit.
+- Token is used for PSK authentication material.
+- Token is not sent in protocol payload.
 
-# Making changes to the driver
+Current implementation uses TLS 1.2 PSK ciphers.
 
-If you make changes to the driver, you can always test these on the Amiga as a regular file in `DEVS:`. For this fallback path, disable the Z3 PiSCSI64 registration call (`z3_piscsi64_register();`) in `src/platforms/amiga/amiga-platform.c`.
+Expected logs:
 
-Steps to create an updated boot ROM, all of these are done in the `device_driver_amiga` directory:
+- Pi side:
+  - `[PISCSI64-REMOTE] Unit X TLS established: version=... cipher=... bits=...`
+- Remote server:
+  - `[piscsi64-remote] tls client=... version=... cipher=... bits=...`
 
-* (Optional) If you've made changes to bootrom.s, first run `./build.sh`.
-* (Optional) If you've had build.sh create a new `bootrom` file, you need to chop off the first few bytes of it, since VASM adds a single hunk to the beginning of it. Simply delete all bytes up until you bump into the value `0x90`, this is the first value in the boot ROM identifier.
-* Compile the new `pi-scsi64.device` using `./build2.sh` (builds `pi-scsi64.device`).
-* (Optional) If you haven't previously compiled the `makerom` binary, or the code for it has been updated since last time, simply run `gcc makerom.c -o makerom`
-* Run `./makerom` to assemble the boot ROM file, it's automatically in the correct place for the emulator to find it.
+## HDToolBox and DOSDriver Notes
 
-# Some quick instructions for mounting a FAT32 disk image or disk using PiSCSI
+- For hard disks in HDToolBox, use `pi-scsi64.device` (not `scsi.device`).
+- CD-ROM targets are not RDB disks; mount with `CDFileSystem` using `Device=pi-scsi64.device`.
 
-* Download giggledisk from http://www.geit.de/eng_giggledisk.html or https://aminet.net/package/disk/misc/giggledisk to make MountLists for attached devices.
-  Place the giggledisk binary in `C:` or something so that it's available in the search path.
-* It might be a good idea to have fat95 installed on your Amiga, in case you want to use FAT32 images or other file systems that fat95 can handle: https://aminet.net/package/disk/misc/fat95
+Boot priority caution:
 
-Now open a new CLI, and type something like:
-`giggledisk device=pi-scsi64.device unit=1 to=RAM:PI1`
+- Do not mark test/removable media bootable unless intended.
+- A higher boot priority disk can unexpectedly take over boot.
 
-This will create a MountList file called `PI0` on the RAM disk, which contains almost all the information needed to mount the drive and its partitions in Workbench.  
-For `unit=`, the value corresponds to your config variable suffix: `piscsi64_1` -> `unit=1`, ... `piscsi64_15` -> `unit=15`. Unit 0 is reserved.
+## Runtime Media Behavior
 
-You'll have to start up your favorite (or least hated) text editor and change the contents of the file a bit.
+- PiSCSI64 tracks media online/offline status.
+- Disconnect-class failures force unit offline.
+- Runtime eject/insert commands are supported for configured units.
 
-Above the `FileSystem` line, you'll notice a drive identifier. This line might say something along the lines of `DH0` or `PDH0`, etc, and it must be removed, otherwise the file can't be parsed.
+## Building
 
-The `FileSystem` line will usually be empty, so you have to fill this out yourself. For instance, you can set it to something like `L:FastFileSystem` to use the standard file system for the drive, or `L:fat95` in case the image is in a format that fat95 can handle.
+### Emulator
 
-Thus, an edited line would look something like `FileSystem       = L:FastFileSystem`  
-Or `FileSystem       = L:fat95` in the case of a FAT32 drive.
+From repo root:
 
-If the MountList has several partitions listed in it, it must be split up into separate files for all partitions to be mounted.
+```sh
+make -j4 emulator
+```
 
-Once you've edited a MountList file, simply copy/move it to `SYS:Devs/DOSDrivers`, and the drive will be mounted automatically the next time you boot into Workbench.
+### Remote tools
 
-If you don't want it to be mounted automatically, simply use the `Mount` command from CLI.
+From repo root:
 
-# Amiga Fast File System (AFFS) considerations
+```sh
+make piscsi64-remote
+make piscsi64-remote-server
+make piscsi64-remote-client
+```
 
-The AmigaOS 3.2 installation instructions instruct users to enable the "Direct SCSI transfer" option for each partition.  While this is supported performance will be marginally faster if you leave this option disabled.
+Or in `tools/piscsi64_remote`:
 
-MaxTransfer can be left default or set to the traditional IDE maximum theoretical setting `0x1FE00`.
+```sh
+make
+```
 
-# A big word of caution
+### Amiga ROM/device artifacts
 
-While the PiSCSI interface can be used to mount physical drives that are available as block device nodes on the Pi, you should not do this unless you are absolutely sure what you're doing.
+In `src/platforms/amiga/piscsi64/device_driver_amiga`:
 
-Directly mounting a block device connected to the Pi may corrupt or destroy the data on the device, depending on what you or the file system drivers do with this disk on the Amiga side.
+```sh
+make
+make install
+```
+
+`make install` copies:
+
+- `pi-scsi64.device` -> `/opt/pistorm64/data/a314-shared/pi-scsi64.device`
+- `piscsi64.rom` -> `/opt/pistorm64/src/platforms/amiga/piscsi64/piscsi64.rom`
+
+## Permissions and Safety
+
+For `/dev/...` mappings, emulator user must have permission to open block nodes.
+
+Common failure:
+
+- `errno=13` permission denied on `/dev/disk/by-id/...`
+
+Use group/udev policy from repo (`etc/udev/99-pistorm.rules`) or run with suitable privileges for testing.
+
+Never map unknown physical disks RW unless you accept destructive risk.
+
+## Documentation
+
+Primary user-facing documentation:
+
+- `docs/wiki/piscsi64.md`
+
+Implementation tracking:
+
+- `SCSI64TASKS.md`

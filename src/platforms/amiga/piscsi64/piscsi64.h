@@ -108,6 +108,8 @@ struct piscsi64_dev {
     uint8_t remote_crypto_enabled;
     uint8_t remote_key[32];
     uint8_t remote_iv[16];
+    void *remote_tls_ctx;
+    void *remote_tls;
     uint32_t remote_block_size;
     uint8_t remote_media_kind;
     enum piscsi64_backend_type backend_type;

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include <limits.h>
 #include <stddef.h>
 #include <time.h>
 #include <fcntl.h>
@@ -22,8 +23,8 @@
 #include <sys/ioctl.h>
 #include <linux/fs.h>
 #endif
-#include <openssl/evp.h>
 #include <openssl/rand.h>
+#include <openssl/ssl.h>
 
 #include "m68k.h"
 #include "config_file/config_file.h"
@@ -296,106 +297,43 @@ static uint64_t piscsi64_now_ms(void)
     return ((uint64_t)ts.tv_sec * 1000ull) + (uint64_t)(ts.tv_nsec / 1000000ull);
 }
 
-static int piscsi64_remote_derive_crypto(const char *token,
-                                         const uint8_t client_nonce[16],
-                                         const uint8_t server_nonce[16],
-                                         uint8_t key_out[32],
-                                         uint8_t iv_out[16])
+typedef struct piscsi64_tls_psk_client_data {
+    char identity[128];
+    char token[128];
+} piscsi64_tls_psk_client_data_t;
+
+static unsigned int piscsi64_tls_psk_client_cb(SSL *ssl, const char *hint,
+                                               char *identity, unsigned int max_identity_len,
+                                               unsigned char *psk, unsigned int max_psk_len)
 {
-    if (!token || !token[0] || !client_nonce || !server_nonce || !key_out || !iv_out) {
-        errno = EINVAL;
-        return -1;
+    (void)hint;
+    const piscsi64_tls_psk_client_data_t *psk_data =
+        (const piscsi64_tls_psk_client_data_t *)SSL_get_app_data(ssl);
+    if (!psk_data || !psk_data->token[0] || !psk_data->identity[0]) {
+        return 0;
     }
-
-    EVP_MD_CTX *ctx = NULL;
-    unsigned int digest_len = 0;
-    uint8_t digest[32];
-
-    ctx = EVP_MD_CTX_new();
-    if (!ctx) {
-        errno = ENOMEM;
-        return -1;
+    size_t id_len = strlen(psk_data->identity);
+    size_t key_len = strlen(psk_data->token);
+    if (id_len == 0 || key_len == 0 || id_len + 1 > max_identity_len || key_len > max_psk_len) {
+        return 0;
     }
-    if (EVP_DigestInit_ex(ctx, EVP_sha256(), NULL) != 1 ||
-        EVP_DigestUpdate(ctx, token, strlen(token)) != 1 ||
-        EVP_DigestUpdate(ctx, client_nonce, 16) != 1 ||
-        EVP_DigestUpdate(ctx, server_nonce, 16) != 1 ||
-        EVP_DigestFinal_ex(ctx, digest, &digest_len) != 1 ||
-        digest_len != sizeof(digest)) {
-        EVP_MD_CTX_free(ctx);
-        errno = EIO;
-        return -1;
-    }
-    EVP_MD_CTX_free(ctx);
-    memcpy(key_out, digest, 32);
-
-    ctx = EVP_MD_CTX_new();
-    if (!ctx) {
-        errno = ENOMEM;
-        return -1;
-    }
-    if (EVP_DigestInit_ex(ctx, EVP_sha256(), NULL) != 1 ||
-        EVP_DigestUpdate(ctx, server_nonce, 16) != 1 ||
-        EVP_DigestUpdate(ctx, client_nonce, 16) != 1 ||
-        EVP_DigestUpdate(ctx, token, strlen(token)) != 1 ||
-        EVP_DigestFinal_ex(ctx, digest, &digest_len) != 1 ||
-        digest_len != sizeof(digest)) {
-        EVP_MD_CTX_free(ctx);
-        errno = EIO;
-        return -1;
-    }
-    EVP_MD_CTX_free(ctx);
-    memcpy(iv_out, digest, 16);
-    return 0;
+    memcpy(identity, psk_data->identity, id_len + 1);
+    memcpy(psk, psk_data->token, key_len);
+    return (unsigned int)key_len;
 }
 
-static int piscsi64_remote_crypt_ctr(const uint8_t key[32], const uint8_t iv_base[16],
-                                     uint64_t counter, const uint8_t *in, uint8_t *out,
-                                     uint32_t len)
-{
-    EVP_CIPHER_CTX *ctx = NULL;
-    uint8_t iv[16];
-    int outl = 0;
-    int finl = 0;
-    uint64_t ctr_be = htobe64(counter);
-
-    if (!key || !iv_base || !in || !out) {
-        errno = EINVAL;
-        return -1;
-    }
-
-    memcpy(iv, iv_base, sizeof(iv));
-    memcpy(iv + 8, &ctr_be, sizeof(ctr_be));
-
-    ctx = EVP_CIPHER_CTX_new();
-    if (!ctx) {
-        errno = ENOMEM;
-        return -1;
-    }
-    if (EVP_EncryptInit_ex(ctx, EVP_aes_256_ctr(), NULL, key, iv) != 1 ||
-        EVP_EncryptUpdate(ctx, out, &outl, in, (int)len) != 1 ||
-        EVP_EncryptFinal_ex(ctx, out + outl, &finl) != 1) {
-        EVP_CIPHER_CTX_free(ctx);
-        errno = EIO;
-        return -1;
-    }
-    EVP_CIPHER_CTX_free(ctx);
-    return 0;
-}
-
-static int piscsi64_send_all(int fd, const void *buf, size_t len)
+static int piscsi64_tls_send_all(SSL *ssl, const void *buf, size_t len)
 {
     const uint8_t *p = (const uint8_t *)buf;
     while (len > 0) {
-        ssize_t n = send(fd, p, len, 0);
-        if (n < 0) {
-            if (errno == EINTR) {
+        int chunk = (len > (size_t)INT_MAX) ? INT_MAX : (int)len;
+        int n = SSL_write(ssl, p, chunk);
+        if (n <= 0) {
+            int e = SSL_get_error(ssl, n);
+            if (e == SSL_ERROR_WANT_READ || e == SSL_ERROR_WANT_WRITE) {
                 continue;
             }
-            return -1;
-        }
-        if (n == 0) {
-            errno = EPIPE;
+            errno = EIO;
             return -1;
         }
         p += (size_t)n;
@@ -404,18 +342,17 @@ static int piscsi64_send_all(int fd, const void *buf, size_t len)
     return 0;
 }
 
-static int piscsi64_recv_all(int fd, void *buf, size_t len)
+static int piscsi64_tls_recv_all(SSL *ssl, void *buf, size_t len)
 {
     uint8_t *p = (uint8_t *)buf;
     while (len > 0) {
-        ssize_t n = recv(fd, p, len, 0);
-        if (n < 0) {
-            if (errno == EINTR) {
+        int chunk = (len > (size_t)INT_MAX) ? INT_MAX : (int)len;
+        int n = SSL_read(ssl, p, chunk);
+        if (n <= 0) {
+            int e = SSL_get_error(ssl, n);
+            if (e == SSL_ERROR_WANT_READ || e == SSL_ERROR_WANT_WRITE) {
                 continue;
             }
-            return -1;
-        }
-        if (n == 0) {
             errno = ENOTCONN;
             return -1;
         }
@@ -513,6 +450,11 @@ static int piscsi64_parse_remote_endpoint(const char *spec,
 static int piscsi64_remote_send_req(struct piscsi64_dev *d, uint16_t op,
                                     uint64_t offset, uint32_t length)
 {
+    SSL *ssl = (SSL *)d->remote_tls;
+    if (!ssl) {
+        errno = ENOTCONN;
+        return -1;
+    }
     piscsi64_remote_io_req_t req;
     req.magic_be = htobe32(PISCSI64_REMOTE_MAGIC_IOREQ);
     req.version_be = htobe16(PISCSI64_REMOTE_VERSION);
@@ -520,12 +462,17 @@ static int piscsi64_remote_send_req(struct piscsi64_dev *d, uint16_t op,
     req.offset_be = htobe64(offset);
     req.length_be = htobe32(length);
     req.reserved_be = 0;
-    return piscsi64_send_all(d->remote_sock, &req, sizeof(req));
+    return piscsi64_tls_send_all(ssl, &req, sizeof(req));
 }
 
 static int piscsi64_remote_recv_rsp(struct piscsi64_dev *d, piscsi64_remote_io_rsp_t *rsp)
 {
-    if (piscsi64_recv_all(d->remote_sock, rsp, sizeof(*rsp)) != 0) {
+    SSL *ssl = (SSL *)d->remote_tls;
+    if (!ssl) {
+        errno = ENOTCONN;
+        return -1;
+    }
+    if (piscsi64_tls_recv_all(ssl, rsp, sizeof(*rsp)) != 0) {
         return -1;
     }
     if (be32toh(rsp->magic_be) != PISCSI64_REMOTE_MAGIC_IORSP ||
@@ -542,7 +489,7 @@ static int piscsi64_remote_connect(int unit_index, const char *spec, int req_rw,
                                    uint32_t *block_size_out,
                                    uint8_t *media_kind_out,
                                    uint8_t *read_only_out,
-                                   uint8_t *key_out, uint8_t *iv_out)
+                                   void **tls_ctx_out, void **tls_out)
 {
     uint64_t t_start_ms = piscsi64_now_ms();
     char token[128];
@@ -611,6 +558,53 @@ static int piscsi64_remote_connect(int unit_index, const char *spec, int req_rw,
     (void)setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
     (void)setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
 
+    SSL_CTX *tls_ctx = SSL_CTX_new(TLS_client_method());
+    if (!tls_ctx) {
+        close(sock);
+        errno = EIO;
+        return -1;
+    }
+    if (SSL_CTX_set_min_proto_version(tls_ctx, TLS1_2_VERSION) != 1 ||
+        SSL_CTX_set_max_proto_version(tls_ctx, TLS1_2_VERSION) != 1 ||
+        SSL_CTX_set_cipher_list(tls_ctx, "PSK-AES256-GCM-SHA384:PSK-AES128-GCM-SHA256") != 1) {
+        SSL_CTX_free(tls_ctx);
+        close(sock);
+        errno = EIO;
+        return -1;
+    }
+    SSL_CTX_set_psk_client_callback(tls_ctx, piscsi64_tls_psk_client_cb);
+    SSL *ssl = SSL_new(tls_ctx);
+    if (!ssl) {
+        SSL_CTX_free(tls_ctx);
+        close(sock);
+        errno = EIO;
+        return -1;
+    }
+    piscsi64_tls_psk_client_data_t psk_data;
+    memset(&psk_data, 0, sizeof(psk_data));
+    snprintf(psk_data.identity, sizeof(psk_data.identity), "%s", export_name);
+    snprintf(psk_data.token, sizeof(psk_data.token), "%s", token);
+    SSL_set_app_data(ssl, &psk_data);
+    SSL_set_fd(ssl, sock);
+    if (SSL_connect(ssl) <= 0) {
+        SSL_free(ssl);
+        SSL_CTX_free(tls_ctx);
+        close(sock);
+        errno = EACCES;
+        return -1;
+    }
+    {
+        int bits = 0;
+        const char *tls_ver = SSL_get_version(ssl);
+        const char *tls_cipher = SSL_get_cipher_name(ssl);
+        bits = SSL_get_cipher_bits(ssl, NULL);
+        LOG_INFO("[PISCSI64-REMOTE] Unit %d TLS established: version=%s cipher=%s bits=%d\n",
+                 unit_index,
+                 tls_ver ? tls_ver : "unknown",
+                 tls_cipher ? tls_cipher : "unknown",
+                 bits);
+    }
+
     piscsi64_remote_hello_req_t req;
     memset(&req, 0, sizeof(req));
     if (RAND_bytes(req.client_nonce, sizeof(req.client_nonce)) != 1) {
@@ -629,26 +623,34 @@ static int piscsi64_remote_connect(int unit_index, const char *spec, int req_rw,
     req.magic_be = htobe32(PISCSI64_REMOTE_MAGIC_HELLO);
     req.version_be = htobe16(PISCSI64_REMOTE_VERSION);
     req.flags_be = htobe16(flags);
-    req.token_len_be = htobe16((uint16_t)strlen(token));
+    req.token_len_be = htobe16(0);
     req.export_len_be = htobe16((uint16_t)strlen(export_name));
 
-    if (piscsi64_send_all(sock, &req, sizeof(req)) != 0 ||
-        (token[0] && piscsi64_send_all(sock, token, strlen(token)) != 0) ||
-        (export_name[0] && piscsi64_send_all(sock, export_name, strlen(export_name)) != 0)) {
+    if (piscsi64_tls_send_all(ssl, &req, sizeof(req)) != 0 ||
+        (export_name[0] && piscsi64_tls_send_all(ssl, export_name, strlen(export_name)) != 0)) {
         LOG_ERROR("[PISCSI64-REMOTE] Unit %d hello send failed (errno=%d).\n", unit_index, errno);
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
+        SSL_CTX_free(tls_ctx);
         close(sock);
         return -1;
     }
 
     piscsi64_remote_hello_rsp_t rsp;
-    if (piscsi64_recv_all(sock, &rsp, sizeof(rsp)) != 0) {
+    if (piscsi64_tls_recv_all(ssl, &rsp, sizeof(rsp)) != 0) {
         LOG_ERROR("[PISCSI64-REMOTE] Unit %d hello recv failed (errno=%d).\n", unit_index, errno);
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
+        SSL_CTX_free(tls_ctx);
         close(sock);
         return -1;
     }
     if (be32toh(rsp.magic_be) != PISCSI64_REMOTE_MAGIC_HELLO ||
         be16toh(rsp.version_be) != PISCSI64_REMOTE_VERSION) {
         LOG_ERROR("[PISCSI64-REMOTE] Unit %d hello protocol mismatch.\n", unit_index);
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
+        SSL_CTX_free(tls_ctx);
         close(sock);
         errno = EPROTO;
         return -1;
@@ -657,6 +659,9 @@ static int piscsi64_remote_connect(int unit_index, const char *spec, int req_rw,
     if (status != 0) {
         LOG_ERROR("[PISCSI64-REMOTE] Unit %d hello rejected: status=%u (%s).\n",
                   unit_index, (unsigned int)status, piscsi64_remote_status_name(status));
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
+        SSL_CTX_free(tls_ctx);
         close(sock);
         errno = EACCES;
         return -1;
@@ -679,13 +684,16 @@ static int piscsi64_remote_connect(int unit_index, const char *spec, int req_rw,
     if (read_only_out) {
         *read_only_out = rsp.read_only ? 1u : 0u;
     }
-    if (key_out && iv_out) {
-        if (piscsi64_remote_derive_crypto(token, req.client_nonce, rsp.server_nonce,
-                                          key_out, iv_out) != 0) {
-            LOG_ERROR("[PISCSI64-REMOTE] Unit %d crypto setup failed.\n", unit_index);
-            close(sock);
-            return -1;
-        }
+    if (tls_ctx_out) {
+        *tls_ctx_out = tls_ctx;
+    } else {
+        SSL_CTX_free(tls_ctx);
+    }
+    if (tls_out) {
+        *tls_out = ssl;
+    } else {
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
     }
     uint64_t t_done_ms = piscsi64_now_ms();
     uint64_t elapsed_ms = (t_done_ms >= t_start_ms) ? (t_done_ms - t_start_ms) : 0;
@@ -851,17 +859,10 @@ static ssize_t piscsi64_backend_remote_pread(struct piscsi64_dev *d, void *buf, 
         errno = EPROTO;
         return -1;
     }
-    if (len && piscsi64_recv_all(d->remote_sock, buf, len) != 0) {
+    if (len && piscsi64_tls_recv_all((SSL *)d->remote_tls, buf, len) != 0) {
         DEBUG("[PISCSI64-REMOTE] Unit:%d READ payload recv failed off=0x%llX len=%u errno=%d\n",
               unit, (unsigned long long)offset, (unsigned int)len, errno);
         return -1;
-    }
-    if (len && d->remote_crypto_enabled) {
-        if (piscsi64_remote_crypt_ctr(d->remote_key, d->remote_iv, d->remote_rx_ctr,
-                                      (const uint8_t *)buf, (uint8_t *)buf, len) != 0) {
-            return -1;
-        }
-        d->remote_rx_ctr++;
     }
     uint64_t t1_ms = piscsi64_now_ms();
     uint64_t dt_ms = (t1_ms >= t0_ms) ? (t1_ms - t0_ms) : 0;
@@ -884,8 +885,6 @@ static ssize_t piscsi64_backend_remote_read(struct piscsi64_dev *d, void *buf, s
 static ssize_t piscsi64_backend_remote_write(struct piscsi64_dev *d, const void *buf, size_t count)
 {
     uint64_t t0_ms = piscsi64_now_ms();
-    uint8_t *enc_buf = NULL;
-    int send_rc = 0;
     int unit = piscsi64_unit_index(d);
 
     if (!d || d->remote_sock < 0) {
@@ -903,32 +902,10 @@ static ssize_t piscsi64_backend_remote_write(struct piscsi64_dev *d, const void 
         return -1;
     }
     if (count) {
-        const void *send_buf = buf;
-        if (d->remote_crypto_enabled) {
-            enc_buf = malloc(count);
-            if (!enc_buf) {
-                errno = ENOMEM;
-                return -1;
-            }
-            if (piscsi64_remote_crypt_ctr(d->remote_key, d->remote_iv, d->remote_tx_ctr,
-                                          (const uint8_t *)buf, enc_buf, (uint32_t)count) != 0) {
-                free(enc_buf);
-                return -1;
-            }
-            send_buf = enc_buf;
-        }
-        send_rc = piscsi64_send_all(d->remote_sock, send_buf, count);
-        if (enc_buf) {
-            free(enc_buf);
-            enc_buf = NULL;
-        }
-        if (send_rc != 0) {
+        if (piscsi64_tls_send_all((SSL *)d->remote_tls, buf, count) != 0) {
             DEBUG("[PISCSI64-REMOTE] Unit:%d WRITE payload send failed off=0x%llX len=%u errno=%d\n",
                   unit, (unsigned long long)d->remote_pos, (unsigned int)count, errno);
             return -1;
-        }
-        if (d->remote_crypto_enabled) {
-            d->remote_tx_ctr++;
         }
     }
 
@@ -1001,6 +978,15 @@ static int piscsi64_backend_remote_close(struct piscsi64_dev *d)
         return 0;
     }
     (void)piscsi64_remote_send_req(d, PISCSI64_REMOTE_OP_CLOSE, 0, 0);
+    if (d->remote_tls) {
+        SSL_shutdown((SSL *)d->remote_tls);
+        SSL_free((SSL *)d->remote_tls);
+        d->remote_tls = NULL;
+    }
+    if (d->remote_tls_ctx) {
+        SSL_CTX_free((SSL_CTX *)d->remote_tls_ctx);
+        d->remote_tls_ctx = NULL;
+    }
     close(d->remote_sock);
     d->remote_sock = -1;
     d->fd = -1;
@@ -1479,6 +1465,8 @@ static void piscsi64_clear_media_runtime(struct piscsi64_dev *d)
     d->remote_crypto_enabled = 0;
     memset(d->remote_key, 0, sizeof(d->remote_key));
     memset(d->remote_iv, 0, sizeof(d->remote_iv));
+    d->remote_tls = NULL;
+    d->remote_tls_ctx = NULL;
     d->remote_block_size = 0;
     d->remote_media_kind = PISCSI64_MEDIA_NONE;
 }
@@ -1494,6 +1482,8 @@ static void piscsi64_reset_dev(struct piscsi64_dev *d) {
     d->backend_spec[0] = '\0';
     d->configured_spec[0] = '\0';
     d->remote_sock = -1;
+    d->remote_tls = NULL;
+    d->remote_tls_ctx = NULL;
     d->media_kind = PISCSI64_MEDIA_NONE;
     d->read_only = 0;
 }
@@ -1535,6 +1525,8 @@ void piscsi64_init(void) {
         piscsi64_devs[i].remote_crypto_enabled = 0;
         memset(piscsi64_devs[i].remote_key, 0, sizeof(piscsi64_devs[i].remote_key));
         memset(piscsi64_devs[i].remote_iv, 0, sizeof(piscsi64_devs[i].remote_iv));
+        piscsi64_devs[i].remote_tls = NULL;
+        piscsi64_devs[i].remote_tls_ctx = NULL;
         piscsi64_devs[i].remote_block_size = 0;
         piscsi64_devs[i].remote_media_kind = PISCSI64_MEDIA_NONE;
         piscsi64_devs[i].backend_type = PISCSI64_BACKEND_NONE;
@@ -1954,16 +1946,14 @@ void piscsi64_map_drive(const char *spec, uint8_t index) {
     uint32_t remote_block_size = 0;
     uint8_t remote_media_kind = PISCSI64_MEDIA_NONE;
     uint8_t remote_read_only = 0;
-    uint8_t remote_key[32];
-    uint8_t remote_iv[16];
-    memset(remote_key, 0, sizeof(remote_key));
-    memset(remote_iv, 0, sizeof(remote_iv));
+    void *remote_tls_ctx = NULL;
+    void *remote_tls = NULL;
 
     if (backend_type == PISCSI64_BACKEND_REMOTE) {
         int req_rw = (media_kind != PISCSI64_MEDIA_CDROM && open_flags == O_RDWR) ? 1 : 0;
         if (piscsi64_remote_connect(index, path, req_rw, media_kind, &tmp_fd, &file_size,
                                     &remote_block_size, &remote_media_kind, &remote_read_only,
-                                    remote_key, remote_iv) != 0) {
+                                    &remote_tls_ctx, &remote_tls) != 0) {
             LOG_ERROR("[PISCSI64] Failed to connect remote backend %s for drive %d (errno=%d).\n",
                       path, index, errno);
             return;
@@ -2013,10 +2003,12 @@ void piscsi64_map_drive(const char *spec, uint8_t index) {
     d->remote_last_probe_ms = 0;
     d->remote_tx_ctr = 1;
     d->remote_rx_ctr = 1;
-    d->remote_crypto_enabled = (backend_type == PISCSI64_BACKEND_REMOTE) ? 1u : 0u;
+    d->remote_crypto_enabled = 0;
+    d->remote_tls_ctx = (backend_type == PISCSI64_BACKEND_REMOTE) ? remote_tls_ctx : NULL;
+    d->remote_tls = (backend_type == PISCSI64_BACKEND_REMOTE) ? remote_tls : NULL;
     if (backend_type == PISCSI64_BACKEND_REMOTE) {
-        memcpy(d->remote_key, remote_key, sizeof(d->remote_key));
-        memcpy(d->remote_iv, remote_iv, sizeof(d->remote_iv));
+        memset(d->remote_key, 0, sizeof(d->remote_key));
+        memset(d->remote_iv, 0, sizeof(d->remote_iv));
     } else {
         memset(d->remote_key, 0, sizeof(d->remote_key));
         memset(d->remote_iv, 0, sizeof(d->remote_iv));

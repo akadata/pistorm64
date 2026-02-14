@@ -4,7 +4,7 @@ OUT_DIR := out
 CC ?= gcc
 CFLAGS ?= -O3 -Wall -Wextra -MMD -MP
 LDFLAGS ?=
-OPENSSL_LIBS ?= -lcrypto
+OPENSSL_LIBS ?= -lssl -lcrypto
 
 SERVER_SRC := piscsi64_remote_server.c
 CLIENT_SRC := piscsi64_remote_client.c

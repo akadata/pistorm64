@@ -10,11 +10,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include <limits.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <openssl/evp.h>
 #include <openssl/rand.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 
 #ifndef htobe16
 #include <endian.h>
@@ -71,19 +73,42 @@ typedef struct __attribute__((packed)) ps64_io_rsp {
     int32_t err_be;
 } ps64_io_rsp_t;
 
-static int send_all(int fd, const void *buf, size_t len)
+typedef struct tls_psk_client_data {
+    char identity[128];
+    char token[128];
+} tls_psk_client_data_t;
+
+static unsigned int tls_psk_client_cb(SSL *ssl, const char *hint,
+                                      char *identity, unsigned int max_identity_len,
+                                      unsigned char *psk, unsigned int max_psk_len)
+{
+    (void)hint;
+    const tls_psk_client_data_t *psk_data = (const tls_psk_client_data_t *)SSL_get_app_data(ssl);
+    if (!psk_data || !psk_data->token[0] || !psk_data->identity[0]) {
+        return 0;
+    }
+    size_t id_len = strlen(psk_data->identity);
+    size_t key_len = strlen(psk_data->token);
+    if (id_len == 0 || key_len == 0 || id_len + 1 > max_identity_len || key_len > max_psk_len) {
+        return 0;
+    }
+    memcpy(identity, psk_data->identity, id_len + 1);
+    memcpy(psk, psk_data->token, key_len);
+    return (unsigned int)key_len;
+}
+
+static int tls_send_all(SSL *ssl, const void *buf, size_t len)
 {
     const uint8_t *p = (const uint8_t *)buf;
     while (len > 0) {
-        ssize_t n = send(fd, p, len, 0);
-        if (n < 0) {
-            if (errno == EINTR) {
+        int chunk = (len > (size_t)INT_MAX) ? INT_MAX : (int)len;
+        int n = SSL_write(ssl, p, chunk);
+        if (n <= 0) {
+            int e = SSL_get_error(ssl, n);
+            if (e == SSL_ERROR_WANT_READ || e == SSL_ERROR_WANT_WRITE) {
                 continue;
             }
-            return -1;
-        }
-        if (n == 0) {
-            errno = EPIPE;
+            errno = EIO;
             return -1;
         }
         p += (size_t)n;
@@ -92,97 +117,23 @@ static int send_all(int fd, const void *buf, size_t len)
     return 0;
 }
 
-static int recv_all(int fd, void *buf, size_t len)
+static int tls_recv_all(SSL *ssl, void *buf, size_t len)
 {
     uint8_t *p = (uint8_t *)buf;
     while (len > 0) {
-        ssize_t n = recv(fd, p, len, 0);
-        if (n < 0) {
-            if (errno == EINTR) {
+        int chunk = (len > (size_t)INT_MAX) ? INT_MAX : (int)len;
+        int n = SSL_read(ssl, p, chunk);
+        if (n <= 0) {
+            int e = SSL_get_error(ssl, n);
+            if (e == SSL_ERROR_WANT_READ || e == SSL_ERROR_WANT_WRITE) {
                 continue;
             }
-            return -1;
-        }
-        if (n == 0) {
             errno = ENOTCONN;
             return -1;
         }
         p += (size_t)n;
         len -= (size_t)n;
     }
-    return 0;
-}
-
-static int derive_crypto(const char *token,
-                         const uint8_t client_nonce[16],
-                         const uint8_t server_nonce[16],
-                         uint8_t key_out[32], uint8_t iv_out[16])
-{
-    EVP_MD_CTX *ctx = NULL;
-    unsigned int digest_len = 0;
-    uint8_t digest[32];
-
-    if (!token || !token[0]) {
-        return -1;
-    }
-
-    ctx = EVP_MD_CTX_new();
-    if (!ctx) {
-        return -1;
-    }
-    if (EVP_DigestInit_ex(ctx, EVP_sha256(), NULL) != 1 ||
-        EVP_DigestUpdate(ctx, token, strlen(token)) != 1 ||
-        EVP_DigestUpdate(ctx, client_nonce, 16) != 1 ||
-        EVP_DigestUpdate(ctx, server_nonce, 16) != 1 ||
-        EVP_DigestFinal_ex(ctx, digest, &digest_len) != 1 ||
-        digest_len != sizeof(digest)) {
-        EVP_MD_CTX_free(ctx);
-        return -1;
-    }
-    EVP_MD_CTX_free(ctx);
-    memcpy(key_out, digest, 32);
-
-    ctx = EVP_MD_CTX_new();
-    if (!ctx) {
-        return -1;
-    }
-    if (EVP_DigestInit_ex(ctx, EVP_sha256(), NULL) != 1 ||
-        EVP_DigestUpdate(ctx, server_nonce, 16) != 1 ||
-        EVP_DigestUpdate(ctx, client_nonce, 16) != 1 ||
-        EVP_DigestUpdate(ctx, token, strlen(token)) != 1 ||
-        EVP_DigestFinal_ex(ctx, digest, &digest_len) != 1 ||
-        digest_len != sizeof(digest)) {
-        EVP_MD_CTX_free(ctx);
-        return -1;
-    }
-    EVP_MD_CTX_free(ctx);
-    memcpy(iv_out, digest, 16);
-    return 0;
-}
-
-static int crypt_ctr(const uint8_t key[32], const uint8_t iv_base[16],
-                     uint64_t counter, const uint8_t *in, uint8_t *out, uint32_t len)
-{
-    EVP_CIPHER_CTX *ctx = NULL;
-    uint8_t iv[16];
-    int outl = 0;
-    int finl = 0;
-    uint64_t ctr_be = htobe64(counter);
-
-    memcpy(iv, iv_base, sizeof(iv));
-    memcpy(iv + 8, &ctr_be, sizeof(ctr_be));
-
-    ctx = EVP_CIPHER_CTX_new();
-    if (!ctx) {
-        return -1;
-    }
-    if (EVP_EncryptInit_ex(ctx, EVP_aes_256_ctr(), NULL, key, iv) != 1 ||
-        EVP_EncryptUpdate(ctx, out, &outl, in, (int)len) != 1 ||
-        EVP_EncryptFinal_ex(ctx, out + outl, &finl) != 1) {
-        EVP_CIPHER_CTX_free(ctx);
-        return -1;
-    }
-    EVP_CIPHER_CTX_free(ctx);
     return 0;
 }
 
@@ -255,9 +206,6 @@ int main(int argc, char **argv)
 
     const char *export_name = argv[2];
     const char *token = argv[3];
-    uint8_t key[32];
-    uint8_t iv[16];
-    uint64_t rx_ctr = 1;
     uint64_t read_offset = 0;
     uint32_t read_len = 0;
     if (argc >= 6) {
@@ -297,6 +245,52 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    SSL_CTX *tls_ctx = SSL_CTX_new(TLS_client_method());
+    if (!tls_ctx) {
+        fprintf(stderr, "TLS context init failed\n");
+        close(sock);
+        return 1;
+    }
+    if (SSL_CTX_set_min_proto_version(tls_ctx, TLS1_2_VERSION) != 1 ||
+        SSL_CTX_set_max_proto_version(tls_ctx, TLS1_2_VERSION) != 1 ||
+        SSL_CTX_set_cipher_list(tls_ctx, "PSK-AES256-GCM-SHA384:PSK-AES128-GCM-SHA256") != 1) {
+        fprintf(stderr, "TLS PSK setup failed\n");
+        SSL_CTX_free(tls_ctx);
+        close(sock);
+        return 1;
+    }
+    SSL_CTX_set_psk_client_callback(tls_ctx, tls_psk_client_cb);
+
+    SSL *ssl = SSL_new(tls_ctx);
+    if (!ssl) {
+        fprintf(stderr, "TLS session init failed\n");
+        SSL_CTX_free(tls_ctx);
+        close(sock);
+        return 1;
+    }
+    tls_psk_client_data_t psk_data;
+    memset(&psk_data, 0, sizeof(psk_data));
+    snprintf(psk_data.identity, sizeof(psk_data.identity), "%s", export_name);
+    snprintf(psk_data.token, sizeof(psk_data.token), "%s", token);
+    SSL_set_app_data(ssl, &psk_data);
+    SSL_set_fd(ssl, sock);
+    if (SSL_connect(ssl) <= 0) {
+        fprintf(stderr, "TLS handshake failed\n");
+        SSL_free(ssl);
+        SSL_CTX_free(tls_ctx);
+        close(sock);
+        return 1;
+    }
+    {
+        int bits = SSL_get_cipher_bits(ssl, NULL);
+        const char *tls_ver = SSL_get_version(ssl);
+        const char *tls_cipher = SSL_get_cipher_name(ssl);
+        printf("TLS: version=%s cipher=%s bits=%d\n",
+               tls_ver ? tls_ver : "unknown",
+               tls_cipher ? tls_cipher : "unknown",
+               bits);
+    }
+
     ps64_hello_req_t hello;
     memset(&hello, 0, sizeof(hello));
     if (RAND_bytes(hello.client_nonce, sizeof(hello.client_nonce)) != 1) {
@@ -307,37 +301,43 @@ int main(int argc, char **argv)
     hello.magic_be = htobe32(PS64_REMOTE_MAGIC_HELLO);
     hello.version_be = htobe16(PS64_REMOTE_VERSION);
     hello.flags_be = htobe16(0);
-    hello.token_len_be = htobe16((uint16_t)strlen(token));
+    hello.token_len_be = htobe16(0);
     hello.export_len_be = htobe16((uint16_t)strlen(export_name));
 
-    if (send_all(sock, &hello, sizeof(hello)) != 0 ||
-        (token[0] && send_all(sock, token, strlen(token)) != 0) ||
-        send_all(sock, export_name, strlen(export_name)) != 0) {
+    if (tls_send_all(ssl, &hello, sizeof(hello)) != 0 ||
+        tls_send_all(ssl, export_name, strlen(export_name)) != 0) {
         perror("send hello");
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
+        SSL_CTX_free(tls_ctx);
         close(sock);
         return 1;
     }
 
     ps64_hello_rsp_t rsp;
-    if (recv_all(sock, &rsp, sizeof(rsp)) != 0) {
+    if (tls_recv_all(ssl, &rsp, sizeof(rsp)) != 0) {
         perror("recv hello");
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
+        SSL_CTX_free(tls_ctx);
         close(sock);
         return 1;
     }
     if (be32toh(rsp.magic_be) != PS64_REMOTE_MAGIC_HELLO ||
         be16toh(rsp.version_be) != PS64_REMOTE_VERSION) {
         fprintf(stderr, "Invalid hello response\n");
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
+        SSL_CTX_free(tls_ctx);
         close(sock);
         return 1;
     }
     uint16_t status = be16toh(rsp.status_be);
     if (status != 0) {
         fprintf(stderr, "Server rejected request (status=%u)\n", status);
-        close(sock);
-        return 1;
-    }
-    if (derive_crypto(token, hello.client_nonce, rsp.server_nonce, key, iv) != 0) {
-        fprintf(stderr, "derive_crypto failed\n");
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
+        SSL_CTX_free(tls_ctx);
         close(sock);
         return 1;
     }
@@ -359,15 +359,21 @@ int main(int argc, char **argv)
         req.offset_be = htobe64(read_offset);
         req.length_be = htobe32(read_len);
 
-        if (send_all(sock, &req, sizeof(req)) != 0) {
+        if (tls_send_all(ssl, &req, sizeof(req)) != 0) {
             perror("send read req");
+            SSL_shutdown(ssl);
+            SSL_free(ssl);
+            SSL_CTX_free(tls_ctx);
             close(sock);
             return 1;
         }
 
         ps64_io_rsp_t r;
-        if (recv_all(sock, &r, sizeof(r)) != 0) {
+        if (tls_recv_all(ssl, &r, sizeof(r)) != 0) {
             perror("recv read rsp");
+            SSL_shutdown(ssl);
+            SSL_free(ssl);
+            SSL_CTX_free(tls_ctx);
             close(sock);
             return 1;
         }
@@ -376,29 +382,29 @@ int main(int argc, char **argv)
         uint32_t rerr = be32toh((uint32_t)r.err_be);
         if (rstatus != 0) {
             fprintf(stderr, "READ failed status=%u err=%u\n", rstatus, rerr);
+            SSL_shutdown(ssl);
+            SSL_free(ssl);
+            SSL_CTX_free(tls_ctx);
             close(sock);
             return 1;
         }
 
         uint8_t *buf = malloc(rlen);
         if (!buf) {
+            SSL_shutdown(ssl);
+            SSL_free(ssl);
+            SSL_CTX_free(tls_ctx);
             close(sock);
             return 1;
         }
-        if (recv_all(sock, buf, rlen) != 0) {
+        if (tls_recv_all(ssl, buf, rlen) != 0) {
             perror("recv read payload");
             free(buf);
+            SSL_shutdown(ssl);
+            SSL_free(ssl);
+            SSL_CTX_free(tls_ctx);
             close(sock);
             return 1;
-        }
-        if (rlen && crypt_ctr(key, iv, rx_ctr, buf, buf, rlen) != 0) {
-            fprintf(stderr, "decrypt payload failed\n");
-            free(buf);
-            close(sock);
-            return 1;
-        }
-        if (rlen) {
-            rx_ctr++;
         }
         dump_hex(buf, rlen);
         free(buf);
@@ -409,8 +415,11 @@ int main(int argc, char **argv)
     close_req.magic_be = htobe32(PS64_REMOTE_MAGIC_IOREQ);
     close_req.version_be = htobe16(PS64_REMOTE_VERSION);
     close_req.op_be = htobe16(PS64_REMOTE_OP_CLOSE);
-    (void)send_all(sock, &close_req, sizeof(close_req));
+    (void)tls_send_all(ssl, &close_req, sizeof(close_req));
 
+    SSL_shutdown(ssl);
+    SSL_free(ssl);
+    SSL_CTX_free(tls_ctx);
     close(sock);
     return 0;
 }

@@ -617,13 +617,13 @@ pistorm_truth_test: tools/pistorm_truth_test.c include/uapi/linux/pistorm.h
 	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
 
 piscsi64-remote: tools/piscsi64_remote/piscsi64_remote_server.c
-	$(CC) -MMD -MP $(CFLAGS) -o $@ $< -lcrypto
+	$(CC) -MMD -MP $(CFLAGS) -o $@ $< -lssl -lcrypto
 
 piscsi64-remote-server: tools/piscsi64_remote/piscsi64_remote_server.c
-	$(CC) -MMD -MP $(CFLAGS) -o $@ $< -lcrypto
+	$(CC) -MMD -MP $(CFLAGS) -o $@ $< -lssl -lcrypto
 
 piscsi64-remote-client: tools/piscsi64_remote/piscsi64_remote_client.c
-	$(CC) -MMD -MP $(CFLAGS) -o $@ $< -lcrypto
+	$(CC) -MMD -MP $(CFLAGS) -o $@ $< -lssl -lcrypto
 
 src/a314/a314.o: src/a314/a314.cc src/a314/a314.h
 	$(CXX) -MMD -MP -c -o src/a314/a314.o $(CXXFLAGS) $(NO_LTO_FLAGS) src/a314/a314.cc
