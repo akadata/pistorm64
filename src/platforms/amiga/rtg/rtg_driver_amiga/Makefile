@@ -8,22 +8,18 @@ AMIGA_PATH := $(AMIGA_TOOLCHAIN)/bin:$(PATH)
 M68K_GCC ?= m68k-amigaos-gcc
 P96DEV ?= ../../../../../amiga.dev/Picasso96Develop
 
-CPU ?= 020
-
+CPU ?= 040
+TARGET = pigfx.card
 ifeq ($(CPU),020)
-TARGET = PiGFX020.card
 CPUFLAG = -m68020
 endif
 ifeq ($(CPU),030)
-TARGET = PiGFX030.card
 CPUFLAG = -m68030
 endif
 ifeq ($(CPU),040)
-TARGET = PiGFX040.card
 CPUFLAG = -m68040
 endif
 ifeq ($(CPU),060)
-TARGET = PiGFX060.card
 CPUFLAG = -m68060
 endif
 
@@ -50,11 +46,11 @@ $(TARGET): $(SRC)
 	PATH="$(AMIGA_PATH)" $(M68K_GCC) $(CFLAGS) -o $@ $< $(LDFLAGS)
 
 clean:
-	rm -f PiGFX*.card
+	rm -f pigfx.card
 
 install:
-	cp PiGFX$(CPU).card /opt/pistorm64/data/a314-shared/pigfx.card
-	cp PiGFX.info /opt/pistorm64/data/a314-shared/
+	sudo cp pigfx.card /opt/pistorm64/data/a314-shared/pigfx.card
+	sudo cp PiGFX.info /opt/pistorm64/data/a314-shared/
 
 FORCE:
 

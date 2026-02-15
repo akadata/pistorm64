@@ -3127,6 +3127,11 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
             }
             (void)piscsi64_media_insert((uint8_t)val);
             break;
+        case PISCSI64_CMD_BACKEND_INFO: {
+            /* Writes to BACKEND_INFO are ignored. */
+            DEBUG("[PISCSI64] Write to BACKEND_INFO ignored\n");
+            break;
+        }
         case PISCSI64_CMD_DEBUGME:
             piscsi64_debugme(val);
             break;
@@ -3594,6 +3599,42 @@ uint32_t handle_piscsi64_read(uint32_t addr, uint8_t type) {
             }
             DEBUG("[PISCSI64] Get block size of drive %d: %d\n", piscsi64_cur_drive, piscsi64_devs[piscsi64_cur_drive].block_size);
             return piscsi64_devs[piscsi64_cur_drive].block_size;
+        case PISCSI64_CMD_BACKEND_INFO: {
+            struct piscsi64_dev *d = &piscsi64_devs[piscsi64_cur_drive];
+            uint32_t info = 0;
+            enum piscsi64_prefix_type prefix = PISCSI64_PREFIX_UNKNOWN;
+
+            if (piscsi64_cur_drive >= PISCSI64_NUM_UNITS || d->fd == -1) {
+                return 0;
+            }
+
+            if (d->backend_type == PISCSI64_BACKEND_REMOTE) {
+                info |= PISCSI64_BACKEND_INFO_REMOTE;
+            }
+
+            if (d->media_kind == PISCSI64_MEDIA_CDROM) {
+                info |= (1u << PISCSI64_BACKEND_INFO_MEDIA_SHIFT);
+            }
+
+            if (d->configured_spec[0] != '\0') {
+                const char *spec = d->configured_spec;
+                if (strncasecmp(spec, "disk:", 5) == 0) {
+                    prefix = PISCSI64_PREFIX_DISK;
+                } else if (strncasecmp(spec, "cdrom:", 6) == 0) {
+                    prefix = PISCSI64_PREFIX_CDROM;
+                } else if (strncasecmp(spec, "floppy:", 7) == 0) {
+                    prefix = PISCSI64_PREFIX_FLOPPY;
+                } else if (strncasecmp(spec, "zip:", 4) == 0) {
+                    prefix = PISCSI64_PREFIX_ZIP;
+                } else if (strncasecmp(spec, "usb:", 4) == 0) {
+                    prefix = PISCSI64_PREFIX_USB;
+                }
+            }
+
+            info |= (uint32_t)prefix & PISCSI64_BACKEND_INFO_PREFIX_MASK;
+            DEBUG("[PISCSI64] Read BACKEND_INFO %d: 0x%08X\n", piscsi64_cur_drive, info);
+            return info;
+        }
         case PISCSI64_CMD_GET_FS_INFO: {
             int fs_idx = 0;
             uint32_t val = piscsi64_u32[1];

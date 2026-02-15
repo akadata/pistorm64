@@ -661,7 +661,7 @@ $(MUSASHIGENCFILES) $(MUSASHIGENHFILES): $(MUSASHIGENERATOR)$(EXE)
 $(MUSASHIGENERATOR)$(EXE): src/musashi/$(MUSASHIGENERATOR).c
 	$(CC) -MMD -MP  -o $(MUSASHIGENERATOR)$(EXE) src/musashi/$(MUSASHIGENERATOR).c
 
-install: all
+install: all amiga-piscsi amiga-piscsi64
 	$(INSTALL) -d $(INSTALL_DIR)
 	for bin in $(INSTALL_BINS); do \
 		[ -x $$bin ] && $(INSTALL) -m 755 $$bin $(INSTALL_DIR)/; \
@@ -871,6 +871,7 @@ else
 	$(MAKE) 
 endif
 	$(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD)
+	$(MAKE) amiga-piscsi amiga-piscsi64
 	$(MAKE) kernel_module
 	sudo $(MAKE) kernel_install
 	sudo $(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD) INSTALL_BOOT_FIRMWARE=$(INSTALL_BOOT_FIRMWARE) BOOT_FIRMWARE_DIR="$(BOOT_FIRMWARE_DIR)" install

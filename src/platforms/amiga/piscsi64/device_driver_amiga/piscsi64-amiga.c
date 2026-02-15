@@ -32,7 +32,7 @@
 #define XSTR(s) STR(s)
 
 #define DEVICE_NAME "pi-scsi64.device"
-#define DEVICE_DATE "(14 Feb 2026)"
+#define DEVICE_DATE "(15 Feb 2026)"
 #define DEVICE_ID_STRING "PiSCSI64 " XSTR(DEVICE_VERSION) "." XSTR(DEVICE_REVISION) " " DEVICE_DATE
 #define DEVICE_VERSION 44
 #define DEVICE_REVISION 0
@@ -454,10 +454,18 @@ uint8_t piscsi64_rw(struct piscsi64_unit* u, struct IORequest* io) {
   return 0;
 }
 
-#define PISCSI64_VENDOR_ID   "PISTORM "
-#define PISCSI64_DISK_PRODID "Virtual Disk    "
-#define PISCSI64_CD_PRODID   "Virtual CD-ROM  "
-#define PISCSI64_REV_ID      "1.0 "
+#define PISCSI64_VENDOR_ID            "_PISTORM"
+#define PISCSI64_DISK_PRODID          "_Virtual_Disk___"
+#define PISCSI64_CD_PRODID            "_Virtual_CD-ROM_"
+#define PISCSI64_DISK_PRODID_REMOTE   "_Remote_Disk____"
+#define PISCSI64_CD_PRODID_REMOTE     "_Remote_CD-ROM__"
+#define PISCSI64_FLOPPY_PRODID        "_Virtual_Floppy_"
+#define PISCSI64_ZIP_PRODID           "_Virtual_ZIP____"
+#define PISCSI64_USB_PRODID           "_Virtual_USB____"
+#define PISCSI64_FLOPPY_PRODID_REMOTE "_Remote_Floppy__"
+#define PISCSI64_ZIP_PRODID_REMOTE    "_Remote_ZIP_____"
+#define PISCSI64_USB_PRODID_REMOTE    "_Remote_USB_____"
+#define PISCSI64_REV_ID      "0.11"
 
 #define PISCSI64_SENSE_NO_SENSE        0x00u
 #define PISCSI64_SENSE_NOT_READY       0x02u
@@ -655,10 +663,44 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
       piscsi64_copy_ascii_field(&data[8], 8, PISCSI64_VENDOR_ID);
     }
     if (scsi->scsi_Length > 16) {
-      piscsi64_copy_ascii_field(&data[16], 16,
-                                (scsi_type == PISCSI64_SCSI_TYPE_CDROM)
-                                  ? PISCSI64_CD_PRODID
-                                  : PISCSI64_DISK_PRODID);
+      const char* prodid = (scsi_type == PISCSI64_SCSI_TYPE_CDROM)
+                             ? PISCSI64_CD_PRODID
+                             : PISCSI64_DISK_PRODID;
+      uint32_t backend_info = 0;
+      uint32_t prefix_type = 0;
+      uint8_t is_remote = 0;
+
+      WRITESHORT(PISCSI64_CMD_DRVNUMX, u->unit_num);
+      READLONG(PISCSI64_CMD_BACKEND_INFO, backend_info);
+      prefix_type = (backend_info & PISCSI64_BACKEND_INFO_PREFIX_MASK);
+      is_remote = ((backend_info & PISCSI64_BACKEND_INFO_REMOTE) != 0u) ? 1 : 0;
+
+      if (is_remote) {
+        prodid = (scsi_type == PISCSI64_SCSI_TYPE_CDROM)
+                   ? PISCSI64_CD_PRODID_REMOTE
+                   : PISCSI64_DISK_PRODID_REMOTE;
+      }
+
+      if (scsi_type != PISCSI64_SCSI_TYPE_CDROM) {
+        switch (prefix_type) {
+          case PISCSI64_PREFIX_FLOPPY:
+            prodid = is_remote ? PISCSI64_FLOPPY_PRODID_REMOTE : PISCSI64_FLOPPY_PRODID;
+            break;
+          case PISCSI64_PREFIX_ZIP:
+            prodid = is_remote ? PISCSI64_ZIP_PRODID_REMOTE : PISCSI64_ZIP_PRODID;
+            break;
+          case PISCSI64_PREFIX_USB:
+            prodid = is_remote ? PISCSI64_USB_PRODID_REMOTE : PISCSI64_USB_PRODID;
+            break;
+          case PISCSI64_PREFIX_DISK:
+          case PISCSI64_PREFIX_CDROM:
+          case PISCSI64_PREFIX_UNKNOWN:
+          default:
+            break;
+        }
+      }
+
+      piscsi64_copy_ascii_field(&data[16], 16, prodid);
     }
     if (scsi->scsi_Length > 32) {
       piscsi64_copy_ascii_field(&data[32], 4, PISCSI64_REV_ID);

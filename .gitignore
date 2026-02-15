@@ -10,6 +10,8 @@ regtool
 # Allow modprobe.d configs (directory name ends in .d)
 !etc/modprobe.d/
 !etc/modprobe.d/*.conf
+!etc/modules-load.d/
+!etc/modules-load.d/*.conf
 
 # Generated files
 m68kops.c
