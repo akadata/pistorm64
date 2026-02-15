@@ -136,6 +136,57 @@ static int rtg_get_ptr_checked(uint32_t base_adj, int16_t x, int16_t y, uint16_t
   return 1;
 }
 
+static int rtg_clip_rect_to_stride_and_vram(int16_t* x, int16_t* y, int16_t* w, int16_t* h,
+                                            uint16_t pitch, uint16_t format, uint32_t base_adj) {
+  if (!x || !y || !w || !h) {
+    return 0;
+  }
+  if (*w <= 0 || *h <= 0 || pitch == 0 || format >= RTGFMT_NUM) {
+    return 0;
+  }
+
+  const size_t bpp = rtg_pixel_size[format];
+  if (bpp == 0) {
+    return 0;
+  }
+
+  const int32_t max_x = (int32_t)(pitch / bpp);
+  if (max_x <= 0) {
+    return 0;
+  }
+
+  const size_t mem_size = rtg_mem_size_bytes();
+  if ((size_t)base_adj >= mem_size) {
+    return 0;
+  }
+  const int32_t max_y = (int32_t)((mem_size - (size_t)base_adj) / pitch);
+  if (max_y <= 0) {
+    return 0;
+  }
+
+  if (*x >= max_x || *y >= max_y) {
+    return 0;
+  }
+
+  int32_t w32 = *w;
+  int32_t h32 = *h;
+  int32_t rem_x = max_x - *x;
+  int32_t rem_y = max_y - *y;
+  if (w32 > rem_x) {
+    w32 = rem_x;
+  }
+  if (h32 > rem_y) {
+    h32 = rem_y;
+  }
+  if (w32 <= 0 || h32 <= 0) {
+    return 0;
+  }
+
+  *w = (int16_t)w32;
+  *h = (int16_t)h32;
+  return 1;
+}
+
 /*
  * P96 blit coordinates are WORD (signed 16-bit), not UWORD.
  * When negative X/Y is interpreted as uint16_t it wraps to ~65535 and corrupts
@@ -595,6 +646,9 @@ void rtg_blittemplate(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t src_a
   if (!rtg_clip_signed_blit_rect(&x, &y, &w, &h, &offset_x, &src_row_offset)) {
     return;
   }
+  if (!rtg_clip_rect_to_stride_and_vram(&x, &y, &w, &h, pitch, format, rtg_address_adj[1])) {
+    return;
+  }
   uint8_t* dptr = NULL;
   if (!rtg_get_ptr_checked(rtg_address_adj[1], x, y, (uint16_t)w, (uint16_t)h, pitch, format,
                            "blittemplate",
@@ -776,6 +830,9 @@ void rtg_blitpattern(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t src_ad
 
   // P96 uses pattern blits for window decoration fills and requesters.
   if (!rtg_clip_signed_blit_rect(&x, &y, &w, &h, &offset_x, &offset_y)) {
+    return;
+  }
+  if (!rtg_clip_rect_to_stride_and_vram(&x, &y, &w, &h, pitch, format, rtg_address_adj[1])) {
     return;
   }
   uint8_t* dptr = NULL;
