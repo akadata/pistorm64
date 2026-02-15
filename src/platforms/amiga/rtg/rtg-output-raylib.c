@@ -193,6 +193,64 @@ struct rtg_shared_data {
   uint8_t* running;
 };
 
+typedef struct rtg_frame_state {
+  uint16_t width;
+  uint16_t height;
+  uint16_t format;
+  uint16_t pitch;
+  uint32_t addr;
+} rtg_frame_state_t;
+
+static void rtg_read_frame_state(const struct rtg_shared_data* data, rtg_frame_state_t* out) {
+  out->width = *data->width;
+  out->height = *data->height;
+  out->format = *data->format;
+  out->pitch = *data->pitch;
+  out->addr = *data->addr;
+}
+
+static int rtg_read_frame_state_stable(const struct rtg_shared_data* data, rtg_frame_state_t* out) {
+  rtg_frame_state_t a = {0};
+  rtg_frame_state_t b = {0};
+  for (int i = 0; i < 3; i++) {
+    rtg_read_frame_state(data, &a);
+    rtg_read_frame_state(data, &b);
+    if (a.width == b.width && a.height == b.height && a.format == b.format &&
+        a.pitch == b.pitch && a.addr == b.addr) {
+      *out = b;
+      return 1;
+    }
+  }
+  *out = b;
+  return 0;
+}
+
+static int rtg_compute_frame_layout(uint16_t width, uint16_t height, uint16_t format,
+                                    uint16_t pitch, size_t* out_bpp, size_t* out_row_bytes,
+                                    size_t* out_needed) {
+  if (format >= RTGFMT_NUM) {
+    return 0;
+  }
+  size_t bpp = rtg_pixel_size[format];
+  if (width == 0 || height == 0 || bpp == 0) {
+    return 0;
+  }
+  if (width > SIZE_MAX / bpp) {
+    return 0;
+  }
+  size_t row_bytes = (size_t)width * bpp;
+  if (pitch < row_bytes) {
+    return 0;
+  }
+  if ((size_t)pitch > SIZE_MAX / (size_t)height) {
+    return 0;
+  }
+  *out_bpp = bpp;
+  *out_row_bytes = row_bytes;
+  *out_needed = (size_t)pitch * (size_t)height;
+  return 1;
+}
+
 float scale_x = 1.0f;
 float scale_y = 1.0f;
 // Source rect in RTG buffer coordinates
@@ -555,6 +613,7 @@ void* rtgThread(void* args) {
   uint16_t height = rtg_display_height;
   uint16_t format = rtg_display_format;
   uint16_t pitch = rtg_pitch;
+  uint32_t frame_addr = framebuffer_addr_adj;
 
   Texture raylib_texture = {0};
   Texture raylib_cursor_texture = {0};
@@ -648,40 +707,20 @@ reinit_raylib:;
   LOG_INFO("Creating %dx%d raylib window...\n", width, height);
 
   LOG_DEBUG("Setting up raylib framebuffer image.\n");
-  if(format >= RTGFMT_NUM) {
-    LOG_ERROR("[RTG/RAYLIB] Invalid RTG format: %u\n", format);
-    reinit = 1;
-    goto shutdown_raylib;
-  }
-
-  size_t bpp = rtg_pixel_size[format];
-  if(width == 0 || height == 0 || bpp == 0) {
-    LOG_ERROR("[RTG/RAYLIB] Invalid framebuffer params: %ux%u bpp=%zu format=%u\n", width, height,
-              bpp, format);
-    reinit = 1;
-    goto shutdown_raylib;
-  }
-
-  if(width > SIZE_MAX / bpp) {
-    LOG_ERROR("[RTG/RAYLIB] Framebuffer width overflow: %u bpp=%zu\n", width, bpp);
-    reinit = 1;
-    goto shutdown_raylib;
-  }
-  size_t row_bytes = (size_t)width * bpp;
-  if(height > 0 && row_bytes > SIZE_MAX / height) {
-    LOG_ERROR("[RTG/RAYLIB] Framebuffer size overflow: row_bytes=%zu height=%u\n", row_bytes,
-              height);
+  size_t bpp = 0;
+  size_t row_bytes = 0;
+  size_t needed = 0;
+  if(!rtg_compute_frame_layout(width, height, format, pitch, &bpp, &row_bytes, &needed)) {
+    LOG_ERROR("[RTG/RAYLIB] Invalid framebuffer params: %ux%u fmt=%u pitch=%u\n", width, height,
+              format, pitch);
     reinit = 1;
     goto shutdown_raylib;
   }
   size_t tight_size = row_bytes * height;
 
-  uint32_t frame_addr = *data->addr;
   size_t addr = (size_t)frame_addr;
-  size_t needed = (size_t)pitch * height;
-  int pitch_ok = (pitch >= row_bytes);
   const size_t rtg_mem_size = rtg_mem_size_bytes();
-  int addr_ok = pitch_ok && (addr < rtg_mem_size) && (addr + needed <= rtg_mem_size);
+  int addr_ok = (addr < rtg_mem_size) && (needed <= (rtg_mem_size - addr));
 
   if ((format == RTGFMT_8BIT_CLUT && clut_cpu_mode) || rtg_format_is_yuv(format)) {
     raylib_fb.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
@@ -827,17 +866,16 @@ reinit_raylib:;
 
   while (1) {
     if(rtg_on) {
-      uint16_t current_width = *data->width;
-      uint16_t current_height = *data->height;
-      uint16_t current_format = *data->format;
-      uint16_t current_pitch = *data->pitch;
-      uint32_t current_addr = *data->addr;
-
-      if(current_format >= RTGFMT_NUM) {
-        LOG_ERROR("[RTG/RAYLIB] Invalid RTG format during frame update: %u\n", current_format);
-        reinit = 1;
-        goto shutdown_raylib;
+      rtg_frame_state_t current = {0};
+      if(!rtg_read_frame_state_stable(data, &current)) {
+        LOG_WARN("[RTG/RAYLIB] Unstable mode snapshot detected; waiting for stable values.\n");
+        continue;
       }
+      uint16_t current_width = current.width;
+      uint16_t current_height = current.height;
+      uint16_t current_format = current.format;
+      uint16_t current_pitch = current.pitch;
+      uint32_t current_addr = current.addr;
 
       if(current_width != width || current_height != height || current_format != format ||
           current_pitch != pitch) {
@@ -848,6 +886,7 @@ reinit_raylib:;
         reinit = 1;
         goto shutdown_raylib;
       }
+      frame_addr = current_addr;
 
       if(current_addr != last_frame_addr) {
         LOG_DEBUG("[RTG/RAYLIB] FB addr update: 0x%08X\n", current_addr);
@@ -965,11 +1004,14 @@ reinit_raylib:;
       cur_rtg_frame++;
       size_t frame_addr_offset = (size_t)current_addr;
       size_t addr_offset = frame_addr_offset;
-      size_t frame_needed = (size_t)current_pitch * height;
+      size_t frame_bpp = 0;
+      size_t frame_row_bytes = 0;
+      size_t frame_needed = 0;
 
-      if(current_pitch < row_bytes) {
-        LOG_WARN("[RTG/RAYLIB] Frame pitch too small: pitch=%u row_bytes=%zu\n", current_pitch,
-                 row_bytes);
+      if(!rtg_compute_frame_layout(current_width, current_height, current_format, current_pitch,
+                                   &frame_bpp, &frame_row_bytes, &frame_needed)) {
+        LOG_WARN("[RTG/RAYLIB] Invalid frame layout: %ux%u fmt=%u pitch=%u\n", current_width,
+                 current_height, current_format, current_pitch);
       } else {
         const size_t rtg_mem_size = rtg_mem_size_bytes();
         if(frame_addr_offset >= rtg_mem_size || frame_needed > rtg_mem_size - frame_addr_offset) {
@@ -1173,7 +1215,7 @@ reinit_raylib:;
           }
           UpdateTexture(raylib_texture, clut_buf);
         }
-      } else if(current_pitch != row_bytes) {
+      } else if(current_pitch != frame_row_bytes) {
         if(tight_buf_size < tight_size) {
           void* resized = realloc(tight_buf, tight_size);
           if(!resized) {
@@ -1184,7 +1226,8 @@ reinit_raylib:;
           }
         }
         if(tight_buf) {
-          rtg_copy_tight_rows(tight_buf, data->memory + addr_offset, row_bytes, current_pitch, height);
+          rtg_copy_tight_rows(tight_buf, data->memory + addr_offset, frame_row_bytes, current_pitch,
+                              height);
           UpdateTexture(raylib_texture, tight_buf);
         }
       } else {
@@ -1214,8 +1257,14 @@ reinit_raylib:;
       // DrawText("RTG is currently sleeping.", 16, 16, 12, RAYWHITE);
       EndDrawing();
     }
-    if(pitch != *data->pitch || height != *data->height || width != *data->width ||
-        format != *data->format) {
+    rtg_frame_state_t after = {0};
+    if(!rtg_read_frame_state_stable(data, &after)) {
+      LOG_WARN("[RTG/RAYLIB] Unstable mode snapshot after frame; forcing reinit.\n");
+      reinit = 1;
+      goto shutdown_raylib;
+    }
+    if(pitch != after.pitch || height != after.height || width != after.width ||
+        format != after.format) {
       LOG_INFO("[RTG/RAYLIB] Mode change detected after frame; reinitializing.\n");
       reinit = 1;
       goto shutdown_raylib;
