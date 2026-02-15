@@ -119,17 +119,19 @@ static const char* rtg_format_names[RTGFMT_NUM] = {
     "NONE/UNKNOWN",
 };
 
-#ifndef RTG_GFX_MEM
-#define RTG_GFX_MEM 40u
-#endif
-#ifndef RTG_MEM_MB
-#define RTG_MEM_MB RTG_GFX_MEM
-#endif
-
-static const unsigned int rtg_mem_size = (unsigned int)RTG_GFX_MEM * SIZE_MEGA;
-
 int init_rtg_data(struct emulator_config* cfg_) {
-  rtg_mem = cfg_alloc_mapped_data(rtg_mem_size, 1, &rtg_mem_alloc_kind, "rtg_mem");
+  const size_t allocated_bytes = rtg_mem_size_bytes();
+  const size_t expected_render_bytes = rtg_render_path_mem_size_bytes();
+
+  LOG_INFO("[RTG] VRAM bytes allocated=%zu render_expected=%zu\n", allocated_bytes,
+           expected_render_bytes);
+  if (allocated_bytes != expected_render_bytes) {
+    LOG_ERROR("[RTG] VRAM size mismatch between allocator and render path (%zu != %zu).\n",
+              allocated_bytes, expected_render_bytes);
+    abort();
+  }
+
+  rtg_mem = cfg_alloc_mapped_data(allocated_bytes, 1, &rtg_mem_alloc_kind, "rtg_mem");
   if (!rtg_mem) {
     LOG_ERROR("Failed to allocate RTG video memory.\n");
     return 0;
@@ -139,7 +141,7 @@ int init_rtg_data(struct emulator_config* cfg_) {
   int map_index = get_named_mapped_item(cfg_, "rtg_mem");
   if (map_index >= 0) {
     unsigned int base = (unsigned int)cfg_->map_offset[map_index];
-    unsigned int size = cfg_->map_size[map_index] ? cfg_->map_size[map_index] : rtg_mem_size;
+    unsigned int size = cfg_->map_size[map_index] ? cfg_->map_size[map_index] : (unsigned int)allocated_bytes;
     cfg_release_map_data(cfg_, map_index);
     cfg_->map_type[map_index] = MAPTYPE_RAM_NOALLOC;
     cfg_->map_size[map_index] = size;
@@ -150,7 +152,7 @@ int init_rtg_data(struct emulator_config* cfg_) {
              map_index, size / SIZE_MEGA);
   } else {
     m68k_add_ram_range(PIGFX_RTG_BASE + PIGFX_REG_SIZE, PIGFX_UPPER, rtg_mem);
-    add_mapping(cfg_, MAPTYPE_RAM_NOALLOC, PIGFX_RTG_BASE + PIGFX_REG_SIZE, rtg_mem_size,
+    add_mapping(cfg_, MAPTYPE_RAM_NOALLOC, PIGFX_RTG_BASE + PIGFX_REG_SIZE, (unsigned int)allocated_bytes,
                 (unsigned int)-1, (char*)rtg_mem, "rtg_mem", 0);
   }
   return 1;
@@ -163,7 +165,7 @@ void shutdown_rtg(void) {
     rtg_on = 0;
   }
   if (rtg_mem) {
-    cfg_free_mapped_data(rtg_mem, rtg_mem_size, rtg_mem_alloc_kind);
+    cfg_free_mapped_data(rtg_mem, rtg_mem_size_bytes(), rtg_mem_alloc_kind);
     rtg_mem = NULL;
     rtg_mem_alloc_kind = MAPALLOC_NONE;
   }
@@ -181,7 +183,7 @@ unsigned int rtg_read(uint32_t address, uint8_t mode) {
   // printf("%s read from RTG: %.8X\n", op_type_names[mode], address);
   if (address >= PIGFX_REG_SIZE) {
     const unsigned int offset = address - PIGFX_REG_SIZE;
-    if (rtg_mem && offset < rtg_mem_size) {
+    if (rtg_mem && offset < rtg_mem_size_bytes()) {
       switch (mode) {
       case OP_TYPE_BYTE:
         return rtg_mem[offset];
@@ -256,7 +258,7 @@ void rtg_write(uint32_t address, uint32_t value, uint8_t mode) {
     PIGFX_REG_SIZE), framebuffer_addr);
     }*/
     const unsigned int offset = address - PIGFX_REG_SIZE;
-    if (rtg_mem && offset < rtg_mem_size) {
+    if (rtg_mem && offset < rtg_mem_size_bytes()) {
       switch (mode) {
       case OP_TYPE_BYTE:
         rtg_mem[offset] = (uint8_t)value;

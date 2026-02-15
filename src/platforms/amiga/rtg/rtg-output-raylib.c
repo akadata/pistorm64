@@ -181,18 +181,6 @@ static int32_t pi_screen_height     = RTG_HEIGHT;
 static uint8_t pi_screen_width_set  = 0;
 static uint8_t pi_screen_height_set = 0;
 
-//static const size_t rtg_mem_size = 40u * SIZE_MEGA;
-
-#ifndef RTG_GFX_MEM
-#define RTG_GFX_MEM 128u
-#endif
-#ifndef RTG_MEM_MB
-#define RTG_MEM_MB RTG_GFX_MEM
-#endif
-
-static const size_t rtg_mem_size = (size_t)RTG_GFX_MEM * SIZE_MEGA;
-
-
 struct rtg_shared_data {
   uint16_t *width;
   uint16_t *height;
@@ -692,6 +680,7 @@ reinit_raylib:;
   size_t addr = (size_t)frame_addr;
   size_t needed = (size_t)pitch * height;
   int pitch_ok = (pitch >= row_bytes);
+  const size_t rtg_mem_size = rtg_mem_size_bytes();
   int addr_ok = pitch_ok && (addr < rtg_mem_size) && (addr + needed <= rtg_mem_size);
 
   if ((format == RTGFMT_8BIT_CLUT && clut_cpu_mode) || rtg_format_is_yuv(format)) {
@@ -981,10 +970,12 @@ reinit_raylib:;
       if(current_pitch < row_bytes) {
         LOG_WARN("[RTG/RAYLIB] Frame pitch too small: pitch=%u row_bytes=%zu\n", current_pitch,
                  row_bytes);
-      } else if(frame_addr_offset >= rtg_mem_size || frame_needed > rtg_mem_size - frame_addr_offset) {
-        LOG_WARN("[RTG/RAYLIB] Framebuffer OOB: addr=0x%08X needed=%zu limit=%zu\n", current_addr,
-                 frame_needed, rtg_mem_size);
-      } else if(rtg_format_is_yuv(current_format)) {
+      } else {
+        const size_t rtg_mem_size = rtg_mem_size_bytes();
+        if(frame_addr_offset >= rtg_mem_size || frame_needed > rtg_mem_size - frame_addr_offset) {
+          LOG_WARN("[RTG/RAYLIB] Framebuffer OOB: addr=0x%08X needed=%zu limit=%zu\n", current_addr,
+                   frame_needed, rtg_mem_size);
+        } else if(rtg_format_is_yuv(current_format)) {
         size_t yuv_bytes = (size_t)width * height * sizeof(uint32_t);
         if(yuv_buf_size < yuv_bytes) {
           void* resized = realloc(yuv_buf, yuv_bytes);
@@ -1198,6 +1189,7 @@ reinit_raylib:;
         }
       } else {
         UpdateTexture(raylib_texture, data->memory + addr_offset);
+      }
       }
       if(cursor_image_updated) {
         if(clut_cursor_enabled) {
