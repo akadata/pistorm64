@@ -1,28 +1,41 @@
 // SPDX-License-Identifier: MIT
 
-#define PIGFX_RTG_BASE 0x70000000
-#define PIGFX_REG_SIZE 0x00010000
-#ifndef RTG_GFX_MEM
-#define RTG_GFX_MEM 40u
-#endif
-#ifndef RTG_MEM_MB
-#define RTG_MEM_MB RTG_GFX_MEM
-#endif
-
-#define PIGFX_RTG_SIZE ((RTG_GFX_MEM) * 0x00100000u)
-#define PIGFX_SCRATCH_SIZE 0x00800000
-#define PIGFX_SCRATCH_AREA 0x72010000
-#define PIGFX_UPPER 0x72810000
-
-#define CARD_OFFSET 0
-
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+
+#define PIGFX_RTG_BASE 0x70000000u
+#define PIGFX_REG_SIZE 0x00010000u
+/*
+ * Keep VRAM size in exactly one shared definition.
+ * We previously had per-C-file fallback defaults that diverged and caused
+ * RTG mode-switch crashes due to mismatched bounds assumptions.
+ */
+#ifndef PIGFX_RTG_VRAM_MB
+#ifdef RTG_GFX_MEM
+#define PIGFX_RTG_VRAM_MB RTG_GFX_MEM
+#else
+#define PIGFX_RTG_VRAM_MB 40u
+#endif
+#endif
+
+#define PIGFX_RTG_SIZE ((uint32_t)(PIGFX_RTG_VRAM_MB) * 0x00100000u)
+#define PIGFX_RTG_VRAM_BYTES ((size_t)PIGFX_RTG_SIZE)
+#define PIGFX_SCRATCH_SIZE 0x00800000
+#define PIGFX_SCRATCH_AREA 0x72010000
+#define PIGFX_UPPER (PIGFX_RTG_BASE + PIGFX_REG_SIZE + PIGFX_RTG_SIZE)
+
+#define CARD_OFFSET 0
 #include "rtg_enums.h"
 
 struct emulator_config;
+
+static inline size_t rtg_mem_size_bytes(void) {
+  return PIGFX_RTG_VRAM_BYTES;
+}
+
+size_t rtg_render_path_mem_size_bytes(void);
 
 static inline uint8_t* rtg_pixel_at(uint8_t *base, size_t index, uint16_t format) {
   return base + ((size_t)index * rtg_pixel_size[format]);
