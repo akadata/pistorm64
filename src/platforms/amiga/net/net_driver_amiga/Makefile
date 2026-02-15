@@ -3,7 +3,7 @@ AMIGA_PATH := $(AMIGA_TOOLCHAIN)/bin:$(PATH)
 
 M68K_GCC ?= m68k-amigaos-gcc
 
-CPU ?= 020
+CPU ?= 030
 
 ifeq ($(CPU),000)
 TARGET = PiNet000.device

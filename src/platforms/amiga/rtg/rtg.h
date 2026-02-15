@@ -182,111 +182,211 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
                 uint8_t minterm, struct BitMap* bm, uint8_t mask, uint16_t dst_pitch,
                 uint16_t src_pitch);
 
-#define PATTERN_LOOPX                                                                              \
-  if (sptr) {                                                                                      \
-    cur_byte = (uint8_t)sptr[tmpl_x];                                                              \
-  } else {                                                                                         \
-    cur_byte = (uint8_t)m68k_read_memory_8(src_addr + tmpl_x);                                     \
-  }                                                                                                \
-  if (invert) {                                                                                    \
-    cur_byte ^= 0xFF;                                                                              \
-  }                                                                                                \
-  tmpl_x ^= 0x01;
+#define PATTERN_LOOPX \
+    if (sptr)   { cur_byte = sptr[tmpl_x]; } \
+    else        { cur_byte = m68k_read_memory_8(src_addr + tmpl_x); } \
+    if (invert) { cur_byte ^= 0xFF; } \
+    tmpl_x ^= 0x01;
 
-#define PATTERN_LOOPY                                                                              \
-  if (sptr) {                                                                                      \
-    sptr += 2;                                                                                     \
-  }                                                                                                \
-  src_addr += 2;                                                                                   \
-  if ((ys + offset_y + 1) % loop_rows == 0) {                                                      \
-    if (sptr)                                                                                      \
-      sptr = sptr_base;                                                                            \
-    src_addr = src_addr_base;                                                                      \
-  }                                                                                                \
-  tmpl_x = (offset_x / 8) % 2;                                                                     \
-  cur_bit = base_bit;                                                                              \
-  dptr += pitch;
+#define PATTERN_LOOPY \
+	sptr += 2 ; \
+    src_addr += 2; \
+	if ((ys + offset_y + 1) % loop_rows == 0) { \
+		if (sptr) sptr = sptr_base; \
+        src_addr = src_addr_base; \
+    } \
+	tmpl_x = (offset_x / 8) % 2; \
+	cur_bit = base_bit; \
+	dptr += pitch;
 
-#define TEMPLATE_LOOPX                                                                             \
-  if (sptr) {                                                                                      \
-    cur_byte = (uint8_t)sptr[tmpl_x];                                                              \
-  } else {                                                                                         \
-    cur_byte = (uint8_t)m68k_read_memory_8(src_addr + tmpl_x);                                     \
-  }                                                                                                \
-  if (invert) {                                                                                    \
-    cur_byte ^= 0xFF;                                                                              \
-  }                                                                                                \
-  tmpl_x++;
+#define TEMPLATE_LOOPX \
+    if (sptr)   { cur_byte = sptr[tmpl_x]; } \
+    else        { cur_byte = m68k_read_memory_8(src_addr + tmpl_x); } \
+    if (invert) { cur_byte ^= 0xFF; } \
+    tmpl_x++;
 
-#define TEMPLATE_LOOPY                                                                             \
-  if (sptr)                                                                                        \
-    sptr += t_pitch;                                                                               \
-  src_addr += t_pitch;                                                                             \
-  dptr += pitch;                                                                                   \
-  tmpl_x = offset_x / 8;                                                                           \
-  cur_bit = base_bit;
+#define TEMPLATE_LOOPY \
+    if (sptr) sptr += t_pitch; \
+    src_addr += t_pitch; \
+    dptr += pitch; \
+    tmpl_x = offset_x / 8; \
+    cur_bit = base_bit;
 
-#define INVERT_RTG_PIXELS(dest, format)                                                            \
-  for (int __rtg_i = 0; __rtg_i < 8; ++__rtg_i) {                                                   \
-    if (cur_byte & (0x80 >> __rtg_i)) {                                                             \
-      rtg_invert_pixel(rtg_pixel_at((uint8_t *)(dest), (size_t)__rtg_i, format), format, mask);      \
-    }                                                                                               \
-  }
+#define INVERT_RTG_PIXELS(dest, format) \
+    switch (format) { \
+        case RTGFMT_8BIT_CLUT: \
+            if (cur_byte & 0x80) (dest)[0] ^= mask; \
+            if (cur_byte & 0x40) (dest)[1] ^= mask; \
+            if (cur_byte & 0x20) (dest)[2] ^= mask; \
+            if (cur_byte & 0x10) (dest)[3] ^= mask; \
+            if (cur_byte & 0x08) (dest)[4] ^= mask; \
+            if (cur_byte & 0x04) (dest)[5] ^= mask; \
+            if (cur_byte & 0x02) (dest)[6] ^= mask; \
+            if (cur_byte & 0x01) (dest)[7] ^= mask; \
+            break; \
+        case RTGFMT_RGB565_LE: case RTGFMT_RGB565_BE: case RTGFMT_BGR565_LE: \
+        case RTGFMT_RGB555_LE: case RTGFMT_RGB555_BE: case RTGFMT_BGR555_LE: \
+            if (cur_byte & 0x80) ((uint16_t *)dest)[0] = ~((uint16_t *)dest)[0]; \
+            if (cur_byte & 0x40) ((uint16_t *)dest)[1] = ~((uint16_t *)dest)[1]; \
+            if (cur_byte & 0x20) ((uint16_t *)dest)[2] = ~((uint16_t *)dest)[2]; \
+            if (cur_byte & 0x10) ((uint16_t *)dest)[3] = ~((uint16_t *)dest)[3]; \
+            if (cur_byte & 0x08) ((uint16_t *)dest)[4] = ~((uint16_t *)dest)[4]; \
+            if (cur_byte & 0x04) ((uint16_t *)dest)[5] = ~((uint16_t *)dest)[5]; \
+            if (cur_byte & 0x02) ((uint16_t *)dest)[6] = ~((uint16_t *)dest)[6]; \
+            if (cur_byte & 0x01) ((uint16_t *)dest)[7] = ~((uint16_t *)dest)[7]; \
+            break; \
+        case RTGFMT_RGB32_ABGR: case RTGFMT_RGB32_ARGB: \
+        case RTGFMT_RGB32_BGRA: case RTGFMT_RGB32_RGBA: \
+            if (cur_byte & 0x80) ((uint32_t *)dest)[0] = ~((uint32_t *)dest)[0]; \
+            if (cur_byte & 0x40) ((uint32_t *)dest)[1] = ~((uint32_t *)dest)[1]; \
+            if (cur_byte & 0x20) ((uint32_t *)dest)[2] = ~((uint32_t *)dest)[2]; \
+            if (cur_byte & 0x10) ((uint32_t *)dest)[3] = ~((uint32_t *)dest)[3]; \
+            if (cur_byte & 0x08) ((uint32_t *)dest)[4] = ~((uint32_t *)dest)[4]; \
+            if (cur_byte & 0x04) ((uint32_t *)dest)[5] = ~((uint32_t *)dest)[5]; \
+            if (cur_byte & 0x02) ((uint32_t *)dest)[6] = ~((uint32_t *)dest)[6]; \
+            if (cur_byte & 0x01) ((uint32_t *)dest)[7] = ~((uint32_t *)dest)[7]; \
+            break; \
+    }
 
-#define SET_RTG_PIXELS_MASK(dest, src, format)                                                     \
-  do {                                                                                              \
-    uint8_t* __rtg_dest = (uint8_t*)(dest);                                                         \
-    for (int __rtg_i = 0; __rtg_i < 8; ++__rtg_i) {                                                 \
-      if (cur_byte & (0x80 >> __rtg_i)) {                                                           \
-        SET_RTG_PIXEL_MASK(__rtg_dest + ((size_t)__rtg_i) * rtg_pixel_size[format], src, format);  \
-      }                                                                                             \
-    }                                                                                               \
-  } while (0)
+#define SET_RTG_PIXELS_MASK(dest, src, format) \
+    if (cur_byte & 0x80) (dest)[0] = src ^ ((dest)[0] & ~mask); \
+    if (cur_byte & 0x40) (dest)[1] = src ^ ((dest)[1] & ~mask); \
+    if (cur_byte & 0x20) (dest)[2] = src ^ ((dest)[2] & ~mask); \
+    if (cur_byte & 0x10) (dest)[3] = src ^ ((dest)[3] & ~mask); \
+    if (cur_byte & 0x08) (dest)[4] = src ^ ((dest)[4] & ~mask); \
+    if (cur_byte & 0x04) (dest)[5] = src ^ ((dest)[5] & ~mask); \
+    if (cur_byte & 0x02) (dest)[6] = src ^ ((dest)[6] & ~mask); \
+    if (cur_byte & 0x01) (dest)[7] = src ^ ((dest)[7] & ~mask); \
 
-#define SET_RTG_PIXELS2_COND_MASK(dest, src, src2, format)                                         \
-  do {                                                                                              \
-    uint8_t* __rtg_dest = (uint8_t*)(dest);                                                         \
-    for (int __rtg_i = 0; __rtg_i < 8; ++__rtg_i) {                                                 \
-      uint8_t* __rtg_ptr = __rtg_dest + ((size_t)__rtg_i) * rtg_pixel_size[format];                \
-      if (cur_byte & (0x80 >> __rtg_i)) {                                                           \
-        SET_RTG_PIXEL(__rtg_ptr, src, format);                                                      \
-      } else {                                                                                      \
-        SET_RTG_PIXEL_MASK(__rtg_ptr, src2, format);                                                \
-      }                                                                                             \
-    }                                                                                               \
-  } while (0)
+#define SET_RTG_PIXELS2_COND_MASK(dest, src, src2, format) \
+    (dest)[0] = (cur_byte & 0x80) ? src : src2 ^ ((dest)[0] & ~mask); \
+    (dest)[1] = (cur_byte & 0x40) ? src : src2 ^ ((dest)[1] & ~mask); \
+    (dest)[2] = (cur_byte & 0x20) ? src : src2 ^ ((dest)[2] & ~mask); \
+    (dest)[3] = (cur_byte & 0x10) ? src : src2 ^ ((dest)[3] & ~mask); \
+    (dest)[4] = (cur_byte & 0x08) ? src : src2 ^ ((dest)[4] & ~mask); \
+    (dest)[5] = (cur_byte & 0x04) ? src : src2 ^ ((dest)[5] & ~mask); \
+    (dest)[6] = (cur_byte & 0x02) ? src : src2 ^ ((dest)[6] & ~mask); \
+    (dest)[7] = (cur_byte & 0x01) ? src : src2 ^ ((dest)[7] & ~mask); \
 
-#define SET_RTG_PIXELS(dest, src, format)                                                          \
-  do {                                                                                              \
-    uint8_t* __rtg_dest = (uint8_t*)(dest);                                                         \
-    for (int __rtg_i = 0; __rtg_i < 8; ++__rtg_i) {                                                 \
-      if (cur_byte & (0x80 >> __rtg_i)) {                                                           \
-        SET_RTG_PIXEL(__rtg_dest + ((size_t)__rtg_i) * rtg_pixel_size[format], src, format);        \
-      }                                                                                             \
-    }                                                                                               \
-  } while (0)
 
-#define SET_RTG_PIXELS2_COND(dest, src, src2, format)                                              \
-  do {                                                                                              \
-    uint8_t* __rtg_dest = (uint8_t*)(dest);                                                         \
-    for (int __rtg_i = 0; __rtg_i < 8; ++__rtg_i) {                                                 \
-      uint8_t* __rtg_ptr = __rtg_dest + ((size_t)__rtg_i) * rtg_pixel_size[format];                \
-      if (cur_byte & (0x80 >> __rtg_i)) {                                                           \
-        SET_RTG_PIXEL(__rtg_ptr, src, format);                                                      \
-      } else {                                                                                      \
-        SET_RTG_PIXEL(__rtg_ptr, src2, format);                                                     \
-      }                                                                                             \
-    }                                                                                               \
-  } while (0)
+#define SET_RTG_PIXELS(dest, src, format) \
+    switch (format) { \
+        case RTGFMT_8BIT_CLUT: \
+            if (cur_byte & 0x80) (dest)[0] = src; \
+            if (cur_byte & 0x40) (dest)[1] = src; \
+            if (cur_byte & 0x20) (dest)[2] = src; \
+            if (cur_byte & 0x10) (dest)[3] = src; \
+            if (cur_byte & 0x08) (dest)[4] = src; \
+            if (cur_byte & 0x04) (dest)[5] = src; \
+            if (cur_byte & 0x02) (dest)[6] = src; \
+            if (cur_byte & 0x01) (dest)[7] = src; \
+            break; \
+        case RTGFMT_RGB565_LE: case RTGFMT_RGB565_BE: case RTGFMT_BGR565_LE: \
+        case RTGFMT_RGB555_LE: case RTGFMT_RGB555_BE: case RTGFMT_BGR555_LE: \
+            if (cur_byte & 0x80) ((uint16_t *)dest)[0] = src; \
+            if (cur_byte & 0x40) ((uint16_t *)dest)[1] = src; \
+            if (cur_byte & 0x20) ((uint16_t *)dest)[2] = src; \
+            if (cur_byte & 0x10) ((uint16_t *)dest)[3] = src; \
+            if (cur_byte & 0x08) ((uint16_t *)dest)[4] = src; \
+            if (cur_byte & 0x04) ((uint16_t *)dest)[5] = src; \
+            if (cur_byte & 0x02) ((uint16_t *)dest)[6] = src; \
+            if (cur_byte & 0x01) ((uint16_t *)dest)[7] = src; \
+            break; \
+        case RTGFMT_RGB32_ABGR: case RTGFMT_RGB32_ARGB: \
+        case RTGFMT_RGB32_BGRA: case RTGFMT_RGB32_RGBA: \
+            if (cur_byte & 0x80) ((uint32_t *)dest)[0] = src; \
+            if (cur_byte & 0x40) ((uint32_t *)dest)[1] = src; \
+            if (cur_byte & 0x20) ((uint32_t *)dest)[2] = src; \
+            if (cur_byte & 0x10) ((uint32_t *)dest)[3] = src; \
+            if (cur_byte & 0x08) ((uint32_t *)dest)[4] = src; \
+            if (cur_byte & 0x04) ((uint32_t *)dest)[5] = src; \
+            if (cur_byte & 0x02) ((uint32_t *)dest)[6] = src; \
+            if (cur_byte & 0x01) ((uint32_t *)dest)[7] = src; \
+            break; \
+    }
 
-#define SET_RTG_PIXEL(dest, src, format)                                                           \
-  rtg_store_pixel((uint8_t *)(dest), (uint16_t)(format), (uint32_t)(src));
+#define SET_RTG_PIXELS2_COND(dest, src, src2, format) \
+    switch (format) { \
+        case RTGFMT_8BIT_CLUT: \
+            (dest)[0] = (cur_byte & 0x80) ? src : src2; \
+            (dest)[1] = (cur_byte & 0x40) ? src : src2; \
+            (dest)[2] = (cur_byte & 0x20) ? src : src2; \
+            (dest)[3] = (cur_byte & 0x10) ? src : src2; \
+            (dest)[4] = (cur_byte & 0x08) ? src : src2; \
+            (dest)[5] = (cur_byte & 0x04) ? src : src2; \
+            (dest)[6] = (cur_byte & 0x02) ? src : src2; \
+            (dest)[7] = (cur_byte & 0x01) ? src : src2; \
+            break; \
+        case RTGFMT_RGB565_LE: case RTGFMT_RGB565_BE: case RTGFMT_BGR565_LE: \
+        case RTGFMT_RGB555_LE: case RTGFMT_RGB555_BE: case RTGFMT_BGR555_LE: \
+            ((uint16_t *)dest)[0] = (cur_byte & 0x80) ? src : src2; \
+            ((uint16_t *)dest)[1] = (cur_byte & 0x40) ? src : src2; \
+            ((uint16_t *)dest)[2] = (cur_byte & 0x20) ? src : src2; \
+            ((uint16_t *)dest)[3] = (cur_byte & 0x10) ? src : src2; \
+            ((uint16_t *)dest)[4] = (cur_byte & 0x08) ? src : src2; \
+            ((uint16_t *)dest)[5] = (cur_byte & 0x04) ? src : src2; \
+            ((uint16_t *)dest)[6] = (cur_byte & 0x02) ? src : src2; \
+            ((uint16_t *)dest)[7] = (cur_byte & 0x01) ? src : src2; \
+            break; \
+        case RTGFMT_RGB32_ABGR: case RTGFMT_RGB32_ARGB: \
+        case RTGFMT_RGB32_BGRA: case RTGFMT_RGB32_RGBA: \
+            ((uint32_t *)dest)[0] = (cur_byte & 0x80) ? src : src2; \
+            ((uint32_t *)dest)[1] = (cur_byte & 0x40) ? src : src2; \
+            ((uint32_t *)dest)[2] = (cur_byte & 0x20) ? src : src2; \
+            ((uint32_t *)dest)[3] = (cur_byte & 0x10) ? src : src2; \
+            ((uint32_t *)dest)[4] = (cur_byte & 0x08) ? src : src2; \
+            ((uint32_t *)dest)[5] = (cur_byte & 0x04) ? src : src2; \
+            ((uint32_t *)dest)[6] = (cur_byte & 0x02) ? src : src2; \
+            ((uint32_t *)dest)[7] = (cur_byte & 0x01) ? src : src2; \
+            break; \
+    }
 
-#define SET_RTG_PIXEL_MASK(dest, src, format)                                                      \
-  rtg_store_pixel_mask((uint8_t *)(dest), (uint16_t)(format), (uint32_t)(src), mask);
 
-#define INVERT_RTG_PIXEL(dest, format)                                                             \
-  rtg_invert_pixel((uint8_t *)(dest), (uint16_t)(format), mask);
+
+#define SET_RTG_PIXEL(dest, src, format) \
+    switch (format) { \
+        case RTGFMT_8BIT_CLUT: \
+            *(dest) = src; \
+            break; \
+        case RTGFMT_RGB565_LE: case RTGFMT_RGB565_BE: case RTGFMT_BGR565_LE: \
+        case RTGFMT_RGB555_LE: case RTGFMT_RGB555_BE: case RTGFMT_BGR555_LE: \
+            *((uint16_t *)dest) = src; \
+            break; \
+        case RTGFMT_RGB32_ABGR: case RTGFMT_RGB32_ARGB: \
+        case RTGFMT_RGB32_BGRA: case RTGFMT_RGB32_RGBA: \
+            *((uint32_t *)dest) = src; \
+            break; \
+    }
+
+#define SET_RTG_PIXEL_MASK(dest, src, format) \
+    switch (format) { \
+        case RTGFMT_8BIT_CLUT: \
+            *(dest) = src ^ (*(dest) & ~mask); \
+            break; \
+        case RTGFMT_RGB565_LE: case RTGFMT_RGB565_BE: case RTGFMT_BGR565_LE: \
+        case RTGFMT_RGB555_LE: case RTGFMT_RGB555_BE: case RTGFMT_BGR555_LE: \
+            *((uint16_t *)dest) = src; \
+            break; \
+        case RTGFMT_RGB32_ABGR: case RTGFMT_RGB32_ARGB: \
+        case RTGFMT_RGB32_BGRA: case RTGFMT_RGB32_RGBA: \
+            *((uint32_t *)dest) = src; \
+            break; \
+    }
+
+#define INVERT_RTG_PIXEL(dest, format) \
+    switch (format) { \
+        case RTGFMT_8BIT_CLUT: \
+            *(dest) ^= mask; \
+            break; \
+        case RTGFMT_RGB565_LE: case RTGFMT_RGB565_BE: case RTGFMT_BGR565_LE: \
+        case RTGFMT_RGB555_LE: case RTGFMT_RGB555_BE: case RTGFMT_BGR555_LE: \
+            *((uint16_t *)dest) = ~*((uint16_t *)dest); \
+            break; \
+        case RTGFMT_RGB32_ABGR: case RTGFMT_RGB32_ARGB: \
+        case RTGFMT_RGB32_BGRA: case RTGFMT_RGB32_RGBA: \
+            *((uint32_t *)dest) = ~*((uint32_t *)dest); \
+            break; \
+    }
 
 #define HANDLE_MINTERM_PIXEL(s, d, f)                                                              \
   switch (draw_mode) {                                                                             \

@@ -7,30 +7,26 @@ VBCC ?=
 AMIGA_NDK_C_INCLUDE ?=
 AMIGA_NDK_ASM_INCLUDE ?=
 
-CPU ?= 040
+CPU ?= 030
+DEVICE_TARGET = pi-scsi.device
 
 ifeq ($(CPU),000)
-DEVICE_TARGET = PiSCSI000.device
+
 CPUFLAG = -m68000
 endif
 ifeq ($(CPU),010)
-DEVICE_TARGET = PiSCSI010.device
 CPUFLAG = -m68010
 endif
 ifeq ($(CPU),020)
-DEVICE_TARGET = PiSCSI020.device
 CPUFLAG = -m68020
 endif
 ifeq ($(CPU),030)
-DEVICE_TARGET = PiSCSI030.device
 CPUFLAG = -m68030
 endif
 ifeq ($(CPU),040)
-DEVICE_TARGET = PiSCSI040.device
 CPUFLAG = -m68040
 endif
 ifeq ($(CPU),060)
-DEVICE_TARGET = PiSCSI060.device
 CPUFLAG = -m68060
 endif
 ifeq ($(strip $(AMIGA_NDK_C_INCLUDE)),)
@@ -83,9 +79,10 @@ $(DEVICE_TARGET): $(DEVICE_SRC)
 	PATH="$(AMIGA_PATH)" $(M68K_GCC) $(DEVICE_CFLAGS) -o $@ $<
 
 install:
-	cp -a PiSCSI$(CPU).device /opt/pistorm64/data/a314-shared/pi-scsi.device
+	cp -a  pi-scsi.device /opt/pistorm64/data/a314-shared/pi-scsi.device
+	sudo chown pistorm:pistorm /opt/pistorm64/data/a314-shared/*
+
 clean:
-	rm -f $(ROM_TARGET) PiSCSI*.device pi-scsi.device pi-scsi000.device pi-scsi010.device pi-scsi020.device pi-scsi030.device pi-scsi040.device pi-scsi060.device
+	rm -f $(ROM_TARGET) pi-scsi.device
 
-
-.PHONY: all clean
+.PHONY: all install clean 

@@ -92,8 +92,9 @@ $(ROM_IMAGE): $(ROM_TARGET) $(DEVICE_TARGET) $(MAKEROM)
 	./$(MAKEROM) $(DEVICE_TARGET)
 
 install:
-	cp -a pi-scsi64.device /opt/pistorm64/data/a314-shared/pi-scsi64.device
-	cp -a $(ROM_IMAGE) /opt/pistorm64/src/platforms/amiga/piscsi64/piscsi64.rom
+	sudo cp -a pi-scsi64.device /opt/pistorm64/data/a314-shared/pi-scsi64.device
+	sudo cp -a $(ROM_IMAGE) /opt/pistorm64/src/platforms/amiga/piscsi64/piscsi64.rom
+	sudo chown pistorm:pistorm /opt/pistorm64/data/a314-shared/* /opt/pistorm64/src/platforms/amiga/piscsi64/piscsi64.rom
 clean:
 	rm -f $(ROM_TARGET) $(MAKEROM) $(ROM_IMAGE) pi-scsi64.device
 

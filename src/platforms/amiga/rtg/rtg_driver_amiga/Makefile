@@ -8,7 +8,7 @@ AMIGA_PATH := $(AMIGA_TOOLCHAIN)/bin:$(PATH)
 M68K_GCC ?= m68k-amigaos-gcc
 P96DEV ?= ../../../../../amiga.dev/Picasso96Develop
 
-CPU ?= 040
+CPU ?= 030
 TARGET = pigfx.card
 ifeq ($(CPU),020)
 CPUFLAG = -m68020
@@ -51,6 +51,7 @@ clean:
 install:
 	sudo cp pigfx.card /opt/pistorm64/data/a314-shared/pigfx.card
 	sudo cp PiGFX.info /opt/pistorm64/data/a314-shared/
+	sudo chown pistorm:pistorm /opt/pistorm64/data/a314-shared/*
 
 FORCE:
 

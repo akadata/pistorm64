@@ -698,7 +698,7 @@ static void handle_irtg_command(uint32_t cmd) {
       y_offset = be16toh(p->YOffset);
       draw_mode = p->DrawMode;
       loop_rows = (uint8_t)(1u << p->Size);
-      src_addr = be32toh(ps_read_32(src_addr + (uint32_t)offsetof(struct P96Pattern, _p_Memory)));
+      src_addr = be32toh(p->_p_Memory);
     } else {
       fgcol = be32toh(ps_read_32(src_addr + (uint32_t)offsetof(struct P96Pattern, FgPen)));
       bgcol = be32toh(ps_read_32(src_addr + (uint32_t)offsetof(struct P96Pattern, BgPen)));
@@ -706,7 +706,7 @@ static void handle_irtg_command(uint32_t cmd) {
       y_offset = be16toh(ps_read_16(src_addr + (uint32_t)offsetof(struct P96Pattern, YOffset)));
       draw_mode = ps_read_8(src_addr + (uint32_t)offsetof(struct P96Pattern, DrawMode));
       loop_rows = (uint8_t)(1u << ps_read_8(src_addr + (uint32_t)offsetof(struct P96Pattern, Size)));
-      src_addr = be32toh(p->_p_Memory);
+      src_addr = be32toh(ps_read_32(src_addr + (uint32_t)offsetof(struct P96Pattern, _p_Memory)));
     }
 
     cmd_mask = (uint8_t)M68KR(M68K_REG_D4);

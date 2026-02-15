@@ -4,34 +4,29 @@ AMIGA_PATH := $(AMIGA_TOOLCHAIN)/bin:$(PATH)
 M68K_GCC ?= m68k-amigaos-gcc
 
 CPU ?= 030
+TARGET = net64.device
 
 ifeq ($(CPU),000)
-TARGET = net64-000.device
 CPUFLAG = -m68000
 endif
 ifeq ($(CPU),010)
-TARGET = net64-010.device
 CPUFLAG = -m68010
 endif
 ifeq ($(CPU),020)
-TARGET = net64-020.device
 CPUFLAG = -m68020
 endif
 ifeq ($(CPU),030)
-TARGET = net64-030.device
 CPUFLAG = -m68030
 endif
 ifeq ($(CPU),040)
-TARGET = net64-040.device
 CPUFLAG = -m68040
 endif
 ifeq ($(CPU),060)
-TARGET = net64-060.device
 CPUFLAG = -m68060
 endif
 
 DEVICE_SRC ?= net64-amiga.c
-DEVICE_TARGET ?= net64-$(CPU).device
+DEVICE_TARGET ?= net64.device
 DEVICE_CFLAGS ?= $(CPUFLAG) -O2 -Wall -Wextra -Wno-unused-parameter -fomit-frame-pointer -nostartfiles
 DEVICE_LDFLAGS ?= -lm -ldebug
 

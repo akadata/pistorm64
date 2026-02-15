@@ -125,7 +125,7 @@ void SetSpriteColor (__REGA0(struct BoardInfo *b), __REGD0(UBYTE idx), __REGD1(U
 #define DEVICE_PRIORITY 0
 #define DEVICE_ID_STRING "PiGFX " XSTR(DEVICE_VERSION) "." XSTR(DEVICE_REVISION) " " DEVICE_DATE
 #define DEVICE_NAME "pigfx.card"
-#define DEVICE_DATE "(29 May 2021)"
+#define DEVICE_DATE "(15 Feb 2026)"
 
 
 int __attribute__((no_reorder)) _start()
@@ -418,44 +418,28 @@ void SetColorArray (__REGA0(struct BoardInfo *b), __REGD0(UWORD start), __REGD1(
     }
 }
 
-UWORD CalculateBytesPerRow(__REGA0(struct BoardInfo *b),
-                           __REGD0(UWORD width),
-                           __REGD7(RGBFTYPE format))
-{
+UWORD CalculateBytesPerRow (__REGA0(struct BoardInfo *b), __REGD0(UWORD width), __REGD7(RGBFTYPE format)) {
     if (!b)
         return 0;
 
-    switch (format) {
-    case RGBFB_CLUT:
-        /* 8-bit paletted: 1 byte per pixel */
-        return width;
+    UWORD pitch = width;
 
-    case RGBFB_R5G6B5PC: case RGBFB_R5G5B5PC:
-    case RGBFB_R5G6B5:   case RGBFB_R5G5B5:
-    case RGBFB_B5G6R5PC: case RGBFB_B5G5R5PC:
-        /* 16-bit: 2 bytes per pixel */
-        return (UWORD)(width * 2u);
-
-    case RGBFB_R8G8B8:
-    case RGBFB_B8G8R8:
-        /*
-         * 24-bit packed. If the Pi side actually stores these as 32-bit,
-         * returning width * 4 is correct for what the hardware really does.
-         * If you ever add a true 24-bit mode, change this to width * 3.
-         */
-        return (UWORD)(width * 4u);
-
-    case RGBFB_B8G8R8A8: case RGBFB_R8G8B8A8:
-    case RGBFB_A8B8G8R8: case RGBFB_A8R8G8B8:
-        /* 32-bit: 4 bytes per pixel */
-        return (UWORD)(width * 4u);
-
-    default:
-        /*
-         * Safe-ish fallback: treat unknown formats as 16-bit instead of
-         * returning a bogus constant like 128.
-         */
-        return (UWORD)(width * 2u);
+    switch(format) {
+        case RGBFB_CLUT:
+            return pitch;
+        default:
+            return 128;
+        case RGBFB_R5G6B5PC: case RGBFB_R5G5B5PC:
+        case RGBFB_R5G6B5: case RGBFB_R5G5B5:
+        case RGBFB_B5G6R5PC: case RGBFB_B5G5R5PC:
+            return (width * 2);
+        case RGBFB_R8G8B8: case RGBFB_B8G8R8:
+            // Should actually return width * 3, but I'm not sure if
+            // the Pi VC supports 24-bit color formats.
+            //return (width * 3);
+        case RGBFB_B8G8R8A8: case RGBFB_R8G8B8A8:
+        case RGBFB_A8B8G8R8: case RGBFB_A8R8G8B8:
+            return (width * 4);
     }
 }
 
@@ -532,7 +516,6 @@ void FillRect (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __RE
 #ifndef IRTG
     if (!r)
         return;
-
     WRITELONG(RTG_ADDR1, (unsigned long)r->Memory);
     
     WRITESHORT(RTG_FORMAT, rgbf_to_rtg[format]);
@@ -553,7 +536,6 @@ void InvertRect (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __
 #ifndef IRTG
     if (!r)
         return;
-    
     WRITELONG(RTG_ADDR1, (unsigned long)r->Memory);
     
     WRITESHORT(RTG_FORMAT, rgbf_to_rtg[format]);
@@ -570,12 +552,12 @@ void InvertRect (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __
 }
 
 void BlitRect (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __REGD0(WORD x), __REGD1(WORD y), __REGD2(WORD dx), __REGD3(WORD dy), __REGD4(WORD w), __REGD5(WORD h), __REGD6(UBYTE mask), __REGD7(RGBFTYPE format)) {
-#ifndef IRTG    
+#ifndef IRTG
     if (!r)
         return;
-
+    
     WRITELONG(RTG_ADDR1, (unsigned long)r->Memory);
-
+    
     WRITESHORT(RTG_FORMAT, rgbf_to_rtg[format]);
     WRITESHORT(RTG_X1, x);
     WRITESHORT(RTG_X2, dx);
@@ -593,9 +575,9 @@ void BlitRect (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __RE
 
 void BlitRectNoMaskComplete (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *rs), __REGA2(struct RenderInfo *rt), __REGD0(WORD x), __REGD1(WORD y), __REGD2(WORD dx), __REGD3(WORD dy), __REGD4(WORD w), __REGD5(WORD h), __REGD6(UBYTE minterm), __REGD7(RGBFTYPE format)) {
 #ifndef IRTG
-    if (!rs || !rt)
+    if (!rs || !rt) 
         return;
-
+    
     WRITESHORT(RTG_FORMAT, rgbf_to_rtg[format]);
     WRITELONG(RTG_ADDR1, (unsigned long)rs->Memory);
     WRITELONG(RTG_ADDR2, (unsigned long)rt->Memory);
@@ -618,7 +600,6 @@ void BlitTemplate (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), 
 #ifndef IRTG
     if (!r || !t) return;
     if (w < 1 || h < 1) return;
-
     WRITELONG(RTG_ADDR2, (unsigned long)r->Memory);
 
     WRITESHORT(RTG_FORMAT, rgbf_to_rtg[format]);
@@ -657,7 +638,6 @@ void BlitPattern (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), _
 #ifndef IRTG
     if (!r || !p) return;
     if (w < 1 || h < 1) return;
-
     WRITELONG(RTG_ADDR2, (unsigned long)r->Memory);
 
     WRITESHORT(RTG_FORMAT, rgbf_to_rtg[format]);
@@ -695,7 +675,6 @@ void BlitPattern (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), _
 void DrawLine (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __REGA2(struct Line *l), __REGD0(UBYTE mask), __REGD7(RGBFTYPE format)) {
 #ifndef IRTG
     if (!r || !b) return;
-
     WRITELONG(RTG_ADDR1, (unsigned long)r->Memory);
 
     WRITELONG(RTG_RGB1, l->FgPen);

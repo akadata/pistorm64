@@ -7,30 +7,25 @@ VBCC ?=
 AHI_INC ?=
 AHI_SDK ?=
 
-CPU ?= 020
+CPU ?= 030
+DEVICE_TARGET = pi-ahi.audio
 
 ifeq ($(CPU),000)
-DEVICE_TARGET = PiAHI000.audio
 CPUFLAG = -m68000
 endif
 ifeq ($(CPU),010)
-DEVICE_TARGET = PiAHI010.audio
 CPUFLAG = -m68010
 endif
 ifeq ($(CPU),020)
-DEVICE_TARGET = PiAHI020.audio
 CPUFLAG = -m68020
 endif
 ifeq ($(CPU),030)
-DEVICE_TARGET = PiAHI030.audio
 CPUFLAG = -m68030
 endif
 ifeq ($(CPU),040)
-DEVICE_TARGET = PiAHI040.audio
 CPUFLAG = -m68040
 endif
 ifeq ($(CPU),060)
-DEVICE_TARGET = PiAHI060.audio
 CPUFLAG = -m68060
 endif
 
@@ -67,7 +62,7 @@ PREFS_SRC ?= prefsfile.a
 
 DEVICE_SRC ?= pi-ahi.c
 
-DEVICE_CFLAGS ?= $(CPUFLAG) -O2 -Wall -Wextra -Wno-unused-parameter -nostartfiles
+DEVICE_CFLAGS ?= $(CPUFLAG) -O3 -Wall -Wextra -Wno-unused-parameter -nostartfiles
 ifneq ($(AHI_SDK),)
 DEVICE_CFLAGS += -I$(AHI_SDK)/Include
 endif
@@ -91,6 +86,9 @@ $(DEVICE_TARGET): $(DEVICE_SRC)
 	PATH="$(AMIGA_PATH)" $(M68K_GCC) $(DEVICE_CFLAGS) -o $@ $<
 
 clean:
-	rm -f $(PREFS_TARGET) PiAHI*.audio pi-ahi.audio pi-ahi000.audio pi-ahi010.audio pi-ahi020.audio pi-ahi030.audio pi-ahi040.audio pi-ahi060.audio
+	rm -f $(PREFS_TARGET) pi-ahi.audio 
+
+install:
+	cp  pi-ahi.audio /opt/pistorm64/data/a314-shared/
 
 .PHONY: all clean

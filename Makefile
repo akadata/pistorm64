@@ -707,6 +707,7 @@ install: all amiga-piscsi amiga-piscsi64
 	else \
 		echo "Skipping /boot/firmware update (INSTALL_BOOT_FIRMWARE=0)."; \
 	fi
+	sudo chown pistorm:pistorm /opt/pistorm64/ -R
 
 install-boot-firmware:
 	@if [ "$$(id -u)" -ne 0 ]; then \
@@ -891,7 +892,7 @@ endif
 	# Enable and start the emulator service
 	# sudo systemctl enable kernelpistorm64.service
 	echo "Loading Kernel PiStorm64"
-#	sudo modprobe pistorm run_batch_enable=1 berr_reset_input=1 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV) 2>/dev/null || true
+	sudo modprobe pistorm run_batch_enable=1 berr_reset_input=1 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV) 2>/dev/null || true
 	sudo modprobe pistorm $(PISTORM_KMOD_PARAMS) 2>/dev/null || true
 
 help:

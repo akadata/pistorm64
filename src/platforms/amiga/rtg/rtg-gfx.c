@@ -470,6 +470,7 @@ void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, uint16_
               uint16_t src_val = load_u16_be(&sptr[src_offset]);
               uint16_t dst_val = load_u16_be(&dptr[dst_offset]);
               HANDLE_MINTERM_PIXEL(src_val, dst_val, format);
+              store_u16_be(&dptr[dst_offset], dst_val);
             }
             break;
           case RTGFMT_RGB32_ABGR:
@@ -482,6 +483,7 @@ void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, uint16_
               uint32_t src_val = load_u32_be(&sptr[src_offset]);
               uint32_t dst_val = load_u32_be(&dptr[dst_offset]);
               HANDLE_MINTERM_PIXEL(src_val, dst_val, format);
+              store_u32_be(&dptr[dst_offset], dst_val);
             }
             break;
           }
@@ -504,6 +506,7 @@ void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, uint16_
               uint16_t src_val = load_u16_be(&sptr[src_offset]);
               uint16_t dst_val = load_u16_be(&dptr[dst_offset]);
               HANDLE_MINTERM_PIXEL(src_val, dst_val, format);
+              store_u16_be(&dptr[dst_offset], dst_val);
             }
             break;
           case RTGFMT_RGB32_ABGR:
@@ -516,6 +519,7 @@ void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, uint16_
               uint32_t src_val = load_u32_be(&sptr[src_offset]);
               uint32_t dst_val = load_u32_be(&dptr[dst_offset]);
               HANDLE_MINTERM_PIXEL(src_val, dst_val, format);
+              store_u32_be(&dptr[dst_offset], dst_val);
             }
             break;
           }
@@ -545,7 +549,8 @@ void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t s
 
   draw_mode &= 0x03;
 
-  tmpl_x = offset_x / 4;
+  /* Template source is 1bpp (8 pixels per byte), so byte index is offset_x/8. */
+  tmpl_x = offset_x / 8;
   cur_bit = base_bit = (0x80 >> (offset_x % 8));
 
   if (realtime_graphics_debug) {
@@ -740,8 +745,8 @@ void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t sr
   case RTGFMT_RGB555_LE:
   case RTGFMT_RGB555_BE:
   case RTGFMT_BGR555_LE:
-    htobe16((fgcol & 0xFFFF));
-    htobe16((bgcol & 0xFFFF));
+    fg_color = htobe16((fgcol & 0xFFFF));
+    bg_color = htobe16((bgcol & 0xFFFF));
     break;
   case RTGFMT_8BIT_CLUT:
   case RTGFMT_4BIT_PLANAR:
@@ -1347,7 +1352,8 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
   for (int i = 0; i < 256; i++) {
     uint32_t temp_val;
     memcpy(&temp_val, &bmp_data_src[(size_t)i * sizeof(uint32_t)], sizeof(uint32_t));
-    clut_array[i] = be32toh(temp_val);
+    /* Keep raw CLUT word layout, matching the original 32-bit implementation. */
+    clut_array[i] = temp_val;
   }
   uint32_t* clut = clut_array;
   bmp_data += (256 * 4);
@@ -1365,6 +1371,7 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
       uint32_t fg_color = clut[u8_fg];
 
       if (mask == 0xFF && (draw_mode == MINTERM_SRC || draw_mode == MINTERM_NOTSRC)) {
+        uint8_t* pix = rtg_pixel_at(dptr, (size_t)x, rtg_format);
         switch (rtg_format) {
         case RTGFMT_RGB565_LE:
         case RTGFMT_RGB565_BE:
@@ -1372,16 +1379,13 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
         case RTGFMT_RGB555_LE:
         case RTGFMT_RGB555_BE:
         case RTGFMT_BGR555_LE:
-          {
-            uint16_t color16 = (fg_color >> 16);
-            store_u16_be(&dptr[(size_t)x * sizeof(uint16_t)], color16);
-          }
+          rtg_store_pixel(pix, rtg_format, (fg_color >> 16));
           break;
         case RTGFMT_RGB32_ABGR:
         case RTGFMT_RGB32_ARGB:
         case RTGFMT_RGB32_BGRA:
         case RTGFMT_RGB32_RGBA:
-          store_u32_be(&dptr[(size_t)x * sizeof(uint32_t)], fg_color);
+          rtg_store_pixel(pix, rtg_format, fg_color);
           break;
         }
         goto skip;
