@@ -100,7 +100,7 @@ static int rtg_check_bounds(size_t base, size_t span, const char* tag, uint16_t 
   return 1;
 }
 
-static int rtg_get_ptr_checked(uint32_t base_adj, uint16_t x, uint16_t y, uint16_t w, uint16_t h,
+static int rtg_get_ptr_checked(uint32_t base_adj, int16_t x, int16_t y, uint16_t w, uint16_t h,
                                uint16_t pitch, uint16_t format, const char* tag,
                                uint8_t** out_ptr) {
   if (format >= RTGFMT_NUM) {
@@ -110,12 +110,19 @@ static int rtg_get_ptr_checked(uint32_t base_adj, uint16_t x, uint16_t y, uint16
     }
     return 0;
   }
+  if (x < 0 || y < 0) {
+    if (rtg_oob_log_count < 20) {
+      LOG_WARN("[RTG/OOB] %s negative coordinates after clip: x=%d y=%d\n", tag, x, y);
+      rtg_oob_log_count++;
+    }
+    return 0;
+  }
   size_t bpp = rtg_pixel_size[format];
   size_t x_bytes = (size_t)x * bpp;
   size_t span = 0;
   if (!rtg_calc_span(x_bytes, w, h, pitch, bpp, &span)) {
     if (rtg_oob_log_count < 20) {
-      LOG_WARN("[RTG/OOB] %s invalid span: x=%u y=%u w=%u h=%u pitch=%u fmt=%u\n", tag, x, y, w, h,
+      LOG_WARN("[RTG/OOB] %s invalid span: x=%d y=%d w=%u h=%u pitch=%u fmt=%u\n", tag, x, y, w, h,
                pitch, format);
       rtg_oob_log_count++;
     }
@@ -126,6 +133,53 @@ static int rtg_get_ptr_checked(uint32_t base_adj, uint16_t x, uint16_t y, uint16
     return 0;
   }
   *out_ptr = &rtg_mem[base];
+  return 1;
+}
+
+/*
+ * P96 blit coordinates are WORD (signed 16-bit), not UWORD.
+ * When negative X/Y is interpreted as uint16_t it wraps to ~65535 and corrupts
+ * clipping math, which causes decoration/artifact placement near left/top edges.
+ */
+static int rtg_clip_signed_blit_rect(int16_t* x, int16_t* y, int16_t* w, int16_t* h,
+                                     int16_t* src_off_x, int16_t* src_off_y) {
+  int32_t x32 = *x;
+  int32_t y32 = *y;
+  int32_t w32 = *w;
+  int32_t h32 = *h;
+
+  if (w32 <= 0 || h32 <= 0) {
+    return 0;
+  }
+
+  if (x32 < 0) {
+    int32_t clip = -x32;
+    if (clip >= w32) {
+      return 0;
+    }
+    x32 = 0;
+    w32 -= clip;
+    if (src_off_x) {
+      *src_off_x = (int16_t)((int32_t)*src_off_x + clip);
+    }
+  }
+
+  if (y32 < 0) {
+    int32_t clip = -y32;
+    if (clip >= h32) {
+      return 0;
+    }
+    y32 = 0;
+    h32 -= clip;
+    if (src_off_y) {
+      *src_off_y = (int16_t)((int32_t)*src_off_y + clip);
+    }
+  }
+
+  *x = (int16_t)x32;
+  *y = (int16_t)y32;
+  *w = (int16_t)w32;
+  *h = (int16_t)h32;
   return 1;
 }
 
@@ -526,12 +580,17 @@ void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, uint16_
 
 extern struct emulator_config* cfg;
 
-void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t src_addr,
+void rtg_blittemplate(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t src_addr,
                       uint32_t fgcol, uint32_t bgcol, uint16_t pitch, uint16_t t_pitch,
-                      uint16_t format, uint16_t offset_x, uint8_t mask, uint8_t draw_mode) {
+                      uint16_t format, int16_t offset_x, uint8_t mask, uint8_t draw_mode) {
   // P96 uses template blits for window decorations (gadgets/scrollbars/titlebar text/masks).
+  int16_t src_row_offset = 0;
+  if (!rtg_clip_signed_blit_rect(&x, &y, &w, &h, &offset_x, &src_row_offset)) {
+    return;
+  }
   uint8_t* dptr = NULL;
-  if (!rtg_get_ptr_checked(rtg_address_adj[1], x, y, w, h, pitch, format, "blittemplate",
+  if (!rtg_get_ptr_checked(rtg_address_adj[1], x, y, (uint16_t)w, (uint16_t)h, pitch, format,
+                           "blittemplate",
                            &dptr)) {
     return;
   }
@@ -543,8 +602,8 @@ void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t s
   draw_mode &= 0x03;
 
   /* Template source is 1bpp (8 pixels per byte), so byte index is offset_x/8. */
-  tmpl_x = offset_x / 8;
-  cur_bit = base_bit = (0x80 >> (offset_x % 8));
+  tmpl_x = (uint16_t)((uint16_t)offset_x / 8);
+  cur_bit = base_bit = (uint8_t)(0x80 >> ((uint16_t)offset_x % 8));
 
   if (realtime_graphics_debug) {
     size_t bpp = (format < RTGFMT_NUM) ? rtg_pixel_size[format] : 0;
@@ -602,9 +661,14 @@ void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t s
     }
   }
 
+  src_addr += (uint32_t)src_row_offset * t_pitch;
+  if (sptr) {
+    sptr += (uint32_t)src_row_offset * t_pitch;
+  }
+
   switch (draw_mode) {
   case DRAWMODE_JAM1:
-    for (uint16_t ys = 0; ys < h; ys++) {
+    for (uint16_t ys = 0; ys < (uint16_t)h; ys++) {
       for (int xs = 0; xs < w; xs++) {
         TEMPLATE_LOOPX;
         if (w >= 8 && cur_bit == 0x80 && xs < w - 8) {
@@ -634,7 +698,7 @@ void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t s
     }
     return;
   case DRAWMODE_JAM2:
-    for (uint16_t ys = 0; ys < h; ys++) {
+    for (uint16_t ys = 0; ys < (uint16_t)h; ys++) {
       for (int xs = 0; xs < w; xs++) {
         TEMPLATE_LOOPX;
         if (w >= 8 && cur_bit == 0x80 && xs < w - 8) {
@@ -666,7 +730,7 @@ void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t s
     }
     return;
   case DRAWMODE_COMPLEMENT:
-    for (uint16_t ys = 0; ys < h; ys++) {
+    for (uint16_t ys = 0; ys < (uint16_t)h; ys++) {
       for (int xs = 0; xs < w; xs++) {
         TEMPLATE_LOOPX;
         if (w >= 8 && cur_bit == 0x80 && xs < w - 8) {
@@ -690,9 +754,9 @@ void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t s
   }
 }
 
-void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t src_addr_,
+void rtg_blitpattern(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t src_addr_,
                      uint32_t fgcol, uint32_t bgcol, uint16_t pitch, uint16_t format,
-                     uint16_t offset_x, uint16_t offset_y, uint8_t mask, uint8_t draw_mode,
+                     int16_t offset_x, int16_t offset_y, uint8_t mask, uint8_t draw_mode,
                      uint8_t loop_rows) {
   if (mask) {
   }
@@ -704,8 +768,12 @@ void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t sr
 #endif
 
   // P96 uses pattern blits for window decoration fills and requesters.
+  if (!rtg_clip_signed_blit_rect(&x, &y, &w, &h, &offset_x, &offset_y)) {
+    return;
+  }
   uint8_t* dptr = NULL;
-  if (!rtg_get_ptr_checked(rtg_address_adj[1], x, y, w, h, pitch, format, "blitpattern",
+  if (!rtg_get_ptr_checked(rtg_address_adj[1], x, y, (uint16_t)w, (uint16_t)h, pitch, format,
+                           "blitpattern",
                            &dptr)) {
     return;
   }
@@ -725,8 +793,8 @@ void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t sr
 
   draw_mode &= 0x03;
 
-  tmpl_x = (offset_x / 8) % 2;
-  cur_bit = base_bit = (0x80 >> (offset_x % 8));
+  tmpl_x = ((uint16_t)offset_x / 8) % 2;
+  cur_bit = base_bit = (uint8_t)(0x80 >> ((uint16_t)offset_x % 8));
 
   uint32_t fg_color = htobe32(fgcol);
   uint32_t bg_color = htobe32(bgcol);
@@ -767,19 +835,19 @@ void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t sr
     if (realtime_graphics_debug) {
       LOG_DEBUG("BlitPattern data NOT available in mapped range, source address: $%.8X\n",
                 src_addr);
-      src_addr += (offset_y % loop_rows) * 2;
+      src_addr += ((uint16_t)offset_y % loop_rows) * 2;
     }
   } else {
     if (realtime_graphics_debug) {
       LOG_DEBUG("BlitPattern data available in mapped range at $%.8X\n", src_addr);
     }
     sptr_base = sptr;
-    sptr += (offset_y % loop_rows) * 2;
+    sptr += ((uint16_t)offset_y % loop_rows) * 2;
   }
 
   switch (draw_mode) {
   case DRAWMODE_JAM1:
-    for (uint16_t ys = 0; ys < h; ys++) {
+    for (uint16_t ys = 0; ys < (uint16_t)h; ys++) {
       for (int xs = 0; xs < w; xs++) {
         PATTERN_LOOPX;
         if (w >= 8 && cur_bit == 0x80 && xs < w - 8) {
@@ -809,7 +877,7 @@ void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t sr
     }
     return;
   case DRAWMODE_JAM2:
-    for (uint16_t ys = 0; ys < h; ys++) {
+    for (uint16_t ys = 0; ys < (uint16_t)h; ys++) {
       for (int xs = 0; xs < w; xs++) {
         PATTERN_LOOPX;
         if (w >= 8 && cur_bit == 0x80 && xs < w - 8) {
@@ -841,7 +909,7 @@ void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t sr
     }
     return;
   case DRAWMODE_COMPLEMENT:
-    for (uint16_t ys = 0; ys < h; ys++) {
+    for (uint16_t ys = 0; ys < (uint16_t)h; ys++) {
       for (int xs = 0; xs < w; xs++) {
         PATTERN_LOOPX;
         if (w >= 8 && cur_bit == 0x80 && xs < w - 8) {

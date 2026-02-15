@@ -171,12 +171,12 @@ void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, uint16_
                                   uint16_t h, uint16_t srcpitch, uint16_t dstpitch,
                                   uint32_t src_addr, uint32_t dst_addr, uint16_t format,
                                   uint8_t minterm);
-void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t src_addr,
+void rtg_blittemplate(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t src_addr,
                       uint32_t fgcol, uint32_t bgcol, uint16_t pitch, uint16_t t_pitch,
-                      uint16_t format, uint16_t offset_x, uint8_t mask, uint8_t draw_mode);
-void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t src_addr,
+                      uint16_t format, int16_t offset_x, uint8_t mask, uint8_t draw_mode);
+void rtg_blitpattern(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t src_addr,
                      uint32_t fgcol, uint32_t bgcol, uint16_t pitch, uint16_t format,
-                     uint16_t offset_x, uint16_t offset_y, uint8_t mask, uint8_t draw_mode,
+                     int16_t offset_x, int16_t offset_y, uint8_t mask, uint8_t draw_mode,
                      uint8_t loop_rows);
 void rtg_drawline_solid(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint16_t len,
                         uint32_t fgcol, uint16_t pitch, uint16_t format);
