@@ -129,6 +129,87 @@ static inline void rtg_invert_pixel(uint8_t *dest, uint16_t format, uint32_t mas
   }
 }
 
+static inline uint32_t rtg_format_full_mask(uint16_t format) {
+  switch (format) {
+  case RTGFMT_RGB565_LE:
+  case RTGFMT_RGB565_BE:
+  case RTGFMT_BGR565_LE:
+  case RTGFMT_RGB555_LE:
+  case RTGFMT_RGB555_BE:
+  case RTGFMT_BGR555_LE:
+    return 0xFFFFu;
+  case RTGFMT_RGB32_ABGR:
+  case RTGFMT_RGB32_ARGB:
+  case RTGFMT_RGB32_BGRA:
+  case RTGFMT_RGB32_RGBA:
+    return 0xFFFFFFFFu;
+  case RTGFMT_8BIT_CLUT:
+  default:
+    return 0xFFu;
+  }
+}
+
+static inline uint32_t rtg_minterm_masked_pixel(uint32_t prev_dst, uint32_t value, uint16_t format,
+                                                 uint32_t mask) {
+  uint32_t full_mask = rtg_format_full_mask(format);
+  value &= full_mask;
+  prev_dst &= full_mask;
+  if (format == RTGFMT_8BIT_CLUT) {
+    uint32_t clut_mask = mask & full_mask;
+    return value ^ (prev_dst & (~clut_mask & full_mask));
+  }
+  return value;
+}
+
+static inline uint32_t rtg_apply_minterm_pixel(uint8_t draw_mode, uint16_t format, uint32_t src,
+                                                uint32_t dst, uint32_t mask,
+                                                bool* out_no_write) {
+  uint32_t full_mask = rtg_format_full_mask(format);
+  uint32_t format_mask = (format == RTGFMT_8BIT_CLUT) ? (mask & full_mask) : full_mask;
+  src &= full_mask;
+  dst &= full_mask;
+  *out_no_write = false;
+
+  switch (draw_mode) {
+  case MINTERM_NOR:
+    src &= ~dst;
+    return rtg_minterm_masked_pixel(dst, src, format, format_mask);
+  case MINTERM_ONLYDST:
+    return (dst & ~src) & full_mask;
+  case MINTERM_NOTSRC:
+    return rtg_minterm_masked_pixel(dst, src, format, format_mask);
+  case MINTERM_ONLYSRC:
+    src &= (dst ^ full_mask);
+    return rtg_minterm_masked_pixel(dst, src, format, format_mask);
+  case MINTERM_INVERT:
+    return (dst ^ full_mask) & full_mask;
+  case MINTERM_EOR:
+    return (dst ^ src) & full_mask;
+  case MINTERM_NAND:
+    src = (~(dst & ~src)) & format_mask;
+    return rtg_minterm_masked_pixel(dst, src, format, format_mask);
+  case MINTERM_AND:
+    src &= dst;
+    return rtg_minterm_masked_pixel(dst, src, format, format_mask);
+  case MINTERM_NEOR:
+    return (dst ^ (src & format_mask)) & full_mask;
+  case MINTERM_DST:
+    *out_no_write = true;
+    return dst;
+  case MINTERM_NOTONLYSRC:
+    return (dst | (src & format_mask)) & full_mask;
+  case MINTERM_SRC:
+    return rtg_minterm_masked_pixel(dst, src, format, format_mask);
+  case MINTERM_NOTONLYDST:
+    src = (~(dst & src)) & format_mask;
+    return rtg_minterm_masked_pixel(dst, src, format, format_mask);
+  case MINTERM_OR:
+    return (dst | (src & format_mask)) & full_mask;
+  default:
+    return dst;
+  }
+}
+
 void rtg_write(uint32_t address, uint32_t value, uint8_t mode);
 unsigned int rtg_read(uint32_t address, uint8_t mode);
 void rtg_set_clut_entry(uint8_t index, uint32_t xrgb);
@@ -400,57 +481,6 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
             *((uint32_t *)dest) = ~*((uint32_t *)dest); \
             break; \
     }
-
-#define HANDLE_MINTERM_PIXEL(s, d, f)                                                              \
-  switch (draw_mode) {                                                                             \
-  case MINTERM_NOR:                                                                                \
-    s &= ~(d);                                                                                     \
-    SET_RTG_PIXEL_MASK(&d, s, f);                                                                  \
-    break;                                                                                         \
-  case MINTERM_ONLYDST:                                                                            \
-    d = d & ~(s);                                                                                  \
-    break;                                                                                         \
-  case MINTERM_NOTSRC:                                                                             \
-    SET_RTG_PIXEL_MASK(&d, s, f);                                                                  \
-    break;                                                                                         \
-  case MINTERM_ONLYSRC:                                                                            \
-    s &= (d ^ 0xFF);                                                                               \
-    SET_RTG_PIXEL_MASK(&d, s, f);                                                                  \
-    break;                                                                                         \
-  case MINTERM_INVERT:                                                                             \
-    d ^= 0xFF;                                                                                     \
-    break;                                                                                         \
-  case MINTERM_EOR:                                                                                \
-    d ^= s;                                                                                        \
-    break;                                                                                         \
-  case MINTERM_NAND:                                                                               \
-    s = ~(d & ~(s)) & mask;                                                                        \
-    SET_RTG_PIXEL_MASK(&d, s, f);                                                                  \
-    break;                                                                                         \
-  case MINTERM_AND:                                                                                \
-    s &= d;                                                                                        \
-    SET_RTG_PIXEL_MASK(&d, s, f);                                                                  \
-    break;                                                                                         \
-  case MINTERM_NEOR:                                                                               \
-    d ^= (s & mask);                                                                               \
-    break;                                                                                         \
-  case MINTERM_DST: /* This one does nothing. */                                                   \
-    return;                                                                                        \
-    break;                                                                                         \
-  case MINTERM_NOTONLYSRC:                                                                         \
-    d |= (s & mask);                                                                               \
-    break;                                                                                         \
-  case MINTERM_SRC:                                                                                \
-    SET_RTG_PIXEL_MASK(&d, s, f);                                                                  \
-    break;                                                                                         \
-  case MINTERM_NOTONLYDST:                                                                         \
-    s = ~(d & s) & mask;                                                                           \
-    SET_RTG_PIXEL_MASK(&d, s, f);                                                                  \
-    break;                                                                                         \
-  case MINTERM_OR:                                                                                 \
-    d |= (s & mask);                                                                               \
-    break;                                                                                         \
-  }
 
 #define DECODE_PLANAR_PIXEL(a)                                                                     \
   switch (planes) {                                                                                \
