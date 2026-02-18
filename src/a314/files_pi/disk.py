@@ -20,6 +20,9 @@ from a314d import A314d
 
 logger = logging.getLogger(__name__)
 
+HOST = 127.0.0.1
+PORT = 23890
+
 SERVICE_NAME = 'disk'
 
 READ_TRACK_REQ = 1
@@ -97,7 +100,7 @@ class DiskService(object):
         self.a314d = A314d(SERVICE_NAME)
 
         self.control_server_socket = socket.socket()
-        self.control_server_socket.bind(('0.0.0.0', 23890))
+        self.control_server_socket.bind((HOST, PORT))
         self.control_server_socket.listen(10)
 
         self.control_sockets: List[socket.socket] = []
