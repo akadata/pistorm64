@@ -86,13 +86,15 @@ static struct pistorm_dev *ps_dev;
 /*
  * GPCLK tuning knobs.
  *
- * Default source = PLLC (5) and divisor = 6 matches Pi3/Zero2 behaviour (~200MHz).
+ * Default source = PLLC (5) and divisor = 6 matches Pi4/Pi3/Zero2 behaviour (~200MHz).
  * On Pi4/BCM2711 firmware/clock trees can vary; these params allow tuning without code edits.
  */
 static unsigned int gpclk_src = 5;  /* 5 = PLLC on bcm2835 style clock manager */
 static unsigned int gpclk_div = 6;  /* integer divider */
+
 module_param(gpclk_src, uint, 0644);
 MODULE_PARM_DESC(gpclk_src, "GPCLK0 clock source (bcm2835 style: 5=PLLC, 6=PLLD, etc.)");
+
 module_param(gpclk_div, uint, 0644);
 MODULE_PARM_DESC(gpclk_div, "GPCLK0 integer divider (default 6 ~200MHz on Pi3-class)");
 
@@ -104,28 +106,23 @@ static bool run_batch_enable;
 module_param(run_batch_enable, bool, 0644);
 MODULE_PARM_DESC(run_batch_enable, "Enable PISTORM_IOC_RUN_BATCH v2 batch interface");
 
-static inline u32 ps_readl(u32 off)
-{
+static inline u32 ps_readl(u32 off) {
 	return readl(ps_dev->gpio_base + off);
 }
 
-static inline void ps_writel(u32 off, u32 val)
-{
+static inline void ps_writel(u32 off, u32 val) {
 	writel(val, ps_dev->gpio_base + off);
 }
 
-static inline void ps_write_set(u32 mask)
-{
+static inline void ps_write_set(u32 mask) {
 	ps_writel(GPIO_GPSET0, mask);
 }
 
-static inline void ps_write_clr(u32 mask)
-{
+static inline void ps_write_clr(u32 mask) {
 	ps_writel(GPIO_GPCLR0, mask);
 }
 
-static u32 ps_set_fsel(u32 fsel, unsigned int pin, unsigned int func)
-{
+static u32 ps_set_fsel(u32 fsel, unsigned int pin, unsigned int func) {
 	unsigned int shift = (pin % 10) * 3;
 	u32 mask = GENMASK(shift + 2, shift);
 
@@ -134,18 +131,20 @@ static u32 ps_set_fsel(u32 fsel, unsigned int pin, unsigned int func)
 	return fsel;
 }
 
-static void ps_prepare_fsel(struct pistorm_dev *ps)
-{
+static void ps_prepare_fsel(struct pistorm_dev *ps) {
 	u32 fsel0 = ps_readl(GPIO_GPFSEL0);
 	u32 fsel1 = ps_readl(GPIO_GPFSEL1);
 	u32 fsel2 = ps_readl(GPIO_GPFSEL2);
 
-	for (int pin = 0; pin <= 9; pin++)
+	for (int pin = 0; pin <= 9; pin++) {
 		fsel0 = ps_set_fsel(fsel0, pin, GPIO_FSEL_INPUT);
-	for (int pin = 10; pin <= 19; pin++)
+	}
+	for (int pin = 10; pin <= 19; pin++) {
 		fsel1 = ps_set_fsel(fsel1, pin, GPIO_FSEL_INPUT);
-	for (int pin = 20; pin <= 23; pin++)
+	}
+	for (int pin = 20; pin <= 23; pin++) {
 		fsel2 = ps_set_fsel(fsel2, pin, GPIO_FSEL_INPUT);
+	}
 
 	/* Fixed-function pins */
 	fsel0 = ps_set_fsel(fsel0, PIN_TXN_IN_PROGRESS, GPIO_FSEL_INPUT);
@@ -165,18 +164,20 @@ static void ps_prepare_fsel(struct pistorm_dev *ps)
 	ps->fsel_output[0] = ps_set_fsel(ps->fsel_output[0], PIN_D(1), GPIO_FSEL_OUTPUT);
 
 	ps->fsel_output[1] = fsel1;
-	for (int pin = 10; pin <= 19; pin++)
+	for (int pin = 10; pin <= 19; pin++) {
 		ps->fsel_output[1] = ps_set_fsel(ps->fsel_output[1], pin, GPIO_FSEL_OUTPUT);
+	}
 
 	ps->fsel_output[2] = fsel2;
-	for (int pin = 20; pin <= 23; pin++)
+	for (int pin = 20; pin <= 23; pin++) {
 		ps->fsel_output[2] = ps_set_fsel(ps->fsel_output[2], pin, GPIO_FSEL_OUTPUT);
+	}
 }
 
-static void ps_set_bus_dir(struct pistorm_dev *ps, bool data_out)
-{
-	if (ps->data_out == data_out)
+static void ps_set_bus_dir(struct pistorm_dev *ps, bool data_out) {
+	if (ps->data_out == data_out) {
 		return;
+	}
 
 	ps->data_out = data_out;
 	ps_writel(GPIO_GPFSEL0, data_out ? ps->fsel_output[0] : ps->fsel_input[0]);
@@ -184,22 +185,21 @@ static void ps_set_bus_dir(struct pistorm_dev *ps, bool data_out)
 	ps_writel(GPIO_GPFSEL2, data_out ? ps->fsel_output[2] : ps->fsel_input[2]);
 }
 
-static void ps_clear_lines(void)
-{
-	u32 mask = GENMASK(23, 8) | BIT(PIN_A0) | BIT(PIN_A1) |
-		   BIT(PIN_RD) | BIT(PIN_WR);
-	if (!berr_reset_input)
+static void ps_clear_lines(void) {
+	u32 mask = GENMASK(23, 8) | BIT(PIN_A0) | BIT(PIN_A1) | BIT(PIN_RD) | BIT(PIN_WR);
+	if (!berr_reset_input) {
 		mask |= BIT(PIN_RESET);
+	}
 	ps_write_clr(mask);
 }
 
-static int ps_wait_for_txn(void)
-{
+static int ps_wait_for_txn(void) {
 	unsigned long timeout_jiffies = jiffies + msecs_to_jiffies(500); /* 500ms */
 
 	while (time_before(jiffies, timeout_jiffies)) {
-		if (!(ps_readl(GPIO_GPLEV0) & BIT(PIN_TXN_IN_PROGRESS)))
+		if (!(ps_readl(GPIO_GPLEV0) & BIT(PIN_TXN_IN_PROGRESS))) {
 			return 0;
+		}
 		cpu_relax();
 	}
 
@@ -207,16 +207,15 @@ static int ps_wait_for_txn(void)
 	return -ETIMEDOUT;
 }
 
-static int ps_wait_for_txn_log(const char *op)
-{
+static int ps_wait_for_txn_log(const char *op) {
 	int ret = ps_wait_for_txn();
-	if (ret == -ETIMEDOUT)
+	if (ret == -ETIMEDOUT) {
 		pr_err("pistorm: txn timeout waiting for %s (PIN_TXN_IN_PROGRESS stuck)\n", op);
+	}
 	return ret;
 }
 
-static void ps_write_payload(u32 payload, u32 reg_sel)
-{
+static void ps_write_payload(u32 payload, u32 reg_sel) {
 	u32 pins = (payload & GENMASK(23, 8)) | (reg_sel << PIN_A0);
 
 	ps_write_set(pins);
@@ -225,10 +224,10 @@ static void ps_write_payload(u32 payload, u32 reg_sel)
 	ps_clear_lines();
 }
 
-static int ps_setup_gpclk(struct pistorm_dev *ps)
-{
-	if (!ps->cprman_base)
+static int ps_setup_gpclk(struct pistorm_dev *ps) {
+	if (!ps->cprman_base) {
 		return -ENODEV;
+	}
 
 	if (gpclk_div == 0 || gpclk_div > 0xfff) {
 		pr_warn("pistorm: invalid gpclk_div=%u (valid 1..4095), refusing\n", gpclk_div);
@@ -239,8 +238,9 @@ static int ps_setup_gpclk(struct pistorm_dev *ps)
 	writel(CPRMAN_PASSWD | GPCLK_CTL_KILL, ps->cprman_base + CPRMAN_GP0CTL);
 	udelay(10);
 	for (unsigned int i = 0; i < 1000; i++) {
-		if (!(readl(ps->cprman_base + CPRMAN_GP0CTL) & GPCLK_CTL_BUSY))
+		if (!(readl(ps->cprman_base + CPRMAN_GP0CTL) & GPCLK_CTL_BUSY)) {
 			break;
+		}
 		udelay(1);
 	}
 
@@ -264,8 +264,7 @@ static int ps_setup_gpclk(struct pistorm_dev *ps)
 	return -ETIMEDOUT;
 }
 
-static int ps_setup_protocol(struct pistorm_dev *ps)
-{
+static int ps_setup_protocol(struct pistorm_dev *ps) {
 	int ret;
 
 	ps_prepare_fsel(ps);
@@ -274,14 +273,14 @@ static int ps_setup_protocol(struct pistorm_dev *ps)
 	ps_clear_lines();
 
 	ret = ps_setup_gpclk(ps);
-	if (ret)
+	if (ret) {
 		pr_warn("pistorm: gpclk not configured (%d)\n", ret);
+	}
 
 	return 0;
 }
 
-static int ps_write16(struct pistorm_dev *ps, u32 addr, u16 data)
-{
+static int ps_write16(struct pistorm_dev *ps, u32 addr, u16 data) {
 	ps_set_bus_dir(ps, true);
 	ps_write_payload((data & 0xffff) << 8, REG_DATA);
 	ps_write_payload((addr & 0xffff) << 8, REG_ADDR_LO);
@@ -290,13 +289,11 @@ static int ps_write16(struct pistorm_dev *ps, u32 addr, u16 data)
 	return ps_wait_for_txn_log("write16");
 }
 
-static inline u32 ps_addr_hi_payload(u32 addr, u16 opbits, u8 fc)
-{
+static inline u32 ps_addr_hi_payload(u32 addr, u16 opbits, u8 fc) {
 	return ((u32)((fc & 0x7) << 13) | opbits | (addr >> 16)) & 0xffff;
 }
 
-static int ps_write16_fc(struct pistorm_dev *ps, u32 addr, u16 data, u8 fc)
-{
+static int ps_write16_fc(struct pistorm_dev *ps, u32 addr, u16 data, u8 fc) {
 	ps_set_bus_dir(ps, true);
 	ps_write_payload((data & 0xffff) << 8, REG_DATA);
 	ps_write_payload((addr & 0xffff) << 8, REG_ADDR_LO);
@@ -305,8 +302,7 @@ static int ps_write16_fc(struct pistorm_dev *ps, u32 addr, u16 data, u8 fc)
 	return ps_wait_for_txn_log("write16_fc");
 }
 
-static int ps_write8_fc(struct pistorm_dev *ps, u32 addr, u8 data, u8 fc)
-{
+static int ps_write8_fc(struct pistorm_dev *ps, u32 addr, u8 data, u8 fc) {
 	u16 payload = (addr & 1) ? data : (data | (data << 8));
 
 	ps_set_bus_dir(ps, true);
@@ -317,8 +313,7 @@ static int ps_write8_fc(struct pistorm_dev *ps, u32 addr, u8 data, u8 fc)
 	return ps_wait_for_txn_log("write8_fc");
 }
 
-static int ps_read16_fc(struct pistorm_dev *ps, u32 addr, u16 *out, u8 fc)
-{
+static int ps_read16_fc(struct pistorm_dev *ps, u32 addr, u16 *out, u8 fc) {
 	int ret;
 	u32 value;
 
@@ -334,26 +329,26 @@ static int ps_read16_fc(struct pistorm_dev *ps, u32 addr, u16 *out, u8 fc)
 	value = ps_readl(GPIO_GPLEV0);
 	ps_clear_lines();
 
-	if (ret)
+	if (ret) {
 		return ret;
+	}
 	*out = (value >> 8) & 0xffff;
 	return 0;
 }
 
-static int ps_read8_fc(struct pistorm_dev *ps, u32 addr, u8 *out, u8 fc)
-{
+static int ps_read8_fc(struct pistorm_dev *ps, u32 addr, u8 *out, u8 fc) {
 	int ret;
 	u16 value = 0;
 
 	ret = ps_read16_fc(ps, addr, &value, fc);
-	if (ret)
+	if (ret) {
 		return ret;
+	}
 	*out = (addr & 1) ? (u8)(value & 0xff) : (u8)(value >> 8);
 	return 0;
 }
 
-static int ps_write8(struct pistorm_dev *ps, u32 addr, u8 data)
-{
+static int ps_write8(struct pistorm_dev *ps, u32 addr, u8 data) {
 	u16 payload = (addr & 1) ? data : (data | (data << 8));
 
 	ps_set_bus_dir(ps, true);
@@ -364,8 +359,7 @@ static int ps_write8(struct pistorm_dev *ps, u32 addr, u8 data)
 	return ps_wait_for_txn_log("write8");
 }
 
-static int ps_read16(struct pistorm_dev *ps, u32 addr, u16 *out)
-{
+static int ps_read16(struct pistorm_dev *ps, u32 addr, u16 *out) {
 	int ret;
 	u32 value;
 
@@ -381,34 +375,33 @@ static int ps_read16(struct pistorm_dev *ps, u32 addr, u16 *out)
 	value = ps_readl(GPIO_GPLEV0);
 	ps_clear_lines();
 
-	if (ret)
+	if (ret) {
 		return ret;
+	}
 	*out = (value >> 8) & 0xffff;
 	return 0;
 }
 
-static int ps_read8(struct pistorm_dev *ps, u32 addr, u8 *out)
-{
+static int ps_read8(struct pistorm_dev *ps, u32 addr, u8 *out) {
 	int ret;
 	u16 value = 0;
 
 	ret = ps_read16(ps, addr, &value);
-	if (ret)
+	if (ret) {
 		return ret;
+	}
 	*out = (addr & 1) ? (value & 0xff) : ((value >> 8) & 0xff);
 	return 0;
 }
 
-static int ps_write_status(struct pistorm_dev *ps, u16 value)
-{
+static int ps_write_status(struct pistorm_dev *ps, u16 value) {
 	ps_set_bus_dir(ps, true);
 	ps_write_payload((value & 0xffff) << 8, REG_STATUS);
 	ps_set_bus_dir(ps, false);
 	return 0;
 }
 
-static int ps_read_status(struct pistorm_dev *ps, u16 *out)
-{
+static int ps_read_status(struct pistorm_dev *ps, u16 *out) {
 	u32 value;
 
 	ps_set_bus_dir(ps, false);
@@ -424,30 +417,29 @@ static int ps_read_status(struct pistorm_dev *ps, u16 *out)
 	return 0;
 }
 
-static int ps_reset_sm(struct pistorm_dev *ps)
-{
+static int ps_reset_sm(struct pistorm_dev *ps) {
 	int ret;
 
 	ret = ps_write_status(ps, STATUS_BIT_INIT);
-	if (ret)
+	if (ret) {
 		return ret;
+	}
 	usleep_range(1500, 2000);
 	ret = ps_write_status(ps, 0);
 	usleep_range(100, 200);
 	return ret;
 }
 
-static int ps_pulse_reset(struct pistorm_dev *ps)
-{
+static int ps_pulse_reset(struct pistorm_dev *ps) {
 	int ret = ps_write_status(ps, 0);
-	if (ret)
+	if (ret) {
 		return ret;
+	}
 	msleep(100);
 	return ps_write_status(ps, STATUS_BIT_RESET);
 }
 
-static int ps_handle_busop(struct pistorm_dev *ps, struct pistorm_busop *op)
-{
+static int ps_handle_busop(struct pistorm_dev *ps, struct pistorm_busop *op) {
 	int ret = 0;
 
 	op->status = 0;
@@ -456,8 +448,9 @@ static int ps_handle_busop(struct pistorm_dev *ps, struct pistorm_busop *op)
 			u16 status;
 			ret = ps_read_status(ps, &status);
 
-			if (!ret)
+			if (!ret) {
 				op->value = status;
+			}
 			return ret;
 		}
 		return ps_write_status(ps, (u16)op->value);
@@ -465,27 +458,31 @@ static int ps_handle_busop(struct pistorm_dev *ps, struct pistorm_busop *op)
 
 	switch (op->width) {
 	case PISTORM_W8:
-		if (op->is_read)
+		if (op->is_read) {
 			ret = ps_read8(ps, op->addr, (u8 *)&op->value);
-		else
+		} else {
 			ret = ps_write8(ps, op->addr, (u8)op->value);
+		}
 		break;
 	case PISTORM_W16:
-		if (op->is_read)
+		if (op->is_read) {
 			ret = ps_read16(ps, op->addr, (u16 *)&op->value);
-		else
+		} else {
 			ret = ps_write16(ps, op->addr, (u16)op->value);
+		}
 		break;
 	case PISTORM_W32:
 		if (op->is_read) {
 			u16 hi, lo;
 			ret = ps_read16(ps, op->addr, &hi);
 
-			if (ret)
+			if (ret) {
 				break;
+			}
 			ret = ps_read16(ps, op->addr + 2, &lo);
-			if (ret)
+			if (ret) {
 				break;
+			}
 			op->value = ((u32)hi << 16) | lo;
 			ret = 0;
 			break;
@@ -502,50 +499,52 @@ static int ps_handle_busop(struct pistorm_dev *ps, struct pistorm_busop *op)
 	}
 
 	/* Map CPLD BERR onto GPIO5 (RESET) when available. */
-	if (!ret && berr_reset_input && !(ps_readl(GPIO_GPLEV0) & BIT(PIN_RESET)))
+	if (!ret && berr_reset_input && !(ps_readl(GPIO_GPLEV0) & BIT(PIN_RESET))) {
 		op->status |= PISTORM_BUSOP_ST_BERR;
+	}
 	return ret;
 }
 
-static int ps_handle_batch(struct pistorm_batch *batch)
-{
+static int ps_handle_batch(struct pistorm_batch *batch) {
 	struct pistorm_busop *ops;
 	int ret = 0;
 
-	if (!batch->ops_count || batch->ops_count > PISTORM_MAX_BATCH_OPS)
+	if (!batch->ops_count || batch->ops_count > PISTORM_MAX_BATCH_OPS) {
 		return -EINVAL;
+	}
 
-	ops = memdup_user(u64_to_user_ptr(batch->ops_ptr),
-			  batch->ops_count * sizeof(*ops));
-	if (IS_ERR(ops))
+	ops = memdup_user(u64_to_user_ptr(batch->ops_ptr), batch->ops_count * sizeof(*ops));
+	if (IS_ERR(ops)) {
 		return PTR_ERR(ops);
+	}
 
 	for (u32 i = 0; i < batch->ops_count; i++) {
 		ret = ps_handle_busop(ps_dev, &ops[i]);
-		if (ret)
+		if (ret) {
 			break;
+		}
 	}
 
-	if (!ret && copy_to_user(u64_to_user_ptr(batch->ops_ptr), ops,
-				 batch->ops_count * sizeof(*ops)))
+	if (!ret && copy_to_user(u64_to_user_ptr(batch->ops_ptr), ops, batch->ops_count * sizeof(*ops))) {
 		ret = -EFAULT;
+	}
 
 	kfree(ops);
 	return ret;
 }
 
-static int ps_handle_run_batch(struct pistorm_run_batch *batch)
-{
+static int ps_handle_run_batch(struct pistorm_run_batch *batch) {
 	struct pistorm_busop_v2 *ops;
 	int ret = 0;
 
-	if (!batch->count || batch->count > PISTORM_MAX_BATCH_OPS)
+	if (!batch->count || batch->count > PISTORM_MAX_BATCH_OPS) {
 		return -EINVAL;
+	}
 
-	ops = memdup_user(u64_to_user_ptr(batch->ops_ptr),
-			  batch->count * sizeof(*ops));
-	if (IS_ERR(ops))
+	ops = memdup_user(u64_to_user_ptr(batch->ops_ptr), batch->count * sizeof(*ops));
+	if (IS_ERR(ops)) {
 		return PTR_ERR(ops);
+	}
 
 	for (u32 i = 0; i < batch->count; i++) {
 		struct pistorm_busop_v2 *op = &ops[i];
@@ -554,31 +553,36 @@ static int ps_handle_run_batch(struct pistorm_run_batch *batch)
 		op->status = 0;
 		switch (op->width) {
 		case PISTORM_W8:
-			if (op->op == 0)
+			if (op->op == 0) {
 				ret = ps_read8_fc(ps_dev, op->addr, (u8 *)&op->value, fc);
-			else
+			} else {
 				ret = ps_write8_fc(ps_dev, op->addr, (u8)op->value, fc);
+			}
 			break;
 		case PISTORM_W16:
-			if (op->op == 0)
+			if (op->op == 0) {
 				ret = ps_read16_fc(ps_dev, op->addr, (u16 *)&op->value, fc);
-			else
+			} else {
 				ret = ps_write16_fc(ps_dev, op->addr, (u16)op->value, fc);
+			}
 			break;
 		case PISTORM_W32:
 			if (op->op == 0) {
 				u16 hi, lo;
 				ret = ps_read16_fc(ps_dev, op->addr, &hi, fc);
-				if (ret)
+				if (ret) {
 					break;
+				}
 				ret = ps_read16_fc(ps_dev, op->addr + 2, &lo, fc);
-				if (ret)
+				if (ret) {
 					break;
+				}
 				op->value = ((u32)hi << 16) | lo;
 			} else {
 				ret = ps_write16_fc(ps_dev, op->addr, (u16)(op->value >> 16), fc);
-				if (ret)
+				if (ret) {
 					break;
+				}
 				ret = ps_write16_fc(ps_dev, op->addr + 2, (u16)op->value, fc);
 			}
 			break;
@@ -593,21 +597,21 @@ static int ps_handle_run_batch(struct pistorm_run_batch *batch)
 			ret = 0;
 			break;
 		}
-		if (berr_reset_input && !(ps_readl(GPIO_GPLEV0) & BIT(PIN_RESET)))
+		if (berr_reset_input && !(ps_readl(GPIO_GPLEV0) & BIT(PIN_RESET))) {
 			op->status |= PISTORM_BUSOP_ST_BERR;
+		}
 	}
 
 out_copy:
-	if (!ret && copy_to_user(u64_to_user_ptr(batch->ops_ptr), ops,
-				 batch->count * sizeof(*ops)))
+	if (!ret && copy_to_user(u64_to_user_ptr(batch->ops_ptr), ops, batch->count * sizeof(*ops))) {
 		ret = -EFAULT;
+	}
 
 	kfree(ops);
 	return ret;
 }
 
-static long ps_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
-{
+static long ps_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
 	void __user *argp = (void __user *)arg;
 	struct pistorm_busop busop;
 	struct pistorm_batch batch;
@@ -615,8 +619,9 @@ static long ps_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	struct pistorm_pins pins;
 	int ret = 0;
 
-	if (_IOC_TYPE(cmd) != PISTORM_IOC_MAGIC)
+	if (_IOC_TYPE(cmd) != PISTORM_IOC_MAGIC) {
 		return -ENOTTY;
+	}
 
 	mutex_lock(&ps_dev->lock);
 
@@ -633,8 +638,9 @@ static long ps_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	case PISTORM_IOC_GET_PINS:
 		pins.gplev0 = ps_readl(GPIO_GPLEV0);
 		pins.gplev1 = ps_readl(GPIO_GPLEV1);
-		if (copy_to_user(argp, &pins, sizeof(pins)))
+		if (copy_to_user(argp, &pins, sizeof(pins))) {
 			ret = -EFAULT;
+		}
 		break;
 	case PISTORM_IOC_BUSOP:
 		if (copy_from_user(&busop, argp, sizeof(busop))) {
@@ -645,8 +651,9 @@ static long ps_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			 busop.is_read, busop.width, busop.addr, busop.flags);
 		ret = ps_handle_busop(ps_dev, &busop);
 		if (!ret) {
-			if (copy_to_user(argp, &busop, sizeof(busop)))
+			if (copy_to_user(argp, &busop, sizeof(busop))) {
 				ret = -EFAULT;
+			}
 		}
 		break;
 	case PISTORM_IOC_BATCH:
@@ -679,8 +686,7 @@ static long ps_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	return ret;
 }
 
-static int ps_open(struct inode *inode, struct file *file)
-{
+static int ps_open(struct inode *inode, struct file *file) {
 	return 0;
 }
 
@@ -692,34 +698,33 @@ static const struct file_operations ps_fops = {
 	.compat_ioctl = ps_ioctl,
 };
 
-static void __iomem *ps_map_resource_compat(const char *compat)
-{
+static void __iomem *ps_map_resource_compat(const char *compat) {
 	struct device_node *np;
 	void __iomem *base;
 
 	np = of_find_compatible_node(NULL, NULL, compat);
-	if (!np)
+	if (!np) {
 		return NULL;
+	}
 
 	base = of_iomap(np, 0);
 	of_node_put(np);
 	return base;
 }
 
-static void __iomem *ps_map_resource_multi(const char *name, const char * const *compats)
-{
+static void __iomem *ps_map_resource_multi(const char *name, const char * const *compats) {
 	void __iomem *base = NULL;
 	for (; *compats; compats++) {
 		base = ps_map_resource_compat(*compats);
-		if (base)
+		if (base) {
 			return base;
+		}
 	}
 	pr_err("pistorm: failed to map %s via DT\n", name);
 	return NULL;
 }
 
-static void ps_request_pins(void)
-{
+static void ps_request_pins(void) {
 	unsigned int pins[] = {
 		0, 1, 2, 3, 4, 5, 6, 7,
 		8, 9, 10, 11, 12, 13, 14, 15,
@@ -728,24 +733,25 @@ static void ps_request_pins(void)
 
 	for (size_t i = 0; i < ARRAY_SIZE(pins); i++) {
 		int ret = gpio_request(pins[i], "pistorm");
-		if (ret == -EPROBE_DEFER)
+		if (ret == -EPROBE_DEFER) {
 			continue;
-		if (ret && ret != -EBUSY)
+		}
+		if (ret && ret != -EBUSY) {
 			pr_warn("pistorm: gpio %u request failed: %d\n", pins[i], ret);
+		}
 	}
 }
 
-static void ps_disable_gpclk(struct pistorm_dev *ps)
-{
-	if (!ps->cprman_base)
+static void ps_disable_gpclk(struct pistorm_dev *ps) {
+	if (!ps->cprman_base) {
 		return;
+	}
 	writel(CPRMAN_PASSWD | GPCLK_CTL_KILL, ps->cprman_base + CPRMAN_GP0CTL);
 	udelay(10);
 	ps->gpclk_ready = false;
 }
 
-static int __init pistorm_init(void)
-{
+static int __init pistorm_init(void) {
 	int ret;
 
 	static const char * const gpio_compats[] = {
@@ -761,8 +767,9 @@ static int __init pistorm_init(void)
 	};
 
 	ps_dev = kzalloc(sizeof(*ps_dev), GFP_KERNEL);
-	if (!ps_dev)
+	if (!ps_dev) {
 		return -ENOMEM;
+	}
 
 	ps_dev->gpio_base = ps_map_resource_multi("gpio", gpio_compats);
 	if (!ps_dev->gpio_base) {
@@ -785,8 +792,9 @@ static int __init pistorm_init(void)
 	}
 
 	ret = ps_setup_protocol(ps_dev);
-	if (ret)
+	if (ret) {
 		pr_warn("pistorm: setup_protocol failed: %d\n", ret);
+	}
 
 	pr_info("pistorm: /dev/%s ready (gpclk %s, src=%u div=%u)\n",
 		DEVICE_NAME,
@@ -799,15 +807,16 @@ err_free:
 	return ret;
 }
 
-static void __exit pistorm_exit(void)
-{
+static void __exit pistorm_exit(void) {
 	if (ps_dev) {
 		ps_disable_gpclk(ps_dev);
 		misc_deregister(&ps_dev->miscdev);
-		if (ps_dev->gpio_base)
+		if (ps_dev->gpio_base) {
 			iounmap(ps_dev->gpio_base);
-		if (ps_dev->cprman_base)
+		}
+		if (ps_dev->cprman_base) {
 			iounmap(ps_dev->cprman_base);
+		}
 		kfree(ps_dev);
 	}
 }
