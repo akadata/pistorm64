@@ -12,6 +12,7 @@ import struct
 import glob
 import logging
 import json
+from pathlib import Path
 
 logging.basicConfig(format = '%(levelname)s, %(asctime)s, %(name)s, line %(lineno)d: %(message)s')
 logger = logging.getLogger(__name__)
@@ -39,7 +40,7 @@ with open(CONFIG_FILE_PATH, encoding='utf-8') as f:
     cfg = json.load(f)
     devs = cfg['devices']
     dev = devs['PI0']
-    SHARED_DIRECTORY = _expand_vars(dev.get('path', SHARED_DIRECTORY))
+    SHARED_DIRECTORY = str(Path(_expand_vars(dev.get('path', SHARED_DIRECTORY))).resolve())
 
 MSG_REGISTER_REQ        = 1
 MSG_REGISTER_RES        = 2
@@ -821,8 +822,13 @@ else:
         done = True
 
 if not done:
-    os.chdir(SHARED_DIRECTORY)
-    logger.info('a314fs is running, shared directory: %s', SHARED_DIRECTORY)
+    shared_path = Path(SHARED_DIRECTORY).resolve()
+    if not shared_path.is_dir():
+        logger.error('Shared directory does not exist: %s', SHARED_DIRECTORY)
+        done = True
+    else:
+        os.chdir(shared_path)
+        logger.info('a314fs is running, shared directory: %s', SHARED_DIRECTORY)
 
 while not done:
     stream_id, ptype, payload = wait_for_msg()

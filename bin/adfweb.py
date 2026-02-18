@@ -8,6 +8,7 @@ import socket
 import sys
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 import os
@@ -28,13 +29,15 @@ def send_disk_cmd(host, port, command):
 
 def list_disks(adf_dir):
     try:
+        adf_path = Path(adf_dir).resolve()
         entries = []
-        for name in sorted(os.listdir(adf_dir)):
-            _, ext = os.path.splitext(name)
-            if ext.lower() in ALLOWED_EXTS:
-                entries.append(name)
-        return entries
-    except FileNotFoundError:
+        for name in adf_path.iterdir():
+            if name.is_file():
+                _, ext = os.path.splitext(name.name)
+                if ext.lower() in ALLOWED_EXTS:
+                    entries.append(name.name)
+        return sorted(entries)
+    except (FileNotFoundError, NotADirectoryError):
         return []
 
 
@@ -115,7 +118,15 @@ def serve_web(args):
                 writable = get_field("writable", "0") == "1"
                 if not name:
                     return self._send_json({"error": "missing name"}, status=HTTPStatus.BAD_REQUEST)
-                filename = os.path.join(adf_dir, name)
+                # Validate path to prevent path traversal
+                adf_path = Path(adf_dir).resolve()
+                try:
+                    filename_path = (adf_path / name).resolve()
+                    if not str(filename_path).startswith(str(adf_path)):
+                        return self._send_json({"error": "invalid disk name"}, status=HTTPStatus.BAD_REQUEST)
+                    filename = str(filename_path)
+                except Exception:
+                    return self._send_json({"error": "invalid disk name"}, status=HTTPStatus.BAD_REQUEST)
                 cmd = build_insert_cmd(int(unit), filename, writable)
                 try:
                     res = send_disk_cmd(disk_host, disk_port, cmd)

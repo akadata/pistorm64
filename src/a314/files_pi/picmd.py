@@ -16,6 +16,7 @@ import termios
 import fcntl
 import logging
 import json
+from pathlib import Path
 
 logging.basicConfig(format = '%(levelname)s, %(asctime)s, %(name)s, line %(lineno)d: %(message)s')
 logger = logging.getLogger(__name__)
@@ -233,8 +234,17 @@ class PiCmdSession(object):
                     winsize = struct.pack('HHHH', rows, cols, 0, 0)
                     fcntl.ioctl(sys.stdin, termios.TIOCSWINSZ, winsize)
                     if component_count != 0 and components[0] in volume_paths:
-                        path = volume_paths[components[0]]
-                        os.chdir(os.path.join(path, *components[1:]))
+                        base_path = Path(volume_paths[components[0]]).resolve()
+                        safe_components = []
+                        for comp in components[1:]:
+                            comp_path = (base_path / comp).resolve()
+                            if str(comp_path).startswith(str(base_path)):
+                                safe_components.append(comp)
+                        if safe_components or len(components) == 1:
+                            target_path = base_path.joinpath(*safe_components) if safe_components else base_path
+                            os.chdir(target_path)
+                        else:
+                            os.chdir(os.getenv('HOME', '/'))
                     else:
                         os.chdir(os.getenv('HOME', '/'))
                     os.execvp(args[0], args)

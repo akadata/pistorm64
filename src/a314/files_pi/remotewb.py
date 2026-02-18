@@ -12,7 +12,7 @@ import socket
 import os
 import sys
 import importlib.util
-import importlib.util
+from pathlib import Path
 
 PISTORM_ROOT = os.environ["PISTORM_ROOT"]
 A314_ROOT = os.environ.get("PISTORM_A314", os.path.join(PISTORM_ROOT, "a314"))
@@ -204,11 +204,13 @@ else:
         if mod and hasattr(mod, 'set_palette') and hasattr(mod, 'encode'):
             return mod
 
-        base_dir = os.path.join(A314_ROOT, 'bpls2gif')
-        if os.path.isdir(base_dir):
-            for name in os.listdir(base_dir):
-                if name.startswith('bpls2gif') and name.endswith(('.so', '.pyd')):
-                    mod_path = os.path.join(base_dir, name)
+        base_dir = Path(A314_ROOT, 'bpls2gif').resolve()
+        if base_dir.is_dir():
+            for name in base_dir.iterdir():
+                if name.name.startswith('bpls2gif') and name.name.endswith(('.so', '.pyd')):
+                    mod_path = name.resolve()
+                    if not str(mod_path).startswith(str(base_dir)):
+                        continue
                     spec = importlib.util.spec_from_file_location('bpls2gif', mod_path)
                     if spec and spec.loader:
                         mod = importlib.util.module_from_spec(spec)

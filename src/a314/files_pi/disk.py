@@ -3,9 +3,6 @@
 
 # Copyright (c) 2021 Niklas Ekström
 
-import logging
-logging.basicConfig(format='%(levelname)s, %(asctime)s, %(name)s, line %(lineno)d: %(message)s', level=logging.INFO)
-
 import io
 import json
 import logging
@@ -14,10 +11,12 @@ import select
 import socket
 import struct
 import sys
+from pathlib import Path
 from typing import Optional, Tuple, List, Dict
 
 from a314d import A314d
 
+logging.basicConfig(format='%(levelname)s, %(asctime)s, %(name)s, line %(lineno)d: %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 HOST = 127.0.0.1
@@ -43,10 +42,22 @@ PISTORM_ROOT = os.environ["PISTORM_ROOT"]
 A314_ROOT = os.environ.get("PISTORM_A314", os.path.join(PISTORM_ROOT, "a314"))
 PISTORM_DATA = os.environ.get("PISTORM_DATA", os.path.join(PISTORM_ROOT, "data"))
 
+DISK_IMAGES_DIR = Path(os.environ.get("DISK_IMAGES_DIR", os.path.join(PISTORM_DATA, "disk-images"))).resolve()
+
 def _expand_vars(value):
     if isinstance(value, str):
         return os.path.expandvars(value)
     return value
+
+def _secure_disk_path(filename: str) -> Path:
+    """Validate and resolve a disk image path to prevent path traversal."""
+    target = Path(filename).expanduser()
+    if not target.is_absolute():
+        target = DISK_IMAGES_DIR / target
+    target = target.resolve()
+    if not str(target).startswith(str(DISK_IMAGES_DIR)):
+        raise ValueError(f"Path traversal detected: {filename}")
+    return target
 
 DEFAULT_CONF_FILE = os.path.join(A314_ROOT, 'disk.conf')
 try:
@@ -123,7 +134,11 @@ class DiskService(object):
             unit: int = e['unit']
             filename: str = _expand_vars(e['filename'])
             rw: bool = e.get('rw', False)
-            self.auto_insert[unit] = (filename, rw)
+            try:
+                safe_path = str(_secure_disk_path(filename))
+                self.auto_insert[unit] = (safe_path, rw)
+            except ValueError:
+                logger.warning(f"Invalid disk path in config for unit {unit}: {filename}")
 
     def eject_adf(self, unit: int):
         drive = self.drives[unit]
@@ -143,7 +158,10 @@ class DiskService(object):
         self.eject_adf(unit)
 
         try:
-            f = open(filename, 'r+b')
+            safe_path = _secure_disk_path(filename)
+            f = open(safe_path, 'r+b')
+        except ValueError as e:
+            return f"Invalid disk path: {e}"
         except:
             return f"Failed to open disk file '{filename}'"
 

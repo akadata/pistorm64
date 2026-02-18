@@ -1,7 +1,18 @@
 import json
 import sys
+from pathlib import Path
 
-in_file = f'libdecl-{sys.argv[1]}.json'
+if len(sys.argv) < 2:
+    print("Usage: gen_stubs.py <library-name>", file=sys.stderr)
+    sys.exit(1)
+
+# Validate library name - only allow alphanumeric, dash and underscore
+lib_name = sys.argv[1]
+if not Path(lib_name).name == lib_name or '..' in lib_name or '/' in lib_name or '\\' in lib_name:
+    print("Error: Invalid library name", file=sys.stderr)
+    sys.exit(1)
+
+in_file = f'libdecl-{lib_name}.json'
 
 with open(in_file, 'rt') as f:
     libdecl = json.load(f)
