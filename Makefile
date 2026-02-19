@@ -213,6 +213,7 @@ MAINFILES += src/platforms/amiga/zorro/z3_piscsi64/z3_piscsi64.c
 MAINFILES += src/platforms/amiga/zorro/serial_echo/serial_echo.c
 MAINFILES += src/platforms/amiga/zorro/z2_rng/z2_rng.c
 MAINFILES += src/platforms/amiga/zorro/z2_pissa/z2_pissa.c
+MAINFILES += src/platforms/amiga/core-rtg/core-rtg.c
 MAINFILES += src/host/crypto/pi_crypto_openssl.c
 
 MAINFILES += src/platforms/amiga/amiga-autoconf.c

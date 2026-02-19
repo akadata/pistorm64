@@ -425,38 +425,35 @@ UWORD CalculateBytesPerRow(__REGA0(struct BoardInfo *b),
     if (!b)
         return 0;
 
+    /*
+     * Align pitch to fixed 1024/2048 bytes like VA2000/ZZ9000 drivers to
+     * avoid tiny pitch in FAKENATIVEMODE and keep blits aligned.
+     */
+    UWORD base_pitch = (width <= 1024) ? 1024 : 2048;
+    UWORD bpp = 1;
+
     switch (format) {
     case RGBFB_CLUT:
-        /* 8-bit paletted: 1 byte per pixel */
+        /* Keep 8-bit modes tightly packed to avoid RTG UI offsets. */
         return width;
-
     case RGBFB_R5G6B5PC: case RGBFB_R5G5B5PC:
     case RGBFB_R5G6B5:   case RGBFB_R5G5B5:
     case RGBFB_B5G6R5PC: case RGBFB_B5G5R5PC:
-        /* 16-bit: 2 bytes per pixel */
-        return (UWORD)(width * 2u);
-
+        bpp = 2;
+        break;
     case RGBFB_R8G8B8:
     case RGBFB_B8G8R8:
-        /*
-         * 24-bit packed. If the Pi side actually stores these as 32-bit,
-         * returning width * 4 is correct for what the hardware really does.
-         * If you ever add a true 24-bit mode, change this to width * 3.
-         */
-        return (UWORD)(width * 4u);
-
     case RGBFB_B8G8R8A8: case RGBFB_R8G8B8A8:
     case RGBFB_A8B8G8R8: case RGBFB_A8R8G8B8:
-        /* 32-bit: 4 bytes per pixel */
-        return (UWORD)(width * 4u);
-
+        bpp = 4;
+        break;
     default:
-        /*
-         * Safe-ish fallback: treat unknown formats as 16-bit instead of
-         * returning a bogus constant like 128.
-         */
-        return (UWORD)(width * 2u);
+        bpp = 2;
+        break;
     }
+
+    return (UWORD)(base_pitch * bpp);
+
 }
 
 

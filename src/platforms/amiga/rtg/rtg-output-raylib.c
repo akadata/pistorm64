@@ -425,10 +425,18 @@ static inline int rtg_format_is_yuv(uint16_t format) {
   }
 }
 
-static void rtg_copy_tight_rows(uint8_t* dst, const uint8_t* src, size_t row_bytes, size_t pitch,
-                                size_t height) {
+static void rtg_copy_tight_rows_padded(uint8_t* dst, size_t dst_row_bytes, const uint8_t* src,
+                                       size_t src_pitch, size_t copy_bytes, size_t height) {
+  if (copy_bytes > dst_row_bytes) {
+    copy_bytes = dst_row_bytes;
+  }
   for (size_t y = 0; y < height; y++) {
-    memcpy(dst + (y * row_bytes), src + (y * pitch), row_bytes);
+    uint8_t* row_dst = dst + (y * dst_row_bytes);
+    const uint8_t* row_src = src + (y * src_pitch);
+    memcpy(row_dst, row_src, copy_bytes);
+    if (copy_bytes < dst_row_bytes) {
+      memset(row_dst + copy_bytes, 0, dst_row_bytes - copy_bytes);
+    }
   }
 }
 
@@ -551,6 +559,9 @@ void* rtgThread(void* args) {
   size_t tight_buf_size = 0;
   uint32_t last_frame_addr = 0;
   uint32_t frame_no = 0;
+  uint16_t last_warn_pitch = 0;
+  uint16_t last_warn_width = 0;
+  uint16_t last_warn_format = 0;
 
   rtg_share_data.format = &rtg_display_format;
   rtg_share_data.width = &rtg_display_width;
@@ -679,7 +690,17 @@ reinit_raylib:;
     reinit = 1;
     goto shutdown_raylib;
   }
+  uint16_t logical_width = width;
   size_t row_bytes = (size_t)width * bpp;
+  uint16_t effective_width = width;
+  size_t effective_row_bytes = row_bytes;
+  if (bpp > 0) {
+    size_t max_width = (size_t)pitch / bpp;
+    if (max_width < effective_width) {
+      effective_width = (uint16_t)max_width;
+      effective_row_bytes = (size_t)effective_width * bpp;
+    }
+  }
   if(height > 0 && row_bytes > SIZE_MAX / height) {
     LOG_ERROR("[RTG/RAYLIB] Framebuffer size overflow: row_bytes=%zu height=%u\n", row_bytes,
               height);
@@ -690,9 +711,12 @@ reinit_raylib:;
 
   uint32_t frame_addr = *data->addr;
   size_t addr = (size_t)frame_addr;
-  size_t needed = (size_t)pitch * height;
-  int pitch_ok = (pitch >= row_bytes);
-  int addr_ok = pitch_ok && (addr < rtg_mem_size) && (addr + needed <= rtg_mem_size);
+  size_t needed = 0;
+  int addr_ok = 0;
+  if(height == 0 || pitch == 0 || pitch <= SIZE_MAX / height) {
+    needed = (size_t)pitch * height;
+    addr_ok = (addr < rtg_mem_size) && (addr + needed <= rtg_mem_size);
+  }
 
   if ((format == RTGFMT_8BIT_CLUT && clut_cpu_mode) || rtg_format_is_yuv(format)) {
     raylib_fb.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
@@ -703,6 +727,11 @@ reinit_raylib:;
   raylib_fb.height = height;
   raylib_fb.mipmaps = 1;
   raylib_fb.data = NULL;
+
+  if(effective_width < logical_width) {
+    LOG_WARN("[RTG/RAYLIB] Frame pitch smaller than width: pitch=%u row_bytes=%zu effective_width=%u\n",
+             pitch, (size_t)logical_width * bpp, effective_width);
+  }
 
   if(!addr_ok) {
     LOG_WARN("[RTG/RAYLIB] Framebuffer bounds invalid: addr=0x%08X pitch=%u width=%u height=%u "
@@ -754,7 +783,11 @@ reinit_raylib:;
     }
     size_t src_stride = pitch / 2;
     for (uint16_t y = 0; y < height; y++) {
-      for (uint16_t x = 0; x < width; x++) {
+      uint16_t* dst_row = indexed_buf + (size_t)width * y;
+      if (effective_width < width) {
+        memset(dst_row, 0, (size_t)width * sizeof(uint16_t));
+      }
+      for (uint16_t x = 0; x < effective_width; x++) {
         size_t src_idx = (x + (y * src_stride)) * sizeof(uint16_t);
         const uint8_t* src_ptr = data->memory + addr + src_idx;
         uint16_t raw = 0;
@@ -785,7 +818,7 @@ reinit_raylib:;
           rgb565 = raw;
           break;
         }
-        indexed_buf[x + (y * width)] = rgb565;
+        dst_row[x] = rgb565;
       }
     }
     raylib_fb.data = indexed_buf;
@@ -814,7 +847,8 @@ reinit_raylib:;
       tight_buf = resized;
       tight_buf_size = tight_size;
     }
-    rtg_copy_tight_rows(tight_buf, data->memory + addr, row_bytes, pitch, height);
+    rtg_copy_tight_rows_padded(tight_buf, row_bytes, data->memory + addr, pitch,
+                               effective_row_bytes, height);
     raylib_fb.data = tight_buf;
   } else {
     raylib_fb.data = &data->memory[frame_addr];
@@ -850,12 +884,34 @@ reinit_raylib:;
         goto shutdown_raylib;
       }
 
-      if(current_width != width || current_height != height || current_format != format ||
-          current_pitch != pitch) {
-        LOG_INFO("[RTG/RAYLIB] Mode change detected: %ux%u fmt=%u pitch=%u -> %ux%u fmt=%u "
-                 "pitch=%u\n",
-                 width, height, format, pitch, current_width, current_height, current_format,
-                 current_pitch);
+      size_t current_bpp = rtg_pixel_size[current_format];
+      size_t current_row_bytes = (size_t)current_width * current_bpp;
+      uint16_t current_effective_width = current_width;
+      size_t current_effective_row_bytes = current_row_bytes;
+      if(current_bpp > 0) {
+        size_t max_width = (size_t)current_pitch / current_bpp;
+        if(max_width < current_effective_width) {
+          current_effective_width = (uint16_t)max_width;
+          current_effective_row_bytes = (size_t)current_effective_width * current_bpp;
+        }
+      }
+      if (current_effective_width == 0) {
+        current_effective_width = current_width;
+        current_effective_row_bytes = current_row_bytes;
+      }
+      if(current_effective_width < width &&
+          (current_pitch != last_warn_pitch || width != last_warn_width ||
+           current_format != last_warn_format)) {
+        LOG_WARN("[RTG/RAYLIB] Frame pitch too small: pitch=%u row_bytes=%zu effective_width=%u\n",
+                 current_pitch, current_row_bytes, current_effective_width);
+        last_warn_pitch = current_pitch;
+        last_warn_width = current_width;
+        last_warn_format = current_format;
+      }
+
+      if(current_width != width || current_height != height || current_format != format) {
+        LOG_INFO("[RTG/RAYLIB] Mode change detected: %ux%u fmt=%u -> %ux%u fmt=%u\n",
+                 width, height, format, current_width, current_height, current_format);
         reinit = 1;
         goto shutdown_raylib;
       }
@@ -903,6 +959,18 @@ reinit_raylib:;
       ClearBackground(black);
       rtg_output_in_vblank = 0;
       updating_screen = 1;
+
+      if (current_effective_width < current_width) {
+        srcrect.x = 0.0f;
+        srcrect.y = 0.0f;
+        srcrect.width = (float)current_effective_width;
+        srcrect.height = (float)height;
+      } else {
+        srcrect.x = 0.0f;
+        srcrect.y = 0.0f;
+        srcrect.width = (float)width;
+        srcrect.height = (float)height;
+      }
 
       switch (format) {
       case RTGFMT_8BIT_CLUT:
@@ -978,10 +1046,10 @@ reinit_raylib:;
       size_t addr_offset = frame_addr_offset;
       size_t frame_needed = (size_t)current_pitch * height;
 
-      if(current_pitch < row_bytes) {
-        LOG_WARN("[RTG/RAYLIB] Frame pitch too small: pitch=%u row_bytes=%zu\n", current_pitch,
-                 row_bytes);
-      } else if(frame_addr_offset >= rtg_mem_size || frame_needed > rtg_mem_size - frame_addr_offset) {
+      size_t current_display_row_bytes = (size_t)current_width * current_bpp;
+      size_t current_tight_size = current_display_row_bytes * height;
+
+      if(frame_addr_offset >= rtg_mem_size || frame_needed > rtg_mem_size - frame_addr_offset) {
         LOG_WARN("[RTG/RAYLIB] Framebuffer OOB: addr=0x%08X needed=%zu limit=%zu\n", current_addr,
                  frame_needed, rtg_mem_size);
       } else if(rtg_format_is_yuv(current_format)) {
@@ -1005,8 +1073,11 @@ reinit_raylib:;
             for (uint16_t y = 0; y < height; y++) {
               const uint8_t* src = data->memory + addr_offset + (size_t)current_pitch * y;
               uint32_t* dst = yuv_buf + (size_t)width * y;
+              if(current_effective_width < width) {
+                memset(dst, 0, (size_t)width * sizeof(uint32_t));
+              }
               uint16_t x = 0;
-              for (; x + 1 < width; x += 2) {
+              for (; x + 1 < current_effective_width; x += 2) {
                 uint8_t b0 = src[0];
                 uint8_t b1 = src[1];
                 uint8_t b2 = src[2];
@@ -1039,7 +1110,7 @@ reinit_raylib:;
                 dst[x + 1] = rtg_yuv601_to_rgba(y1, u0, v0);
                 src += 4;
               }
-              if(x < width) {
+              if(x < current_effective_width) {
                 uint8_t y0 = src[0];
                 dst[x] = rtg_yuv601_to_rgba(y0, 128, 128);
               }
@@ -1050,8 +1121,11 @@ reinit_raylib:;
             for (uint16_t y = 0; y < height; y++) {
               const uint8_t* src = data->memory + addr_offset + (size_t)current_pitch * y;
               uint32_t* dst = yuv_buf + (size_t)width * y;
+              if(current_effective_width < width) {
+                memset(dst, 0, (size_t)width * sizeof(uint32_t));
+              }
               uint16_t x = 0;
-              for (; x + 3 < width; x += 4) {
+              for (; x + 3 < current_effective_width; x += 4) {
                 uint32_t pack = load_u32_be(src);
                 if(current_format == RTGFMT_YUV411_PC) {
                   pack = __builtin_bswap32(pack);
@@ -1074,7 +1148,7 @@ reinit_raylib:;
                 dst[x + 3] = rtg_yuv601_to_rgba(yy3, u0, v0);
                 src += 4;
               }
-              for (; x < width; x++) {
+              for (; x < current_effective_width; x++) {
                 uint8_t y0 = src[0];
                 dst[x] = rtg_yuv601_to_rgba(y0, 128, 128);
                 src++;
@@ -1112,19 +1186,24 @@ reinit_raylib:;
         if((current_pitch % 2) != 0) {
           LOG_WARN("[RTG/RAYLIB] 16-bit pitch not aligned: pitch=%u\n", current_pitch);
         } else {
-          if(indexed_buf_size < tight_size) {
-            void* resized = realloc(indexed_buf, tight_size);
+          if(indexed_buf_size < current_tight_size) {
+            void* resized = realloc(indexed_buf, current_tight_size);
             if(!resized) {
-              LOG_ERROR("[RTG/RAYLIB] Failed to allocate indexed buffer (%zu bytes)\n", tight_size);
+              LOG_ERROR("[RTG/RAYLIB] Failed to allocate indexed buffer (%zu bytes)\n",
+                        current_tight_size);
             } else {
               indexed_buf = resized;
-              indexed_buf_size = tight_size;
+              indexed_buf_size = current_tight_size;
             }
           }
           if(indexed_buf) {
             size_t src_stride = current_pitch / 2;
             for (uint16_t y = 0; y < height; y++) {
-              for (uint16_t x = 0; x < width; x++) {
+              uint16_t* dst_row = indexed_buf + (size_t)current_width * y;
+              if(current_effective_width < current_width) {
+                memset(dst_row, 0, (size_t)current_width * sizeof(uint16_t));
+              }
+              for (uint16_t x = 0; x < current_effective_width && x < current_width; x++) {
                 size_t src_idx = (x + (y * src_stride)) * sizeof(uint16_t);
                 const uint8_t* src_ptr = data->memory + addr_offset + src_idx;
                 uint16_t raw = 0;
@@ -1155,45 +1234,51 @@ reinit_raylib:;
                   rgb565 = raw;
                   break;
                 }
-                indexed_buf[x + (y * width)] = rgb565;
+                dst_row[x] = rgb565;
               }
             }
             UpdateTexture(raylib_texture, indexed_buf);
           }
         }
       } else if(current_format == RTGFMT_8BIT_CLUT && clut_cpu_mode) {
-        if(clut_buf_size < tight_size * sizeof(uint32_t)) {
-          void* resized = realloc(clut_buf, tight_size * sizeof(uint32_t));
+        if(clut_buf_size < current_tight_size * sizeof(uint32_t)) {
+          void* resized = realloc(clut_buf, current_tight_size * sizeof(uint32_t));
           if(!resized) {
             LOG_ERROR("[RTG/RAYLIB] Failed to allocate CLUT buffer (%zu bytes)\n",
-                      tight_size * sizeof(uint32_t));
+                      current_tight_size * sizeof(uint32_t));
           } else {
             clut_buf = resized;
-            clut_buf_size = tight_size * sizeof(uint32_t);
+            clut_buf_size = current_tight_size * sizeof(uint32_t);
           }
         }
         if(clut_buf) {
           for (uint16_t y = 0; y < height; y++) {
             const uint8_t* src = data->memory + addr_offset + (size_t)current_pitch * y;
-            uint32_t* dst = clut_buf + (size_t)width * y;
-            for (uint16_t x = 0; x < width; x++) {
+            uint32_t* dst = clut_buf + (size_t)current_width * y;
+            if(current_effective_width < current_width) {
+              memset(dst, 0, (size_t)current_width * sizeof(uint32_t));
+            }
+            for (uint16_t x = 0; x < current_effective_width && x < current_width; x++) {
               dst[x] = palette[src[x]];
             }
           }
           UpdateTexture(raylib_texture, clut_buf);
         }
-      } else if(current_pitch != row_bytes) {
-        if(tight_buf_size < tight_size) {
-          void* resized = realloc(tight_buf, tight_size);
+      } else if(current_pitch != current_row_bytes) {
+        if(tight_buf_size < current_tight_size) {
+          void* resized = realloc(tight_buf, current_tight_size);
           if(!resized) {
-            LOG_ERROR("[RTG/RAYLIB] Failed to allocate tight buffer (%zu bytes)\n", tight_size);
+            LOG_ERROR("[RTG/RAYLIB] Failed to allocate tight buffer (%zu bytes)\n",
+                      current_tight_size);
           } else {
             tight_buf = resized;
-            tight_buf_size = tight_size;
+            tight_buf_size = current_tight_size;
           }
         }
         if(tight_buf) {
-          rtg_copy_tight_rows(tight_buf, data->memory + addr_offset, row_bytes, current_pitch, height);
+          rtg_copy_tight_rows_padded(tight_buf, current_display_row_bytes,
+                                     data->memory + addr_offset, current_pitch,
+                                     current_effective_row_bytes, height);
           UpdateTexture(raylib_texture, tight_buf);
         }
       } else {
@@ -1222,11 +1307,15 @@ reinit_raylib:;
       // DrawText("RTG is currently sleeping.", 16, 16, 12, RAYWHITE);
       EndDrawing();
     }
-    if(pitch != *data->pitch || height != *data->height || width != *data->width ||
-        format != *data->format) {
-      LOG_INFO("[RTG/RAYLIB] Mode change detected after frame; reinitializing.\n");
-      reinit = 1;
-      goto shutdown_raylib;
+    {
+      uint16_t chk_width = *data->width;
+      uint16_t chk_height = *data->height;
+      uint16_t chk_format = *data->format;
+      if(height != chk_height || width != chk_width || format != chk_format) {
+        LOG_INFO("[RTG/RAYLIB] Mode change detected after frame; reinitializing.\n");
+        reinit = 1;
+        goto shutdown_raylib;
+      }
     }
     if(emulator_exiting) {
       goto shutdown_raylib;

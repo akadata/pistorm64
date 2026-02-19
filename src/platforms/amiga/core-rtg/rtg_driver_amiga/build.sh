@@ -1,0 +1,2 @@
+#m68k-amigaos-gcc core-rtg.c -m68020 -O2 -o core-rtg020.card -noixemul -Wall -Wextra -Wno-unused-parameter -fomit-frame-pointer -nostartfiles -lamiga -I../../rtg -I/home/smalley/pistorm64/amiga.dev/Picasso96Develop/Include
+m68k-amigaos-gcc core-rtg.c -m68040 -O2 -o core-rtg.card -noixemul -Wall -Wextra -Wno-unused-parameter -fomit-frame-pointer -nostartfiles -lamiga -I../../rtg -I/home/smalley/pistorm64/amiga.dev/Picasso96Develop/Include

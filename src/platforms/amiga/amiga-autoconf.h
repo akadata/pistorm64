@@ -126,6 +126,9 @@ typedef enum pistorm_product_id {
   PISTORM_PROD_PI_AHI        = 0x0031,
   PISTORM_PROD_NET64_Z2      = 0x0032,
 
+  PISTORM_PROD_CORE_RTG_Z2   = 0x0040,
+  PISTORM_PROD_CORE_RTG_Z3   = 0x0041,
+
   PISTORM_PROD_Z3BUS_DEMO    = 0x00F0,
 } pistorm_product_id_t;
 

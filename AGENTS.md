@@ -1,207 +1,197 @@
-PiStorm64 UAE JIT / Musashi memory mapping plan
+# AGENTS: PiStorm64 RTG / P96 FAKENATIVE Investigation
 
-Goal
+Branch: `hotfix/p96offset-bpissue`
 
-* Keep A500 real-chip ranges on the real bus (through kmod / ps_read/ps_write), never direct-mapped into UAE JIT.
-* Only give JIT a direct pointer (addrbank.baseaddr) for Pi-owned RAM/ROM (Kick-in-RAM, Z2/Z3 fast, RTG, etc.).
-* Make behaviour depend on the config file: holes in the map table are "real Amiga" space.
-* Make JIT automatically fall back to non-JIT/Musashi when Kickstart is not Pi-mapped.
+This document is for Codex / Qwen / other agents working on the PiStorm64 RTG path. It summarizes what has been observed so far, what is suspected to be wrong, and how fixes should be approached and tested.
 
-Key hardware ranges (24-bit A500/A2000)
+## High‑level symptoms
 
-* $000000-$001FFFFF  Chip/Slow space
+1. **Window decoration offset (2×) in RTG modes**
 
-  * On A500 with 1MB chip on board: $000000-$0FFFFF real chip RAM on motherboard.
-  * PiStorm should snoop these via the bus only; no UAE direct mapping into JIT.
-* $00200000-$009FFFFF  Zorro II memory expansion space (8MB) – RAM-type for Z2 cards.
-* $00A00000-$00B7FFFF  Zorro II I/O expansion space (1.5MB)
-* $00B80000-$00BEFFFF  Reserved
-* $00BF0000-$00BFFFFF  CIA / ports region
-* $00C00000-$00CFFFFF  Misc expansion / extra chip RAM
-* $00DC0000-$00DDFFFF  Clock / SCSI / motherboard resources
-* $00DF0000-$00DFFFFF  Custom chip registers
-* $00E80000-$00EFFFFF  Zorro II I/O & Autoconfig
-* $00F80000-$00FFFFFF  System ROM (Kickstart, 512K here in 3.1)
+   * In RTG screen modes, standard Intuition / P96 window decorations (title bars, gadgets, etc.) appear horizontally offset by roughly 2× their expected position.
+   * The actual drawable content area seems to be offset as well, not just a visual glitch in the host renderer.
+   * This happens both with and without `FAKENATIVEMODE`, however it is much more noticeable with P96 FAKENATIVEMODE enabled.
 
-What we want for PiStorm64
+2. **Text/font rendering without `.info` file looks misaligned**
 
-1. Treat real chip RAM as "Amiga-only" space
+   * On screens where there is no `.info` icon or where standard Workbench fonts are used without companion metadata, character cells and baselines appear shifted.
+   * This is likely the same root cause as the decoration offset: the underlying RTG surface origin / pitch / pan is wrong, so everything drawn by Intuition is landing at the wrong pixel coordinates.
 
-* Addresses: $000000-$0FFFFF (1MB chip on A500 in this setup).
-* Implementation rule:
+3. **FAKENATIVEMODE tiny bitplane surfaces**
 
-  * Do NOT install a UAE addrbank with a baseaddr for this range when JIT is active.
-  * Provide bank handlers that always go through ps_read/ps_write (kmod) to the physical bus.
-  * That keeps all chip cycles visible to Agnus/Gary and honours the real DRAM timing.
+   * With `FAKENATIVEMODE=Yes` in Picasso96, some screens do not use a full‑screen RTG surface.
+   * Instead, at least one (and possibly two) RTG bitplanes are **small surfaces**, visually around **256×256** (estimate), composited on a larger 640×480 (or similar) RTG screen.
+   * On the host side, these appear as small “sprite‑like” rectangles of valid graphics surrounded by repeated or garbage areas.
+   * This is not corruption from the Amiga’s perspective – it is legal P96 behaviour. The RTG card is being asked to expose a framebuffer that does not match simple `width * bpp` assumptions.
 
-2. Treat Z2/Z3 fast and RTG memory as Pi-owned fast memory
+4. **RTG is very slow (~5 FPS)**
 
-* Addresses coming from cfg:
+   * In the problematic modes, the RTG output feels like ~5 frames per second.
 
-  * map type=ram address=0x08000000 size=0x08000000 id=cpu_slot_ram (128MB)
-  * map type=ram address=0x10000000 size=0x10000000 id=z3_autoconf_fast (256MB)
-  * map type=ram address=0xD0000000 size=0x10000000 id=z3_autoconf_fast (256MB)
-  * map type=ram address=0x00400000 size=0x00400000 id=z2_autoconf_fast (4MB)
-  * map type=ram_noalloc address=0x70010000 size=0x04000000 id=rtg_mem
-* Implementation rule:
+   * The log shows repeated messages like:
 
-  * For every map entry with type=ram / ram_noalloc that is not directly on the A500 24-bit bus, allocate host memory and install a UAE addrbank with baseaddr!=NULL.
-  * Under JIT: call put_mem_bank(addr, &fastmem_bank[n], realstart) so baseaddr[] gets filled.
-  * Use fastmem_bank for 32-bit/Z3 style addresses, while the autoconf windows at $10000000/$D0000000 are just bridge points from the 24-bit space.
+     * `RTG display enabled.` / `RTG display disabled.`
+     * `[RTG/RAYLIB] Mode change detected after frame; reinitializing.`
+     * `Reinitializing raylib...`
 
-3. Kickstart ROM detection and policy
+   * This strongly suggests that the backend is tearing down and recreating the raylib texture and window **every frame** or every few frames because it believes the mode keeps changing.
 
-* Kick ROM region: $00F80000-$00FFFFFF
-* Two operating modes:
+## Key log evidence
 
-  A) Pi-mapped Kickstart (recommended JIT mode)
+From a typical session with P96 + FAKENATIVEMODE:
 
-  * CFG line: map type=rom address=0xF80000 size=0x80000 file=../Amiga/kick/Kickstart-v3.1-r40.068.rom ovl=0 id=kickstart
-  * Loader allocates host buffer for the ROM file.
-  * UAE side: install kickmem_bank with baseaddr pointing at that buffer, and set mem_banks[] for $F80000..$FFFFFF.
-  * JIT: get_real_address(PC) for PC=$00F800D2 returns a real pointer; JIT can safely decode and run reset vector code directly from Pi RAM.
+* RTG mapping and mode changes:
 
-  B) Real motherboard Kick ROM (no Pi mapping)
+  * `Pixel format switch from: 4BPP PLANAR (0) to 8BPP CLUT (1)`
+  * Later: `Pixel format switch from: 8BPP CLUT (1) to 32BPP RGB (BGRA) (10)`
 
-  * No map entry overlapping 0x00F80000-0x00FFFFFF.
-  * Implementation:
+* Raylib window creation:
 
-    * Do not install a baseaddr for this range. Instead, install a handler bank that forwards to ps_read/ps_write so reads go out over the bus.
-    * At reset, PC is read from address 4, which lives in ROM. For JIT, get_real_address(PC) will return NULL.
-    * When get_real_address() returns NULL for the initial PC, mark JIT as unsupported for this configuration and fall back to Musashi CPU core.
+  * `Creating 640x480 raylib window...`
+  * `Creating 1024x768 raylib window...`
 
-4. Define "Pi vs Amiga" ownership based on cfg map table
+* Critical warnings:
 
-* Rule: the cfg map table defines everything that Pi owns directly.
+  * `[WARN] [RTG/RAYLIB] Framebuffer bounds invalid: addr=0x00300010 pitch=640 width=1024 height=768 bpp=4 needed=491520`
+  * `[WARN] [RTG/RAYLIB] Frame pitch too small: pitch=640 row_bytes=4096`
 
-* For 24-bit addresses:
+Interpretation:
 
-  * Start from the canonical A500 memory map (chip, custom, CIA, Z2, autoconfig, ROM).
-  * For any interval that is covered by a cfg map entry of type=ram/rom/ram_noalloc with host backing, set up a direct UAE addrbank.
-  * For other intervals (holes), set a bank that always goes through ps_read/ps_write to the A500 bus.
+* The RTG core reports a mode of **1024×768, 32‑bit** (bpp = 4 bytes), but the configured pitch remains **640 bytes** (from a previous **640×480 8‑bit** mode).
+* The raylib backend computes `row_bytes = width * bpp = 1024 * 4 = 4096` and compares it to the reported pitch (640) and to the configured RTG memory size.
+* Since 640 < 4096, it declares the framebuffer invalid and/or too small and triggers a mode reinitialization.
+* P96 FAKENATIVEMODE uses these kinds of partial surfaces legitimately (small RTG buffers that simulate native PAL/ECS/AGA modes). The backend needs to be tolerant rather than panicking.
 
-* Concrete classifications for this build:
+## Hypotheses
 
-  * $000000-$0FFFFF: real chip RAM -> ps_read/ps_write only; no JIT direct mapping.
-  * $00200000-$009FFFFF: Z2 memory space -> part of this is used by autoconfig RAM window (e.g. $00200000-$00600000). Backed by Pi RAM and set as fastmem bank with baseaddr. Remaining ranges stay as bus-forward.
-  * $00A00000-$00B7FFFF: Z2 I/O space -> autoconfig + devices; use handler-only banks (no baseaddr) because accesses must hit Zorro bus logic in the emulator (Z2 PICs, pissa, rng, etc.).
-  * $00BF0000-$00BFFFFF: CIA/ports -> custom/cia banks, no baseaddr.
-  * $00C00000-$00CFFFFF: chipram_extra map provides 1MB of extra chip or pseudo-chip; decide per board design whether that is Pi RAM or real bus. For safety under JIT, treat it as handler-only unless explicitly Pi-owned.
-  * $00DC0000-$00DDFFFF: clock/scsi/mb resources -> handler-only banks.
-  * $00DF0000-$00DFFFFF: custom chip registers -> custom_bank with handlers only.
-  * $00E80000-$00EFFFFF: Z2 I/O and autoconfig registers -> expamem_bank/uaeboard_bank handlers only.
-  * $00F80000-$00FFFFFF: Kick ROM -> either Pi mapped (baseaddr) or bus-forward depending on cfg.
+1. **Pitch is not being normalized when mode or format changes**
 
-Code changes (high-level)
+   * The RTG core keeps an old pitch value when the driver changes pixel format or logical width.
+   * For FAKENATIVE, P96 may intentionally set a pitch smaller than width×bpp (e.g., 640‑byte stride into a larger logical mode).
+   * The backend currently assumes `pitch >= width * bpp` and treats anything smaller as an error.
 
-1. During config parsing (cfg.c / platform_amiga.c)
+2. **Mode change detection is over‑sensitive**
 
-* After all map entries are loaded, walk the full 24-bit address space in 64k banks.
+   * The raylib backend treats changes in pitch, base address, or other non‑visual parameters as a “mode change”.
+   * As a result, it spikes the texture and re‑creates the window even when width, height, and pixel format are unchanged.
 
-* For each bank:
+3. **Pan/offset handling is incomplete**
 
-  * Determine which map entry (if any) owns it.
-  * Determine whether that entry is Pi RAM/ROM or a pure register/forward region.
+   * The 2× offset for window decorations and fonts suggests that pan/viewport offsets are being applied incorrectly:
 
-* Pseudocode:
+     * Either the origin of the framebuffer is miscomputed when mapping Amiga VRAM to host texture coordinates.
+     * Or pitch is misused, effectively doubling the horizontal offset.
 
-  for (addr = 0; addr < 0x01000000; addr += 0x10000) {
-  map = find_cfg_map_for(addr);
-  if (!map) {
-  // No Pi mapping: real Amiga bus only
-  install_bus_forward_bank(addr);
-  continue;
-  }
+## What agents should **not** change
 
-  ```
-  switch (map->type) {
-  case MAP_RAM:
-  case MAP_RAM_NOALLOC:
-  case MAP_ROM:
-      if (is_safe_for_direct_map(addr, map)) {
-          install_direct_uae_bank(addr, map);
-      } else {
-          install_bus_forward_bank(addr);
-      }
-      break;
-  case MAP_REGISTER:
-  case MAP_Z2_DEVICE:
-  case MAP_Z3_DEVICE:
-      install_bus_forward_bank(addr);
-      break;
-  }
-  ```
+* **Do not change endianness** anywhere in RTG paths. The current code and shaders already respect the existing big‑endian / little‑endian choices and they match the working non‑FAKENATIVE modes.
+* **Do not re‑interpret pixel formats**. The enums and format handling in `rtg.c`, `rtg-gfx.c`, and `rtg-output-*.c` are already aligned. Fix the geometry (pitch, width, pan), not the format.
+* **Do not remove bounds checks**. Any relaxation of checks must still guarantee no out‑of‑bounds reads from `rtg_mem`.
 
-  }
+## Files of interest
 
-2. is_safe_for_direct_map()
+* `src/rtg/rtg.c`
+* `src/rtg/rtg.h`
+* `src/rtg/rtg_enums.h`
+* `src/rtg/rtg-gfx.c`
+* `src/rtg/rtg-output-raylib.c`
+* `src/rtg/rtg-output-null.c`
+* `src/rtg/rtg-output-sdl2.c`
 
-* Returns true only for ranges that are pure Pi RAM/ROM and not mirrored onto the physical A500 bus.
-* Examples: cpu_slot_ram, z3_autoconf_fast (high 32-bit), rtg_mem.
-* Returns false for:
+The active backend in this configuration is **raylib DRM**, so most changes should focus on `rtg-output-raylib.c` and the core RTG pitch/mode logic in `rtg.c` / `rtg-gfx.c`.
 
-  * $000000-$0FFFFF chip
-  * $00200000-$009FFFFF when used purely as a Z2 autoconf window onto 32-bit fast memory (the actual fast memory lives at 0x08000000+ or 0x10000000+).
-  * All I/O and custom ranges.
+## Suggested approach for Codex / agents
 
-3. Kickstart / JIT check at CPU init
+### 1. Add detailed logging (temporary)
 
-* After memory banks are initialized, in the CPU/JIT setup:
+Goal: understand, for each frame and each mode change, what RTG thinks the mode is and how the backend sees it.
 
-  bool kick_mapped_by_pi = (mem_banks[bankindex(0x00F80000)]->baseaddr != NULL);
+Log the following whenever:
 
-  if (jit_enabled_in_cfg) {
-  if (!kick_mapped_by_pi) {
-  log("[CPU][JIT] Kickstart ROM not Pi-mapped; disabling JIT and using Musashi core.\n");
-  disable_uae_jit();
-  use_musashi_core();
-  } else {
-  enable_uae_jit();
-  }
-  }
+* A mode is changed or set (SETMODE, SETPITCH, SETPAN, SETCLUT, etc.).
+* A frame is about to be drawn.
 
-* This prevents the segfault seen when PC=00F800D2 and get_real_address() returns garbage or an unmapped host pointer.
+Log fields:
 
-4. JIT get_real_address() integration
+* `width`, `height`
+* `format` (enum + human‑readable string)
+* `pitch` (bytes)
+* framebuffer `addr`
+* `row_bytes = width * bytes_per_pixel`
+* `rtg_mem_size`
 
-* baseaddr[] table is already defined under #ifdef JIT in pistorm_sources_h.
+This log will confirm where pitch is inconsistent and how often mode reinit is triggered.
 
-* put_mem_bank(addr, bank, realstart) already fills baseaddr[bankindex(addr)] when bank->baseaddr != NULL.
+### 2. Normalize pitch on mode/format change (core RTG)
 
-* get_real_address(pc) effectively does:
+In RTG core (likely in `rtg.c` when handling SETMODE / SETPITCH), enforce a minimum pitch:
 
-  bank = mem_banks[bankindex(pc)];
-  if (!bank->baseaddr) return NULL;
-  return baseaddr[bankindex(pc)] + (pc & bank->mask);
+* Compute `min_pitch = width * bytes_per_pixel`.
+* If `pitch < min_pitch`, **either**:
 
-* With the new mapping rules:
+  * adjust pitch up to `min_pitch`, or
+  * leave pitch as is but expose an `effective_width = pitch / bpp` to the backend.
 
-  * For chip RAM and real-Kick configurations, baseaddr is NULL, so JIT never sees a real pointer and will not try to JIT those ranges.
-  * For Pi-owned fast and Pi Kick, baseaddr is valid and JIT can build translations.
+The first option is simpler for the card emulation but may diverge from what P96 expects.
 
-5. Keeping Musashi path unchanged
+### 3. Make raylib backend tolerant and stop re‑creating textures unnecessarily
 
-* Musashi core still goes through ps_read/ps_write for any address not backed by Pi RAM/ROM.
-* For Pi RAM/ROM, there are two options:
+In `rtg-output-raylib.c`:
 
-  * Keep using ps_read/ps_write wrappers that hit the same host buffer (simpler and consistent).
-  * Or let Musashi use its own direct mapping for fast mem.
-* Either way, the primary fix for the crash is about ensuring UAE JIT only ever executes from ranges where baseaddr is valid.
+* Only consider it a **mode change** when **width, height, or pixel format** change.
+* Treat pitch and base address changes as state updates, not full reinitializations.
+* If `pitch < width * bpp`, log a warning once and **clamp the effective width** used for texture updates to `pitch / bpp`.
 
-Testing plan
+  * This will draw a smaller, correct “window” inside the texture without reading past the buffer.
 
-* Config A: current setup with map type=rom for Kick, JIT on.
+### 4. Investigate 2× offset for decorations and fonts
 
-  * Expected: no segfault, JIT runs reset code at $00F800D2.
-  * Verify PC trace shows valid pointer from get_real_address().
+With pitch and mode handling fixed, re‑check FAKENATIVE modes:
 
-* Config B: remove the Kick map so ROM is only on A500 board.
+* If decorations are still offset by ~2× horizontally, inspect:
 
-  * Expected: on startup, log message about Kick not Pi-mapped and JIT disabled; Musashi core runs instead; no SIGSEGV.
+  * The SETPAN / viewport code in RTG core.
+  * Any code that converts Amiga byte offsets into host pixel coordinates.
+* Look for places where `pitch` or `width` is multiplied twice or where an extra `<< 1` or `* 2` slipped in for 8‑bit → 16‑bit or 16‑bit → 32‑bit transitions.
 
-* Config C: JIT off (Musashi only).
+## How to test changes
 
-  * Expected: unchanged behaviour compared to today.
+Branch: `hotfix/p96offset-bpissue`
 
-These changes cleanly separate real Amiga bus ranges (chip, real ROM, custom, CIA, Z2 I/O) from Pi-owned RAM/ROM, and feed UAE JIT only with memory that truly lives in host RAM.
+Build:
+
+* Run: `make -j4 full`
+* Ensure it completes without warnings newly introduced by the agent.
+
+Runtime test:
+
+1. Start emulator:
+
+   * `./emulator --config min.cfg`
+
+2. In Workbench / P96, test at least two screen modes:
+
+   * A classic **640×480 8‑bit** RTG mode.
+   * A **1024×768 32‑bit** RTG mode.
+
+3. For each mode, verify:
+
+   * Window decorations line up correctly (no 2× offset).
+   * Fonts and icons without `.info` files render at correct positions.
+   * FAKENATIVEMODE screens with partial bitplanes show a stable, non‑garbled image (even if still letterboxed or “mini” in the larger screen).
+   * FPS is significantly higher than the current ~5 FPS and the log no longer shows per‑frame mode rebuilds.
+
+4. Capture logs:
+
+   * Save `rtg.log` or main emulator log with new debug output for regression analysis.
+
+## Performance target
+
+* RTG rendering should feel “interactive” (ideally 50–60 FPS) on the Pi4 in the tested modes.
+* Occasional mode switches (e.g., opening a screen with different resolution) can re‑initialise raylib, however **not every frame**.
+* The Dhrystone / MIPS numbers are already very strong in FAKENATIVE modes; RTG throughput should no longer be the bottleneck for normal Workbench usage.
+
+---
+
+Agents: focus first on **stopping the constant mode reinitialisation** and **fixing pitch / effective width handling**. Once the picture is stable and fast, the residual 2× offset for decorations should become much easier to track down and correct.
 

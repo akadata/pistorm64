@@ -58,6 +58,7 @@ extern uint16_t rtg_user[8];
 extern uint16_t rtg_x[8], rtg_y[8];
 extern uint16_t rtg_format;
 extern uint16_t rtg_display_format;
+extern uint16_t rtg_pitch;
 
 extern uint32_t framebuffer_addr;
 extern uint32_t framebuffer_addr_adj;
@@ -77,6 +78,7 @@ static const size_t rtg_mem_size = (size_t)RTG_GFX_MEM * SIZE_MEGA;
 
 
 static uint32_t rtg_oob_log_count = 0;
+static uint32_t rtg_pitch_mismatch_log_count = 0;
 
 static int rtg_calc_span(size_t x_bytes, uint16_t w, uint16_t h, uint16_t pitch, size_t bpp,
                          size_t* out_span) {
@@ -131,6 +133,11 @@ static int rtg_get_ptr_checked(uint32_t base_adj, uint16_t x, uint16_t y, uint16
   size_t base = (size_t)base_adj + x_bytes + ((size_t)y * pitch);
   if (!rtg_check_bounds(base, span, tag, pitch, w, h, format)) {
     return 0;
+  }
+  if (pitch != rtg_pitch && rtg_pitch_mismatch_log_count < 10) {
+    LOG_INFO("[RTG] Pitch mismatch %s pitch=%u rtg_pitch=%u fmt=%u w=%u h=%u\n",
+             tag, pitch, rtg_pitch, format, w, h);
+    rtg_pitch_mismatch_log_count++;
   }
   *out_ptr = &rtg_mem[base];
   return 1;
@@ -1215,7 +1222,7 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
 void rtg_p2c(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t h,
              uint8_t draw_mode, uint8_t planes, uint8_t mask, uint8_t layer_mask,
              uint16_t src_line_pitch, uint8_t* bmp_data_src) {
-  uint16_t pitch = rtg_x[3];
+  uint16_t pitch = rtg_pitch;
   uint8_t* dptr = NULL;
   if (dx < 0 || dy < 0) {
     if (rtg_oob_log_count < 20) {
@@ -1297,7 +1304,7 @@ void rtg_p2c(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
 void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t h,
              uint8_t draw_mode, uint8_t planes, uint8_t mask, uint8_t layer_mask,
              uint16_t src_line_pitch, uint8_t* bmp_data_src) {
-  uint16_t pitch = rtg_x[3];
+  uint16_t pitch = rtg_pitch;
   uint8_t* dptr = NULL;
   if (dx < 0 || dy < 0) {
     if (rtg_oob_log_count < 20) {

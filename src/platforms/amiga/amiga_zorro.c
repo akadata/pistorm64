@@ -9,6 +9,7 @@
 #include "zorro/z2_rng/z2_rng.h"
 #include "zorro/serial_echo/serial_echo.h"
 #include "zorro/z3bus_demo/z3bus_demo.h"
+#include "platforms/amiga/core-rtg/core-rtg.h"
 #include "log.h"
 
 #define MAX_ZORRO_DEVICES AC_PIC_LIMIT
@@ -84,6 +85,14 @@ void zorro_setvar(struct emulator_config *cfg, const char *var, const char *val)
     z2_rng_register();
   } else if (strcmp(var, "zorro-pissa") == 0) {
     z2_pissa_register();
+  } else if (strcmp(var, "core-rtg") == 0) {
+    if (!val || strlen(val) == 0 || strcasecmp(val, "z3") == 0) {
+      core_rtg_register(ZORRO_BUS_Z3);
+    } else if (strcasecmp(val, "z2") == 0) {
+      core_rtg_register(ZORRO_BUS_Z2);
+    } else {
+      LOG_WARN("[ZORRO] Unknown core-rtg mode '%s' (use z2 or z3).\n", val);
+    }
   }
 }
 

@@ -1,3 +1,10 @@
+zz9000-drivers 
+zz9000-linux 
+VideoCore.card 
+captain-amygdala-pistorm 
+pistorm64Z3660 
+amiga2000-gfxcard
+Emu68
 # Build artifacts
 emulator
 m68kmake
