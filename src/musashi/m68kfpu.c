@@ -2079,28 +2079,31 @@ void m68040_fpu_op1(m68ki_cpu_core *state) {
 		case 1:		// FRESTORE <ea>
 		{
 			switch (mode) {
-				case 2: // (An)
+				case 2: {// (An)
 					addr = REG_A[reg];
 					m68040_do_frestore(state, addr, -1);
 					break;
+				}
 
-				case 3:	// (An)+
+				case 3:{	// (An)+
 					addr = EA_AY_PI_32();
 					m68040_do_frestore(state, addr, reg);
 					break;
+				}
 
-				case 5: // (D16, An)
+				case 5: {// (D16, An)
 					addr = EA_AY_DI_16();
 					m68040_do_frestore(state, addr, -1);
 					break;
+				}
 
-				case 6: // (An) + (Xn) + d8
+				case 6: {// (An) + (Xn) + d8
 					addr = EA_AY_IX_16();
 					m68040_do_frestore(state, addr, -1);
 					break;
+				}
 
-				case 7: //
-				{
+				case 7:	{
 					switch (reg) {
 						case 1:     // (abs32)
 						{
@@ -2126,7 +2129,8 @@ void m68040_fpu_op1(m68ki_cpu_core *state) {
 		}
 		break;
 
-		default:    fatalerror("m68040_fpu_op1: unimplemented op %d at %08X\n", (REG_IR >> 6) & 0x3, REG_PC-2);
+		default:    
+			fatalerror("m68040_fpu_op1: unimplemented op %d at %08X\n", (REG_IR >> 6) & 0x3, REG_PC-2);
 	}
 }
 
