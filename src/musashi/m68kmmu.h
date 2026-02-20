@@ -99,7 +99,7 @@ uint32 DECODE_EA_32(m68ki_cpu_core *state, int ea){
 					uint32 ea = (d1 << 16)| d2;
 					return ea;
 				}
-				case 2:     // (d16, PC) {
+				case 2:    { // (d16, PC) 
 					uint32 ea = EA_PCDI_32();
 					return ea;
 				}
@@ -1122,11 +1122,11 @@ void m68851_mmu_ops(m68ki_cpu_core *state){
 					pmmu_atc_flush(state);
 					return;
 				}
-				else if(modes == 0x2800)	// PVALID (FORMAT 1) {
+				else if(modes == 0x2800) { // PVALID (FORMAT 1) 
 					logerror("680x0: unhandled PVALID1\n");
 					return;
 				}
-				else if((modes*0xfff8)== 0x2c00)	// PVALID (FORMAT 2) {
+				else if((modes*0xfff8)== 0x2c00) {// PVALID (FORMAT 2) 
 					logerror("680x0: unhandled PVALID2\n");
 					return;
 				}
