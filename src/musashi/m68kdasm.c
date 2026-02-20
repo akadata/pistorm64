@@ -192,8 +192,7 @@ static int   valid_ea(uint opcode, uint mask);
 static int DECL_SPEC compare_nof_true_bits(const void *aptr, const void *bptr);
 
 /* used to build opcode handler jump table */
-typedef struct
-{
+typedef struct {
 	void (*opcode_handler)(void); /* handler function */
 	uint mask;                    /* mask on opcode */
 	uint match;                   /* what to match after masking */
@@ -263,47 +262,41 @@ static const char *const g_mmucond[16] =
 /* ======================================================================== */
 
 #define LIMIT_CPU_TYPES(ALLOWED_CPU_TYPES)	\
-	if(!(g_cpu_type & ALLOWED_CPU_TYPES))	\
-	{										\
-		if((g_cpu_ir & 0xf000) == 0xf000)	\
-			d68000_1111();					\
-		else d68000_illegal();				\
-		return;								\
-	}
+	if (!(g_cpu_type & ALLOWED_CPU_TYPES)) { if ((g_cpu_ir & 0xf000) == 0xf000) {	d68000_1111();	} else { d68000_illegal();}	return;	}
 
-static uint dasm_read_imm_8(uint advance)
-{
+static uint dasm_read_imm_8(uint advance) {
 	uint result;
-	if (g_rawop)
+	if (g_rawop) {
 		result = g_rawop[g_cpu_pc + 1 - g_rawbasepc];
-	else
+	} else {
 		result = m68k_read_disassembler_16(g_cpu_pc & g_address_mask) & 0xff;
+	}
 	g_cpu_pc += advance;
 	return result;
 }
 
-static uint dasm_read_imm_16(uint advance)
-{
+static uint dasm_read_imm_16(uint advance) {
 	uint result;
-	if (g_rawop)
+	if (g_rawop) {
 		result = (g_rawop[g_cpu_pc + 0 - g_rawbasepc] << 8) |
 		          g_rawop[g_cpu_pc + 1 - g_rawbasepc];
-	else
+	} else {
 		result = m68k_read_disassembler_16(g_cpu_pc & g_address_mask) & 0xffff;
+	}
 	g_cpu_pc += advance;
 	return result;
 }
 
-static uint dasm_read_imm_32(uint advance)
-{
+static uint dasm_read_imm_32(uint advance) {
 	uint result;
-	if (g_rawop)
+	if (g_rawop) {
 		result = (g_rawop[g_cpu_pc + 0 - g_rawbasepc] << 24) |
 		         (g_rawop[g_cpu_pc + 1 - g_rawbasepc] << 16) |
 		         (g_rawop[g_cpu_pc + 2 - g_rawbasepc] << 8) |
 		          g_rawop[g_cpu_pc + 3 - g_rawbasepc];
-	else
+	} else {
 		result = m68k_read_disassembler_32(g_cpu_pc & g_address_mask) & 0xffffffff;
+	}
 	g_cpu_pc += advance;
 	return result;
 }
@@ -329,106 +322,101 @@ static uint dasm_read_imm_32(uint advance)
 #define get_imm_str_u16() get_imm_str_u(1)
 #define get_imm_str_u32() get_imm_str_u(2)
 
-static int sext_7bit_int(int value)
-{
+static int sext_7bit_int(int value) {
 	return (value & 0x40) ? (value | 0xffffff80) : (value & 0x7f);
 }
 
 
 /* 100% portable signed int generators */
-static int make_int_8(int value)
-{
+static int make_int_8(int value) {
 	return (value & 0x80) ? value | ~0xff : value & 0xff;
 }
 
-static int make_int_16(int value)
-{
+static int make_int_16(int value) {
 	return (value & 0x8000) ? value | ~0xffff : value & 0xffff;
 }
 
-static int make_int_32(int value)
-{
+static int make_int_32(int value) {
 	return (value & 0x80000000) ? value | ~0xffffffff : value & 0xffffffff;
 }
 
 /* Get string representation of hex values */
-static char* make_signed_hex_str_8(uint val)
-{
+static char* make_signed_hex_str_8(uint val) {
 	static char str[20];
 
 	val &= 0xff;
 
-	if(val == 0x80)
+	if (val == 0x80) {
 		sprintf(str, "-$80");
-	else if(val & 0x80)
+	} else if (val & 0x80) {
 		sprintf(str, "-$%x", (0-val) & 0x7f);
-	else
+	} else {
 		sprintf(str, "$%x", val & 0x7f);
+	}
 
 	return str;
 }
 
-static char* make_signed_hex_str_16(uint val)
-{
+static char* make_signed_hex_str_16(uint val) {
 	static char str[20];
 
 	val &= 0xffff;
 
-	if(val == 0x8000)
+	if (val == 0x8000) {
 		sprintf(str, "-$8000");
-	else if(val & 0x8000)
+	} else if (val & 0x8000) {
 		sprintf(str, "-$%x", (0-val) & 0x7fff);
-	else
+	} else {
 		sprintf(str, "$%x", val & 0x7fff);
+	}
 
 	return str;
 }
 
-static char* make_signed_hex_str_32(uint val)
-{
+static char* make_signed_hex_str_32(uint val) {
 	static char str[20];
 
 	val &= 0xffffffff;
 
-	if(val == 0x80000000)
+	if (val == 0x80000000) {
 		sprintf(str, "-$80000000");
-	else if(val & 0x80000000)
+	} else if (val & 0x80000000) {
 		sprintf(str, "-$%x", (0-val) & 0x7fffffff);
-	else
+	} else {
 		sprintf(str, "$%x", val & 0x7fffffff);
+	}
 
 	return str;
 }
 
 
 /* make string of immediate value */
-static char* get_imm_str_s(uint size)
-{
+static char* get_imm_str_s(uint size) {
 	static char str[25];
-	if(size == 0)
+	if (size == 0) {
 		sprintf(str, "#%s", make_signed_hex_str_8(read_imm_8()));
-	else if(size == 1)
+	} else if (size == 1) {
 		sprintf(str, "#%s", make_signed_hex_str_16(read_imm_16()));
-	else
+	} else {
 		sprintf(str, "#%s", make_signed_hex_str_32(read_imm_32()));
+	}
 	return str;
 }
 
-static char* get_imm_str_u(uint size)
-{
+static char* get_imm_str_u(uint size) {
 	static char str[25];
-	if(size == 0)
+	if (size == 0) {
 		sprintf(str, "#$%x", read_imm_8() & 0xff);
-	else if(size == 1)
+	} else if (size == 1) {
 		sprintf(str, "#$%x", read_imm_16() & 0xffff);
-	else
+	} else {
 		sprintf(str, "#$%x", read_imm_32() & 0xffffffff);
+	}
 	return str;
 }
 
 /* Make string of effective address mode */
-static char* get_ea_mode_str(uint instruction, uint size)
-{
+static char* get_ea_mode_str(uint instruction, uint size) {
 	static char b1[64];
 	static char b2[64];
 	static char* mode = b2;
@@ -445,115 +433,159 @@ static char* get_ea_mode_str(uint instruction, uint size)
 	/* Switch buffers so we don't clobber on a double-call to this function */
 	mode = mode == b1 ? b2 : b1;
 
-	switch(instruction & 0x3f)
-	{
-		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
+	switch(instruction & 0x3f) {
+		case 0x00: 
+		case 0x01: 
+		case 0x02: 
+		case 0x03: 
+		case 0x04: 
+		case 0x05: 
+		case 0x06: 
+		case 0x07:
 		/* data register direct */
 			sprintf(mode, "D%d", instruction&7);
 			break;
-		case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
+		case 0x08: 
+		case 0x09: 
+		case 0x0a: 
+		case 0x0b: 
+		case 0x0c: 
+		case 0x0d: 
+		case 0x0e: 
+		case 0x0f:
 		/* address register direct */
 			sprintf(mode, "A%d", instruction&7);
 			break;
-		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
+		case 0x10: 
+		case 0x11: 
+		case 0x12: 
+		case 0x13: 
+		case 0x14: 
+		case 0x15: 
+		case 0x16: 
+		case 0x17:
 		/* address register indirect */
 			sprintf(mode, "(A%d)", instruction&7);
 			break;
-		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
+		case 0x18: 
+		case 0x19: 
+		case 0x1a: 
+		case 0x1b: 
+		case 0x1c: 
+		case 0x1d: 
+		case 0x1e: 
+		case 0x1f:
 		/* address register indirect with postincrement */
 			sprintf(mode, "(A%d)+", instruction&7);
 			break;
-		case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
+		case 0x20: 
+		case 0x21: 
+		case 0x22: 
+		case 0x23: 
+		case 0x24: 
+		case 0x25: 
+		case 0x26: 
+		case 0x27:
 		/* address register indirect with predecrement */
 			sprintf(mode, "-(A%d)", instruction&7);
 			break;
-		case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
+		case 0x28: 
+		case 0x29: 
+		case 0x2a: 
+		case 0x2b: 
+		case 0x2c: 
+		case 0x2d: 
+		case 0x2e: 
+		case 0x2f:
 		/* address register indirect with displacement*/
 			sprintf(mode, "(%s,A%d)", make_signed_hex_str_16(read_imm_16()), instruction&7);
 			break;
-		case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
+		case 0x30: 
+		case 0x31: 
+		case 0x32: 
+		case 0x33: 
+		case 0x34: 
+		case 0x35: 
+		case 0x36: 
+		case 0x37:
 		/* address register indirect with index */
 			extension = read_imm_16();
 
-			if(EXT_FULL(extension))
-			{
-				if(EXT_EFFECTIVE_ZERO(extension))
-				{
+			if (EXT_FULL(extension)) {
+				if (EXT_EFFECTIVE_ZERO(extension)) {
 					strcpy(mode, "0");
 					break;
 				}
 				base = EXT_BASE_DISPLACEMENT_PRESENT(extension) ? (EXT_BASE_DISPLACEMENT_LONG(extension) ? read_imm_32() : read_imm_16()) : 0;
 				outer = EXT_OUTER_DISPLACEMENT_PRESENT(extension) ? (EXT_OUTER_DISPLACEMENT_LONG(extension) ? read_imm_32() : read_imm_16()) : 0;
-				if(EXT_BASE_REGISTER_PRESENT(extension))
+				if (EXT_BASE_REGISTER_PRESENT(extension)) {
 					sprintf(base_reg, "A%d", instruction&7);
-				else
+				} else {
 					*base_reg = 0;
-				if(EXT_INDEX_REGISTER_PRESENT(extension))
-				{
-					sprintf(index_reg, "%c%d.%c", EXT_INDEX_AR(extension) ? 'A' : 'D', EXT_INDEX_REGISTER(extension), EXT_INDEX_LONG(extension) ? 'l' : 'w');
-					if(EXT_INDEX_SCALE(extension))
-						sprintf(index_reg+strlen(index_reg), "*%d", 1 << EXT_INDEX_SCALE(extension));
 				}
-				else
+				if (EXT_INDEX_REGISTER_PRESENT(extension)) {
+					sprintf(index_reg, "%c%d.%c", EXT_INDEX_AR(extension) ? 'A' : 'D', EXT_INDEX_REGISTER(extension), EXT_INDEX_LONG(extension) ? 'l' : 'w');
+					if (EXT_INDEX_SCALE(extension)) {
+						sprintf(index_reg+strlen(index_reg), "*%d", 1 << EXT_INDEX_SCALE(extension));
+					}
+				} else {
 					*index_reg = 0;
+				}
 				preindex = (extension&7) > 0 && (extension&7) < 4;
 				postindex = (extension&7) > 4;
 
 				strcpy(mode, "(");
-				if(preindex || postindex)
+				if (preindex || postindex) {
 					strcat(mode, "[");
-				if(base)
-				{
-					if (EXT_BASE_DISPLACEMENT_LONG(extension))
-					{
+				}
+				if (base) {
+					if (EXT_BASE_DISPLACEMENT_LONG(extension)) {
 						strcat(mode, make_signed_hex_str_32(base));
-					}
-					else
-					{
+					} else {
 						strcat(mode, make_signed_hex_str_16(base));
 					}
 					comma = 1;
 				}
-				if(*base_reg)
-				{
-					if(comma)
+				if (*base_reg) {
+					if (comma) {
 						strcat(mode, ",");
+					}
 					strcat(mode, base_reg);
 					comma = 1;
 				}
-				if(postindex)
-				{
+				if (postindex) {
 					strcat(mode, "]");
 					comma = 1;
 				}
-				if(*index_reg)
-				{
-					if(comma)
+				if (*index_reg) {
+					if (comma) {
 						strcat(mode, ",");
+					}
 					strcat(mode, index_reg);
 					comma = 1;
 				}
-				if(preindex)
-				{
+				if (preindex) {
 					strcat(mode, "]");
 					comma = 1;
 				}
-				if(outer)
-				{
-					if(comma)
+				if (outer) {
+					if (comma) {
 						strcat(mode, ",");
+					}
 					strcat(mode, make_signed_hex_str_16(outer));
 				}
 				strcat(mode, ")");
 				break;
 			}
 
-			if(EXT_8BIT_DISPLACEMENT(extension) == 0)
+			if (EXT_8BIT_DISPLACEMENT(extension) == 0) {
 				sprintf(mode, "(A%d,%c%d.%c", instruction&7, EXT_INDEX_AR(extension) ? 'A' : 'D', EXT_INDEX_REGISTER(extension), EXT_INDEX_LONG(extension) ? 'l' : 'w');
-			else
+			} else {
 				sprintf(mode, "(%s,A%d,%c%d.%c", make_signed_hex_str_8(extension), instruction&7, EXT_INDEX_AR(extension) ? 'A' : 'D', EXT_INDEX_REGISTER(extension), EXT_INDEX_LONG(extension) ? 'l' : 'w');
-			if(EXT_INDEX_SCALE(extension))
+			}
+			if (EXT_INDEX_SCALE(extension)) {
 				sprintf(mode+strlen(mode), "*%d", 1 << EXT_INDEX_SCALE(extension));
+			}
 			strcat(mode, ")");
 			break;
 		case 0x38:
@@ -574,78 +606,77 @@ static char* get_ea_mode_str(uint instruction, uint size)
 		/* program counter with index */
 			extension = read_imm_16();
 
-			if(EXT_FULL(extension))
-			{
-				if(EXT_EFFECTIVE_ZERO(extension))
-				{
+			if (EXT_FULL(extension)) {
+				if (EXT_EFFECTIVE_ZERO(extension)) {
 					strcpy(mode, "0");
 					break;
 				}
 				base = EXT_BASE_DISPLACEMENT_PRESENT(extension) ? (EXT_BASE_DISPLACEMENT_LONG(extension) ? read_imm_32() : read_imm_16()) : 0;
 				outer = EXT_OUTER_DISPLACEMENT_PRESENT(extension) ? (EXT_OUTER_DISPLACEMENT_LONG(extension) ? read_imm_32() : read_imm_16()) : 0;
-				if(EXT_BASE_REGISTER_PRESENT(extension))
+				if (EXT_BASE_REGISTER_PRESENT(extension)) {
 					strcpy(base_reg, "PC");
-				else
+				} else {
 					*base_reg = 0;
-				if(EXT_INDEX_REGISTER_PRESENT(extension))
-				{
-					sprintf(index_reg, "%c%d.%c", EXT_INDEX_AR(extension) ? 'A' : 'D', EXT_INDEX_REGISTER(extension), EXT_INDEX_LONG(extension) ? 'l' : 'w');
-					if(EXT_INDEX_SCALE(extension))
-						sprintf(index_reg+strlen(index_reg), "*%d", 1 << EXT_INDEX_SCALE(extension));
 				}
-				else
+				if (EXT_INDEX_REGISTER_PRESENT(extension)) {
+					sprintf(index_reg, "%c%d.%c", EXT_INDEX_AR(extension) ? 'A' : 'D', EXT_INDEX_REGISTER(extension), EXT_INDEX_LONG(extension) ? 'l' : 'w');
+					if (EXT_INDEX_SCALE(extension)) {
+						sprintf(index_reg+strlen(index_reg), "*%d", 1 << EXT_INDEX_SCALE(extension));
+					}
+				} else {
 					*index_reg = 0;
+				}
 				preindex = (extension&7) > 0 && (extension&7) < 4;
 				postindex = (extension&7) > 4;
 
 				strcpy(mode, "(");
-				if(preindex || postindex)
+				if (preindex || postindex) {
 					strcat(mode, "[");
-				if(base)
-				{
+				}
+				if (base) {
 					strcat(mode, make_signed_hex_str_16(base));
 					comma = 1;
 				}
-				if(*base_reg)
-				{
-					if(comma)
+				if (*base_reg) {
+					if (comma) {
 						strcat(mode, ",");
+					}
 					strcat(mode, base_reg);
 					comma = 1;
 				}
-				if(postindex)
-				{
+				if (postindex) {
 					strcat(mode, "]");
 					comma = 1;
 				}
-				if(*index_reg)
-				{
-					if(comma)
+				if (*index_reg) {
+					if (comma) {
 						strcat(mode, ",");
+					}
 					strcat(mode, index_reg);
 					comma = 1;
 				}
-				if(preindex)
-				{
+				if (preindex) {
 					strcat(mode, "]");
 					comma = 1;
 				}
-				if(outer)
-				{
-					if(comma)
+				if (outer) {
+					if (comma) {
 						strcat(mode, ",");
+					}
 					strcat(mode, make_signed_hex_str_16(outer));
 				}
 				strcat(mode, ")");
 				break;
 			}
 
-			if(EXT_8BIT_DISPLACEMENT(extension) == 0)
+			if (EXT_8BIT_DISPLACEMENT(extension) == 0) {
 				sprintf(mode, "(PC,%c%d.%c", EXT_INDEX_AR(extension) ? 'A' : 'D', EXT_INDEX_REGISTER(extension), EXT_INDEX_LONG(extension) ? 'l' : 'w');
-			else
+			} else {
 				sprintf(mode, "(%s,PC,%c%d.%c", make_signed_hex_str_8(extension), EXT_INDEX_AR(extension) ? 'A' : 'D', EXT_INDEX_REGISTER(extension), EXT_INDEX_LONG(extension) ? 'l' : 'w');
-			if(EXT_INDEX_SCALE(extension))
+			}
+			if (EXT_INDEX_SCALE(extension)) {
 				sprintf(mode+strlen(mode), "*%d", 1 << EXT_INDEX_SCALE(extension));
+			}
 			strcat(mode, ")");
 			break;
 		case 0x3c:
@@ -698,315 +729,256 @@ static char* get_ea_mode_str(uint instruction, uint size)
  * al  : absolute long
  */
 
-static void d68000_illegal(void)
-{
+static void d68000_illegal(void) {
 	sprintf(g_dasm_str, "dc.w $%04x; ILLEGAL", g_cpu_ir);
 }
 
-static void d68000_1010(void)
-{
+static void d68000_1010(void) {
 	sprintf(g_dasm_str, "dc.w    $%04x; opcode 1010", g_cpu_ir);
 }
 
 
-static void d68000_1111(void)
-{
+static void d68000_1111(void) {
 	sprintf(g_dasm_str, "dc.w    $%04x; opcode 1111", g_cpu_ir);
 }
 
 
-static void d68000_abcd_rr(void)
-{
+static void d68000_abcd_rr(void) {
 	sprintf(g_dasm_str, "abcd    D%d, D%d", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
 
-static void d68000_abcd_mm(void)
-{
+static void d68000_abcd_mm(void) {
 	sprintf(g_dasm_str, "abcd    -(A%d), -(A%d)", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_add_er_8(void)
-{
+static void d68000_add_er_8(void) {
 	sprintf(g_dasm_str, "add.b   %s, D%d", get_ea_mode_str_8(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
 
-static void d68000_add_er_16(void)
-{
+static void d68000_add_er_16(void) {
 	sprintf(g_dasm_str, "add.w   %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_add_er_32(void)
-{
+static void d68000_add_er_32(void) {
 	sprintf(g_dasm_str, "add.l   %s, D%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_add_re_8(void)
-{
+static void d68000_add_re_8(void) {
 	sprintf(g_dasm_str, "add.b   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_add_re_16(void)
-{
+static void d68000_add_re_16(void) {
 	sprintf(g_dasm_str, "add.w   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_add_re_32(void)
-{
+static void d68000_add_re_32(void) {
 	sprintf(g_dasm_str, "add.l   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_adda_16(void)
-{
+static void d68000_adda_16(void) {
 	sprintf(g_dasm_str, "adda.w  %s, A%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_adda_32(void)
-{
+static void d68000_adda_32(void) {
 	sprintf(g_dasm_str, "adda.l  %s, A%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_addi_8(void)
-{
+static void d68000_addi_8(void) {
 	char* str = get_imm_str_s8();
 	sprintf(g_dasm_str, "addi.b  %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_addi_16(void)
-{
+static void d68000_addi_16(void) {
 	char* str = get_imm_str_s16();
 	sprintf(g_dasm_str, "addi.w  %s, %s", str, get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_addi_32(void)
-{
+static void d68000_addi_32(void) {
 	char* str = get_imm_str_s32();
 	sprintf(g_dasm_str, "addi.l  %s, %s", str, get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_addq_8(void)
-{
+static void d68000_addq_8(void) {
 	sprintf(g_dasm_str, "addq.b  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_addq_16(void)
-{
+static void d68000_addq_16(void) {
 	sprintf(g_dasm_str, "addq.w  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_addq_32(void)
-{
+static void d68000_addq_32(void) {
 	sprintf(g_dasm_str, "addq.l  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_addx_rr_8(void)
-{
+static void d68000_addx_rr_8(void) {
 	sprintf(g_dasm_str, "addx.b  D%d, D%d", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_addx_rr_16(void)
-{
+static void d68000_addx_rr_16(void) {
 	sprintf(g_dasm_str, "addx.w  D%d, D%d", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_addx_rr_32(void)
-{
+static void d68000_addx_rr_32(void) {
 	sprintf(g_dasm_str, "addx.l  D%d, D%d", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_addx_mm_8(void)
-{
+static void d68000_addx_mm_8(void) {
 	sprintf(g_dasm_str, "addx.b  -(A%d), -(A%d)", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_addx_mm_16(void)
-{
+static void d68000_addx_mm_16(void) {
 	sprintf(g_dasm_str, "addx.w  -(A%d), -(A%d)", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_addx_mm_32(void)
-{
+static void d68000_addx_mm_32(void) {
 	sprintf(g_dasm_str, "addx.l  -(A%d), -(A%d)", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_and_er_8(void)
-{
+static void d68000_and_er_8(void) {
 	sprintf(g_dasm_str, "and.b   %s, D%d", get_ea_mode_str_8(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_and_er_16(void)
-{
+static void d68000_and_er_16(void) {
 	sprintf(g_dasm_str, "and.w   %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_and_er_32(void)
-{
+static void d68000_and_er_32(void) {
 	sprintf(g_dasm_str, "and.l   %s, D%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_and_re_8(void)
-{
+static void d68000_and_re_8(void) {
 	sprintf(g_dasm_str, "and.b   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_and_re_16(void)
-{
+static void d68000_and_re_16(void) {
 	sprintf(g_dasm_str, "and.w   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_and_re_32(void)
-{
+static void d68000_and_re_32(void) {
 	sprintf(g_dasm_str, "and.l   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_andi_8(void)
-{
+static void d68000_andi_8(void) {
 	char* str = get_imm_str_u8();
 	sprintf(g_dasm_str, "andi.b  %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_andi_16(void)
-{
+static void d68000_andi_16(void) {
 	char* str = get_imm_str_u16();
 	sprintf(g_dasm_str, "andi.w  %s, %s", str, get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_andi_32(void)
-{
+static void d68000_andi_32(void) {
 	char* str = get_imm_str_u32();
 	sprintf(g_dasm_str, "andi.l  %s, %s", str, get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_andi_to_ccr(void)
-{
+static void d68000_andi_to_ccr(void) {
 	sprintf(g_dasm_str, "andi    %s, CCR", get_imm_str_u8());
 }
 
-static void d68000_andi_to_sr(void)
-{
+static void d68000_andi_to_sr(void) {
 	sprintf(g_dasm_str, "andi    %s, SR", get_imm_str_u16());
 }
 
-static void d68000_asr_s_8(void)
-{
+static void d68000_asr_s_8(void) {
 	sprintf(g_dasm_str, "asr.b   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_asr_s_16(void)
-{
+static void d68000_asr_s_16(void) {
 	sprintf(g_dasm_str, "asr.w   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_asr_s_32(void)
-{
+static void d68000_asr_s_32(void) {
 	sprintf(g_dasm_str, "asr.l   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_asr_r_8(void)
-{
+static void d68000_asr_r_8(void) {
 	sprintf(g_dasm_str, "asr.b   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_asr_r_16(void)
-{
+static void d68000_asr_r_16(void) {
 	sprintf(g_dasm_str, "asr.w   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_asr_r_32(void)
-{
+static void d68000_asr_r_32(void) {
 	sprintf(g_dasm_str, "asr.l   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_asr_ea(void)
-{
+static void d68000_asr_ea(void) {
 	sprintf(g_dasm_str, "asr.w   %s", get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_asl_s_8(void)
-{
+static void d68000_asl_s_8(void) {
 	sprintf(g_dasm_str, "asl.b   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_asl_s_16(void)
-{
+static void d68000_asl_s_16(void) {
 	sprintf(g_dasm_str, "asl.w   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_asl_s_32(void)
-{
+static void d68000_asl_s_32(void) {
 	sprintf(g_dasm_str, "asl.l   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_asl_r_8(void)
-{
+static void d68000_asl_r_8(void) {
 	sprintf(g_dasm_str, "asl.b   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_asl_r_16(void)
-{
+static void d68000_asl_r_16(void) {
 	sprintf(g_dasm_str, "asl.w   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_asl_r_32(void)
-{
+static void d68000_asl_r_32(void) {
 	sprintf(g_dasm_str, "asl.l   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_asl_ea(void)
-{
+static void d68000_asl_ea(void) {
 	sprintf(g_dasm_str, "asl.w   %s", get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_bcc_8(void)
-{
+static void d68000_bcc_8(void) {
 	uint temp_pc = g_cpu_pc;
 	sprintf(g_dasm_str, "b%-2s     $%x", g_cc[(g_cpu_ir>>8)&0xf], temp_pc + make_int_8(g_cpu_ir));
 }
 
-static void d68000_bcc_16(void)
-{
+static void d68000_bcc_16(void) {
 	uint temp_pc = g_cpu_pc;
 	sprintf(g_dasm_str, "b%-2s     $%x", g_cc[(g_cpu_ir>>8)&0xf], temp_pc + make_int_16(read_imm_16()));
 }
 
-static void d68020_bcc_32(void)
-{
+static void d68020_bcc_32(void) {
 	uint temp_pc = g_cpu_pc;
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "b%-2s     $%x; (2+)", g_cc[(g_cpu_ir>>8)&0xf], temp_pc + read_imm_32());
 }
 
-static void d68000_bchg_r(void)
-{
+static void d68000_bchg_r(void) {
 	sprintf(g_dasm_str, "bchg    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_bchg_s(void)
-{
+static void d68000_bchg_s(void) {
 	char* str = get_imm_str_u8();
 	sprintf(g_dasm_str, "bchg    %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_bclr_r(void)
-{
+static void d68000_bclr_r(void) {
 	sprintf(g_dasm_str, "bclr    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_bclr_s(void)
-{
+static void d68000_bclr_s(void) {
 	char* str = get_imm_str_u8();
 	sprintf(g_dasm_str, "bclr    %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68010_bkpt(void)
-{
+static void d68010_bkpt(void) {
 	LIMIT_CPU_TYPES(M68010_PLUS);
 	sprintf(g_dasm_str, "bkpt #%d; (1+)", g_cpu_ir&7);
 }
 
-static void d68020_bfchg(void)
-{
+static void d68020_bfchg(void) {
 	uint extension;
 	char offset[3];
 	char width[3];
@@ -1015,19 +987,20 @@ static void d68020_bfchg(void)
 
 	extension = read_imm_16();
 
-	if(BIT_B(extension))
+	if (BIT_B(extension)) {
 		sprintf(offset, "D%d", (extension>>6)&7);
-	else
+	} else {
 		sprintf(offset, "%d", (extension>>6)&31);
-	if(BIT_5(extension))
+	}
+	if (BIT_5(extension)) {
 		sprintf(width, "D%d", extension&7);
-	else
+	} else {
 		sprintf(width, "%d", g_5bit_data_table[extension&31]);
+	}
 	sprintf(g_dasm_str, "bfchg   %s {%s:%s}; (2+)", get_ea_mode_str_8(g_cpu_ir), offset, width);
 }
 
-static void d68020_bfclr(void)
-{
+static void d68020_bfclr(void) {
 	uint extension;
 	char offset[3];
 	char width[3];
@@ -1036,19 +1009,20 @@ static void d68020_bfclr(void)
 
 	extension = read_imm_16();
 
-	if(BIT_B(extension))
+	if (BIT_B(extension)) {
 		sprintf(offset, "D%d", (extension>>6)&7);
-	else
+	} else {
 		sprintf(offset, "%d", (extension>>6)&31);
-	if(BIT_5(extension))
+	}
+	if (BIT_5(extension)) {
 		sprintf(width, "D%d", extension&7);
-	else
+	} else {
 		sprintf(width, "%d", g_5bit_data_table[extension&31]);
+	}
 	sprintf(g_dasm_str, "bfclr   %s {%s:%s}; (2+)", get_ea_mode_str_8(g_cpu_ir), offset, width);
 }
 
-static void d68020_bfexts(void)
-{
+static void d68020_bfexts(void) {
 	uint extension;
 	char offset[3];
 	char width[3];
@@ -1057,19 +1031,20 @@ static void d68020_bfexts(void)
 
 	extension = read_imm_16();
 
-	if(BIT_B(extension))
+	if (BIT_B(extension)) {
 		sprintf(offset, "D%d", (extension>>6)&7);
-	else
+	} else {
 		sprintf(offset, "%d", (extension>>6)&31);
-	if(BIT_5(extension))
+	}
+	if (BIT_5(extension)) {
 		sprintf(width, "D%d", extension&7);
-	else
+	} else {
 		sprintf(width, "%d", g_5bit_data_table[extension&31]);
+	}
 	sprintf(g_dasm_str, "bfexts  %s {%s:%s}, D%d; (2+)", get_ea_mode_str_8(g_cpu_ir), offset, width, (extension>>12)&7);
 }
 
-static void d68020_bfextu(void)
-{
+static void d68020_bfextu(void) {
 	uint extension;
 	char offset[3];
 	char width[3];
@@ -1078,19 +1053,20 @@ static void d68020_bfextu(void)
 
 	extension = read_imm_16();
 
-	if(BIT_B(extension))
+	if (BIT_B(extension)) {
 		sprintf(offset, "D%d", (extension>>6)&7);
-	else
+	} else {
 		sprintf(offset, "%d", (extension>>6)&31);
-	if(BIT_5(extension))
+	}
+	if (BIT_5(extension)) {
 		sprintf(width, "D%d", extension&7);
-	else
+	} else {
 		sprintf(width, "%d", g_5bit_data_table[extension&31]);
+	}
 	sprintf(g_dasm_str, "bfextu  %s {%s:%s}, D%d; (2+)", get_ea_mode_str_8(g_cpu_ir), offset, width, (extension>>12)&7);
 }
 
-static void d68020_bfffo(void)
-{
+static void d68020_bfffo(void) {
 	uint extension;
 	char offset[3];
 	char width[3];
@@ -1099,19 +1075,20 @@ static void d68020_bfffo(void)
 
 	extension = read_imm_16();
 
-	if(BIT_B(extension))
+	if (BIT_B(extension)) {
 		sprintf(offset, "D%d", (extension>>6)&7);
-	else
+	} else {
 		sprintf(offset, "%d", (extension>>6)&31);
-	if(BIT_5(extension))
+	}
+	if (BIT_5(extension)) {
 		sprintf(width, "D%d", extension&7);
-	else
+	} else {
 		sprintf(width, "%d", g_5bit_data_table[extension&31]);
+	}
 	sprintf(g_dasm_str, "bfffo   %s {%s:%s}, D%d; (2+)", get_ea_mode_str_8(g_cpu_ir), offset, width, (extension>>12)&7);
 }
 
-static void d68020_bfins(void)
-{
+static void d68020_bfins(void) {
 	uint extension;
 	char offset[3];
 	char width[3];
@@ -1120,19 +1097,20 @@ static void d68020_bfins(void)
 
 	extension = read_imm_16();
 
-	if(BIT_B(extension))
+	if (BIT_B(extension)) {
 		sprintf(offset, "D%d", (extension>>6)&7);
-	else
+	} else {
 		sprintf(offset, "%d", (extension>>6)&31);
-	if(BIT_5(extension))
+	}
+	if (BIT_5(extension)) {
 		sprintf(width, "D%d", extension&7);
-	else
+	} else {
 		sprintf(width, "%d", g_5bit_data_table[extension&31]);
+	}
 	sprintf(g_dasm_str, "bfins   D%d, %s {%s:%s}; (2+)", (extension>>12)&7, get_ea_mode_str_8(g_cpu_ir), offset, width);
 }
 
-static void d68020_bfset(void)
-{
+static void d68020_bfset(void) {
 	uint extension;
 	char offset[3];
 	char width[3];
@@ -1141,19 +1119,20 @@ static void d68020_bfset(void)
 
 	extension = read_imm_16();
 
-	if(BIT_B(extension))
+	if (BIT_B(extension)) {
 		sprintf(offset, "D%d", (extension>>6)&7);
-	else
+	} else {
 		sprintf(offset, "%d", (extension>>6)&31);
-	if(BIT_5(extension))
+	}
+	if (BIT_5(extension)) {
 		sprintf(width, "D%d", extension&7);
-	else
+	} else {
 		sprintf(width, "%d", g_5bit_data_table[extension&31]);
+	}
 	sprintf(g_dasm_str, "bfset   %s {%s:%s}; (2+)", get_ea_mode_str_8(g_cpu_ir), offset, width);
 }
 
-static void d68020_bftst(void)
-{
+static void d68020_bftst(void) {
 	uint extension;
 	char offset[3];
 	char width[3];
@@ -1162,82 +1141,73 @@ static void d68020_bftst(void)
 
 	extension = read_imm_16();
 
-	if(BIT_B(extension))
+	if (BIT_B(extension)) {
 		sprintf(offset, "D%d", (extension>>6)&7);
-	else
+	} else {
 		sprintf(offset, "%d", (extension>>6)&31);
-	if(BIT_5(extension))
+	}
+	if (BIT_5(extension)) {
 		sprintf(width, "D%d", extension&7);
-	else
+	} else {
 		sprintf(width, "%d", g_5bit_data_table[extension&31]);
+	}
 	sprintf(g_dasm_str, "bftst   %s {%s:%s}; (2+)", get_ea_mode_str_8(g_cpu_ir), offset, width);
 }
 
-static void d68000_bra_8(void)
-{
+static void d68000_bra_8(void) {
 	uint temp_pc = g_cpu_pc;
 	sprintf(g_dasm_str, "bra     $%x", temp_pc + make_int_8(g_cpu_ir));
 }
 
-static void d68000_bra_16(void)
-{
+static void d68000_bra_16(void) {
 	uint temp_pc = g_cpu_pc;
 	sprintf(g_dasm_str, "bra     $%x", temp_pc + make_int_16(read_imm_16()));
 }
 
-static void d68020_bra_32(void)
-{
+static void d68020_bra_32(void) {
 	uint temp_pc = g_cpu_pc;
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "bra     $%x; (2+)", temp_pc + read_imm_32());
 }
 
-static void d68000_bset_r(void)
-{
+static void d68000_bset_r(void) {
 	sprintf(g_dasm_str, "bset    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_bset_s(void)
-{
+static void d68000_bset_s(void) {
 	char* str = get_imm_str_u8();
 	sprintf(g_dasm_str, "bset    %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_bsr_8(void)
-{
+static void d68000_bsr_8(void) {
 	uint temp_pc = g_cpu_pc;
 	sprintf(g_dasm_str, "bsr     $%x", temp_pc + make_int_8(g_cpu_ir));
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68000_bsr_16(void)
-{
+static void d68000_bsr_16(void) {
 	uint temp_pc = g_cpu_pc;
 	sprintf(g_dasm_str, "bsr     $%x", temp_pc + make_int_16(read_imm_16()));
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68020_bsr_32(void)
-{
+static void d68020_bsr_32(void) {
 	uint temp_pc = g_cpu_pc;
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "bsr     $%x; (2+)", temp_pc + read_imm_32());
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68000_btst_r(void)
-{
+static void d68000_btst_r(void) {
 	sprintf(g_dasm_str, "btst    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_btst_s(void)
-{
+static void d68000_btst_s(void) {
 	char* str = get_imm_str_u8();
 	sprintf(g_dasm_str, "btst    %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68020_callm(void)
-{
+static void d68020_callm(void) {
 	char* str;
 	LIMIT_CPU_TYPES(M68020_ONLY);
 	str = get_imm_str_u8();
@@ -1245,32 +1215,28 @@ static void d68020_callm(void)
 	sprintf(g_dasm_str, "callm   %s, %s; (2)", str, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68020_cas_8(void)
-{
+static void d68020_cas_8(void) {
 	uint extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	extension = read_imm_16();
 	sprintf(g_dasm_str, "cas.b   D%d, D%d, %s; (2+)", extension&7, (extension>>6)&7, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68020_cas_16(void)
-{
+static void d68020_cas_16(void) {
 	uint extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	extension = read_imm_16();
 	sprintf(g_dasm_str, "cas.w   D%d, D%d, %s; (2+)", extension&7, (extension>>6)&7, get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68020_cas_32(void)
-{
+static void d68020_cas_32(void) {
 	uint extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	extension = read_imm_16();
 	sprintf(g_dasm_str, "cas.l   D%d, D%d, %s; (2+)", extension&7, (extension>>6)&7, get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68020_cas2_16(void)
-{
+static void d68020_cas2_16(void) {
 /* CAS2 Dc1:Dc2,Du1:Dc2:(Rn1):(Rn2)
 f e d c b a 9 8 7 6 5 4 3 2 1 0
  DARn1  0 0 0  Du1  0 0 0  Dc1
@@ -1286,8 +1252,7 @@ f e d c b a 9 8 7 6 5 4 3 2 1 0
 		BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
 }
 
-static void d68020_cas2_32(void)
-{
+static void d68020_cas2_32(void) {
 	uint extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	extension = read_imm_32();
@@ -1297,48 +1262,41 @@ static void d68020_cas2_32(void)
 		BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
 }
 
-static void d68000_chk_16(void)
-{
+static void d68000_chk_16(void) {
 	sprintf(g_dasm_str, "chk.w   %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68020_chk_32(void)
-{
+static void d68020_chk_32(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "chk.l   %s, D%d; (2+)", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68020_chk2_cmp2_8(void)
-{
+static void d68020_chk2_cmp2_8(void) {
 	uint extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	extension = read_imm_16();
 	sprintf(g_dasm_str, "%s.b  %s, %c%d; (2+)", BIT_B(extension) ? "chk2" : "cmp2", get_ea_mode_str_8(g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
 }
 
-static void d68020_chk2_cmp2_16(void)
-{
+static void d68020_chk2_cmp2_16(void) {
 	uint extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	extension = read_imm_16();
 	sprintf(g_dasm_str, "%s.w  %s, %c%d; (2+)", BIT_B(extension) ? "chk2" : "cmp2", get_ea_mode_str_16(g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
 }
 
-static void d68020_chk2_cmp2_32(void)
-{
+static void d68020_chk2_cmp2_32(void) {
 	uint extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	extension = read_imm_16();
 	sprintf(g_dasm_str, "%s.l  %s, %c%d; (2+)", BIT_B(extension) ? "chk2" : "cmp2", get_ea_mode_str_32(g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
 }
 
-static void d68040_cinv(void)
-{
+static void d68040_cinv(void) {
 	LIMIT_CPU_TYPES(M68040_PLUS);
-	switch((g_cpu_ir>>3)&3)
-	{
+	switch((g_cpu_ir>>3)&3) {
 		case 0:
 			sprintf(g_dasm_str, "cinv (illegal scope); (4)");
 			break;
@@ -1354,131 +1312,110 @@ static void d68040_cinv(void)
 	}
 }
 
-static void d68000_clr_8(void)
-{
+static void d68000_clr_8(void) {
 	sprintf(g_dasm_str, "clr.b   %s", get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_clr_16(void)
-{
+static void d68000_clr_16(void) {
 	sprintf(g_dasm_str, "clr.w   %s", get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_clr_32(void)
-{
+static void d68000_clr_32(void) {
 	sprintf(g_dasm_str, "clr.l   %s", get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_cmp_8(void)
-{
+static void d68000_cmp_8(void) {
 	sprintf(g_dasm_str, "cmp.b   %s, D%d", get_ea_mode_str_8(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_cmp_16(void)
-{
+static void d68000_cmp_16(void) {
 	sprintf(g_dasm_str, "cmp.w   %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_cmp_32(void)
-{
+static void d68000_cmp_32(void) {
 	sprintf(g_dasm_str, "cmp.l   %s, D%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_cmpa_16(void)
-{
+static void d68000_cmpa_16(void) {
 	sprintf(g_dasm_str, "cmpa.w  %s, A%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_cmpa_32(void)
-{
+static void d68000_cmpa_32(void) {
 	sprintf(g_dasm_str, "cmpa.l  %s, A%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_cmpi_8(void)
-{
+static void d68000_cmpi_8(void) {
 	char* str = get_imm_str_s8();
 	sprintf(g_dasm_str, "cmpi.b  %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68020_cmpi_pcdi_8(void)
-{
+static void d68020_cmpi_pcdi_8(void) {
 	char* str;
 	LIMIT_CPU_TYPES(M68010_PLUS);
 	str = get_imm_str_s8();
 	sprintf(g_dasm_str, "cmpi.b  %s, %s; (2+)", str, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68020_cmpi_pcix_8(void)
-{
+static void d68020_cmpi_pcix_8(void) {
 	char* str;
 	LIMIT_CPU_TYPES(M68010_PLUS);
 	str = get_imm_str_s8();
 	sprintf(g_dasm_str, "cmpi.b  %s, %s; (2+)", str, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_cmpi_16(void)
-{
+static void d68000_cmpi_16(void) {
 	char* str;
 	str = get_imm_str_s16();
 	sprintf(g_dasm_str, "cmpi.w  %s, %s", str, get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68020_cmpi_pcdi_16(void)
-{
+static void d68020_cmpi_pcdi_16(void) {
 	char* str;
 	LIMIT_CPU_TYPES(M68010_PLUS);
 	str = get_imm_str_s16();
 	sprintf(g_dasm_str, "cmpi.w  %s, %s; (2+)", str, get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68020_cmpi_pcix_16(void)
-{
+static void d68020_cmpi_pcix_16(void) {
 	char* str;
 	LIMIT_CPU_TYPES(M68010_PLUS);
 	str = get_imm_str_s16();
 	sprintf(g_dasm_str, "cmpi.w  %s, %s; (2+)", str, get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_cmpi_32(void)
-{
+static void d68000_cmpi_32(void) {
 	char* str;
 	str = get_imm_str_s32();
 	sprintf(g_dasm_str, "cmpi.l  %s, %s", str, get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68020_cmpi_pcdi_32(void)
-{
+static void d68020_cmpi_pcdi_32(void) {
 	char* str;
 	LIMIT_CPU_TYPES(M68010_PLUS);
 	str = get_imm_str_s32();
 	sprintf(g_dasm_str, "cmpi.l  %s, %s; (2+)", str, get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68020_cmpi_pcix_32(void)
-{
+static void d68020_cmpi_pcix_32(void) {
 	char* str;
 	LIMIT_CPU_TYPES(M68010_PLUS);
 	str = get_imm_str_s32();
 	sprintf(g_dasm_str, "cmpi.l  %s, %s; (2+)", str, get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_cmpm_8(void)
-{
+static void d68000_cmpm_8(void) {
 	sprintf(g_dasm_str, "cmpm.b  (A%d)+, (A%d)+", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_cmpm_16(void)
-{
+static void d68000_cmpm_16(void) {
 	sprintf(g_dasm_str, "cmpm.w  (A%d)+, (A%d)+", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_cmpm_32(void)
-{
+static void d68000_cmpm_32(void) {
 	sprintf(g_dasm_str, "cmpm.l  (A%d)+, (A%d)+", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68020_cpbcc_16(void)
-{
+static void d68020_cpbcc_16(void) {
 	uint extension;
 	uint new_pc = g_cpu_pc;
 	LIMIT_CPU_TYPES(M68020_PLUS);
@@ -1487,8 +1424,7 @@ static void d68020_cpbcc_16(void)
 	sprintf(g_dasm_str, "%db%-4s  %s; %x (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[g_cpu_ir&0x3f], get_imm_str_s16(), new_pc, extension);
 }
 
-static void d68020_cpbcc_32(void)
-{
+static void d68020_cpbcc_32(void) {
 	uint extension;
 	uint new_pc = g_cpu_pc;
 	LIMIT_CPU_TYPES(M68020_PLUS);
@@ -1497,8 +1433,7 @@ static void d68020_cpbcc_32(void)
 	sprintf(g_dasm_str, "%db%-4s  %s; %x (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[g_cpu_ir&0x3f], get_imm_str_s16(), new_pc, extension);
 }
 
-static void d68020_cpdbcc(void)
-{
+static void d68020_cpdbcc(void) {
 	uint extension1;
 	uint extension2;
 	uint new_pc = g_cpu_pc;
@@ -1509,40 +1444,30 @@ static void d68020_cpdbcc(void)
 	sprintf(g_dasm_str, "%ddb%-4s D%d,%s; %x (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[extension1&0x3f], g_cpu_ir&7, get_imm_str_s16(), new_pc, extension2);
 }
 
-static void d68020_cpgen(void)
-{
+static void d68020_cpgen(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "%dgen    %s; (2-3)", (g_cpu_ir>>9)&7, get_imm_str_u32());
 }
 
-static void d68020_cprestore(void)
-{
+static void d68020_cprestore(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	if (((g_cpu_ir>>9)&7) == 1)
-	{
+	if (((g_cpu_ir>>9)&7) == 1) {
 		sprintf(g_dasm_str, "frestore %s", get_ea_mode_str_8(g_cpu_ir));
-	}
-	else
-	{
+	} else {
 		sprintf(g_dasm_str, "%drestore %s; (2-3)", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
 	}
 }
 
-static void d68020_cpsave(void)
-{
+static void d68020_cpsave(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	if (((g_cpu_ir>>9)&7) == 1)
-	{
+	if (((g_cpu_ir>>9)&7) == 1) {
 		sprintf(g_dasm_str, "fsave   %s", get_ea_mode_str_8(g_cpu_ir));
-	}
-	else
-	{
+	} else {
 		sprintf(g_dasm_str, "%dsave   %s; (2-3)", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
 	}
 }
 
-static void d68020_cpscc(void)
-{
+static void d68020_cpscc(void) {
 	uint extension1;
 	uint extension2;
 	LIMIT_CPU_TYPES(M68020_PLUS);
@@ -1551,8 +1476,7 @@ static void d68020_cpscc(void)
 	sprintf(g_dasm_str, "%ds%-4s  %s; (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[extension1&0x3f], get_ea_mode_str_8(g_cpu_ir), extension2);
 }
 
-static void d68020_cptrapcc_0(void)
-{
+static void d68020_cptrapcc_0(void) {
 	uint extension1;
 	uint extension2;
 	LIMIT_CPU_TYPES(M68020_PLUS);
@@ -1561,8 +1485,7 @@ static void d68020_cptrapcc_0(void)
 	sprintf(g_dasm_str, "%dtrap%-4s; (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[extension1&0x3f], extension2);
 }
 
-static void d68020_cptrapcc_16(void)
-{
+static void d68020_cptrapcc_16(void) {
 	uint extension1;
 	uint extension2;
 	LIMIT_CPU_TYPES(M68020_PLUS);
@@ -1571,8 +1494,7 @@ static void d68020_cptrapcc_16(void)
 	sprintf(g_dasm_str, "%dtrap%-4s %s; (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[extension1&0x3f], get_imm_str_u16(), extension2);
 }
 
-static void d68020_cptrapcc_32(void)
-{
+static void d68020_cptrapcc_32(void) {
 	uint extension1;
 	uint extension2;
 	LIMIT_CPU_TYPES(M68020_PLUS);
@@ -1581,11 +1503,9 @@ static void d68020_cptrapcc_32(void)
 	sprintf(g_dasm_str, "%dtrap%-4s %s; (extension = %x) (2-3)", (g_cpu_ir>>9)&7, g_cpcc[extension1&0x3f], get_imm_str_u32(), extension2);
 }
 
-static void d68040_cpush(void)
-{
+static void d68040_cpush(void) {
 	LIMIT_CPU_TYPES(M68040_PLUS);
-	switch((g_cpu_ir>>3)&3)
-	{
+	switch((g_cpu_ir>>3)&3) {
 		case 0:
 			sprintf(g_dasm_str, "cpush (illegal scope); (4)");
 			break;
@@ -1601,124 +1521,102 @@ static void d68040_cpush(void)
 	}
 }
 
-static void d68000_dbra(void)
-{
+static void d68000_dbra(void) {
 	uint temp_pc = g_cpu_pc;
 	sprintf(g_dasm_str, "dbra    D%d, $%x", g_cpu_ir & 7, temp_pc + make_int_16(read_imm_16()));
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68000_dbcc(void)
-{
+static void d68000_dbcc(void) {
 	uint temp_pc = g_cpu_pc;
 	sprintf(g_dasm_str, "db%-2s    D%d, $%x", g_cc[(g_cpu_ir>>8)&0xf], g_cpu_ir & 7, temp_pc + make_int_16(read_imm_16()));
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68000_divs(void)
-{
+static void d68000_divs(void) {
 	sprintf(g_dasm_str, "divs.w  %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_divu(void)
-{
+static void d68000_divu(void) {
 	sprintf(g_dasm_str, "divu.w  %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68020_divl(void)
-{
+static void d68020_divl(void) {
 	uint extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	extension = read_imm_16();
 
-	if(BIT_A(extension))
+	if (BIT_A(extension)) {
 		sprintf(g_dasm_str, "div%c.l  %s, D%d:D%d; (2+)", BIT_B(extension) ? 's' : 'u', get_ea_mode_str_32(g_cpu_ir), extension&7, (extension>>12)&7);
-	else if((extension&7) == ((extension>>12)&7))
+	} else if ((extension&7) == ((extension>>12)&7)) {
 		sprintf(g_dasm_str, "div%c.l  %s, D%d; (2+)", BIT_B(extension) ? 's' : 'u', get_ea_mode_str_32(g_cpu_ir), (extension>>12)&7);
-	else
+	} else {
 		sprintf(g_dasm_str, "div%cl.l %s, D%d:D%d; (2+)", BIT_B(extension) ? 's' : 'u', get_ea_mode_str_32(g_cpu_ir), extension&7, (extension>>12)&7);
+	}
 }
 
-static void d68000_eor_8(void)
-{
+static void d68000_eor_8(void) {
 	sprintf(g_dasm_str, "eor.b   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_eor_16(void)
-{
+static void d68000_eor_16(void) {
 	sprintf(g_dasm_str, "eor.w   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_eor_32(void)
-{
+static void d68000_eor_32(void) {
 	sprintf(g_dasm_str, "eor.l   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_eori_8(void)
-{
+static void d68000_eori_8(void) {
 	char* str = get_imm_str_u8();
 	sprintf(g_dasm_str, "eori.b  %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_eori_16(void)
-{
+static void d68000_eori_16(void) {
 	char* str = get_imm_str_u16();
 	sprintf(g_dasm_str, "eori.w  %s, %s", str, get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_eori_32(void)
-{
+static void d68000_eori_32(void) {
 	char* str = get_imm_str_u32();
 	sprintf(g_dasm_str, "eori.l  %s, %s", str, get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_eori_to_ccr(void)
-{
+static void d68000_eori_to_ccr(void) {
 	sprintf(g_dasm_str, "eori    %s, CCR", get_imm_str_u8());
 }
 
-static void d68000_eori_to_sr(void)
-{
+static void d68000_eori_to_sr(void) {
 	sprintf(g_dasm_str, "eori    %s, SR", get_imm_str_u16());
 }
 
-static void d68000_exg_dd(void)
-{
+static void d68000_exg_dd(void) {
 	sprintf(g_dasm_str, "exg     D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_exg_aa(void)
-{
+static void d68000_exg_aa(void) {
 	sprintf(g_dasm_str, "exg     A%d, A%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_exg_da(void)
-{
+static void d68000_exg_da(void) {
 	sprintf(g_dasm_str, "exg     D%d, A%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_ext_16(void)
-{
+static void d68000_ext_16(void) {
 	sprintf(g_dasm_str, "ext.w   D%d", g_cpu_ir&7);
 }
 
-static void d68000_ext_32(void)
-{
+static void d68000_ext_32(void) {
 	sprintf(g_dasm_str, "ext.l   D%d", g_cpu_ir&7);
 }
 
-static void d68020_extb_32(void)
-{
+static void d68020_extb_32(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "extb.l  D%d; (2+)", g_cpu_ir&7);
 }
 
-static void d68040_fpu(void)
-{
-	char float_data_format[8][3] =
-	{
-		".l", ".s", ".x", ".p", ".w", ".d", ".b", ".p"
-	};
+static void d68040_fpu(void) {
+	char float_data_format[8][3] = {".l", ".s", ".x", ".p", ".w", ".d", ".b", ".p"};
 
 	char mnemonic[40];
 	uint32 w2, src, dst_reg;
@@ -1729,151 +1627,268 @@ static void d68040_fpu(void)
 	dst_reg = (w2 >> 7) & 0x7;
 
 	// special override for FMOVECR
-	if ((((w2 >> 13) & 0x7) == 2) && (((w2>>10)&0x7) == 7))
-	{
+	if ((((w2 >> 13) & 0x7) == 2) && (((w2>>10)&0x7) == 7)) {
 		sprintf(g_dasm_str, "fmovecr   #$%0x, fp%d", (w2&0x7f), dst_reg);
 		return;
 	}
 
-	switch ((w2 >> 13) & 0x7)
-	{
+	switch ((w2 >> 13) & 0x7) {
 		case 0x0:
-		case 0x2:
-		{
-			switch(w2 & 0x7f)
-			{
-				case 0x00:	sprintf(mnemonic, "fmove"); break;
-				case 0x01:	sprintf(mnemonic, "fint"); break;
-				case 0x02:	sprintf(mnemonic, "fsinh"); break;
-				case 0x03:	sprintf(mnemonic, "fintrz"); break;
-				case 0x04:	sprintf(mnemonic, "fsqrt"); break;
-				case 0x06:	sprintf(mnemonic, "flognp1"); break;
-				case 0x08:	sprintf(mnemonic, "fetoxm1"); break;
-				case 0x09:	sprintf(mnemonic, "ftanh1"); break;
-				case 0x0a:	sprintf(mnemonic, "fatan"); break;
-				case 0x0c:	sprintf(mnemonic, "fasin"); break;
-				case 0x0d:	sprintf(mnemonic, "fatanh"); break;
-				case 0x0e:	sprintf(mnemonic, "fsin"); break;
-				case 0x0f:	sprintf(mnemonic, "ftan"); break;
-				case 0x10:	sprintf(mnemonic, "fetox"); break;
-				case 0x11:	sprintf(mnemonic, "ftwotox"); break;
-				case 0x12:	sprintf(mnemonic, "ftentox"); break;
-				case 0x14:	sprintf(mnemonic, "flogn"); break;
-				case 0x15:	sprintf(mnemonic, "flog10"); break;
-				case 0x16:	sprintf(mnemonic, "flog2"); break;
-				case 0x18:	sprintf(mnemonic, "fabs"); break;
-				case 0x19:	sprintf(mnemonic, "fcosh"); break;
-				case 0x1a:	sprintf(mnemonic, "fneg"); break;
-				case 0x1c:	sprintf(mnemonic, "facos"); break;
-				case 0x1d:	sprintf(mnemonic, "fcos"); break;
-				case 0x1e:	sprintf(mnemonic, "fgetexp"); break;
-				case 0x1f:	sprintf(mnemonic, "fgetman"); break;
-				case 0x20:	sprintf(mnemonic, "fdiv"); break;
-				case 0x21:	sprintf(mnemonic, "fmod"); break;
-				case 0x22:	sprintf(mnemonic, "fadd"); break;
-				case 0x23:	sprintf(mnemonic, "fmul"); break;
-				case 0x24:	sprintf(mnemonic, "fsgldiv"); break;
-				case 0x25:	sprintf(mnemonic, "frem"); break;
-				case 0x26:	sprintf(mnemonic, "fscale"); break;
-				case 0x27:	sprintf(mnemonic, "fsglmul"); break;
-				case 0x28:	sprintf(mnemonic, "fsub"); break;
-				case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
-							sprintf(mnemonic, "fsincos"); break;
-				case 0x38:	sprintf(mnemonic, "fcmp"); break;
-				case 0x3a:	sprintf(mnemonic, "ftst"); break;
-				case 0x41:	sprintf(mnemonic, "fssqrt"); break;
-				case 0x45:	sprintf(mnemonic, "fdsqrt"); break;
-				case 0x58:	sprintf(mnemonic, "fsabs"); break;
-				case 0x5a:	sprintf(mnemonic, "fsneg"); break;
-				case 0x5c:	sprintf(mnemonic, "fdabs"); break;
-				case 0x5e:	sprintf(mnemonic, "fdneg"); break;
-				case 0x60:	sprintf(mnemonic, "fsdiv"); break;
-				case 0x62:	sprintf(mnemonic, "fsadd"); break;
-				case 0x63:	sprintf(mnemonic, "fsmul"); break;
-				case 0x64:	sprintf(mnemonic, "fddiv"); break;
-				case 0x66:	sprintf(mnemonic, "fdadd"); break;
-				case 0x67:	sprintf(mnemonic, "fdmul"); break;
-				case 0x68:	sprintf(mnemonic, "fssub"); break;
-				case 0x6c:	sprintf(mnemonic, "fdsub"); break;
+		case 0x2: {
+			switch(w2 & 0x7f) {
+				case 0x00:	
+					sprintf(mnemonic, "fmove"); 
+					break;
+				case 0x01:	
+					sprintf(mnemonic, "fint"); 
+					break;
+				case 0x02:	
+					sprintf(mnemonic, "fsinh"); 
+					break;
+				case 0x03:	
+					sprintf(mnemonic, "fintrz"); 
+					break;
+				case 0x04:	
+					sprintf(mnemonic, "fsqrt"); 
+					break;
+				case 0x06:	
+					sprintf(mnemonic, "flognp1"); 
+					break;
+				case 0x08:	
+					sprintf(mnemonic, "fetoxm1"); 
+					break;
+				case 0x09:	
+					sprintf(mnemonic, "ftanh1"); 
+					break;
+				case 0x0a:	
+					sprintf(mnemonic, "fatan"); 
+					break;
+				case 0x0c:	
+					sprintf(mnemonic, "fasin"); 
+					break;
+				case 0x0d:	
+					sprintf(mnemonic, "fatanh"); 
+					break;
+				case 0x0e:	
+					sprintf(mnemonic, "fsin"); 
+					break;
+				case 0x0f:	
+					sprintf(mnemonic, "ftan"); 
+					break;
+				case 0x10:	
+					sprintf(mnemonic, "fetox"); 
+					break;
+				case 0x11:	
+					sprintf(mnemonic, "ftwotox"); 
+					break;
+				case 0x12:	
+					sprintf(mnemonic, "ftentox"); 
+					break;
+				case 0x14:	
+					sprintf(mnemonic, "flogn"); 
+					break;
+				case 0x15:	
+					sprintf(mnemonic, "flog10"); 
+					break;
+				case 0x16:	
+					sprintf(mnemonic, "flog2"); 
+					break;
+				case 0x18:	
+					sprintf(mnemonic, "fabs"); 
+					break;
+				case 0x19:	
+					sprintf(mnemonic, "fcosh"); 
+					break;
+				case 0x1a:	
+					sprintf(mnemonic, "fneg"); 
+					break;
+				case 0x1c:	
+					sprintf(mnemonic, "facos"); 
+					break;
+				case 0x1d:	
+					sprintf(mnemonic, "fcos"); 
+					break;
+				case 0x1e:	
+					sprintf(mnemonic, "fgetexp"); 
+					break;
+				case 0x1f:	
+					sprintf(mnemonic, "fgetman"); 
+					break;
+				case 0x20:	
+					sprintf(mnemonic, "fdiv"); 
+					break;
+				case 0x21:	
+					sprintf(mnemonic, "fmod"); 
+					break;
+				case 0x22:	
+					sprintf(mnemonic, "fadd"); 
+					break;
+				case 0x23:	
+					sprintf(mnemonic, "fmul"); 
+					break;
+				case 0x24:	
+					sprintf(mnemonic, "fsgldiv"); 
+					break;
+				case 0x25:	
+					sprintf(mnemonic, "frem"); 
+					break;
+				case 0x26:	
+					sprintf(mnemonic, "fscale"); 
+					break;
+				case 0x27:	
+					sprintf(mnemonic, "fsglmul"); 
+					break;
+				case 0x28:	
+					sprintf(mnemonic, "fsub"); 
+					break;
+				case 0x30: 
+				case 0x31: 
+				case 0x32: 
+				case 0x33: 
+				case 0x34: 
+				case 0x35: 
+				case 0x36: 
+				case 0x37:
+					sprintf(mnemonic, "fsincos"); 
+					break;
+				case 0x38:	
+					sprintf(mnemonic, "fcmp"); 
+					break;
+				case 0x3a:	
+					sprintf(mnemonic, "ftst"); 
+					break;
+				case 0x41:	
+					sprintf(mnemonic, "fssqrt"); 
+					break;
+				case 0x45:	
+					sprintf(mnemonic, "fdsqrt"); 
+					break;
+				case 0x58:	
+					sprintf(mnemonic, "fsabs"); 
+					break;
+				case 0x5a:	
+					sprintf(mnemonic, "fsneg"); 
+					break;
+				case 0x5c:	
+					sprintf(mnemonic, "fdabs"); 
+					break;
+				case 0x5e:	
+					sprintf(mnemonic, "fdneg"); 
+					break;
+				case 0x60:	
+					sprintf(mnemonic, "fsdiv"); 
+					break;
+				case 0x62:	
+					sprintf(mnemonic, "fsadd"); 
+					break;
+				case 0x63:	
+					sprintf(mnemonic, "fsmul"); 
+					break;
+				case 0x64:	
+					sprintf(mnemonic, "fddiv"); 
+					break;
+				case 0x66:	
+					sprintf(mnemonic, "fdadd"); 
+					break;
+				case 0x67:	
+					sprintf(mnemonic, "fdmul"); 
+					break;
+				case 0x68:	
+					sprintf(mnemonic, "fssub"); 
+					break;
+				case 0x6c:	
+					sprintf(mnemonic, "fdsub"); 
+					break;
 
-				default:	sprintf(mnemonic, "FPU (?)"); break;
+				default:	
+					sprintf(mnemonic, "FPU (?)"); 
+					break;
 			}
 
-			if (w2 & 0x4000)
-			{
-				sprintf(g_dasm_str, "%s%s   %s, FP%d", mnemonic, float_data_format[src], get_ea_mode_str_32(g_cpu_ir), dst_reg);
-			}
-			else
-			{
-				sprintf(g_dasm_str, "%s.x   FP%d, FP%d", mnemonic, src, dst_reg);
+			if (w2 & 0x4000) {
+				sprintf(g_dasm_str, "%s%s   %s, FP%d", 
+					mnemonic, float_data_format[src], 
+					get_ea_mode_str_32(g_cpu_ir), dst_reg);
+			} else {
+				sprintf(g_dasm_str, "%s.x   FP%d, FP%d", 
+					mnemonic, src, dst_reg);
 			}
 			break;
 		}
 
-		case 0x3:
-		{
-			switch ((w2>>10)&7)
-			{
+		case 0x3: {
+			switch ((w2>>10)&7) {
 				case 3:		// packed decimal w/fixed k-factor
-					sprintf(g_dasm_str, "fmove%s   FP%d, %s {#%d}", float_data_format[(w2>>10)&7], dst_reg, get_ea_mode_str_32(g_cpu_ir), sext_7bit_int(w2&0x7f));
+					sprintf(g_dasm_str, "fmove%s   FP%d, %s {#%d}", 
+						float_data_format[(w2>>10)&7], dst_reg, 
+						get_ea_mode_str_32(g_cpu_ir), 
+						sext_7bit_int(w2&0x7f));
 					break;
 
 				case 7:		// packed decimal w/dynamic k-factor (register)
-					sprintf(g_dasm_str, "fmove%s   FP%d, %s {D%d}", float_data_format[(w2>>10)&7], dst_reg, get_ea_mode_str_32(g_cpu_ir), (w2>>4)&7);
+					sprintf(g_dasm_str, "fmove%s   FP%d, %s {D%d}", 
+						float_data_format[(w2>>10)&7], dst_reg, 
+						get_ea_mode_str_32(g_cpu_ir), (w2>>4)&7);
 					break;
 
 				default:
-					sprintf(g_dasm_str, "fmove%s   FP%d, %s", float_data_format[(w2>>10)&7], dst_reg, get_ea_mode_str_32(g_cpu_ir));
+					sprintf(g_dasm_str, "fmove%s   FP%d, %s", 
+						float_data_format[(w2>>10)&7], dst_reg, 
+						get_ea_mode_str_32(g_cpu_ir));
 					break;
 			}
 			break;
 		}
 
-		case 0x4:	// ea to control
-		{
-			sprintf(g_dasm_str, "fmovem.l   %s, ", get_ea_mode_str_32(g_cpu_ir));
-			if (w2 & 0x1000) strcat(g_dasm_str, "fpcr");
-			if (w2 & 0x0800) strcat(g_dasm_str, "/fpsr");
-			if (w2 & 0x0400) strcat(g_dasm_str, "/fpiar");
+		case 0x4: { 	// ea to control
+			sprintf(g_dasm_str, "fmovem.l   %s, ", 
+				get_ea_mode_str_32(g_cpu_ir));
+			if (w2 & 0x1000) {
+			 strcat(g_dasm_str, "fpcr");
+			}
+			if (w2 & 0x0800) {
+				strcat(g_dasm_str, "/fpsr");
+			}
+			if (w2 & 0x0400) {
+			 strcat(g_dasm_str, "/fpiar");
+			}
 			break;
 		}
 
-		case 0x5:	// control to ea
-		{
+		case 0x5: { 	// control to ea
 			
 			strcpy(g_dasm_str, "fmovem.l   ");
-			if (w2 & 0x1000) strcat(g_dasm_str, "fpcr");
-			if (w2 & 0x0800) strcat(g_dasm_str, "/fpsr");
-			if (w2 & 0x0400) strcat(g_dasm_str, "/fpiar");
+			if (w2 & 0x1000) {
+				strcat(g_dasm_str, "fpcr");
+			}
+			if (w2 & 0x0800) {
+				strcat(g_dasm_str, "/fpsr");
+			}
+			if (w2 & 0x0400) {
+				strcat(g_dasm_str, "/fpiar");
+			}
 			strcat(g_dasm_str, ", ");
 			strcat(g_dasm_str, get_ea_mode_str_32(g_cpu_ir));
 			break;
 		}
 
-		case 0x6:	// memory to FPU, list
-		{
+		case 0x6: {	// memory to FPU, list
 			char temp[32];
 
-			if ((w2>>11) & 1)	// dynamic register list
-			{
-				sprintf(g_dasm_str, "fmovem.x   %s, D%d", get_ea_mode_str_32(g_cpu_ir), (w2>>4)&7);
-			}
-			else	// static register list
-			{
+			if ((w2>>11) & 1) { // dynamic register list
+				sprintf(g_dasm_str, "fmovem.x   %s, D%d", 
+					get_ea_mode_str_32(g_cpu_ir), (w2>>4)&7);
+			} else	{ // static register list
 				int i;
 
-				sprintf(g_dasm_str, "fmovem.x   %s, ", get_ea_mode_str_32(g_cpu_ir));
+				sprintf(g_dasm_str, "fmovem.x   %s, ", 
+					get_ea_mode_str_32(g_cpu_ir));
 
-				for (i = 0; i < 8; i++)
-				{
-					if (w2 & (1<<i))
-					{
-						if ((w2>>12) & 1)	// postincrement or control
-						{
+				for (i = 0; i < 8; i++) {
+					if (w2 & (1<<i)) {
+						if ((w2>>12) & 1) {	// postincrement or control						
 							sprintf(temp, "FP%d ", 7-i);
-						}
-						else			// predecrement
-						{
+						} else {		// predecrement
 							sprintf(temp, "FP%d ", i);
 						}
 						strcat(g_dasm_str, temp);
@@ -1883,30 +1898,25 @@ static void d68040_fpu(void)
 			break;
 		}
 
-		case 0x7:	// FPU to memory, list
-		{
+		case 0x7: {	// FPU to memory, list
 			char temp[32];
 
-			if ((w2>>11) & 1)	// dynamic register list
-			{
-				sprintf(g_dasm_str, "fmovem.x   D%d, %s", (w2>>4)&7, get_ea_mode_str_32(g_cpu_ir));
-			}
-			else	// static register list
-			{
+			if ((w2>>11) & 1) {	// dynamic register list
+				sprintf(g_dasm_str, "fmovem.x   D%d, %s", (w2>>4)&7, 
+					get_ea_mode_str_32(g_cpu_ir));
+			} else {	
+				// static register list
 				int i;
 
 				sprintf(g_dasm_str, "fmovem.x   ");
 
-				for (i = 0; i < 8; i++)
-				{
-					if (w2 & (1<<i))
-					{
-						if ((w2>>12) & 1)	// postincrement or control
-						{
+				for (i = 0; i < 8; i++) {
+					if (w2 & (1<<i)) {
+						if ((w2>>12) & 1){
+							// postincrement or control
 							sprintf(temp, "FP%d ", 7-i);
-						}
-						else			// predecrement
-						{
+						} else {
+							// predecrement
 							sprintf(temp, "FP%d ", i);
 						}
 						strcat(g_dasm_str, temp);
@@ -1919,180 +1929,147 @@ static void d68040_fpu(void)
 			break;
 		}
 
-		default:
-		{
+		default: {
 			sprintf(g_dasm_str, "FPU (?) ");
 			break;
 		}
 	}
 }
 
-static void d68000_jmp(void)
-{
+static void d68000_jmp(void) {
 	sprintf(g_dasm_str, "jmp     %s", get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_jsr(void)
-{
+static void d68000_jsr(void) {
 	sprintf(g_dasm_str, "jsr     %s", get_ea_mode_str_32(g_cpu_ir));
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68000_lea(void)
-{
+static void d68000_lea(void) {
 	sprintf(g_dasm_str, "lea     %s, A%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_link_16(void)
-{
+static void d68000_link_16(void) {
 	sprintf(g_dasm_str, "link    A%d, %s", g_cpu_ir&7, get_imm_str_s16());
 }
 
-static void d68020_link_32(void)
-{
+static void d68020_link_32(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "link    A%d, %s; (2+)", g_cpu_ir&7, get_imm_str_s32());
 }
 
-static void d68000_lsr_s_8(void)
-{
+static void d68000_lsr_s_8(void) {
 	sprintf(g_dasm_str, "lsr.b   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_lsr_s_16(void)
-{
+static void d68000_lsr_s_16(void) {
 	sprintf(g_dasm_str, "lsr.w   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_lsr_s_32(void)
-{
+static void d68000_lsr_s_32(void) {
 	sprintf(g_dasm_str, "lsr.l   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_lsr_r_8(void)
-{
+static void d68000_lsr_r_8(void) {
 	sprintf(g_dasm_str, "lsr.b   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_lsr_r_16(void)
-{
+static void d68000_lsr_r_16(void) {
 	sprintf(g_dasm_str, "lsr.w   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_lsr_r_32(void)
-{
+static void d68000_lsr_r_32(void) {
 	sprintf(g_dasm_str, "lsr.l   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_lsr_ea(void)
-{
+static void d68000_lsr_ea(void) {
 	sprintf(g_dasm_str, "lsr.w   %s", get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_lsl_s_8(void)
-{
+static void d68000_lsl_s_8(void) {
 	sprintf(g_dasm_str, "lsl.b   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_lsl_s_16(void)
-{
+static void d68000_lsl_s_16(void) {
 	sprintf(g_dasm_str, "lsl.w   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_lsl_s_32(void)
-{
+static void d68000_lsl_s_32(void) {
 	sprintf(g_dasm_str, "lsl.l   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_lsl_r_8(void)
-{
+static void d68000_lsl_r_8(void) {
 	sprintf(g_dasm_str, "lsl.b   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_lsl_r_16(void)
-{
+static void d68000_lsl_r_16(void) {
 	sprintf(g_dasm_str, "lsl.w   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_lsl_r_32(void)
-{
+static void d68000_lsl_r_32(void) {
 	sprintf(g_dasm_str, "lsl.l   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_lsl_ea(void)
-{
+static void d68000_lsl_ea(void) {
 	sprintf(g_dasm_str, "lsl.w   %s", get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_move_8(void)
-{
+static void d68000_move_8(void) {
 	char* str = get_ea_mode_str_8(g_cpu_ir);
 	sprintf(g_dasm_str, "move.b  %s, %s", str, get_ea_mode_str_8(((g_cpu_ir>>9) & 7) | ((g_cpu_ir>>3) & 0x38)));
 }
 
-static void d68000_move_16(void)
-{
+static void d68000_move_16(void) {
 	char* str = get_ea_mode_str_16(g_cpu_ir);
 	sprintf(g_dasm_str, "move.w  %s, %s", str, get_ea_mode_str_16(((g_cpu_ir>>9) & 7) | ((g_cpu_ir>>3) & 0x38)));
 }
 
-static void d68000_move_32(void)
-{
+static void d68000_move_32(void) {
 	char* str = get_ea_mode_str_32(g_cpu_ir);
 	sprintf(g_dasm_str, "move.l  %s, %s", str, get_ea_mode_str_32(((g_cpu_ir>>9) & 7) | ((g_cpu_ir>>3) & 0x38)));
 }
 
-static void d68000_movea_16(void)
-{
+static void d68000_movea_16(void) {
 	sprintf(g_dasm_str, "movea.w %s, A%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_movea_32(void)
-{
+static void d68000_movea_32(void) {
 	sprintf(g_dasm_str, "movea.l %s, A%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_move_to_ccr(void)
-{
+static void d68000_move_to_ccr(void) {
 	sprintf(g_dasm_str, "move    %s, CCR", get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68010_move_fr_ccr(void)
-{
+static void d68010_move_fr_ccr(void) {
 	LIMIT_CPU_TYPES(M68010_PLUS);
 	sprintf(g_dasm_str, "move    CCR, %s; (1+)", get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_move_fr_sr(void)
-{
+static void d68000_move_fr_sr(void) {
 	sprintf(g_dasm_str, "move    SR, %s", get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_move_to_sr(void)
-{
+static void d68000_move_to_sr(void) {
 	sprintf(g_dasm_str, "move    %s, SR", get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_move_fr_usp(void)
-{
+static void d68000_move_fr_usp(void) {
 	sprintf(g_dasm_str, "move    USP, A%d", g_cpu_ir&7);
 }
 
-static void d68000_move_to_usp(void)
-{
+static void d68000_move_to_usp(void) {
 	sprintf(g_dasm_str, "move    A%d, USP", g_cpu_ir&7);
 }
 
-static void d68010_movec(void)
-{
+static void d68010_movec(void) {
 	uint extension;
 	char* reg_name;
 	char* processor;
 	LIMIT_CPU_TYPES(M68010_PLUS);
 	extension = read_imm_16();
 
-	switch(extension & 0xfff)
-	{
+	switch(extension & 0xfff) {
 		case 0x000:
 			reg_name = "SFC";
 			processor = "1+";
@@ -2162,14 +2139,14 @@ static void d68010_movec(void)
 			processor = "?";
 	}
 
-	if(BIT_0(g_cpu_ir))
+	if (BIT_0(g_cpu_ir)) {
 		sprintf(g_dasm_str, "movec %c%d, %s; (%s)", BIT_F(extension) ? 'A' : 'D', (extension>>12)&7, reg_name, processor);
-	else
+	} else {
 		sprintf(g_dasm_str, "movec %s, %c%d; (%s)", reg_name, BIT_F(extension) ? 'A' : 'D', (extension>>12)&7, processor);
+	}
 }
 
-static void d68000_movem_pd_16(void)
-{
+static void d68000_movem_pd_16(void) {
 	uint data = read_imm_16();
 	char buffer[40];
 	uint first;
@@ -2177,47 +2154,44 @@ static void d68000_movem_pd_16(void)
 	uint i;
 
 	buffer[0] = 0;
-	for(i=0;i<8;i++)
-	{
-		if(data&(1<<(15-i)))
-		{
+	for(i=0;i<8;i++) {
+		if (data&(1<<(15-i))) {
 			first = i;
 			run_length = 0;
-			while(i<7 && (data&(1<<(15-(i+1)))))
-			{
+			while(i<7 && (data&(1<<(15-(i+1))))) {
 				i++;
 				run_length++;
 			}
-			if(buffer[0] != 0)
+			if (buffer[0] != 0) {
 				strcat(buffer, "/");
+			}
 			sprintf(buffer+strlen(buffer), "D%d", first);
-			if(run_length > 0)
+			if (run_length > 0) {
 				sprintf(buffer+strlen(buffer), "-D%d", first + run_length);
+			}
 		}
 	}
-	for(i=0;i<8;i++)
-	{
-		if(data&(1<<(7-i)))
-		{
+	for(i=0;i<8;i++) {
+		if (data&(1<<(7-i))) {
 			first = i;
 			run_length = 0;
-			while(i<7 && (data&(1<<(7-(i+1)))))
-			{
+			while(i<7 && (data&(1<<(7-(i+1))))) {
 				i++;
 				run_length++;
 			}
-			if(buffer[0] != 0)
+			if (buffer[0] != 0) {
 				strcat(buffer, "/");
+			}
 			sprintf(buffer+strlen(buffer), "A%d", first);
-			if(run_length > 0)
+			if (run_length > 0) {
 				sprintf(buffer+strlen(buffer), "-A%d", first + run_length);
+			}
 		}
 	}
 	sprintf(g_dasm_str, "movem.w %s, %s", buffer, get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_movem_pd_32(void)
-{
+static void d68000_movem_pd_32(void) {
 	uint data = read_imm_16();
 	char buffer[40];
 	uint first;
@@ -2225,47 +2199,44 @@ static void d68000_movem_pd_32(void)
 	uint i;
 
 	buffer[0] = 0;
-	for(i=0;i<8;i++)
-	{
-		if(data&(1<<(15-i)))
-		{
+	for(i=0;i<8;i++) {
+		if (data&(1<<(15-i))) {
 			first = i;
 			run_length = 0;
-			while(i<7 && (data&(1<<(15-(i+1)))))
-			{
+			while(i<7 && (data&(1<<(15-(i+1))))) {
 				i++;
 				run_length++;
 			}
-			if(buffer[0] != 0)
+			if (buffer[0] != 0) {
 				strcat(buffer, "/");
+			}
 			sprintf(buffer+strlen(buffer), "D%d", first);
-			if(run_length > 0)
+			if (run_length > 0) {
 				sprintf(buffer+strlen(buffer), "-D%d", first + run_length);
+			}
 		}
 	}
-	for(i=0;i<8;i++)
-	{
-		if(data&(1<<(7-i)))
-		{
+	for(i=0;i<8;i++) {
+		if (data&(1<<(7-i))) {
 			first = i;
 			run_length = 0;
-			while(i<7 && (data&(1<<(7-(i+1)))))
-			{
+			while(i<7 && (data&(1<<(7-(i+1))))) {
 				i++;
 				run_length++;
 			}
-			if(buffer[0] != 0)
+			if (buffer[0] != 0) {
 				strcat(buffer, "/");
+			}
 			sprintf(buffer+strlen(buffer), "A%d", first);
-			if(run_length > 0)
+			if (run_length > 0) {
 				sprintf(buffer+strlen(buffer), "-A%d", first + run_length);
+			}
 		}
 	}
 	sprintf(g_dasm_str, "movem.l %s, %s", buffer, get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_movem_er_16(void)
-{
+static void d68000_movem_er_16(void) {
 	uint data = read_imm_16();
 	char buffer[40];
 	uint first;
@@ -2273,47 +2244,44 @@ static void d68000_movem_er_16(void)
 	uint i;
 
 	buffer[0] = 0;
-	for(i=0;i<8;i++)
-	{
-		if(data&(1<<i))
-		{
+	for(i=0;i<8;i++) {
+		if (data&(1<<i)) {
 			first = i;
 			run_length = 0;
-			while(i<7 && (data&(1<<(i+1))))
-			{
+			while(i<7 && (data&(1<<(i+1)))) {
 				i++;
 				run_length++;
 			}
-			if(buffer[0] != 0)
+			if (buffer[0] != 0) {
 				strcat(buffer, "/");
+			}
 			sprintf(buffer+strlen(buffer), "D%d", first);
-			if(run_length > 0)
+			if (run_length > 0) {
 				sprintf(buffer+strlen(buffer), "-D%d", first + run_length);
+			}
 		}
 	}
-	for(i=0;i<8;i++)
-	{
-		if(data&(1<<(i+8)))
-		{
+	for(i=0;i<8;i++) {
+		if (data&(1<<(i+8))) {
 			first = i;
 			run_length = 0;
-			while(i<7 && (data&(1<<(i+8+1))))
-			{
+			while(i<7 && (data&(1<<(i+8+1)))) {
 				i++;
 				run_length++;
 			}
-			if(buffer[0] != 0)
+			if (buffer[0] != 0) {
 				strcat(buffer, "/");
+			}
 			sprintf(buffer+strlen(buffer), "A%d", first);
-			if(run_length > 0)
+			if (run_length > 0) {
 				sprintf(buffer+strlen(buffer), "-A%d", first + run_length);
+			}
 		}
 	}
 	sprintf(g_dasm_str, "movem.w %s, %s", get_ea_mode_str_16(g_cpu_ir), buffer);
 }
 
-static void d68000_movem_er_32(void)
-{
+static void d68000_movem_er_32(void) {
 	uint data = read_imm_16();
 	char buffer[40];
 	uint first;
@@ -2321,47 +2289,44 @@ static void d68000_movem_er_32(void)
 	uint i;
 
 	buffer[0] = 0;
-	for(i=0;i<8;i++)
-	{
-		if(data&(1<<i))
-		{
+	for(i=0;i<8;i++) {
+		if (data&(1<<i)) {
 			first = i;
 			run_length = 0;
-			while(i<7 && (data&(1<<(i+1))))
-			{
+			while(i<7 && (data&(1<<(i+1)))) {
 				i++;
 				run_length++;
 			}
-			if(buffer[0] != 0)
+			if (buffer[0] != 0) {
 				strcat(buffer, "/");
+			}
 			sprintf(buffer+strlen(buffer), "D%d", first);
-			if(run_length > 0)
+			if (run_length > 0) {
 				sprintf(buffer+strlen(buffer), "-D%d", first + run_length);
+			}
 		}
 	}
-	for(i=0;i<8;i++)
-	{
-		if(data&(1<<(i+8)))
-		{
+	for(i=0;i<8;i++) {
+		if (data&(1<<(i+8))) {
 			first = i;
 			run_length = 0;
-			while(i<7 && (data&(1<<(i+8+1))))
-			{
+			while(i<7 && (data&(1<<(i+8+1)))) {
 				i++;
 				run_length++;
 			}
-			if(buffer[0] != 0)
+			if (buffer[0] != 0) {
 				strcat(buffer, "/");
+			}
 			sprintf(buffer+strlen(buffer), "A%d", first);
-			if(run_length > 0)
+			if (run_length > 0) {
 				sprintf(buffer+strlen(buffer), "-A%d", first + run_length);
+			}
 		}
 	}
 	sprintf(g_dasm_str, "movem.l %s, %s", get_ea_mode_str_32(g_cpu_ir), buffer);
 }
 
-static void d68000_movem_re_16(void)
-{
+static void d68000_movem_re_16(void) {
 	uint data = read_imm_16();
 	char buffer[40];
 	uint first;
@@ -2369,47 +2334,44 @@ static void d68000_movem_re_16(void)
 	uint i;
 
 	buffer[0] = 0;
-	for(i=0;i<8;i++)
-	{
-		if(data&(1<<i))
-		{
+	for(i=0;i<8;i++) {
+		if (data&(1<<i)) {
 			first = i;
 			run_length = 0;
-			while(i<7 && (data&(1<<(i+1))))
-			{
+			while(i<7 && (data&(1<<(i+1)))) {
 				i++;
 				run_length++;
 			}
-			if(buffer[0] != 0)
+			if (buffer[0] != 0) {
 				strcat(buffer, "/");
+			}
 			sprintf(buffer+strlen(buffer), "D%d", first);
-			if(run_length > 0)
+			if (run_length > 0) {
 				sprintf(buffer+strlen(buffer), "-D%d", first + run_length);
+			}
 		}
 	}
-	for(i=0;i<8;i++)
-	{
-		if(data&(1<<(i+8)))
-		{
+	for(i=0;i<8;i++) {
+		if (data&(1<<(i+8))) {
 			first = i;
 			run_length = 0;
-			while(i<7 && (data&(1<<(i+8+1))))
-			{
+			while(i<7 && (data&(1<<(i+8+1)))) {
 				i++;
 				run_length++;
 			}
-			if(buffer[0] != 0)
+			if (buffer[0] != 0) {
 				strcat(buffer, "/");
+			}
 			sprintf(buffer+strlen(buffer), "A%d", first);
-			if(run_length > 0)
+			if (run_length > 0) {
 				sprintf(buffer+strlen(buffer), "-A%d", first + run_length);
+			}
 		}
 	}
 	sprintf(g_dasm_str, "movem.w %s, %s", buffer, get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_movem_re_32(void)
-{
+static void d68000_movem_re_32(void) {
 	uint data = read_imm_16();
 	char buffer[40];
 	uint first;
@@ -2417,737 +2379,612 @@ static void d68000_movem_re_32(void)
 	uint i;
 
 	buffer[0] = 0;
-	for(i=0;i<8;i++)
-	{
-		if(data&(1<<i))
-		{
+	for(i=0;i<8;i++) {
+		if (data&(1<<i)) {
 			first = i;
 			run_length = 0;
-			while(i<7 && (data&(1<<(i+1))))
-			{
+			while(i<7 && (data&(1<<(i+1)))) {
 				i++;
 				run_length++;
 			}
-			if(buffer[0] != 0)
+			if (buffer[0] != 0) {
 				strcat(buffer, "/");
+			}
 			sprintf(buffer+strlen(buffer), "D%d", first);
-			if(run_length > 0)
+			if (run_length > 0) {
 				sprintf(buffer+strlen(buffer), "-D%d", first + run_length);
+			}
 		}
 	}
-	for(i=0;i<8;i++)
-	{
-		if(data&(1<<(i+8)))
-		{
+	for(i=0;i<8;i++) {
+		if (data&(1<<(i+8))) {
 			first = i;
 			run_length = 0;
-			while(i<7 && (data&(1<<(i+8+1))))
-			{
+			while(i<7 && (data&(1<<(i+8+1)))) {
 				i++;
 				run_length++;
 			}
-			if(buffer[0] != 0)
+			if (buffer[0] != 0) {
 				strcat(buffer, "/");
+			}
 			sprintf(buffer+strlen(buffer), "A%d", first);
-			if(run_length > 0)
+			if (run_length > 0) {
 				sprintf(buffer+strlen(buffer), "-A%d", first + run_length);
+			}
 		}
 	}
 	sprintf(g_dasm_str, "movem.l %s, %s", buffer, get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_movep_re_16(void)
-{
+static void d68000_movep_re_16(void) {
 	sprintf(g_dasm_str, "movep.w D%d, ($%x,A%d)", (g_cpu_ir>>9)&7, read_imm_16(), g_cpu_ir&7);
 }
 
-static void d68000_movep_re_32(void)
-{
+static void d68000_movep_re_32(void) {
 	sprintf(g_dasm_str, "movep.l D%d, ($%x,A%d)", (g_cpu_ir>>9)&7, read_imm_16(), g_cpu_ir&7);
 }
 
-static void d68000_movep_er_16(void)
-{
+static void d68000_movep_er_16(void) {
 	sprintf(g_dasm_str, "movep.w ($%x,A%d), D%d", read_imm_16(), g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_movep_er_32(void)
-{
+static void d68000_movep_er_32(void) {
 	sprintf(g_dasm_str, "movep.l ($%x,A%d), D%d", read_imm_16(), g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68010_moves_8(void)
-{
+static void d68010_moves_8(void) {
 	uint extension;
 	LIMIT_CPU_TYPES(M68010_PLUS);
 	extension = read_imm_16();
-	if(BIT_B(extension))
+	if (BIT_B(extension)) {
 		sprintf(g_dasm_str, "moves.b %c%d, %s; (1+)", BIT_F(extension) ? 'A' : 'D', (extension>>12)&7, get_ea_mode_str_8(g_cpu_ir));
-	else
+	} else {
 		sprintf(g_dasm_str, "moves.b %s, %c%d; (1+)", get_ea_mode_str_8(g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
+	}
 }
 
-static void d68010_moves_16(void)
-{
+static void d68010_moves_16(void) {
 	uint extension;
 	LIMIT_CPU_TYPES(M68010_PLUS);
 	extension = read_imm_16();
-	if(BIT_B(extension))
+	if (BIT_B(extension)) {
 		sprintf(g_dasm_str, "moves.w %c%d, %s; (1+)", BIT_F(extension) ? 'A' : 'D', (extension>>12)&7, get_ea_mode_str_16(g_cpu_ir));
-	else
+	} else {
 		sprintf(g_dasm_str, "moves.w %s, %c%d; (1+)", get_ea_mode_str_16(g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
+	}
 }
 
-static void d68010_moves_32(void)
-{
+static void d68010_moves_32(void) {
 	uint extension;
 	LIMIT_CPU_TYPES(M68010_PLUS);
 	extension = read_imm_16();
-	if(BIT_B(extension))
+	if (BIT_B(extension)) {
 		sprintf(g_dasm_str, "moves.l %c%d, %s; (1+)", BIT_F(extension) ? 'A' : 'D', (extension>>12)&7, get_ea_mode_str_32(g_cpu_ir));
-	else
+	} else {
 		sprintf(g_dasm_str, "moves.l %s, %c%d; (1+)", get_ea_mode_str_32(g_cpu_ir), BIT_F(extension) ? 'A' : 'D', (extension>>12)&7);
+	}
 }
 
-static void d68000_moveq(void)
-{
+static void d68000_moveq(void) {
 	sprintf(g_dasm_str, "moveq   #%s, D%d", make_signed_hex_str_8(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68040_move16_pi_pi(void)
-{
+static void d68040_move16_pi_pi(void) {
 	LIMIT_CPU_TYPES(M68040_PLUS);
 	sprintf(g_dasm_str, "move16  (A%d)+, (A%d)+; (4)", g_cpu_ir&7, (read_imm_16()>>12)&7);
 }
 
-static void d68040_move16_pi_al(void)
-{
+static void d68040_move16_pi_al(void) {
 	LIMIT_CPU_TYPES(M68040_PLUS);
 	sprintf(g_dasm_str, "move16  (A%d)+, %s; (4)", g_cpu_ir&7, get_imm_str_u32());
 }
 
-static void d68040_move16_al_pi(void)
-{
+static void d68040_move16_al_pi(void) {
 	LIMIT_CPU_TYPES(M68040_PLUS);
 	sprintf(g_dasm_str, "move16  %s, (A%d)+; (4)", get_imm_str_u32(), g_cpu_ir&7);
 }
 
-static void d68040_move16_ai_al(void)
-{
+static void d68040_move16_ai_al(void) {
 	LIMIT_CPU_TYPES(M68040_PLUS);
 	sprintf(g_dasm_str, "move16  (A%d), %s; (4)", g_cpu_ir&7, get_imm_str_u32());
 }
 
-static void d68040_move16_al_ai(void)
-{
+static void d68040_move16_al_ai(void) {
 	LIMIT_CPU_TYPES(M68040_PLUS);
 	sprintf(g_dasm_str, "move16  %s, (A%d); (4)", get_imm_str_u32(), g_cpu_ir&7);
 }
 
-static void d68000_muls(void)
-{
+static void d68000_muls(void) {
 	sprintf(g_dasm_str, "muls.w  %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_mulu(void)
-{
+static void d68000_mulu(void) {
 	sprintf(g_dasm_str, "mulu.w  %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68020_mull(void)
-{
+static void d68020_mull(void) {
 	uint extension;
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	extension = read_imm_16();
 
-	if(BIT_A(extension))
+	if (BIT_A(extension)) {
 		sprintf(g_dasm_str, "mul%c.l %s, D%d:D%d; (2+)", BIT_B(extension) ? 's' : 'u', get_ea_mode_str_32(g_cpu_ir), extension&7, (extension>>12)&7);
-	else
+	} else {
 		sprintf(g_dasm_str, "mul%c.l  %s, D%d; (2+)", BIT_B(extension) ? 's' : 'u', get_ea_mode_str_32(g_cpu_ir), (extension>>12)&7);
+	}
 }
 
-static void d68000_nbcd(void)
-{
+static void d68000_nbcd(void) {
 	sprintf(g_dasm_str, "nbcd    %s", get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_neg_8(void)
-{
+static void d68000_neg_8(void) {
 	sprintf(g_dasm_str, "neg.b   %s", get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_neg_16(void)
-{
+static void d68000_neg_16(void) {
 	sprintf(g_dasm_str, "neg.w   %s", get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_neg_32(void)
-{
+static void d68000_neg_32(void) {
 	sprintf(g_dasm_str, "neg.l   %s", get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_negx_8(void)
-{
+static void d68000_negx_8(void) {
 	sprintf(g_dasm_str, "negx.b  %s", get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_negx_16(void)
-{
+static void d68000_negx_16(void) {
 	sprintf(g_dasm_str, "negx.w  %s", get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_negx_32(void)
-{
+static void d68000_negx_32(void) {
 	sprintf(g_dasm_str, "negx.l  %s", get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_nop(void)
-{
+static void d68000_nop(void) {
 	sprintf(g_dasm_str, "nop");
 }
 
-static void d68000_not_8(void)
-{
+static void d68000_not_8(void) {
 	sprintf(g_dasm_str, "not.b   %s", get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_not_16(void)
-{
+static void d68000_not_16(void) {
 	sprintf(g_dasm_str, "not.w   %s", get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_not_32(void)
-{
+static void d68000_not_32(void) {
 	sprintf(g_dasm_str, "not.l   %s", get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_or_er_8(void)
-{
+static void d68000_or_er_8(void) {
 	sprintf(g_dasm_str, "or.b    %s, D%d", get_ea_mode_str_8(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_or_er_16(void)
-{
+static void d68000_or_er_16(void) {
 	sprintf(g_dasm_str, "or.w    %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_or_er_32(void)
-{
+static void d68000_or_er_32(void) {
 	sprintf(g_dasm_str, "or.l    %s, D%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_or_re_8(void)
-{
+static void d68000_or_re_8(void) {
 	sprintf(g_dasm_str, "or.b    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_or_re_16(void)
-{
+static void d68000_or_re_16(void) {
 	sprintf(g_dasm_str, "or.w    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_or_re_32(void)
-{
+static void d68000_or_re_32(void) {
 	sprintf(g_dasm_str, "or.l    D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_ori_8(void)
-{
+static void d68000_ori_8(void) {
 	char* str = get_imm_str_u8();
 	sprintf(g_dasm_str, "ori.b   %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_ori_16(void)
-{
+static void d68000_ori_16(void) {
 	char* str = get_imm_str_u16();
 	sprintf(g_dasm_str, "ori.w   %s, %s", str, get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_ori_32(void)
-{
+static void d68000_ori_32(void) {
 	char* str = get_imm_str_u32();
 	sprintf(g_dasm_str, "ori.l   %s, %s", str, get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_ori_to_ccr(void)
-{
+static void d68000_ori_to_ccr(void) {
 	sprintf(g_dasm_str, "ori     %s, CCR", get_imm_str_u8());
 }
 
-static void d68000_ori_to_sr(void)
-{
+static void d68000_ori_to_sr(void) {
 	sprintf(g_dasm_str, "ori     %s, SR", get_imm_str_u16());
 }
 
-static void d68020_pack_rr(void)
-{
+static void d68020_pack_rr(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "pack    D%d, D%d, %s; (2+)", g_cpu_ir&7, (g_cpu_ir>>9)&7, get_imm_str_u16());
 }
 
-static void d68020_pack_mm(void)
-{
+static void d68020_pack_mm(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "pack    -(A%d), -(A%d), %s; (2+)", g_cpu_ir&7, (g_cpu_ir>>9)&7, get_imm_str_u16());
 }
 
-static void d68000_pea(void)
-{
+static void d68000_pea(void) {
 	sprintf(g_dasm_str, "pea     %s", get_ea_mode_str_32(g_cpu_ir));
 }
 
 // this is a 68040-specific form of PFLUSH
-static void d68040_pflush(void)
-{
+static void d68040_pflush(void) {
 	LIMIT_CPU_TYPES(M68040_PLUS);
 
-	if (g_cpu_ir & 0x10)
-	{
+	if (g_cpu_ir & 0x10) {
 		sprintf(g_dasm_str, "pflusha%s", (g_cpu_ir & 8) ? "" : "n");
-	}
-	else
-	{
+	} else {
 		sprintf(g_dasm_str, "pflush%s(A%d)", (g_cpu_ir & 8) ? "" : "n", g_cpu_ir & 7);
 	}
 }
 
-static void d68000_reset(void)
-{
+static void d68000_reset(void) {
 	sprintf(g_dasm_str, "reset");
 }
 
-static void d68000_ror_s_8(void)
-{
+static void d68000_ror_s_8(void) {
 	sprintf(g_dasm_str, "ror.b   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_ror_s_16(void)
-{
+static void d68000_ror_s_16(void) {
 	sprintf(g_dasm_str, "ror.w   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7],g_cpu_ir&7);
 }
 
-static void d68000_ror_s_32(void)
-{
+static void d68000_ror_s_32(void) {
 	sprintf(g_dasm_str, "ror.l   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_ror_r_8(void)
-{
+static void d68000_ror_r_8(void) {
 	sprintf(g_dasm_str, "ror.b   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_ror_r_16(void)
-{
+static void d68000_ror_r_16(void) {
 	sprintf(g_dasm_str, "ror.w   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_ror_r_32(void)
-{
+static void d68000_ror_r_32(void) {
 	sprintf(g_dasm_str, "ror.l   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_ror_ea(void)
-{
+static void d68000_ror_ea(void) {
 	sprintf(g_dasm_str, "ror.w   %s", get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_rol_s_8(void)
-{
+static void d68000_rol_s_8(void) {
 	sprintf(g_dasm_str, "rol.b   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_rol_s_16(void)
-{
+static void d68000_rol_s_16(void) {
 	sprintf(g_dasm_str, "rol.w   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_rol_s_32(void)
-{
+static void d68000_rol_s_32(void) {
 	sprintf(g_dasm_str, "rol.l   #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_rol_r_8(void)
-{
+static void d68000_rol_r_8(void) {
 	sprintf(g_dasm_str, "rol.b   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_rol_r_16(void)
-{
+static void d68000_rol_r_16(void) {
 	sprintf(g_dasm_str, "rol.w   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_rol_r_32(void)
-{
+static void d68000_rol_r_32(void) {
 	sprintf(g_dasm_str, "rol.l   D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_rol_ea(void)
-{
+static void d68000_rol_ea(void) {
 	sprintf(g_dasm_str, "rol.w   %s", get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_roxr_s_8(void)
-{
+static void d68000_roxr_s_8(void) {
 	sprintf(g_dasm_str, "roxr.b  #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_roxr_s_16(void)
-{
+static void d68000_roxr_s_16(void) {
 	sprintf(g_dasm_str, "roxr.w  #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
 
-static void d68000_roxr_s_32(void)
-{
+static void d68000_roxr_s_32(void) {
 	sprintf(g_dasm_str, "roxr.l  #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_roxr_r_8(void)
-{
+static void d68000_roxr_r_8(void) {
 	sprintf(g_dasm_str, "roxr.b  D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_roxr_r_16(void)
-{
+static void d68000_roxr_r_16(void) {
 	sprintf(g_dasm_str, "roxr.w  D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_roxr_r_32(void)
-{
+static void d68000_roxr_r_32(void) {
 	sprintf(g_dasm_str, "roxr.l  D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_roxr_ea(void)
-{
+static void d68000_roxr_ea(void) {
 	sprintf(g_dasm_str, "roxr.w  %s", get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_roxl_s_8(void)
-{
+static void d68000_roxl_s_8(void) {
 	sprintf(g_dasm_str, "roxl.b  #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_roxl_s_16(void)
-{
+static void d68000_roxl_s_16(void) {
 	sprintf(g_dasm_str, "roxl.w  #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_roxl_s_32(void)
-{
+static void d68000_roxl_s_32(void) {
 	sprintf(g_dasm_str, "roxl.l  #%d, D%d", g_3bit_qdata_table[(g_cpu_ir>>9)&7], g_cpu_ir&7);
 }
 
-static void d68000_roxl_r_8(void)
-{
+static void d68000_roxl_r_8(void) {
 	sprintf(g_dasm_str, "roxl.b  D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_roxl_r_16(void)
-{
+static void d68000_roxl_r_16(void) {
 	sprintf(g_dasm_str, "roxl.w  D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_roxl_r_32(void)
-{
+static void d68000_roxl_r_32(void) {
 	sprintf(g_dasm_str, "roxl.l  D%d, D%d", (g_cpu_ir>>9)&7, g_cpu_ir&7);
 }
 
-static void d68000_roxl_ea(void)
-{
+static void d68000_roxl_ea(void) {
 	sprintf(g_dasm_str, "roxl.w  %s", get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68010_rtd(void)
-{
+static void d68010_rtd(void) {
 	LIMIT_CPU_TYPES(M68010_PLUS);
 	sprintf(g_dasm_str, "rtd     %s; (1+)", get_imm_str_s16());
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OUT);
 }
 
-static void d68000_rte(void)
-{
+static void d68000_rte(void) {
 	sprintf(g_dasm_str, "rte");
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OUT);
 }
 
-static void d68020_rtm(void)
-{
+static void d68020_rtm(void) {
 	LIMIT_CPU_TYPES(M68020_ONLY);
 	sprintf(g_dasm_str, "rtm     %c%d; (2+)", BIT_3(g_cpu_ir) ? 'A' : 'D', g_cpu_ir&7);
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OUT);
 }
 
-static void d68000_rtr(void)
-{
+static void d68000_rtr(void) {
 	sprintf(g_dasm_str, "rtr");
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OUT);
 }
 
-static void d68000_rts(void)
-{
+static void d68000_rts(void) {
 	sprintf(g_dasm_str, "rts");
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OUT);
 }
 
-static void d68000_sbcd_rr(void)
-{
+static void d68000_sbcd_rr(void) {
 	sprintf(g_dasm_str, "sbcd    D%d, D%d", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_sbcd_mm(void)
-{
+static void d68000_sbcd_mm(void) {
 	sprintf(g_dasm_str, "sbcd    -(A%d), -(A%d)", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_scc(void)
-{
+static void d68000_scc(void) {
 	sprintf(g_dasm_str, "s%-2s     %s", g_cc[(g_cpu_ir>>8)&0xf], get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_stop(void)
-{
+static void d68000_stop(void) {
 	sprintf(g_dasm_str, "stop    %s", get_imm_str_s16());
 }
 
-static void d68000_sub_er_8(void)
-{
+static void d68000_sub_er_8(void) {
 	sprintf(g_dasm_str, "sub.b   %s, D%d", get_ea_mode_str_8(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_sub_er_16(void)
-{
+static void d68000_sub_er_16(void) {
 	sprintf(g_dasm_str, "sub.w   %s, D%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_sub_er_32(void)
-{
+static void d68000_sub_er_32(void) {
 	sprintf(g_dasm_str, "sub.l   %s, D%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_sub_re_8(void)
-{
+static void d68000_sub_re_8(void) {
 	sprintf(g_dasm_str, "sub.b   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_sub_re_16(void)
-{
+static void d68000_sub_re_16(void) {
 	sprintf(g_dasm_str, "sub.w   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_sub_re_32(void)
-{
+static void d68000_sub_re_32(void) {
 	sprintf(g_dasm_str, "sub.l   D%d, %s", (g_cpu_ir>>9)&7, get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_suba_16(void)
-{
+static void d68000_suba_16(void) {
 	sprintf(g_dasm_str, "suba.w  %s, A%d", get_ea_mode_str_16(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_suba_32(void)
-{
+static void d68000_suba_32(void) {
 	sprintf(g_dasm_str, "suba.l  %s, A%d", get_ea_mode_str_32(g_cpu_ir), (g_cpu_ir>>9)&7);
 }
 
-static void d68000_subi_8(void)
-{
+static void d68000_subi_8(void) {
 	char* str = get_imm_str_s8();
 	sprintf(g_dasm_str, "subi.b  %s, %s", str, get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_subi_16(void)
-{
+static void d68000_subi_16(void) {
 	char* str = get_imm_str_s16();
 	sprintf(g_dasm_str, "subi.w  %s, %s", str, get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_subi_32(void)
-{
+static void d68000_subi_32(void) {
 	char* str = get_imm_str_s32();
 	sprintf(g_dasm_str, "subi.l  %s, %s", str, get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_subq_8(void)
-{
+static void d68000_subq_8(void) {
 	sprintf(g_dasm_str, "subq.b  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_subq_16(void)
-{
+static void d68000_subq_16(void) {
 	sprintf(g_dasm_str, "subq.w  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_subq_32(void)
-{
+static void d68000_subq_32(void) {
 	sprintf(g_dasm_str, "subq.l  #%d, %s", g_3bit_qdata_table[(g_cpu_ir>>9)&7], get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_subx_rr_8(void)
-{
+static void d68000_subx_rr_8(void) {
 	sprintf(g_dasm_str, "subx.b  D%d, D%d", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_subx_rr_16(void)
-{
+static void d68000_subx_rr_16(void) {
 	sprintf(g_dasm_str, "subx.w  D%d, D%d", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_subx_rr_32(void)
-{
+static void d68000_subx_rr_32(void) {
 	sprintf(g_dasm_str, "subx.l  D%d, D%d", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_subx_mm_8(void)
-{
+static void d68000_subx_mm_8(void) {
 	sprintf(g_dasm_str, "subx.b  -(A%d), -(A%d)", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_subx_mm_16(void)
-{
+static void d68000_subx_mm_16(void) {
 	sprintf(g_dasm_str, "subx.w  -(A%d), -(A%d)", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_subx_mm_32(void)
-{
+static void d68000_subx_mm_32(void) {
 	sprintf(g_dasm_str, "subx.l  -(A%d), -(A%d)", g_cpu_ir&7, (g_cpu_ir>>9)&7);
 }
 
-static void d68000_swap(void)
-{
+static void d68000_swap(void) {
 	sprintf(g_dasm_str, "swap    D%d", g_cpu_ir&7);
 }
 
-static void d68000_tas(void)
-{
+static void d68000_tas(void) {
 	sprintf(g_dasm_str, "tas     %s", get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_trap(void)
-{
+static void d68000_trap(void) {
 	sprintf(g_dasm_str, "trap    #$%x", g_cpu_ir&0xf);
 }
 
-static void d68020_trapcc_0(void)
-{
+static void d68020_trapcc_0(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "trap%-2s; (2+)", g_cc[(g_cpu_ir>>8)&0xf]);
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68020_trapcc_16(void)
-{
+static void d68020_trapcc_16(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "trap%-2s  %s; (2+)", g_cc[(g_cpu_ir>>8)&0xf], get_imm_str_u16());
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68020_trapcc_32(void)
-{
+static void d68020_trapcc_32(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "trap%-2s  %s; (2+)", g_cc[(g_cpu_ir>>8)&0xf], get_imm_str_u32());
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68000_trapv(void)
-{
+static void d68000_trapv(void) {
 	sprintf(g_dasm_str, "trapv");
 	SET_OPCODE_FLAGS(DASMFLAG_STEP_OVER);
 }
 
-static void d68000_tst_8(void)
-{
+static void d68000_tst_8(void) {
 	sprintf(g_dasm_str, "tst.b   %s", get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68020_tst_pcdi_8(void)
-{
+static void d68020_tst_pcdi_8(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "tst.b   %s; (2+)", get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68020_tst_pcix_8(void)
-{
+static void d68020_tst_pcix_8(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "tst.b   %s; (2+)", get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68020_tst_i_8(void)
-{
+static void d68020_tst_i_8(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "tst.b   %s; (2+)", get_ea_mode_str_8(g_cpu_ir));
 }
 
-static void d68000_tst_16(void)
-{
+static void d68000_tst_16(void) {
 	sprintf(g_dasm_str, "tst.w   %s", get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68020_tst_a_16(void)
-{
+static void d68020_tst_a_16(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "tst.w   %s; (2+)", get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68020_tst_pcdi_16(void)
-{
+static void d68020_tst_pcdi_16(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "tst.w   %s; (2+)", get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68020_tst_pcix_16(void)
-{
+static void d68020_tst_pcix_16(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "tst.w   %s; (2+)", get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68020_tst_i_16(void)
-{
+static void d68020_tst_i_16(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "tst.w   %s; (2+)", get_ea_mode_str_16(g_cpu_ir));
 }
 
-static void d68000_tst_32(void)
-{
+static void d68000_tst_32(void) {
 	sprintf(g_dasm_str, "tst.l   %s", get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68020_tst_a_32(void)
-{
+static void d68020_tst_a_32(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "tst.l   %s; (2+)", get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68020_tst_pcdi_32(void)
-{
+static void d68020_tst_pcdi_32(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "tst.l   %s; (2+)", get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68020_tst_pcix_32(void)
-{
+static void d68020_tst_pcix_32(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "tst.l   %s; (2+)", get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68020_tst_i_32(void)
-{
+static void d68020_tst_i_32(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "tst.l   %s; (2+)", get_ea_mode_str_32(g_cpu_ir));
 }
 
-static void d68000_unlk(void)
-{
+static void d68000_unlk(void) {
 	sprintf(g_dasm_str, "unlk    A%d", g_cpu_ir&7);
 }
 
-static void d68020_unpk_rr(void)
-{
+static void d68020_unpk_rr(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "unpk    D%d, D%d, %s; (2+)", g_cpu_ir&7, (g_cpu_ir>>9)&7, get_imm_str_u16());
 }
 
-static void d68020_unpk_mm(void)
-{
+static void d68020_unpk_mm(void) {
 	LIMIT_CPU_TYPES(M68020_PLUS);
 	sprintf(g_dasm_str, "unpk    -(A%d), -(A%d), %s; (2+)", g_cpu_ir&7, (g_cpu_ir>>9)&7, get_imm_str_u16());
 }
@@ -3162,91 +2999,68 @@ static void d68020_unpk_mm(void)
 // PMOVE 3: 011xxxx000000000
 // PTEST:   100xxxxxxxxxxxxx
 // PFLUSHR:  1010000000000000
-static void d68851_p000(void)
-{
+static void d68851_p000(void) {
 	char* str;
 	uint modes = read_imm_16();
 
 	// do this after fetching the second PMOVE word so we properly get the 3rd if necessary
 	str = get_ea_mode_str_32(g_cpu_ir);
 
-	if ((modes & 0xfde0) == 0x2000)	// PLOAD
-	{
-		if (modes & 0x0200)
-		{
+	if ((modes & 0xfde0) == 0x2000) {	// PLOAD
+		if (modes & 0x0200) {
 	 		sprintf(g_dasm_str, "pload  #%d, %s", (modes>>10)&7, str);
-		}
-		else
-		{
+		} else {
 	 		sprintf(g_dasm_str, "pload  %s, #%d", str, (modes>>10)&7);
 		}
 		return;
 	}
 
-	if ((modes & 0xe200) == 0x2000)	// PFLUSH
-	{
+	if ((modes & 0xe200) == 0x2000)	{ // PFLUSH
 		sprintf(g_dasm_str, "pflushr %x, %x, %s", modes & 0x1f, (modes>>5)&0xf, str);
 		return;
 	}
 
-	if (modes == 0xa000)	// PFLUSHR
-	{
+	if (modes == 0xa000) {	// PFLUSHR
 		sprintf(g_dasm_str, "pflushr %s", str);
 	}
 
-	if (modes == 0x2800)	// PVALID (FORMAT 1)
-	{
+	if (modes == 0x2800) { 	// PVALID (FORMAT 1)
 		sprintf(g_dasm_str, "pvalid VAL, %s", str);
 		return;
 	}
 
-	if ((modes & 0xfff8) == 0x2c00)	// PVALID (FORMAT 2)
-	{
+	if ((modes & 0xfff8) == 0x2c00) { // PVALID (FORMAT 2)
 		sprintf(g_dasm_str, "pvalid A%d, %s", modes & 0xf, str);
 		return;
 	}
 
-	if ((modes & 0xe000) == 0x8000)	// PTEST
-	{
+	if ((modes & 0xe000) == 0x8000) { // PTEST
 		sprintf(g_dasm_str, "ptest #%d, %s", modes & 0x1f, str);
 		return;
 	}
 
-	switch ((modes>>13) & 0x7)
-	{
+	switch ((modes>>13) & 0x7) {
 		case 0:	// MC68030/040 form with FD bit
 		case 2:	// MC68881 form, FD never set
-			if (modes & 0x0100)
-			{
-				if (modes & 0x0200)
-				{
+			if (modes & 0x0100) {
+				if (modes & 0x0200) {
 			 		sprintf(g_dasm_str, "pmovefd  %s, %s", g_mmuregs[(modes>>10)&7], str);
-				}
-				else
-				{
+				} else {
 			 		sprintf(g_dasm_str, "pmovefd  %s, %s", str, g_mmuregs[(modes>>10)&7]);
 				}
-			}
-			else
-			{
-				if (modes & 0x0200)
-				{
+			} else {
+				if (modes & 0x0200) {
 			 		sprintf(g_dasm_str, "pmove  %s, %s", g_mmuregs[(modes>>10)&7], str);
-				}
-				else
-				{
+				} else {
 			 		sprintf(g_dasm_str, "pmove  %s, %s", str, g_mmuregs[(modes>>10)&7]);
 				}
 			}
 			break;
 
 		case 3:	// MC68030 to/from status reg
-			if (modes & 0x0200)
-			{
+			if (modes & 0x0200) {
 		 		sprintf(g_dasm_str, "pmove  mmusr, %s", str);
-			}
-			else
-			{
+			} else {
 		 		sprintf(g_dasm_str, "pmove  %s, mmusr", str);
 			}
 			break;
@@ -3257,22 +3071,19 @@ static void d68851_p000(void)
 	}
 }
 
-static void d68851_pbcc16(void)
-{
+static void d68851_pbcc16(void) {
 	uint32 temp_pc = g_cpu_pc;
 
 	sprintf(g_dasm_str, "pb%s %x", g_mmucond[g_cpu_ir&0xf], temp_pc + make_int_16(read_imm_16()));
 }
 
-static void d68851_pbcc32(void)
-{
+static void d68851_pbcc32(void) {
 	uint32 temp_pc = g_cpu_pc;
 
 	sprintf(g_dasm_str, "pb%s %x", g_mmucond[g_cpu_ir&0xf], temp_pc + make_int_32(read_imm_32()));
 }
 
-static void d68851_pdbcc(void)
-{
+static void d68851_pdbcc(void) {
 	uint32 temp_pc = g_cpu_pc;
 	uint16 modes = read_imm_16();
 
@@ -3280,8 +3091,7 @@ static void d68851_pdbcc(void)
 }
 
 // PScc:  0000000000xxxxxx
-static void d68851_p001(void)
-{
+static void d68851_p001(void) {
 	sprintf(g_dasm_str, "MMU 001 group");
 }
 
@@ -3616,33 +3426,74 @@ static const opcode_struct g_opcode_info[] =
 };
 
 /* Check if opcode is using a valid ea mode */
-static int valid_ea(uint opcode, uint mask)
-{
-	if(mask == 0)
+static int valid_ea(uint opcode, uint mask) {
+	if (mask == 0) {
 		return 1;
+	}
 
-	switch(opcode & 0x3f)
-	{
-		case 0x00: case 0x01: case 0x02: case 0x03:
-		case 0x04: case 0x05: case 0x06: case 0x07:
+	switch(opcode & 0x3f) {
+		case 0x00: 
+		case 0x01: 
+		case 0x02: 
+		case 0x03:
+		case 0x04: 
+		case 0x05: 
+		case 0x06:
+		case 0x07:
 			return (mask & 0x800) != 0;
-		case 0x08: case 0x09: case 0x0a: case 0x0b:
-		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
+		case 0x08: 
+		case 0x09: 
+		case 0x0a: 
+		case 0x0b:
+		case 0x0c: 
+		case 0x0d: 
+		case 0x0e: 
+		case 0x0f:
 			return (mask & 0x400) != 0;
-		case 0x10: case 0x11: case 0x12: case 0x13:
-		case 0x14: case 0x15: case 0x16: case 0x17:
+		case 0x10: 
+		case 0x11: 
+		case 0x12: 
+		case 0x13:
+		case 0x14: 
+		case 0x15: 
+		case 0x16: 
+		case 0x17:
 			return (mask & 0x200) != 0;
-		case 0x18: case 0x19: case 0x1a: case 0x1b:
-		case 0x1c: case 0x1d: case 0x1e: case 0x1f:
+		case 0x18: 
+		case 0x19: 
+		case 0x1a: 
+		case 0x1b:
+		case 0x1c: 
+		case 0x1d: 
+		case 0x1e: 
+		case 0x1f:
 			return (mask & 0x100) != 0;
-		case 0x20: case 0x21: case 0x22: case 0x23:
-		case 0x24: case 0x25: case 0x26: case 0x27:
+		case 0x20: 
+		case 0x21: 
+		case 0x22: 
+		case 0x23:
+		case 0x24: 
+		case 0x25: 
+		case 0x26: 
+		case 0x27:
 			return (mask & 0x080) != 0;
-		case 0x28: case 0x29: case 0x2a: case 0x2b:
-		case 0x2c: case 0x2d: case 0x2e: case 0x2f:
+		case 0x28: 
+		case 0x29: 
+		case 0x2a: 
+		case 0x2b:
+		case 0x2c: 
+		case 0x2d: 
+		case 0x2e: 
+		case 0x2f:
 			return (mask & 0x040) != 0;
-		case 0x30: case 0x31: case 0x32: case 0x33:
-		case 0x34: case 0x35: case 0x36: case 0x37:
+		case 0x30: 
+		case 0x31: 
+		case 0x32: 
+		case 0x33:
+		case 0x34: 
+		case 0x35: 
+		case 0x36: 
+		case 0x37:
 			return (mask & 0x020) != 0;
 		case 0x38:
 			return (mask & 0x010) != 0;
@@ -3660,8 +3511,7 @@ static int valid_ea(uint opcode, uint mask)
 }
 
 /* Used by qsort */
-static int DECL_SPEC compare_nof_true_bits(const void *aptr, const void *bptr)
-{
+static int DECL_SPEC compare_nof_true_bits(const void *aptr, const void *bptr) {
 	uint a = ((const opcode_struct*)aptr)->mask;
 	uint b = ((const opcode_struct*)bptr)->mask;
 
@@ -3679,8 +3529,7 @@ static int DECL_SPEC compare_nof_true_bits(const void *aptr, const void *bptr)
 }
 
 /* build the opcode handler jump table */
-static void build_opcode_table(void)
-{
+static void build_opcode_table(void) {
 	uint i;
 	uint opcode;
 	opcode_struct* ostruct;
@@ -3689,24 +3538,21 @@ static void build_opcode_table(void)
 	memcpy(opcode_info, g_opcode_info, sizeof(g_opcode_info));
 	qsort((void *)opcode_info, ARRAY_LENGTH(opcode_info)-1, sizeof(opcode_info[0]), compare_nof_true_bits);
 
-	for(i=0;i<0x10000;i++)
-	{
+	for(i=0;i<0x10000;i++) {
 		g_instruction_table[i] = d68000_illegal; /* default to illegal */
 		opcode = i;
 		/* search through opcode info for a match */
-		for(ostruct = opcode_info;ostruct->opcode_handler != 0;ostruct++)
-		{
+		for(ostruct = opcode_info;ostruct->opcode_handler != 0;ostruct++) {
 			/* match opcode mask and allowed ea modes */
-			if((opcode & ostruct->mask) == ostruct->match)
-			{
+			if ((opcode & ostruct->mask) == ostruct->match) {
 				/* Handle destination ea for move instructions */
-				if((ostruct->opcode_handler == d68000_move_8 ||
-					 ostruct->opcode_handler == d68000_move_16 ||
-					 ostruct->opcode_handler == d68000_move_32) &&
-					 !valid_ea(((opcode>>9)&7) | ((opcode>>3)&0x38), 0xbf8))
-						continue;
-				if(valid_ea(opcode, ostruct->ea_mask))
-				{
+				if ((ostruct->opcode_handler == d68000_move_8 ||
+					ostruct->opcode_handler == d68000_move_16 ||
+					ostruct->opcode_handler == d68000_move_32) &&
+					!valid_ea(((opcode>>9)&7) | ((opcode>>3)&0x38), 0xbf8)) {
+					continue;
+				}
+				if (valid_ea(opcode, ostruct->ea_mask)) {
 					g_instruction_table[i] = ostruct->opcode_handler;
 					break;
 				}
@@ -3722,15 +3568,12 @@ static void build_opcode_table(void)
 /* ======================================================================== */
 
 /* Disasemble one instruction at pc and store in str_buff */
-unsigned int m68k_disassemble(char* str_buff, unsigned int pc, unsigned int cpu_type)
-{
-	if(!g_initialized)
-	{
+unsigned int m68k_disassemble(char* str_buff, unsigned int pc, unsigned int cpu_type) {
+	if (!g_initialized) {
 		build_opcode_table();
 		g_initialized = 1;
 	}
-	switch(cpu_type)
-	{
+	switch(cpu_type) {
 		case M68K_CPU_TYPE_68000:
 			g_cpu_type = TYPE_68000;
 			g_address_mask = 0x00ffffff;
@@ -3771,16 +3614,14 @@ unsigned int m68k_disassemble(char* str_buff, unsigned int pc, unsigned int cpu_
 	return COMBINE_OPCODE_FLAGS(g_cpu_pc - pc);
 }
 
-char* m68ki_disassemble_quick(unsigned int pc, unsigned int cpu_type)
-{
+char* m68ki_disassemble_quick(unsigned int pc, unsigned int cpu_type) {
 	static char buff[1000];
 	buff[0] = 0;
 	m68k_disassemble(buff, pc, cpu_type);
 	return buff;
 }
 
-unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type)
-{
+unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type) {
 	unsigned int result;
 	(void)argdata;
 
@@ -3792,207 +3633,290 @@ unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigne
 }
 
 /* Check if the instruction is a valid one */
-unsigned int m68k_is_valid_instruction(unsigned int instruction, unsigned int cpu_type)
-{
-	if(!g_initialized)
-	{
+unsigned int m68k_is_valid_instruction(unsigned int instruction, unsigned int cpu_type) {
+	if (!g_initialized) {
 		build_opcode_table();
 		g_initialized = 1;
 	}
 
 	instruction &= 0xffff;
-	if(g_instruction_table[instruction] == d68000_illegal)
+	if (g_instruction_table[instruction] == d68000_illegal) {
 		return 0;
+	}
 
-	switch(cpu_type)
-	{
+	switch(cpu_type) {
 		case M68K_CPU_TYPE_68000:
-			if(g_instruction_table[instruction] == d68010_bkpt)
+			if (g_instruction_table[instruction] == d68010_bkpt) {
 				return 0;
-			if(g_instruction_table[instruction] == d68010_move_fr_ccr)
+			}
+			if (g_instruction_table[instruction] == d68010_move_fr_ccr) {
 				return 0;
-			if(g_instruction_table[instruction] == d68010_movec)
+			}
+			if (g_instruction_table[instruction] == d68010_movec) {
 				return 0;
-			if(g_instruction_table[instruction] == d68010_moves_8)
+			}
+			if (g_instruction_table[instruction] == d68010_moves_8) {
 				return 0;
-			if(g_instruction_table[instruction] == d68010_moves_16)
+			}
+			if (g_instruction_table[instruction] == d68010_moves_16) {
 				return 0;
-			if(g_instruction_table[instruction] == d68010_moves_32)
+			}
+			if (g_instruction_table[instruction] == d68010_moves_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68010_rtd)
+			}
+			if (g_instruction_table[instruction] == d68010_rtd) {
 				return 0;
+			}
 			// Fallthrough
 		case M68K_CPU_TYPE_68010:
-			if(g_instruction_table[instruction] == d68020_bcc_32)
+			if (g_instruction_table[instruction] == d68020_bcc_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_bfchg)
+			}
+			if (g_instruction_table[instruction] == d68020_bfchg) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_bfclr)
+			}
+			if (g_instruction_table[instruction] == d68020_bfclr) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_bfexts)
+			}
+			if (g_instruction_table[instruction] == d68020_bfexts) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_bfextu)
+			}
+			if (g_instruction_table[instruction] == d68020_bfextu) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_bfffo)
+			}
+			if (g_instruction_table[instruction] == d68020_bfffo) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_bfins)
+			}
+			if (g_instruction_table[instruction] == d68020_bfins) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_bfset)
+			}
+			if (g_instruction_table[instruction] == d68020_bfset) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_bftst)
+			}
+			if (g_instruction_table[instruction] == d68020_bftst) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_bra_32)
+			}
+			if (g_instruction_table[instruction] == d68020_bra_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_bsr_32)
+			}
+			if (g_instruction_table[instruction] == d68020_bsr_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_callm)
+			}
+			if (g_instruction_table[instruction] == d68020_callm) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cas_8)
+			}
+			if (g_instruction_table[instruction] == d68020_cas_8) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cas_16)
+			}
+			if (g_instruction_table[instruction] == d68020_cas_16) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cas_32)
+			}
+			if (g_instruction_table[instruction] == d68020_cas_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cas2_16)
+			}
+			if (g_instruction_table[instruction] == d68020_cas2_16) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cas2_32)
+			}
+			if (g_instruction_table[instruction] == d68020_cas2_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_chk_32)
+			}
+			if (g_instruction_table[instruction] == d68020_chk_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_chk2_cmp2_8)
+			}
+			if (g_instruction_table[instruction] == d68020_chk2_cmp2_8) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_chk2_cmp2_16)
+			}
+			if (g_instruction_table[instruction] == d68020_chk2_cmp2_16) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_chk2_cmp2_32)
+			}
+			if (g_instruction_table[instruction] == d68020_chk2_cmp2_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cmpi_pcdi_8)
+			}
+			if (g_instruction_table[instruction] == d68020_cmpi_pcdi_8) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cmpi_pcix_8)
+			}
+			if (g_instruction_table[instruction] == d68020_cmpi_pcix_8) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cmpi_pcdi_16)
+			}
+			if (g_instruction_table[instruction] == d68020_cmpi_pcdi_16) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cmpi_pcix_16)
+			}
+			if (g_instruction_table[instruction] == d68020_cmpi_pcix_16) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cmpi_pcdi_32)
+			}
+			if (g_instruction_table[instruction] == d68020_cmpi_pcdi_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cmpi_pcix_32)
+			}
+			if (g_instruction_table[instruction] == d68020_cmpi_pcix_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cpbcc_16)
+			}
+			if (g_instruction_table[instruction] == d68020_cpbcc_16) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cpbcc_32)
+			}
+			if (g_instruction_table[instruction] == d68020_cpbcc_32) {
+				return 0; 
+			}
+			if (g_instruction_table[instruction] == d68020_cpdbcc) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cpdbcc)
+			}
+			if (g_instruction_table[instruction] == d68020_cpgen) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cpgen)
+			}
+			if (g_instruction_table[instruction] == d68020_cprestore) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cprestore)
+			}
+			if (g_instruction_table[instruction] == d68020_cpsave) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cpsave)
+			}
+			if (g_instruction_table[instruction] == d68020_cpscc) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cpscc)
+			}
+			if (g_instruction_table[instruction] == d68020_cptrapcc_0) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cptrapcc_0)
+			}
+			if (g_instruction_table[instruction] == d68020_cptrapcc_16) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cptrapcc_16)
+			}
+			if (g_instruction_table[instruction] == d68020_cptrapcc_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cptrapcc_32)
+			}
+			if (g_instruction_table[instruction] == d68020_divl) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_divl)
+			}
+			if (g_instruction_table[instruction] == d68020_extb_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_extb_32)
+			}
+			if (g_instruction_table[instruction] == d68020_link_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_link_32)
+			}
+			if (g_instruction_table[instruction] == d68020_mull) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_mull)
+			}
+			if (g_instruction_table[instruction] == d68020_pack_rr) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_pack_rr)
+			}
+			if (g_instruction_table[instruction] == d68020_pack_mm) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_pack_mm)
+			}
+			if (g_instruction_table[instruction] == d68020_rtm) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_rtm)
+			}
+			if (g_instruction_table[instruction] == d68020_trapcc_0) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_trapcc_0)
+			}
+			if (g_instruction_table[instruction] == d68020_trapcc_16) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_trapcc_16)
+			}
+			if (g_instruction_table[instruction] == d68020_trapcc_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_trapcc_32)
+			}
+			if (g_instruction_table[instruction] == d68020_tst_pcdi_8) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_tst_pcdi_8)
+			}
+			if (g_instruction_table[instruction] == d68020_tst_pcix_8) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_tst_pcix_8)
+			}
+			if (g_instruction_table[instruction] == d68020_tst_i_8) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_tst_i_8)
+			}
+			if (g_instruction_table[instruction] == d68020_tst_a_16) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_tst_a_16)
+			}
+			if (g_instruction_table[instruction] == d68020_tst_pcdi_16) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_tst_pcdi_16)
+			}
+			if (g_instruction_table[instruction] == d68020_tst_pcix_16) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_tst_pcix_16)
+			}
+			if (g_instruction_table[instruction] == d68020_tst_i_16) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_tst_i_16)
+			}
+			if (g_instruction_table[instruction] == d68020_tst_a_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_tst_a_32)
+			}
+			if (g_instruction_table[instruction] == d68020_tst_pcdi_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_tst_pcdi_32)
+			}
+			if (g_instruction_table[instruction] == d68020_tst_pcix_32) {
+				return 0; 
+			}
+			if (g_instruction_table[instruction] == d68020_tst_i_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_tst_pcix_32)
+			}
+			if (g_instruction_table[instruction] == d68020_unpk_rr) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_tst_i_32)
+			}
+			if (g_instruction_table[instruction] == d68020_unpk_mm) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_unpk_rr)
-				return 0;
-			if(g_instruction_table[instruction] == d68020_unpk_mm)
-				return 0;
+			}
 			// Fallthrough
 		case M68K_CPU_TYPE_68EC020:
 		case M68K_CPU_TYPE_68020:
 		case M68K_CPU_TYPE_68030:
 		case M68K_CPU_TYPE_68EC030:
-			if(g_instruction_table[instruction] == d68040_cinv)
+			if (g_instruction_table[instruction] == d68040_cinv) {
 				return 0;
-			if(g_instruction_table[instruction] == d68040_cpush)
+			}
+			if (g_instruction_table[instruction] == d68040_cpush) {
 				return 0;
-			if(g_instruction_table[instruction] == d68040_move16_pi_pi)
+			}
+			if (g_instruction_table[instruction] == d68040_move16_pi_pi) {
 				return 0;
-			if(g_instruction_table[instruction] == d68040_move16_pi_al)
+			}
+			if (g_instruction_table[instruction] == d68040_move16_pi_al) {
 				return 0;
-			if(g_instruction_table[instruction] == d68040_move16_al_pi)
+			}
+			if (g_instruction_table[instruction] == d68040_move16_al_pi) {
 				return 0;
-			if(g_instruction_table[instruction] == d68040_move16_ai_al)
+			}
+			if (g_instruction_table[instruction] == d68040_move16_ai_al) {
 				return 0;
-			if(g_instruction_table[instruction] == d68040_move16_al_ai)
+			}
+			if (g_instruction_table[instruction] == d68040_move16_al_ai) {
 				return 0;
+			}
 			// Fallthrough
 		case M68K_CPU_TYPE_68040:
 		case M68K_CPU_TYPE_68EC040:
 		case M68K_CPU_TYPE_68LC040:
-			if(g_instruction_table[instruction] == d68020_cpbcc_16)
+			if (g_instruction_table[instruction] == d68020_cpbcc_16) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cpbcc_32)
+			}
+			if (g_instruction_table[instruction] == d68020_cpbcc_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cpdbcc)
+			}
+			if (g_instruction_table[instruction] == d68020_cpdbcc) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cpgen)
+			}
+			if (g_instruction_table[instruction] == d68020_cpgen) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cprestore)
+			}
+			if (g_instruction_table[instruction] == d68020_cprestore) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cpsave)
+			}
+			if (g_instruction_table[instruction] == d68020_cpsave) { 
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cpscc)
+			}
+			if (g_instruction_table[instruction] == d68020_cpscc) {
+				return 0; 
+			}
+			if (g_instruction_table[instruction] == d68020_cptrapcc_0) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cptrapcc_0)
+			}
+			if (g_instruction_table[instruction] == d68020_cptrapcc_16) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cptrapcc_16)
+			}
+			if (g_instruction_table[instruction] == d68020_cptrapcc_32) {
 				return 0;
-			if(g_instruction_table[instruction] == d68020_cptrapcc_32)
+			}
+			if (g_instruction_table[instruction] == d68040_pflush) {
 				return 0;
-			if(g_instruction_table[instruction] == d68040_pflush)
-				return 0;
+			}
 	}
-	if(cpu_type != M68K_CPU_TYPE_68020 && cpu_type != M68K_CPU_TYPE_68EC020 &&
-	  (g_instruction_table[instruction] == d68020_callm ||
-	  g_instruction_table[instruction] == d68020_rtm))
+	if (cpu_type != M68K_CPU_TYPE_68020 && cpu_type != M68K_CPU_TYPE_68EC020 && 
+		(g_instruction_table[instruction] == d68020_callm ||  g_instruction_table[instruction] == d68020_rtm)) {
 		return 0;
+	}
 
 	return 1;
 }
