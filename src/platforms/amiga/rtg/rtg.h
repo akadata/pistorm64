@@ -129,13 +129,21 @@ void rtg_set_cursor_clut_entry(uint8_t r, uint8_t g, uint8_t b, uint8_t idx);
 void rtg_set_mouse_cursor_image(uint8_t* src, uint8_t w, uint8_t h);
 
 void rtg_show_fps(uint8_t enable);
+
 void rtg_set_scale_mode(uint16_t scale_mode);
+
 uint16_t rtg_get_scale_mode(void);
+
 void rtg_set_scale_rect(uint16_t scale_mode, int16_t x1, int16_t y1, int16_t x2, int16_t y2);
+
 void rtg_set_scale_filter(uint16_t _filter_mode);
+
 void rtg_set_screen_width(uint32_t width);
+
 void rtg_set_screen_height(uint32_t height);
+
 void rtg_show_clut_cursor(uint8_t show);
+
 void rtg_set_clut_cursor(uint8_t* bmp, uint32_t* pal, int16_t offs_x, int16_t offs_y, uint16_t w,
                          uint16_t h, uint8_t mask_color);
 uint16_t rtg_get_scale_filter(void);
@@ -146,27 +154,36 @@ void shutdown_rtg(void);
 
 void rtg_fillrect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t color, uint16_t pitch,
                   uint16_t format, uint8_t mask);
+
 void rtg_fillrect_solid(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t color,
                         uint16_t pitch, uint16_t format);
+
 void rtg_invertrect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t pitch, uint16_t format,
                     uint8_t mask);
+
 void rtg_blitrect(uint16_t x, uint16_t y, uint16_t dx, uint16_t dy, uint16_t w, uint16_t h,
                   uint16_t pitch, uint16_t format, uint8_t mask);
+
 void rtg_blitrect_solid(uint16_t x, uint16_t y, uint16_t dx, uint16_t dy, uint16_t w, uint16_t h,
                         uint16_t pitch, uint16_t format);
+
 void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, uint16_t dy, uint16_t w,
                                   uint16_t h, uint16_t srcpitch, uint16_t dstpitch,
                                   uint32_t src_addr, uint32_t dst_addr, uint16_t format,
                                   uint8_t minterm);
+
 void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t src_addr,
                       uint32_t fgcol, uint32_t bgcol, uint16_t pitch, uint16_t t_pitch,
                       uint16_t format, uint16_t offset_x, uint8_t mask, uint8_t draw_mode);
+
 void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t src_addr,
                      uint32_t fgcol, uint32_t bgcol, uint16_t pitch, uint16_t format,
                      uint16_t offset_x, uint16_t offset_y, uint8_t mask, uint8_t draw_mode,
                      uint8_t loop_rows);
+
 void rtg_drawline_solid(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint16_t len,
                         uint32_t fgcol, uint16_t pitch, uint16_t format);
+
 void rtg_drawline(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint16_t len,
                   uint16_t pattern, uint16_t pattern_offset, uint32_t fgcol, uint32_t bgcol,
                   uint16_t pitch, uint16_t format, uint8_t mask, uint8_t draw_mode);
@@ -174,6 +191,7 @@ void rtg_drawline(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint16_t l
 void rtg_p2c(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t h,
              uint8_t draw_mode, uint8_t planes, uint8_t mask, uint8_t layer_mask,
              uint16_t src_line_pitch, uint8_t* bmp_data_src);
+
 void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t h,
              uint8_t draw_mode, uint8_t planes, uint8_t mask, uint8_t layer_mask,
              uint16_t src_line_pitch, uint8_t* bmp_data_src);

@@ -45,18 +45,18 @@
 #define ReadMemA314(dst, src, len) CopyMem((void *)(src), (dst), (len))
 #endif
 
-static ULONG alloc_a314_buffer(ULONG length)
-{
+static ULONG alloc_a314_buffer(ULONG length) {
     APTR buf = AllocMem(length, MEMF_PUBLIC | MEMF_CLEAR);
-    if (!buf)
+    if(!buf) {
         return INVALID_A314_ADDRESS;
+    }
     return (ULONG)buf;
 }
 
-static void free_a314_buffer(ULONG address, ULONG length)
-{
-    if (address != INVALID_A314_ADDRESS)
+static void free_a314_buffer(ULONG address, ULONG length) {
+    if(address != INVALID_A314_ADDRESS) {
         FreeMem((APTR)address, length);
+    }
 }
 
 #ifndef TD_GETGEOMETRY
@@ -117,8 +117,7 @@ struct DriveGeometry
 
 // Structs.
 
-struct DriveState
-{
+struct DriveState {
     struct IOStdReq *change_int;
     struct Interrupt *remove_int;
     ULONG *env_vec;
@@ -133,8 +132,8 @@ struct DriveState
 };
 
 #pragma pack(push, 1)
-struct RequestMsg
-{
+
+struct RequestMsg {
     UBYTE kind;
     UBYTE unit;
     UWORD length;
@@ -144,16 +143,15 @@ struct RequestMsg
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-struct ResponseMsg
-{
+
+struct ResponseMsg {
     UBYTE kind;
     UBYTE unit;
-    union
-    {
+    union     {
         UBYTE error; // READ_/WRITE_TRACK_RES
         UBYTE writable; // INSERT_NOTIFY
-        struct // SET_GEOMETRY
-        {
+        struct {
+            // SET_GEOMETRY
             UBYTE heads;
             UBYTE sectors_per_track;
             ULONG cylinders;
@@ -162,8 +160,7 @@ struct ResponseMsg
 };
 #pragma pack(pop)
 
-struct DiskDevice
-{
+struct DiskDevice {
     struct Library lib;
 
     BPTR saved_seg_list;
@@ -209,15 +206,13 @@ static const char a314_device_name[] = A314_NAME;
 
 // Procedures.
 
-void NewList(struct List *l)
-{
+void NewList(struct List *l) {
     l->lh_Head = (struct Node *)&(l->lh_Tail);
     l->lh_Tail = NULL;
     l->lh_TailPred = (struct Node *)&(l->lh_Head);
 }
 
-static void send_a314_cmd(struct DiskDevice *dev, struct A314_IORequest *ior, UWORD cmd, char *buffer, int length)
-{
+static void send_a314_cmd(struct DiskDevice *dev, struct A314_IORequest *ior, UWORD cmd, char *buffer, int length) {
     ior->a314_Request.io_Command = cmd;
     ior->a314_Request.io_Error = 0;
     ior->a314_Socket = dev->a314_socket;
@@ -226,27 +221,24 @@ static void send_a314_cmd(struct DiskDevice *dev, struct A314_IORequest *ior, UW
     SendIO((struct IORequest *)ior);
 }
 
-static void send_request_if_possible(struct DiskDevice *dev)
-{
-    if (dev->connection_resetted || dev->pending_operation)
+static void send_request_if_possible(struct DiskDevice *dev) {
+    if(dev->connection_resetted || dev->pending_operation) {
         return;
+    }
 
     struct IOStdReq *ior = NULL;
 
-    while (TRUE)
-    {
+    while (TRUE) {
         ior = (struct IOStdReq *)RemHead(&dev->request_queue);
-        if (!ior)
+        if(!ior) {
             return;
+        }
 
         struct DriveState *ds = (struct DriveState *)ior->io_Unit;
-        if (ds->present)
-        {
+        if(ds->present) {
             dev->req_msg.unit = ds->unit;
             break;
-        }
-        else
-        {
+        } else {
             ior->io_Error = TDERR_DiskChanged;
             ReplyMsg(&ior->io_Message);
         }
@@ -259,22 +251,23 @@ static void send_request_if_possible(struct DiskDevice *dev)
 
     ULONG buf_address = TranslateAddressA314(ior->io_Data);
 
-    switch (ior->io_Command)
-    {
+    switch (ior->io_Command) {
     case CMD_READ:
         dev->req_msg.kind = MSG_READ_TRACK_REQ;
         break;
 
     case TD_FORMAT:
     case CMD_WRITE:
-        if (buf_address == INVALID_A314_ADDRESS)
+        if(buf_address == INVALID_A314_ADDRESS) {
             WriteMemA314(dev->track_buffer_address, ior->io_Data, ior->io_Length);
+        }
         dev->req_msg.kind = MSG_WRITE_TRACK_REQ;
         break;
     }
 
-    if (buf_address == INVALID_A314_ADDRESS)
+    if(buf_address == INVALID_A314_ADDRESS) {
         buf_address = dev->track_buffer_address;
+    }
 
     dev->req_msg.length = ior->io_Length;
     dev->req_msg.offset = ior->io_Offset;
@@ -284,64 +277,62 @@ static void send_request_if_possible(struct DiskDevice *dev)
     dev->pending_write = TRUE;
 }
 
-static void handle_eject_msg(struct DriveState *ds)
-{
+static void handle_eject_msg(struct DriveState *ds) {
     ds->change_num++;
     ds->present = FALSE;
 
     struct Interrupt *remove_int = ds->remove_int;
-    if (remove_int)
+    if(remove_int) {
         Cause(remove_int);
+    }
 
     struct IOStdReq *change_int = ds->change_int;
-    if (change_int)
+    if(change_int) {
         Cause((struct Interrupt *)change_int->io_Data);
+    }
 }
 
-static void handle_insert_msg(struct DriveState *ds, struct ResponseMsg *msg)
-{
+static void handle_insert_msg(struct DriveState *ds, struct ResponseMsg *msg) {
     ds->write_protected = msg->u.writable == 0;
     ds->change_num++;
     ds->present = TRUE;
 
     struct Interrupt *remove_int = ds->remove_int;
-    if (remove_int)
+    if(remove_int) {
         Cause(remove_int);
+    }
 
     struct IOStdReq *change_int = ds->change_int;
-    if (change_int)
+    if(change_int) {
         Cause((struct Interrupt *)change_int->io_Data);
+    }
 }
 
-static void handle_set_geometry_msg(struct DriveState *ds, struct ResponseMsg *msg)
-{
+static void handle_set_geometry_msg(struct DriveState *ds, struct ResponseMsg *msg) {
     ds->heads = msg->u.geometry.heads;
     ds->sectors_per_track = msg->u.geometry.sectors_per_track;
     ds->cylinders = msg->u.geometry.cylinders;
 
     ULONG *ev = ds->env_vec;
-    if (ev)
-    {
+    if(ev) {
         ev[DE_NUMHEADS] = msg->u.geometry.heads;
         ev[DE_BLKSPERTRACK] = msg->u.geometry.sectors_per_track;
         ev[DE_UPPERCYL] = msg->u.geometry.cylinders - 1;
     }
 }
 
-static void handle_response_msg(struct DiskDevice *dev)
-{
+static void handle_response_msg(struct DiskDevice *dev) {
     struct DriveState *ds = &dev->drive_states[dev->res_msg.unit];
 
-    switch (dev->res_msg.kind)
-    {
+    switch (dev->res_msg.kind) {
     case MSG_READ_TRACK_RES:
     case MSG_WRITE_TRACK_RES:
-        switch (dev->res_msg.u.error)
-        {
+        switch (dev->res_msg.u.error) {
         case OP_RES_OK:
-            if (dev->res_msg.kind == MSG_READ_TRACK_RES &&
-                    TranslateAddressA314(dev->pending_operation->io_Data) == INVALID_A314_ADDRESS)
+            if(dev->res_msg.kind == MSG_READ_TRACK_RES &&
+                    TranslateAddressA314(dev->pending_operation->io_Data) == INVALID_A314_ADDRESS) {
                 ReadMemA314(dev->pending_operation->io_Data, dev->track_buffer_address, dev->pending_operation->io_Length);
+            }
             dev->pending_operation->io_Actual = dev->pending_operation->io_Length;
             break;
 
@@ -372,28 +363,30 @@ static void handle_response_msg(struct DiskDevice *dev)
     }
 }
 
-static void handle_a314_reply(struct DiskDevice *dev, struct A314_IORequest *ior)
-{
+static void handle_a314_reply(struct DiskDevice *dev, struct A314_IORequest *ior) {
     switch (ior->a314_Request.io_Command)
     {
     case A314_CONNECT:
         dev->pending_connect = FALSE;
-        if (ior->a314_Request.io_Error != A314_CONNECT_OK)
+        if(ior->a314_Request.io_Error != A314_CONNECT_OK) {
             dev->connection_resetted = TRUE;
+        }
         break;
 
     case A314_READ:
         dev->pending_read = FALSE;
-        if (dev->read_ior.a314_Request.io_Error == A314_READ_OK)
+        if(dev->read_ior.a314_Request.io_Error == A314_READ_OK) {
             handle_response_msg(dev);
-        else if (dev->read_ior.a314_Request.io_Error == A314_READ_RESET)
+        } else if(dev->read_ior.a314_Request.io_Error == A314_READ_RESET) {
             dev->connection_resetted = TRUE;
+        }
         break;
 
     case A314_WRITE:
         dev->pending_write = FALSE;
-        if (dev->write_ior.a314_Request.io_Error != A314_WRITE_OK)
+        if(dev->write_ior.a314_Request.io_Error != A314_WRITE_OK) {
             dev->connection_resetted = TRUE;
+        }
         break;
 
     case A314_RESET:
@@ -405,44 +398,40 @@ static void handle_a314_reply(struct DiskDevice *dev, struct A314_IORequest *ior
     // then should eject disks from all drives automatically,
     // and reply to any pending requests.
 
-    if (!dev->connection_resetted && !dev->pending_connect && !dev->pending_read)
-    {
+    if(!dev->connection_resetted && !dev->pending_connect && !dev->pending_read) {
         send_a314_cmd(dev, &dev->read_ior, A314_READ, (char *)&dev->res_msg, sizeof(struct ResponseMsg));
         dev->pending_read = TRUE;
     }
 }
 
-static void task_main()
-{
+static void task_main() {
     struct DiskDevice *dev = (struct DiskDevice *)FindTask(NULL)->tc_UserData;
 
     send_a314_cmd(dev, &dev->read_ior, A314_CONNECT, (char *)service_name, strlen(service_name));
     dev->pending_connect = TRUE;
 
-    while (TRUE)
-    {
+    while (TRUE) {
         ULONG sigs = Wait(SIGF_A314 | SIGF_OP_REQ);
 
-        if (sigs & SIGF_A314)
-        {
+        if(sigs & SIGF_A314) {
             struct A314_IORequest *ior;
-            while ((ior = (struct A314_IORequest *)GetMsg(&dev->a314_mp)))
+            while ((ior = (struct A314_IORequest *)GetMsg(&dev->a314_mp))) {
                 handle_a314_reply(dev, ior);
+            }
         }
 
-        if (sigs & SIGF_OP_REQ)
-        {
+        if(sigs & SIGF_OP_REQ) {
             struct IOStdReq *ior;
-            while ((ior = (struct IOStdReq *)GetMsg(&dev->op_req_mp)))
+            while ((ior = (struct IOStdReq *)GetMsg(&dev->op_req_mp))) {
                 AddTail(&dev->request_queue, &ior->io_Message.mn_Node);
+            }
         }
 
         send_request_if_possible(dev);
     }
 }
 
-static void init_task(struct DiskDevice *dev)
-{
+static void init_task(struct DiskDevice *dev) {
     char *stack = dev->task_stack;
     struct Task *task = &dev->task;
     task->tc_Node.ln_Type = NT_TASK;
@@ -457,8 +446,7 @@ static void init_task(struct DiskDevice *dev)
     AddTask(task, (void *)task_main, 0);
 }
 
-static void init_message_port(struct MsgPort *mp, UBYTE sig_bit, struct Task *sig_task)
-{
+static void init_message_port(struct MsgPort *mp, UBYTE sig_bit, struct Task *sig_task) {
     mp->mp_Node.ln_Type = NT_MSGPORT;
     mp->mp_Flags = PA_SIGNAL;
     mp->mp_SigBit = sig_bit;
@@ -466,15 +454,13 @@ static void init_message_port(struct MsgPort *mp, UBYTE sig_bit, struct Task *si
     NewList(&mp->mp_MsgList);
 }
 
-static void init_a314_ioreq(struct A314_IORequest *ior, struct MsgPort *mp)
-{
+static void init_a314_ioreq(struct A314_IORequest *ior, struct MsgPort *mp) {
     ior->a314_Request.io_Message.mn_ReplyPort = mp;
     ior->a314_Request.io_Message.mn_Length = sizeof(struct A314_IORequest);
     ior->a314_Request.io_Message.mn_Node.ln_Type = NT_REPLYMSG;
 }
 
-static void get_geometry(struct DriveState *ds, struct DriveGeometry *geom)
-{
+static void get_geometry(struct DriveState *ds, struct DriveGeometry *geom) {
     ULONG numtracks = ds->cylinders * ds->heads;
     geom->dg_SectorSize = TD_SECTOR;
     geom->dg_TotalSectors = numtracks * ds->sectors_per_track;
@@ -487,10 +473,10 @@ static void get_geometry(struct DriveState *ds, struct DriveGeometry *geom)
     geom->dg_Flags = DGF_REMOVABLE;
 }
 
-static void begin_io(struct DiskDevice *dev __asm("a6"), struct IOStdReq *ior __asm("a1"))
-{
-    if (!ior || !ior->io_Unit)
+static void begin_io(struct DiskDevice *dev __asm("a6"), struct IOStdReq *ior __asm("a1")) {
+    if(!ior || !ior->io_Unit) {
         return;
+    }
 
     struct DriveState *ds = (void *)ior->io_Unit;
 
@@ -499,8 +485,7 @@ static void begin_io(struct DiskDevice *dev __asm("a6"), struct IOStdReq *ior __
     ior->io_Error = 0;
     ior->io_Actual = 0;
 
-    switch (ior->io_Command)
-    {
+    switch (ior->io_Command) {
     case CMD_RESET:
     case CMD_CLEAR:
     case CMD_UPDATE:
@@ -537,10 +522,9 @@ static void begin_io(struct DiskDevice *dev __asm("a6"), struct IOStdReq *ior __
         break;
 
     case TD_ADDCHANGEINT:
-        if (ds->change_int)
+        if(ds->change_int) {
             ior->io_Error = IOERR_ABORTED;
-        else
-        {
+        } else {
             ds->change_int = ior;
             ior->io_Flags &= ~IOF_QUICK;
             ior = NULL;
@@ -548,16 +532,16 @@ static void begin_io(struct DiskDevice *dev __asm("a6"), struct IOStdReq *ior __
         break;
 
     case TD_REMCHANGEINT:
-        if (ds->change_int == ior)
+        if(ds->change_int == ior) {
             ds->change_int = NULL;
+        }
         break;
 
     case CMD_READ:
         dbg("CMD_READ, unit=$b, offset=$l, length=$l, data=$l", ds->unit, ior->io_Offset, ior->io_Length, ior->io_Data);
-        if (!ds->present)
+        if(!ds->present) {
             ior->io_Error = TDERR_DiskChanged;
-        else
-        {
+        } else {
             PutMsg(&dev->op_req_mp, &ior->io_Message);
             ior->io_Flags &= ~IOF_QUICK;
             ior = NULL;
@@ -567,12 +551,11 @@ static void begin_io(struct DiskDevice *dev __asm("a6"), struct IOStdReq *ior __
     case TD_FORMAT:
     case CMD_WRITE:
         dbg("CMD_WRITE, unit=$b, offset=$l, length=$l, data=$l", ds->unit, ior->io_Offset, ior->io_Length, ior->io_Data);
-        if (!ds->present)
+        if(!ds->present) {
             ior->io_Error = TDERR_DiskChanged;
-        else if (ds->write_protected)
+        } else if(ds->write_protected) {
             ior->io_Error = TDERR_WriteProt;
-        else
-        {
+        } else {
             PutMsg(&dev->op_req_mp, &ior->io_Message);
             ior->io_Flags &= ~IOF_QUICK;
             ior = NULL;
@@ -584,17 +567,16 @@ static void begin_io(struct DiskDevice *dev __asm("a6"), struct IOStdReq *ior __
         break;
     }
 
-    if (ior && !(ior->io_Flags & IOF_QUICK))
+    if(ior && !(ior->io_Flags & IOF_QUICK)) {
         ReplyMsg(&ior->io_Message);
+    }
 }
 
-static ULONG abort_io(struct DiskDevice *dev __asm("a6"), struct IOStdReq *ior __asm("a1"))
-{
+static ULONG abort_io(struct DiskDevice *dev __asm("a6"), struct IOStdReq *ior __asm("a1")) {
     return IOERR_NOCMD;
 }
 
-static ULONG get_socket_id()
-{
+static ULONG get_socket_id() {
     struct timerequest tr;
     memset(&tr, 0, sizeof(tr));
     tr.tr_node.io_Message.mn_Length = sizeof(tr);
@@ -641,8 +623,7 @@ static ULONG env_vec_template[20] = {
     2               // DE_BOOTBLOCKS
 };
 
-static void add_boot_node(struct ExpansionBase *expansion_base, struct DriveState *ds)
-{
+static void add_boot_node(struct ExpansionBase *expansion_base, struct DriveState *ds) {
     struct MountListEntry *mle = AllocMem(sizeof(struct MountListEntry), MEMF_PUBLIC | MEMF_CLEAR);
 
     //mle->dev_node.dn_Type = DLT_DEVICE;
@@ -672,8 +653,7 @@ static void add_boot_node(struct ExpansionBase *expansion_base, struct DriveStat
     Permit();
 }
 
-static struct Library *init_device(struct ExecBase *sys_base __asm("a6"), BPTR seg_list __asm("a0"), struct DiskDevice *dev __asm("d0"))
-{
+static struct Library *init_device(struct ExecBase *sys_base __asm("a6"), BPTR seg_list __asm("a0"), struct DiskDevice *dev __asm("d0")) {
     dev->saved_seg_list = seg_list;
 
     dev->lib.lib_Node.ln_Type = NT_DEVICE;
@@ -688,8 +668,9 @@ static struct Library *init_device(struct ExecBase *sys_base __asm("a6"), BPTR s
 
     init_a314_ioreq(&dev->read_ior, &dev->a314_mp);
 
-    if (OpenDevice((char *)a314_device_name, 0, &dev->read_ior.a314_Request, 0))
+    if(OpenDevice((char *)a314_device_name, 0, &dev->read_ior.a314_Request, 0)) {
         goto fail1;
+    }
 
     dev->a314_base = &(dev->read_ior.a314_Request.io_Device->dd_Library);
 
@@ -697,11 +678,11 @@ static struct Library *init_device(struct ExecBase *sys_base __asm("a6"), BPTR s
     memcpy(&dev->reset_ior, &dev->read_ior, sizeof(struct A314_IORequest));
 
     dev->track_buffer_address = alloc_a314_buffer(TRACK_SIZE);
-    if (dev->track_buffer_address == INVALID_A314_ADDRESS)
+    if(dev->track_buffer_address == INVALID_A314_ADDRESS) {
         goto fail2;
+    }
 
-    for (int i = 0; i < UNIT_COUNT; i++)
-    {
+    for(int i = 0; i < UNIT_COUNT; i++) {
         struct DriveState *ds = &dev->drive_states[i];
         ds->unit = i;
         ds->heads = 2; // Default to floppy disk geometry.
@@ -714,17 +695,17 @@ static struct Library *init_device(struct ExecBase *sys_base __asm("a6"), BPTR s
     dev->a314_socket = get_socket_id();
 
     dev->task_stack = AllocMem(TASK_STACK_SIZE, MEMF_CLEAR);
-    if (!dev->task_stack)
+    if(!dev->task_stack) {
         goto fail3;
+    }
 
-    if (!seg_list)
-    {
+    if(!seg_list) {
         struct ExpansionBase *expansion_base = (struct ExpansionBase *)OpenLibrary(EXPANSIONNAME, 0);
 
-        if (expansion_base)
-        {
-            for (int i = 0; i < AUTOBOOT_UNIT_COUNT; i++)
+        if(expansion_base) {
+            for(int i = 0; i < AUTOBOOT_UNIT_COUNT; i++) {
                 add_boot_node(expansion_base, &dev->drive_states[i]);
+            }
 
             CloseLibrary(&expansion_base->LibNode);
         }
@@ -748,11 +729,9 @@ fail1:
     return NULL;
 }
 
-static BPTR expunge(struct DiskDevice *dev __asm("a6"))
-{
+static BPTR expunge(struct DiskDevice *dev __asm("a6")) {
     // Currently no support for unloading device driver.
-    if (dev->lib.lib_OpenCnt != 0)
-    {
+    if(dev->lib.lib_OpenCnt != 0) {
         dev->lib.lib_Flags |= LIBF_DELEXP;
         return 0;
     }
@@ -760,15 +739,15 @@ static BPTR expunge(struct DiskDevice *dev __asm("a6"))
     return 0;
 }
 
-static void open(struct DiskDevice *dev __asm("a6"), struct IORequest *ior __asm("a1"), ULONG unitnum __asm("d0"), ULONG flags __asm("d1"))
-{
+static void open(struct DiskDevice *dev __asm("a6"), struct IORequest *ior __asm("a1"), ULONG unitnum __asm("d0"), ULONG flags __asm("d1")) {
     dbg("open device, unit=$l, ior=$l, flags=$l", (ULONG)unitnum, (ULONG)ior, (ULONG)flags);
 
     ior->io_Error = IOERR_OPENFAIL;
     ior->io_Message.mn_Node.ln_Type = NT_REPLYMSG;
 
-    if (unitnum >= UNIT_COUNT)
+    if(unitnum >= UNIT_COUNT) {
         return;
+    }
 
     struct DriveState *ds = &dev->drive_states[unitnum];
     ds->opencnt++;
@@ -778,12 +757,12 @@ static void open(struct DiskDevice *dev __asm("a6"), struct IORequest *ior __asm
     ior->io_Error = 0;
 }
 
-static BPTR close(struct DiskDevice *dev __asm("a6"), struct IORequest *ior __asm("a1"))
-{
+static BPTR close(struct DiskDevice *dev __asm("a6"), struct IORequest *ior __asm("a1")) {
     dbg("close device, ior=$l", ior);
 
-    if (!ior || !ior->io_Unit)
+    if(!ior || !ior->io_Unit) {
         return 0;
+    }
 
     struct DriveState *ds = (void *)ior->io_Unit;
     ds->opencnt--;
@@ -793,14 +772,14 @@ static BPTR close(struct DiskDevice *dev __asm("a6"), struct IORequest *ior __as
 
     dev->lib.lib_OpenCnt--;
 
-    if (dev->lib.lib_OpenCnt == 0 && (dev->lib.lib_Flags & LIBF_DELEXP))
+    if(dev->lib.lib_OpenCnt == 0 && (dev->lib.lib_Flags & LIBF_DELEXP)) {
         return expunge(dev);
+    }
 
     return 0;
 }
 
-static ULONG device_vectors[] =
-{
+static ULONG device_vectors[] = {
     (ULONG)open,
     (ULONG)close,
     (ULONG)expunge,
@@ -810,10 +789,6 @@ static ULONG device_vectors[] =
     -1,
 };
 
-ULONG auto_init_tables[] =
-{
-    sizeof(struct DiskDevice),
-    (ULONG)device_vectors,
-    0,
-    (ULONG)init_device,
+ULONG auto_init_tables[] = {
+    sizeof(struct DiskDevice), (ULONG)device_vectors, 0, (ULONG)init_device,
 };

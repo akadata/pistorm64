@@ -7,3 +7,4 @@ int main(int argc, char *argv[]) {
     // Register signal handlers for graceful shutdown
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
+}

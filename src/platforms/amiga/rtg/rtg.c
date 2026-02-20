@@ -120,7 +120,7 @@ static const char* rtg_format_names[RTGFMT_NUM] = {
 };
 
 #ifndef RTG_GFX_MEM
-#define RTG_GFX_MEM 40u
+#define RTG_GFX_MEM 128u
 #endif
 #ifndef RTG_MEM_MB
 #define RTG_MEM_MB RTG_GFX_MEM
@@ -242,10 +242,7 @@ static struct timespec diff(struct timespec start, struct timespec end) {
   return temp;
 }
 
-#define CHKREG(a, b)                                                                               \
-  case a:                                                                                          \
-    b = value;                                                                                     \
-    break;
+#define CHKREG(a, b) case a: b = value; break;
 
 void rtg_write(uint32_t address, uint32_t value, uint8_t mode) {
   // printf("%s write to RTG: %.8X (%.8X)\n", op_type_names[mode], address, value);
@@ -425,7 +422,9 @@ static uint8_t cmd_mask;
 // Helper functions for safe aligned struct access
 static struct P96BoardInfo* safe_get_board_info(struct emulator_config* cfg_ptr, uint32_t addr) {
     uint8_t* ptr = get_mapped_data_pointer_by_address(cfg_ptr, addr);
-    if (!ptr) return NULL;
+    if (!ptr) {
+      return NULL;
+    }
     static struct P96BoardInfo temp;
     memcpy(&temp, ptr, sizeof(temp));
     return &temp;
@@ -433,7 +432,9 @@ static struct P96BoardInfo* safe_get_board_info(struct emulator_config* cfg_ptr,
 
 static struct P96RenderInfo* safe_get_render_info(struct emulator_config* cfg_ptr, uint32_t addr) {
     uint8_t* ptr = get_mapped_data_pointer_by_address(cfg_ptr, addr);
-    if (!ptr) return NULL;
+    if (!ptr) {
+      return NULL;
+    }
     static struct P96RenderInfo temp;
     memcpy(&temp, ptr, sizeof(temp));
     return &temp;
@@ -441,7 +442,9 @@ static struct P96RenderInfo* safe_get_render_info(struct emulator_config* cfg_pt
 
 static struct P96Line* safe_get_line(struct emulator_config* cfg_ptr, uint32_t addr) {
     uint8_t* ptr = get_mapped_data_pointer_by_address(cfg_ptr, addr);
-    if (!ptr) return NULL;
+    if (!ptr) {
+      return NULL;
+    }
     static struct P96Line temp;
     memcpy(&temp, ptr, sizeof(temp));
     return &temp;
@@ -449,8 +452,9 @@ static struct P96Line* safe_get_line(struct emulator_config* cfg_ptr, uint32_t a
 
 static struct BitMap* safe_get_bitmap(struct emulator_config* cfg_ptr, uint32_t addr) {
   uint8_t* ptr = get_mapped_data_pointer_by_address(cfg_ptr, addr);
-  if (!ptr)
+  if (!ptr) {
     return NULL;
+  }
   static struct BitMap temp;
   memcpy(&temp, ptr, sizeof(temp));
   return &temp;
@@ -458,8 +462,9 @@ static struct BitMap* safe_get_bitmap(struct emulator_config* cfg_ptr, uint32_t 
 
 static struct P96Template* safe_get_template(struct emulator_config* cfg_ptr, uint32_t addr) {
   uint8_t* ptr = get_mapped_data_pointer_by_address(cfg_ptr, addr);
-  if (!ptr)
+  if (!ptr) {
     return NULL;
+  }
   static struct P96Template temp;
   memcpy(&temp, ptr, sizeof(temp));
   return &temp;
@@ -467,8 +472,9 @@ static struct P96Template* safe_get_template(struct emulator_config* cfg_ptr, ui
 
 static struct P96Pattern* safe_get_pattern(struct emulator_config* cfg_ptr, uint32_t addr) {
   uint8_t* ptr = get_mapped_data_pointer_by_address(cfg_ptr, addr);
-  if (!ptr)
+  if (!ptr) {
     return NULL;
+  }
   static struct P96Pattern temp;
   memcpy(&temp, ptr, sizeof(temp));
   return &temp;
@@ -492,8 +498,9 @@ static void handle_irtg_command(uint32_t cmd) {
       LOG_DEBUG("BoardInfo Xoffs: %d Yoffs: %d\n", be16toh(b->XOffset), be16toh(b->YOffset));
     }
 #endif
-    if (!b)
+    if (!b) {
       break;
+    }
 
     b->XOffset = (int16_t)htobe16(M68KR(M68K_REG_D1));
     b->YOffset = (int16_t)htobe16(M68KR(M68K_REG_D2));
@@ -523,22 +530,40 @@ static void handle_irtg_command(uint32_t cmd) {
     gdebug("iDrawLine begin\n");
     ln = safe_get_line(cfg, M68KR(M68K_REG_A2));
 
-    if (!ln || !r)
+    if (!ln || !r) {
       break;
+    }
 
     cmd_mask = (uint8_t)M68KR(M68K_REG_D0);
     rtg_address_adj[0] = be32toh(r->_p_Memory) - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
 
     if (cmd_mask == 0xFF && be16toh(ln->LinePtrn) == 0xFFFF) {
-      rtg_drawline_solid((int16_t)be16toh(ln->X), (int16_t)be16toh(ln->Y), (int16_t)be16toh(ln->dX),
-                         (int16_t)be16toh(ln->dY), (uint16_t)be16toh(ln->Length), be32toh(ln->FgPen),
-                         (uint16_t)CMD_PITCH, RGBF_D7);
+      rtg_drawline_solid(
+        (int16_t)be16toh(ln->X), 
+        (int16_t)be16toh(ln->Y), 
+        (int16_t)be16toh(ln->dX),
+        (int16_t)be16toh(ln->dY), 
+        (uint16_t)be16toh(ln->Length),
+        be32toh(ln->FgPen),
+        (uint16_t)CMD_PITCH, 
+        RGBF_D7
+        );
     } else {
-      rtg_drawline((int16_t)be16toh(ln->X), (int16_t)be16toh(ln->Y), (int16_t)be16toh(ln->dX),
-                   (int16_t)be16toh(ln->dY), (uint16_t)be16toh(ln->Length),
-                   (uint16_t)be16toh(ln->LinePtrn), (uint16_t)be16toh(ln->PatternShift),
-                   be32toh(ln->FgPen), be32toh(ln->BgPen), (uint16_t)CMD_PITCH, RGBF_D7, cmd_mask,
-                   ln->DrawMode);
+      rtg_drawline(
+        (int16_t)be16toh(ln->X), 
+        (int16_t)be16toh(ln->Y),
+        (int16_t)be16toh(ln->dX),                   
+        (int16_t)be16toh(ln->dY), 
+        (uint16_t)be16toh(ln->Length),                   
+        (uint16_t)be16toh(ln->LinePtrn), 
+        (uint16_t)be16toh(ln->PatternShift),                   
+        be32toh(ln->FgPen), 
+        be32toh(ln->BgPen), 
+        (uint16_t)CMD_PITCH, 
+        RGBF_D7, 
+        cmd_mask,
+        ln->DrawMode
+        );
     }
     gdebug("iDrawLine end\n");
     break;
@@ -556,20 +581,34 @@ static void handle_irtg_command(uint32_t cmd) {
     }
 #endif
 
-    if (!b || !r)
+    if (!b || !r) {
       break;
+    }
 
     cmd_mask = (uint8_t)M68KR(M68K_REG_D5);
     rtg_address_adj[0] = be32toh(r->_p_Memory) - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
 
     if (cmd_mask == 0xFF) {
-      rtg_fillrect_solid((uint16_t)M68KR(M68K_REG_D0), (uint16_t)M68KR(M68K_REG_D1),
-                         (uint16_t)M68KR(M68K_REG_D2), (uint16_t)M68KR(M68K_REG_D3),
-                         M68KR(M68K_REG_D4), (uint16_t)CMD_PITCH, RGBF_D7);
+      rtg_fillrect_solid(
+        (uint16_t)M68KR(M68K_REG_D0), 
+        (uint16_t)M68KR(M68K_REG_D1),
+        (uint16_t)M68KR(M68K_REG_D2), 
+        (uint16_t)M68KR(M68K_REG_D3),
+        M68KR(M68K_REG_D4), 
+        (uint16_t)CMD_PITCH, 
+        RGBF_D7
+        );
     } else {
-      rtg_fillrect((uint16_t)M68KR(M68K_REG_D0), (uint16_t)M68KR(M68K_REG_D1),
-                   (uint16_t)M68KR(M68K_REG_D2), (uint16_t)M68KR(M68K_REG_D3), M68KR(M68K_REG_D4),
-                   (uint16_t)CMD_PITCH, RGBF_D7, cmd_mask);
+      rtg_fillrect(
+        (uint16_t)M68KR(M68K_REG_D0),
+        (uint16_t)M68KR(M68K_REG_D1),                   
+        (uint16_t)M68KR(M68K_REG_D2), 
+        (uint16_t)M68KR(M68K_REG_D3), 
+        M68KR(M68K_REG_D4),                   
+        (uint16_t)CMD_PITCH, 
+        RGBF_D7, 
+        cmd_mask
+        );
     }
     gdebug("iFillRect end\n");
     break;
@@ -579,15 +618,22 @@ static void handle_irtg_command(uint32_t cmd) {
     // D0 WORD x, D1: WORD y, D2: WORD w, D3: WORD h
     // D4: UBYTE mask, D7: RGBFTYPE format
     gdebug("iInvertRect begin\n");
-    if (!b || !r)
+    if (!b || !r) {
       break;
+    }
 
     cmd_mask = (uint8_t)M68KR(M68K_REG_D4);
     rtg_address_adj[0] = be32toh(r->_p_Memory) - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
 
-    rtg_invertrect((uint16_t)M68KR(M68K_REG_D0), (uint16_t)M68KR(M68K_REG_D1),
-                   (uint16_t)M68KR(M68K_REG_D2), (uint16_t)M68KR(M68K_REG_D3), (uint16_t)CMD_PITCH,
-                   RGBF_D7, cmd_mask);
+    rtg_invertrect(
+      (uint16_t)M68KR(M68K_REG_D0), 
+      (uint16_t)M68KR(M68K_REG_D1),
+      (uint16_t)M68KR(M68K_REG_D2), 
+      (uint16_t)M68KR(M68K_REG_D3), 
+      (uint16_t)CMD_PITCH,
+      RGBF_D7, 
+      cmd_mask
+      );
     gdebug("iInvertRect end\n");
     break;
   }
@@ -601,14 +647,27 @@ static void handle_irtg_command(uint32_t cmd) {
     rtg_address_adj[0] = be32toh(r->_p_Memory) - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
 
     if (cmd_mask == 0xFF) {
-      rtg_blitrect_solid((uint16_t)M68KR(M68K_REG_D0), (uint16_t)M68KR(M68K_REG_D1),
-                         (uint16_t)M68KR(M68K_REG_D2), (uint16_t)M68KR(M68K_REG_D3),
-                         (uint16_t)M68KR(M68K_REG_D4), (uint16_t)M68KR(M68K_REG_D5), (uint16_t)CMD_PITCH,
-                         RGBF_D7);
+      rtg_blitrect_solid(
+        (uint16_t)M68KR(M68K_REG_D0), 
+        (uint16_t)M68KR(M68K_REG_D1),
+        (uint16_t)M68KR(M68K_REG_D2), 
+        (uint16_t)M68KR(M68K_REG_D3),
+        (uint16_t)M68KR(M68K_REG_D4), 
+        (uint16_t)M68KR(M68K_REG_D5), 
+        (uint16_t)CMD_PITCH,
+        RGBF_D7
+        );
     } else {
-      rtg_blitrect((uint16_t)M68KR(M68K_REG_D0), (uint16_t)M68KR(M68K_REG_D1),
-                   (uint16_t)M68KR(M68K_REG_D2), (uint16_t)M68KR(M68K_REG_D3), (uint16_t)M68KR(M68K_REG_D4),
-                   (uint16_t)M68KR(M68K_REG_D5), (uint16_t)CMD_PITCH, RGBF_D7, cmd_mask);
+      rtg_blitrect(
+        (uint16_t)M68KR(M68K_REG_D0), 
+        (uint16_t)M68KR(M68K_REG_D1),
+        (uint16_t)M68KR(M68K_REG_D2), 
+        (uint16_t)M68KR(M68K_REG_D3), 
+        (uint16_t)M68KR(M68K_REG_D4),
+        (uint16_t)M68KR(M68K_REG_D5), 
+        (uint16_t)CMD_PITCH, RGBF_D7,                    
+        cmd_mask
+        );
     }
 
     gdebug("iBlitRect end\n");
@@ -622,17 +681,27 @@ static void handle_irtg_command(uint32_t cmd) {
 
     uint8_t minterm = (uint8_t)M68KR(M68K_REG_D6);
     struct P96RenderInfo* rt = safe_get_render_info(cfg, M68KR(M68K_REG_A2));
-    if (!rt)
+    if (!rt) {
       break;
+    }
 
     uint32_t src_addr = be32toh(r->_p_Memory);
     uint32_t dst_addr = be32toh(rt->_p_Memory);
 
-    rtg_blitrect_nomask_complete((uint16_t)M68KR(M68K_REG_D0), (uint16_t)M68KR(M68K_REG_D1),
-                                 (uint16_t)M68KR(M68K_REG_D2), (uint16_t)M68KR(M68K_REG_D3),
-                                 (uint16_t)M68KR(M68K_REG_D4), (uint16_t)M68KR(M68K_REG_D5),
-                                 (uint16_t)CMD_PITCH, be16toh(rt->BytesPerRow), src_addr, dst_addr,
-                                 RGBF_D7, minterm);
+    rtg_blitrect_nomask_complete(
+      (uint16_t)M68KR(M68K_REG_D0), 
+      (uint16_t)M68KR(M68K_REG_D1),
+      (uint16_t)M68KR(M68K_REG_D2), 
+      (uint16_t)M68KR(M68K_REG_D3),
+      (uint16_t)M68KR(M68K_REG_D4), 
+      (uint16_t)M68KR(M68K_REG_D5), 
+      (uint16_t)CMD_PITCH, 
+      be16toh(rt->BytesPerRow), 
+      src_addr, 
+      dst_addr,
+      RGBF_D7, 
+      minterm
+      );
 
     gdebug("iBlitRectNoMaskComplete end\n");
     break;
@@ -641,8 +710,9 @@ static void handle_irtg_command(uint32_t cmd) {
     // A0: BoardInfo *b, A1: RenderInfo *r, A2: Template *t
     // D0: WORD x, D1: WORD y, D2: WORD w, D3: WORD h
     // D4: UBYTE mask, D7: RGBFTYPE format
-    if (!r || !M68KR(M68K_REG_A2))
+    if (!r || !M68KR(M68K_REG_A2)) {
       break;
+    }
     gdebug("iBlitTemplate begin\n");
 
     uint16_t t_pitch = 0, x_offset = 0;
@@ -671,9 +741,21 @@ static void handle_irtg_command(uint32_t cmd) {
     rtg_address[1] = be32toh(r->_p_Memory);
     rtg_address_adj[1] = rtg_address[1] - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
 
-    rtg_blittemplate((uint16_t)M68KR(M68K_REG_D0), (uint16_t)M68KR(M68K_REG_D1),
-                     (uint16_t)M68KR(M68K_REG_D2), (uint16_t)M68KR(M68K_REG_D3), src_addr, fgcol, bgcol,
-                     (uint16_t)CMD_PITCH, t_pitch, RGBF_D7, x_offset, cmd_mask, draw_mode);
+    rtg_blittemplate(
+      (uint16_t)M68KR(M68K_REG_D0), 
+      (uint16_t)M68KR(M68K_REG_D1),
+      (uint16_t)M68KR(M68K_REG_D2), 
+      (uint16_t)M68KR(M68K_REG_D3), 
+      src_addr, 
+      fgcol, 
+      bgcol,
+      (uint16_t)CMD_PITCH, 
+      t_pitch, 
+      RGBF_D7, 
+      x_offset, 
+      cmd_mask, 
+      draw_mode
+      );
     gdebug("iBlitTemplate end\n");
     break;
   }
@@ -681,8 +763,9 @@ static void handle_irtg_command(uint32_t cmd) {
     // A0: BoardInfo *b, A1: RenderInfo *r, A2: Pattern *p
     // D0: WORD x, D1: WORD y, D2: WORD w, D3: WORD h
     // D4: UBYTE mask, D7: RGBFTYPE format
-    if (!r || !M68KR(M68K_REG_A2))
+    if (!r || !M68KR(M68K_REG_A2)) {
       break;
+    }
     gdebug("iBlitPattern begin\n");
 
     uint16_t x_offset = 0, y_offset = 0;
@@ -713,10 +796,22 @@ static void handle_irtg_command(uint32_t cmd) {
     rtg_address[1] = be32toh(r->_p_Memory);
     rtg_address_adj[1] = rtg_address[1] - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
 
-    rtg_blitpattern((uint16_t)M68KR(M68K_REG_D0), (uint16_t)M68KR(M68K_REG_D1),
-                    (uint16_t)M68KR(M68K_REG_D2), (uint16_t)M68KR(M68K_REG_D3), src_addr, fgcol, bgcol,
-                    (uint16_t)CMD_PITCH, RGBF_D7, x_offset, y_offset, cmd_mask, draw_mode,
-                    loop_rows);
+    rtg_blitpattern(
+      (uint16_t)M68KR(M68K_REG_D0), 
+      (uint16_t)M68KR(M68K_REG_D1),
+      (uint16_t)M68KR(M68K_REG_D2), 
+      (uint16_t)M68KR(M68K_REG_D3), 
+      src_addr, 
+      fgcol, 
+      bgcol,
+      (uint16_t)CMD_PITCH, 
+      RGBF_D7, 
+      x_offset, 
+      y_offset, 
+      cmd_mask, 
+      draw_mode,
+      loop_rows
+      );
     gdebug("iBlitPattern end\n");
     break;
   }
@@ -726,8 +821,9 @@ static void handle_irtg_command(uint32_t cmd) {
     // D6: UBYTE minterm, D7: UBYTE mask
     r = safe_get_render_info(cfg, M68KR(M68K_REG_A2));
     struct BitMap* bm = safe_get_bitmap(cfg, M68KR(M68K_REG_A1));
-    if (!r || !bm)
+    if (!r || !bm) {
       break;
+    }
 
     gdebug("iP2C begin\n");
 
@@ -740,10 +836,12 @@ static void handle_irtg_command(uint32_t cmd) {
 
     if (realtime_graphics_debug) {
       LOG_DEBUG("bm: 0x%" PRIxPTR " r: 0x%" PRIxPTR "\n", (uintptr_t)bm, (uintptr_t)r);
-      if (bm)
+      if (bm) {
         LOG_DEBUG("bm pitch: %d\n", be16toh(bm->BytesPerRow));
-      if (r)
+      }
+      if (r) {
         LOG_DEBUG("r pitch: %d\n", be16toh(r->BytesPerRow));
+      }
     }
 
     uint16_t bmp_pitch = be16toh(bm->BytesPerRow);
@@ -753,9 +851,19 @@ static void handle_irtg_command(uint32_t cmd) {
     uint8_t minterm = (uint8_t)M68KR(M68K_REG_D6);
     cmd_mask = (uint8_t)M68KR(M68K_REG_D7);
 
-    rtg_p2c_ex((int16_t)M68KR(M68K_REG_D0), (int16_t)M68KR(M68K_REG_D1), (int16_t)M68KR(M68K_REG_D2), (int16_t)M68KR(M68K_REG_D3),
-               (int16_t)M68KR(M68K_REG_D4), (int16_t)M68KR(M68K_REG_D5), minterm, bm, cmd_mask, line_pitch,
-               bmp_pitch);
+    rtg_p2c_ex(
+      (int16_t)M68KR(M68K_REG_D0), 
+      (int16_t)M68KR(M68K_REG_D1), 
+      (int16_t)M68KR(M68K_REG_D2), 
+      (int16_t)M68KR(M68K_REG_D3),
+      (int16_t)M68KR(M68K_REG_D4), 
+      (int16_t)M68KR(M68K_REG_D5), 
+      minterm, 
+      bm, 
+      cmd_mask, 
+      line_pitch,               
+      bmp_pitch
+      );
     gdebug("iP2C end\n");
     break;
   }
@@ -780,15 +888,11 @@ static void handle_rtg_command(uint32_t cmd) {
     rtg_display_height = rtg_y[0];
     if (rtg_u8[0]) {
       // rtg_pitch = rtg_display_width << rtg_format;
-      framebuffer_addr_adj =
-          framebuffer_addr + (rtg_offset_x * rtg_pixel_size[rtg_display_format]) +
-          (rtg_offset_y * rtg_pitch);
+      framebuffer_addr_adj =  framebuffer_addr + (rtg_offset_x * rtg_pixel_size[rtg_display_format]) + (rtg_offset_y * rtg_pitch);
       rtg_total_rows = rtg_y[1];
     } else {
       // rtg_pitch = rtg_display_width << rtg_format;
-      framebuffer_addr_adj =
-          framebuffer_addr + (rtg_offset_x * rtg_pixel_size[rtg_display_format]) +
-          (rtg_offset_y * rtg_pitch);
+      framebuffer_addr_adj = framebuffer_addr + (rtg_offset_x * rtg_pixel_size[rtg_display_format]) + (rtg_offset_y * rtg_pitch);
       rtg_total_rows = rtg_y[1];
     }
     if (realtime_graphics_debug) {
@@ -797,22 +901,21 @@ static void handle_rtg_command(uint32_t cmd) {
     }
     break;
   case RTGCMD_SETPAN:
-    // printf("Command: SetPan.\n");
+     printf("Command: SetPan.\n");
     rtg_offset_x = rtg_x[1];
     rtg_offset_y = rtg_y[1];
     rtg_pitch = (uint16_t)(rtg_x[0] * rtg_pixel_size[rtg_display_format]);
     framebuffer_addr = rtg_address[0] - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
-    framebuffer_addr_adj = framebuffer_addr + (rtg_offset_x * rtg_pixel_size[rtg_display_format]) +
-                           (rtg_offset_y * rtg_pitch);
-    // printf("PAN:\nPitch: %d\n", rtg_pitch);
-    // printf("Pixel format: %s (%d)\n", rtg_format_names[rtg_format], rtg_format);
-    // printf("Display pixel format: %s (%d)\n", rtg_format_names[rtg_display_format],
-    // rtg_display_format);
+    framebuffer_addr_adj = framebuffer_addr + (rtg_offset_x * rtg_pixel_size[rtg_display_format]) + (rtg_offset_y * rtg_pitch);
+
+     printf("PAN:\nPitch: %d\n", rtg_pitch);
+     printf("Pixel format: %s (%d)\n", rtg_format_names[rtg_format], rtg_format);
+     printf("Display pixel format: %s (%d)\n", rtg_format_names[rtg_display_format], rtg_display_format);
     break;
   case RTGCMD_SETCLUT: {
-    // printf("Command: SetCLUT.\n");
-    // printf("Set palette entry %d to %d, %d, %d\n", rtg_u8[0], rtg_u8[1], rtg_u8[2], rtg_u8[3]);
-    // printf("Set palette entry %d to 32-bit palette color: %.8X\n", rtg_u8[0], rtg_rgb[0]);
+     printf("Command: SetCLUT.\n");
+     printf("Set palette entry %d to %d, %d, %d\n", rtg_u8[0], rtg_u8[1], rtg_u8[2], rtg_u8[3]);
+     printf("Set palette entry %d to 32-bit palette color: %.8X\n", rtg_u8[0], rtg_rgb[0]);
     rtg_set_clut_entry(rtg_u8[0], rtg_rgb[0]);
     break;
   }
@@ -832,93 +935,256 @@ static void handle_rtg_command(uint32_t cmd) {
     display_enabled = ((rtg_x[0]) & 0x01);
     if (display_enabled != rtg_on) {
       rtg_on = display_enabled;
-      if (rtg_on)
+      if (rtg_on) {
         rtg_init_display();
-      else
+      } else {
         rtg_shutdown_display();
+      }
     }
     break;
   case RTGCMD_FILLRECT:
     if (rtg_u8[0] == 0xFF || rtg_format != RTGFMT_8BIT_CLUT) {
-      rtg_fillrect_solid((uint16_t)rtg_x[0], (uint16_t)rtg_y[0], (uint16_t)rtg_x[1], (uint16_t)rtg_y[1],
-                         rtg_rgb[0], (uint16_t)rtg_x[2], rtg_format);
+      rtg_fillrect_solid(
+        (uint16_t)rtg_x[0], 
+        (uint16_t)rtg_y[0], 
+        (uint16_t)rtg_x[1], 
+        (uint16_t)rtg_y[1], 
+        rtg_rgb[0], 
+        (uint16_t)rtg_x[2], 
+        rtg_format
+        );
+      LOG_WARN("[RTG/RTGCMD_FILLRECT/FillRect Solid] rtg_x=%u \n", rtg_x[1]);
       gdebug("FillRect Solid\n");
     } else {
-      rtg_fillrect((uint16_t)rtg_x[0], (uint16_t)rtg_y[0], (uint16_t)rtg_x[1], (uint16_t)rtg_y[1],
-                   rtg_rgb[0], (uint16_t)rtg_x[2], rtg_format, rtg_u8[0]);
+      rtg_fillrect(
+        (uint16_t)rtg_x[0], 
+        (uint16_t)rtg_y[0], 
+        (uint16_t)rtg_x[1], 
+        (uint16_t)rtg_y[1], 
+        rtg_rgb[0], 
+        (uint16_t)rtg_x[2], 
+        rtg_format, 
+        rtg_u8[0]
+        );
+
+      LOG_WARN("[RTG/RTGCMD_FILLRECT/FillRect Masked] rtg_x=%u \n", rtg_x[1]);
       gdebug("FillRect Masked\n");
     }
     break;
   case RTGCMD_INVERTRECT:
-    rtg_invertrect((uint16_t)rtg_x[0], (uint16_t)rtg_y[0], (uint16_t)rtg_x[1], (uint16_t)rtg_y[1], (uint16_t)rtg_x[2],
-                   rtg_format, rtg_u8[0]);
+    rtg_invertrect(
+      (uint16_t)rtg_x[0], 
+      (uint16_t)rtg_y[0], 
+      (uint16_t)rtg_x[1], 
+      (uint16_t)rtg_y[1], 
+      (uint16_t)rtg_x[2], 
+      rtg_format, 
+      rtg_u8[0]
+      );
+    LOG_WARN("[RTG/RTGCMD_INVERTRECT] rtg_x=%u \n", rtg_x[1]);
     gdebug("InvertRect\n");
     break;
   case RTGCMD_BLITRECT:
     if (rtg_u8[0] == 0xFF || rtg_format != RTGFMT_8BIT_CLUT) {
-      rtg_blitrect_solid((uint16_t)rtg_x[0], (uint16_t)rtg_y[0], (uint16_t)rtg_x[1], (uint16_t)rtg_y[1],
-                         (uint16_t)rtg_x[2], (uint16_t)rtg_y[2], (uint16_t)rtg_x[3], rtg_format);
+      rtg_blitrect_solid(
+        (uint16_t)rtg_x[0], 
+        (uint16_t)rtg_y[0], 
+        (uint16_t)rtg_x[1], 
+        (uint16_t)rtg_y[1], 
+        (uint16_t)rtg_x[2], 
+        (uint16_t)rtg_y[2], 
+        (uint16_t)rtg_x[3], 
+        rtg_format
+        );
+      LOG_WARN("[RTG/RTGCMD_BLITRECT] rtg_x=%u \n", rtg_x[1]);
       gdebug("BlitRect Solid\n");
     } else {
-      rtg_blitrect((uint16_t)rtg_x[0], (uint16_t)rtg_y[0], (uint16_t)rtg_x[1], (uint16_t)rtg_y[1],
-                   (uint16_t)rtg_x[2], (uint16_t)rtg_y[2], (uint16_t)rtg_x[3], rtg_format,
-                   rtg_u8[0]);
+      rtg_blitrect(
+        (uint16_t)rtg_x[0], 
+        (uint16_t)rtg_y[0], 
+        (uint16_t)rtg_x[1], 
+        (uint16_t)rtg_y[1],
+        (uint16_t)rtg_x[2],
+        (uint16_t)rtg_y[2], 
+        (uint16_t)rtg_x[3], 
+        rtg_format, 
+        rtg_u8[0]
+        );
       gdebug("BlitRect Masked\n");
     }
     break;
   case RTGCMD_BLITRECT_NOMASK_COMPLETE:
-    rtg_blitrect_nomask_complete((uint16_t)rtg_x[0], (uint16_t)rtg_y[0], (uint16_t)rtg_x[1], (uint16_t)rtg_y[1],
-                                 (uint16_t)rtg_x[2], (uint16_t)rtg_y[2], (uint16_t)rtg_x[3],
-                                 (uint16_t)rtg_x[4], rtg_address[0], rtg_address[1], rtg_format,
-                                 rtg_u8[0]);
+    rtg_blitrect_nomask_complete(
+      (uint16_t)rtg_x[0], 
+      (uint16_t)rtg_y[0], 
+      (uint16_t)rtg_x[1], 
+      (uint16_t)rtg_y[1], 
+      (uint16_t)rtg_x[2], 
+      (uint16_t)rtg_y[2], 
+      (uint16_t)rtg_x[3], 
+      (uint16_t)rtg_x[4], 
+      rtg_address[0], 
+      rtg_address[1], 
+      rtg_format, 
+      rtg_u8[0]
+      );
+    LOG_WARN("[RTG/RTGCMD_BLITRECT_NOMASK_COMPLETE] rtg_x=%u \n", rtg_x[1]);
     gdebug("BlitRectNoMaskComplete\n");
     break;
   case RTGCMD_BLITPATTERN:
-    rtg_blitpattern((uint16_t)rtg_x[0], (uint16_t)rtg_y[0], (uint16_t)rtg_x[1], (uint16_t)rtg_y[1],
-                    rtg_address[0], rtg_rgb[0], rtg_rgb[1], (uint16_t)rtg_x[3], rtg_format, rtg_x[2],
-                    rtg_y[2], rtg_u8[0], rtg_u8[1], rtg_u8[2]);
+    rtg_blitpattern((uint16_t)rtg_x[0], 
+      (uint16_t)rtg_y[0], 
+      (uint16_t)rtg_x[1], 
+      (uint16_t)rtg_y[1],
+      rtg_address[0], 
+      rtg_rgb[0], 
+      rtg_rgb[1], 
+      (uint16_t)rtg_x[3], 
+      rtg_format, 
+      rtg_x[2],
+      rtg_y[2], 
+      rtg_u8[0], 
+      rtg_u8[1], 
+      rtg_u8[2]
+      );
+    LOG_WARN(
+    "[RTG/RTGCMD_BLITPATTERN] "
+    "x0=%u y0=%u x1=%u y1=%u addr=0x%08X fg=0x%08X bg=0x%08X "
+    "pitch=%u fmt=%u x2=%u y2=%u u0=%u u1=%u u2=%u\n",
+    (uint16_t)rtg_x[0],
+    (uint16_t)rtg_y[0],
+    (uint16_t)rtg_x[1],
+    (uint16_t)rtg_y[1],
+    (uint32_t)rtg_address[0],
+    (uint32_t)rtg_rgb[0],
+    (uint32_t)rtg_rgb[1],
+    (uint16_t)rtg_x[3],
+    (unsigned)rtg_format,
+    (uint16_t)rtg_x[2],
+    (uint16_t)rtg_y[2],
+    (unsigned)rtg_u8[0],
+    (unsigned)rtg_u8[1],
+    (unsigned)rtg_u8[2]
+    );
+    
+
     gdebug("BlitPattern\n");
     return;
   case RTGCMD_BLITTEMPLATE:
-    rtg_blittemplate((uint16_t)rtg_x[0], (uint16_t)rtg_y[0], (uint16_t)rtg_x[1], (uint16_t)rtg_y[1],
-                     rtg_address[0], rtg_rgb[0], rtg_rgb[1], (uint16_t)rtg_x[3], (uint16_t)rtg_x[4],
-                     rtg_format, rtg_x[2], rtg_u8[0], rtg_u8[1]);
+    rtg_blittemplate(
+      (uint16_t)rtg_x[0], 
+      (uint16_t)rtg_y[0], 
+      (uint16_t)rtg_x[1], 
+      (uint16_t)rtg_y[1], 
+      rtg_address[0], 
+      rtg_rgb[0], 
+      rtg_rgb[1], 
+      (uint16_t)rtg_x[3], 
+      (uint16_t)rtg_x[4], 
+      rtg_format, 
+      rtg_x[2], 
+      rtg_u8[0], 
+      rtg_u8[1]
+      );
+    LOG_WARN("[RTG/RTGCMD_BLITTEMPLATE] rtg_x=%u \n", rtg_x[1]);
     gdebug("BlitTemplate\n");
     break;
   case RTGCMD_DRAWLINE:
-    if (rtg_u8[0] == 0xFF && rtg_y[2] == 0xFFFF)
-      rtg_drawline_solid((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], (uint16_t)rtg_x[2], rtg_rgb[0],
-                         (uint16_t)rtg_x[3], rtg_format);
-    else
-      rtg_drawline((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], (uint16_t)rtg_x[2],
-                   (uint16_t)rtg_y[2], (uint16_t)rtg_x[4], rtg_rgb[0], rtg_rgb[1], (uint16_t)rtg_x[3],
-                   rtg_format, rtg_u8[0], rtg_u8[1]);
+    if (rtg_u8[0] == 0xFF && rtg_y[2] == 0xFFFF) {
+      rtg_drawline_solid(
+        (int16_t)rtg_x[0], 
+        (int16_t)rtg_y[0], 
+        (int16_t)rtg_x[1], 
+        (int16_t)rtg_y[1], 
+        (uint16_t)rtg_x[2], 
+        rtg_rgb[0], 
+        (uint16_t)rtg_x[3], 
+        rtg_format
+        );
+      LOG_WARN("[RTG/RTGCMD_DRAWLINE] rtg_x=%u \n", rtg_x[1]);
+    }  else {
+      rtg_drawline(
+        (int16_t)rtg_x[0], 
+        (int16_t)rtg_y[0], 
+        (int16_t)rtg_x[1], 
+        (int16_t)rtg_y[1], 
+        (uint16_t)rtg_x[2], 
+        (uint16_t)rtg_y[2], 
+        (uint16_t)rtg_x[4], 
+        rtg_rgb[0], 
+        rtg_rgb[1], 
+        (uint16_t)rtg_x[3], 
+        rtg_format, 
+        rtg_u8[0], 
+        rtg_u8[1]);
+    }
+
     gdebug("DrawLine\n");
     break;
   case RTGCMD_P2C:
-    rtg_p2c((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], (int16_t)rtg_x[2], (int16_t)rtg_y[2], rtg_u8[1], rtg_u8[2],
-            rtg_u8[0], (uint8_t)(rtg_user[0] >> 0x8), (uint16_t)rtg_x[4], (uint8_t*)&rtg_mem[rtg_address_adj[1]]);
+    rtg_p2c((int16_t)rtg_x[0], 
+      (int16_t)rtg_y[0], 
+      (int16_t)rtg_x[1]/2, // THIS IS FAKENATIVEMODE! /2 to place icons in the correct place on the screeen
+      (int16_t)rtg_y[1],   
+      (int16_t)rtg_x[2], 
+      (int16_t)rtg_y[2], 
+      rtg_u8[1], 
+      rtg_u8[2], 
+      rtg_u8[0], 
+      (uint8_t)(rtg_user[0] >> 0x8), 
+      (uint16_t)rtg_x[4], 
+      (uint8_t*)&rtg_mem[rtg_address_adj[1]]
+      );
+     LOG_WARN("[RTG/RTGCMD_P2C] rtg_x=%u \n", rtg_x[1]);
     gdebug("Planar2Chunky\n");
     break;
   case RTGCMD_P2D:
-    rtg_p2d((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], (int16_t)rtg_x[2], (int16_t)rtg_y[2], rtg_u8[1], rtg_u8[2],
-            rtg_u8[0], (uint8_t)(rtg_user[0] >> 0x8), (uint16_t)rtg_x[4], (uint8_t*)&rtg_mem[rtg_address_adj[1]]);
+    /// found it!!!
+    rtg_p2d(
+      (int16_t)rtg_x[0], 
+      (int16_t)rtg_y[0], 
+      (int16_t)(rtg_x[1]/2),   // this is PiGFX Mode /2 to make decorations be in the right place. 
+      (int16_t)rtg_y[1], 
+      (int16_t)rtg_x[2], 
+      (int16_t)rtg_y[2], 
+      rtg_u8[1], 
+      rtg_u8[2],
+      rtg_u8[0], 
+      (uint8_t)(rtg_user[0] >> 0x8), 
+      (uint16_t)rtg_x[4], 
+      (uint8_t*)&rtg_mem[rtg_address_adj[1]]
+      );
+    LOG_WARN("[RTG/RTGCMD_P2D] rtg_x=%u \n", rtg_x[1]);
     gdebug("Planar2Direct\n");
     break;
   case RTGCMD_SETSPRITE:
-    rtg_enable_mouse_cursor((uint8_t)rtg_user[0]);
+    rtg_enable_mouse_cursor(
+      (uint8_t)rtg_user[0]
+      );
     gdebug("SetSprite\n");
     break;
   case RTGCMD_SETSPRITECOLOR:
-    rtg_set_cursor_clut_entry(rtg_u8[0], rtg_u8[1], rtg_u8[2], rtg_u8[3]);
+    rtg_set_cursor_clut_entry(
+      rtg_u8[0], 
+      rtg_u8[1], 
+      rtg_u8[2], 
+      rtg_u8[3]
+      );
     gdebug("SetSpriteColor\n");
     break;
   case RTGCMD_SETSPRITEPOS:
-    rtg_set_mouse_cursor_pos((int16_t)rtg_x[0], (int16_t)rtg_y[0]);
+    rtg_set_mouse_cursor_pos(
+      (int16_t)rtg_x[0], 
+      (int16_t)rtg_y[0]
+      );
     gdebug("SetSpritePos\n");
     break;
   case RTGCMD_SETSPRITEIMAGE:
-    rtg_set_mouse_cursor_image(&rtg_mem[rtg_address_adj[1]], rtg_u8[0], rtg_u8[1]);
+    rtg_set_mouse_cursor_image(
+      &rtg_mem[rtg_address_adj[1]], 
+      rtg_u8[0], 
+      rtg_u8[1]
+      );
     gdebug("SetSpriteImage\n");
     break;
   case RTGCMD_DEBUGME:

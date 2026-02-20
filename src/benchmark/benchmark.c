@@ -50,7 +50,7 @@ struct region {
 
 static int check_emulator(void) {
   DIR *dir = opendir("/proc");
-  if (!dir) {
+  if(!dir) {
     perror("can't open /proc, assuming emulator running");
     return 1;
   }
@@ -58,20 +58,20 @@ static int check_emulator(void) {
   struct dirent *ent;
   while ((ent = readdir(dir)) != NULL) {
     long pid = atol(ent->d_name);
-    if (pid <= 0) {
+    if(pid <= 0) {
       continue;
     }
     char buf[256];
     snprintf(buf, sizeof(buf), "/proc/%ld/stat", pid);
     FILE *fp = fopen(buf, "r");
-    if (!fp) {
+    if(!fp) {
       continue;
     }
     char pname[128];
     char state;
     long rpid;
-    if (fscanf(fp, "%ld (%127[^)]) %c", &rpid, pname, &state) == 3) {
-      if (strcmp(pname, "emulator") == 0) {
+    if(fscanf(fp, "%ld (%127[^)]) %c", &rpid, pname, &state) == 3) {
+      if(strcmp(pname, "emulator") == 0) {
         fclose(fp);
         closedir(dir);
         return 1;
@@ -86,8 +86,10 @@ static int check_emulator(void) {
 
 
 static void pacing_delay_us(int pacing_us) {
-  if (pacing_us <= 0) return;
-  if (g_pacing_kind == PACING_SLEEP) {
+  if(pacing_us <= 0) {
+    return;
+  }
+  if(g_pacing_kind == PACING_SLEEP) {
     usleep((useconds_t)pacing_us);
     return;
   }
@@ -95,16 +97,18 @@ static void pacing_delay_us(int pacing_us) {
   struct timespec t0, tn;
   uint64_t target_ns = (uint64_t)pacing_us * 1000ull;
   clock_gettime(CLOCK_MONOTONIC, &t0);
-  for (;;) {
+  for(;;) {
     clock_gettime(CLOCK_MONOTONIC, &tn);
     uint64_t elapsed_ns = (uint64_t)(tn.tv_sec - t0.tv_sec) * 1000000000ull;
-    if (tn.tv_nsec >= t0.tv_nsec) {
+    if(tn.tv_nsec >= t0.tv_nsec) {
       elapsed_ns += (uint64_t)(tn.tv_nsec - t0.tv_nsec);
     } else {
       elapsed_ns -= 1000000000ull;
       elapsed_ns += (uint64_t)(1000000000ull + tn.tv_nsec - t0.tv_nsec);
     }
-    if (elapsed_ns >= target_ns) break;
+    if(elapsed_ns >= target_ns) {
+      break;
+    }
   }
 }
 static void stats_init(struct wait_stats *st, uint64_t total_txns, uint32_t *samples, uint32_t max_samples) {
@@ -114,9 +118,11 @@ static void stats_init(struct wait_stats *st, uint64_t total_txns, uint32_t *sam
   st->samples = samples;
   st->sample_count = 0;
   st->sample_max = max_samples;
-  if (max_samples > 0 && total_txns > max_samples) {
+  if(max_samples > 0 && total_txns > max_samples) {
     st->sample_stride = (uint32_t)((total_txns + max_samples - 1) / max_samples);
-    if (st->sample_stride == 0) st->sample_stride = 1;
+    if(st->sample_stride == 0) { 
+      st->sample_stride = 1;
+    }
   } else {
     st->sample_stride = 1;
   }
@@ -129,10 +135,12 @@ static void stats_init(struct wait_stats *st, uint64_t total_txns, uint32_t *sam
 static void stats_update(struct wait_stats *st, uint32_t wait_us) {
   st->count++;
   st->total_us += wait_us;
-  if (wait_us > st->max_us) st->max_us = wait_us;
-  if (st->sample_stride > 0) {
-    if (st->sample_next == 0) {
-      if (st->samples && st->sample_count < st->sample_max) {
+  if(wait_us > st->max_us) {
+    st->max_us = wait_us;
+  }
+  if(st->sample_stride > 0) {
+    if(st->sample_next == 0) {
+      if(st->samples && st->sample_count < st->sample_max) {
         st->samples[st->sample_count++] = wait_us;
       }
       st->sample_next = st->sample_stride;
@@ -145,26 +153,34 @@ static void stats_update(struct wait_stats *st, uint32_t wait_us) {
 static int cmp_u32(const void *a, const void *b) {
   uint32_t va = *(const uint32_t *)a;
   uint32_t vb = *(const uint32_t *)b;
-  if (va < vb) return -1;
-  if (va > vb) return 1;
+  if(va < vb) {
+    return -1;
+  }
+  if(va > vb) {
+    return 1;
+  }
   return 0;
 }
 
 static void stats_report(const struct wait_stats *st, char *out, size_t outlen) {
-  if (st->count == 0 || st->sample_count == 0) {
+  if(st->count == 0 || st->sample_count == 0) {
     snprintf(out, outlen, "avg=? p95=? max=?");
     return;
   }
   uint32_t *sorted = malloc(sizeof(uint32_t) * st->sample_count);
-  if (!sorted) {
+  if(!sorted) {
     snprintf(out, outlen, "avg=? p95=? max=%u", st->max_us);
     return;
   }
   memcpy(sorted, st->samples, sizeof(uint32_t) * st->sample_count);
   qsort(sorted, st->sample_count, sizeof(uint32_t), cmp_u32);
   uint32_t idx = (uint32_t)((st->sample_count * 95ull + 99ull) / 100ull);
-  if (idx == 0) idx = 1;
-  if (idx > st->sample_count) idx = st->sample_count;
+  if(idx == 0) {
+    idx = 1;
+  }
+  if(idx > st->sample_count) {
+    idx = st->sample_count;
+  }
   uint32_t p95 = sorted[idx - 1];
   free(sorted);
   ((struct wait_stats *)st)->last_p95 = p95;
@@ -183,20 +199,20 @@ static int wait_txn_idle(const char *tag, int timeout_us) {
 
 static void warmup_bus(void) {
   // Perform a few dummy operations to warm up the bus
-  for (int i = 0; i < 64; i++) {
+  for(int i = 0; i < 64; i++) {
     (void)ps_read_status_reg();
-    if ((i & 0x0f) == 0) {
+    if((i & 0x0f) == 0) {
       usleep(100);
     }
   }
 }
 
 static void reset_amiga(const char *tag) {
-  for (int attempt = 0; attempt < 3; attempt++) {
+  for(int attempt = 0; attempt < 3; attempt++) {
     ps_reset_state_machine();
     ps_pulse_reset();
     usleep(1500);
-    if (wait_txn_idle(tag, 20000) == 0) {
+    if(wait_txn_idle(tag, 20000) == 0) {
       warmup_bus();
       return;
     }
@@ -218,7 +234,7 @@ static inline void write8_raw(uint32_t address, uint8_t data, struct wait_stats 
   ps_write_8(address, data);
   clock_gettime(CLOCK_MONOTONIC, &t1);
   uint64_t us = (uint64_t)(t1.tv_sec - t0.tv_sec) * 1000000ull;
-  if (t1.tv_nsec >= t0.tv_nsec) {
+  if(t1.tv_nsec >= t0.tv_nsec) {
     us += (uint64_t)(t1.tv_nsec - t0.tv_nsec) / 1000ull;
   } else {
     us -= 1000000ull;
@@ -233,7 +249,7 @@ static inline uint8_t read8_raw(uint32_t address, struct wait_stats *st) {
   uint8_t value = ps_read_8(address);
   clock_gettime(CLOCK_MONOTONIC, &t1);
   uint64_t us = (uint64_t)(t1.tv_sec - t0.tv_sec) * 1000000ull;
-  if (t1.tv_nsec >= t0.tv_nsec) {
+  if(t1.tv_nsec >= t0.tv_nsec) {
     us += (uint64_t)(t1.tv_nsec - t0.tv_nsec) / 1000ull;
   } else {
     us -= 1000000ull;
@@ -249,7 +265,7 @@ static inline void write16_raw(uint32_t address, uint16_t data, struct wait_stat
   ps_write_16(address, data);
   clock_gettime(CLOCK_MONOTONIC, &t1);
   uint64_t us = (uint64_t)(t1.tv_sec - t0.tv_sec) * 1000000ull;
-  if (t1.tv_nsec >= t0.tv_nsec) {
+  if(t1.tv_nsec >= t0.tv_nsec) {
     us += (uint64_t)(t1.tv_nsec - t0.tv_nsec) / 1000ull;
   } else {
     us -= 1000000ull;
@@ -264,7 +280,7 @@ static inline uint16_t read16_raw(uint32_t address, struct wait_stats *st) {
   uint16_t value = ps_read_16(address);
   clock_gettime(CLOCK_MONOTONIC, &t1);
   uint64_t us = (uint64_t)(t1.tv_sec - t0.tv_sec) * 1000000ull;
-  if (t1.tv_nsec >= t0.tv_nsec) {
+  if(t1.tv_nsec >= t0.tv_nsec) {
     us += (uint64_t)(t1.tv_nsec - t0.tv_nsec) / 1000ull;
   } else {
     us -= 1000000ull;
@@ -280,7 +296,7 @@ static inline void write32_raw(uint32_t address, uint32_t data, struct wait_stat
   ps_write_32(address, data);
   clock_gettime(CLOCK_MONOTONIC, &t1);
   uint64_t us = (uint64_t)(t1.tv_sec - t0.tv_sec) * 1000000ull;
-  if (t1.tv_nsec >= t0.tv_nsec) {
+  if(t1.tv_nsec >= t0.tv_nsec) {
     us += (uint64_t)(t1.tv_nsec - t0.tv_nsec) / 1000ull;
   } else {
     us -= 1000000ull;
@@ -295,7 +311,7 @@ static inline uint32_t read32_raw(uint32_t address, struct wait_stats *st) {
   uint32_t value = ps_read_32(address);
   clock_gettime(CLOCK_MONOTONIC, &t1);
   uint64_t us = (uint64_t)(t1.tv_sec - t0.tv_sec) * 1000000ull;
-  if (t1.tv_nsec >= t0.tv_nsec) {
+  if(t1.tv_nsec >= t0.tv_nsec) {
     us += (uint64_t)(t1.tv_nsec - t0.tv_nsec) / 1000ull;
   } else {
     us -= 1000000ull;
@@ -309,15 +325,21 @@ static double bench_write8(uint32_t base, uint32_t size, int burst, int pacing_u
   uint32_t bytes = size;
   struct timespec t0, t1;
   clock_gettime(CLOCK_MONOTONIC, &t0);
-  for (uint32_t i = 0; i < bytes;) {
+  for(uint32_t i = 0; i < bytes;) {
     uint32_t todo = (uint32_t)burst;
-    if (todo > bytes - i) todo = bytes - i;
-    for (uint32_t j = 0; j < todo; j++) {
+    if(todo > bytes - i) {
+      todo = bytes - i;
+    }
+    for(uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + i + j;
       write8_raw(addr, (uint8_t)(addr ^ 0xA5u), st);
-      if (pacing_mode == PACING_TXN) pacing_delay_us(pacing_us);
+      if(pacing_mode == PACING_TXN) {
+        pacing_delay_us(pacing_us);
+      }
     }
-    if (pacing_mode == PACING_BURST) pacing_delay_us(pacing_us);
+    if(pacing_mode == PACING_BURST) {
+      pacing_delay_us(pacing_us);
+    }
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -329,16 +351,22 @@ static double bench_read8(uint32_t base, uint32_t size, int burst, int pacing_us
   struct timespec t0, t1;
   uint32_t acc = 0;
   clock_gettime(CLOCK_MONOTONIC, &t0);
-  for (uint32_t i = 0; i < bytes;) {
+  for(uint32_t i = 0; i < bytes;) {
     uint32_t todo = (uint32_t)burst;
-    if (todo > bytes - i) todo = bytes - i;
-    for (uint32_t j = 0; j < todo; j++) {
+    if(todo > bytes - i) {
+      todo = bytes - i;
+    }
+    for(uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + i + j;
       uint8_t v = read8_raw(addr, st);
       acc ^= v;
-      if (pacing_mode == PACING_TXN) pacing_delay_us(pacing_us);
+      if(pacing_mode == PACING_TXN) {
+       pacing_delay_us(pacing_us);
+      }
     }
-    if (pacing_mode == PACING_BURST) pacing_delay_us(pacing_us);
+    if(pacing_mode == PACING_BURST) {
+      pacing_delay_us(pacing_us);
+    }
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -350,15 +378,21 @@ static double bench_write16(uint32_t base, uint32_t size, int burst, int pacing_
   uint32_t words = size / 2u;
   struct timespec t0, t1;
   clock_gettime(CLOCK_MONOTONIC, &t0);
-  for (uint32_t i = 0; i < words;) {
+  for(uint32_t i = 0; i < words;) {
     uint32_t todo = (uint32_t)burst;
-    if (todo > words - i) todo = words - i;
-    for (uint32_t j = 0; j < todo; j++) {
+    if(todo > words - i) {
+      todo = words - i;
+    }
+    for(uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 2u);
       write16_raw(addr, (uint16_t)(addr ^ 0xA5A5u), st);
-      if (pacing_mode == PACING_TXN) pacing_delay_us(pacing_us);
+      if(pacing_mode == PACING_TXN) {
+        pacing_delay_us(pacing_us);
+      }
     }
-    if (pacing_mode == PACING_BURST) pacing_delay_us(pacing_us);
+    if(pacing_mode == PACING_BURST) {
+      pacing_delay_us(pacing_us);
+    }
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -370,16 +404,22 @@ static double bench_read16(uint32_t base, uint32_t size, int burst, int pacing_u
   struct timespec t0, t1;
   uint32_t acc = 0;
   clock_gettime(CLOCK_MONOTONIC, &t0);
-  for (uint32_t i = 0; i < words;) {
+  for(uint32_t i = 0; i < words;) {
     uint32_t todo = (uint32_t)burst;
-    if (todo > words - i) todo = words - i;
-    for (uint32_t j = 0; j < todo; j++) {
+    if(todo > words - i) {
+      todo = words - i;
+    }
+    for(uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 2u);
       uint16_t v = read16_raw(addr, st);
       acc ^= v;
-      if (pacing_mode == PACING_TXN) pacing_delay_us(pacing_us);
+      if(pacing_mode == PACING_TXN) {
+        pacing_delay_us(pacing_us);
+      }
     }
-    if (pacing_mode == PACING_BURST) pacing_delay_us(pacing_us);
+    if(pacing_mode == PACING_BURST) {
+      pacing_delay_us(pacing_us);
+    }
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -391,15 +431,21 @@ static double bench_write32(uint32_t base, uint32_t size, int burst, int pacing_
   uint32_t words = size / 4u;
   struct timespec t0, t1;
   clock_gettime(CLOCK_MONOTONIC, &t0);
-  for (uint32_t i = 0; i < words;) {
+  for(uint32_t i = 0; i < words;) {
     uint32_t todo = (uint32_t)burst;
-    if (todo > words - i) todo = words - i;
-    for (uint32_t j = 0; j < todo; j++) {
+    if(todo > words - i) {
+      todo = words - i;
+    }
+    for(uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 4u);
       write32_raw(addr, addr ^ 0xA5A5A5A5u, st);
-      if (pacing_mode == PACING_TXN) pacing_delay_us(pacing_us);
+      if(pacing_mode == PACING_TXN) {
+        pacing_delay_us(pacing_us);
+      }
     }
-    if (pacing_mode == PACING_BURST) pacing_delay_us(pacing_us);
+    if(pacing_mode == PACING_BURST) {
+     pacing_delay_us(pacing_us);
+    }
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -411,16 +457,22 @@ static double bench_read32(uint32_t base, uint32_t size, int burst, int pacing_u
   struct timespec t0, t1;
   uint32_t acc = 0;
   clock_gettime(CLOCK_MONOTONIC, &t0);
-  for (uint32_t i = 0; i < words;) {
+  for(uint32_t i = 0; i < words;) {
     uint32_t todo = (uint32_t)burst;
-    if (todo > words - i) todo = words - i;
-    for (uint32_t j = 0; j < todo; j++) {
+    if(todo > words - i) {
+      todo = words - i;
+    }
+    for(uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 4u);
       uint32_t v = read32_raw(addr, st);
       acc ^= v;
-      if (pacing_mode == PACING_TXN && pacing_us > 0) usleep((useconds_t)pacing_us);
+      if(pacing_mode == PACING_TXN && pacing_us > 0) {
+        usleep((useconds_t)pacing_us);
+      }
     }
-    if (pacing_mode == PACING_BURST && pacing_us > 0) usleep((useconds_t)pacing_us);
+    if(pacing_mode == PACING_BURST && pacing_us > 0) {
+      usleep((useconds_t)pacing_us);
+    }
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -429,7 +481,7 @@ static double bench_read32(uint32_t base, uint32_t size, int burst, int pacing_u
 }
 
 static void run_region(const struct region *r, int repeats, int burst, int pacing_us, int pacing_mode) {
-  if (r->size < 4u) {
+  if(r->size < 4u) {
     printf("[SKIP] %s size too small\n", r->name);
     return;
   }
@@ -444,7 +496,7 @@ static void run_region(const struct region *r, int repeats, int burst, int pacin
   uint32_t samples_w32[10000], samples_r32[10000];
   uint32_t sink = 0;
 
-  for (int i = 0; i < repeats; i++) {
+  for(int i = 0; i < repeats; i++) {
     stats_init(&st_w8, size, samples_w8, 10000);
     stats_init(&st_r8, size, samples_r8, 10000);
     stats_init(&st_w16, size / 2u, samples_w16, 10000);
@@ -457,12 +509,24 @@ static void run_region(const struct region *r, int repeats, int burst, int pacin
     double tr16 = bench_read16(r->base, size, burst, pacing_us, pacing_mode, &st_r16, &sink);
     double tw32 = bench_write32(r->base, size, burst, pacing_us, pacing_mode, &st_w32);
     double tr32 = bench_read32(r->base, size, burst, pacing_us, pacing_mode, &st_r32, &sink);
-    if (tw8 < best_w8) best_w8 = tw8;
-    if (tr8 < best_r8) best_r8 = tr8;
-    if (tw16 < best_w16) best_w16 = tw16;
-    if (tr16 < best_r16) best_r16 = tr16;
-    if (tw32 < best_w32) best_w32 = tw32;
-    if (tr32 < best_r32) best_r32 = tr32;
+    if(tw8 < best_w8) {
+      best_w8 = tw8;
+    }
+    if(tr8 < best_r8) {
+      best_r8 = tr8;
+    }
+    if(tw16 < best_w16) {
+      best_w16 = tw16;
+    }
+    if(tr16 < best_r16) {
+      best_r16 = tr16;
+    }
+    if(tw32 < best_w32) {
+      best_w32 = tw32;
+    }
+    if(tr32 < best_r32) {
+      best_r32 = tr32;
+    }
   }
 
   double mb = (double)size / (1024.0 * 1024.0);
@@ -516,7 +580,7 @@ static int run_smoke(uint32_t base, uint32_t size, int burst) {
 }
 
 static int report_error(uint32_t addr, uint16_t expected, uint16_t got, uint32_t *printed, uint32_t max_print) {
-  if (*printed < max_print) {
+  if(*printed < max_print) {
     printf("  ERR @0x%06X exp=0x%04X got=0x%04X\n", addr, expected, got);
     (*printed)++;
   }
@@ -532,44 +596,56 @@ static int memtest_region(const struct region *r) {
 
   // Address test
   printf("  Address test...\n");
-  for (uint32_t off = 0; off < size; off += 2) {
+  for(uint32_t off = 0; off < size; off += 2) {
     uint16_t v = (uint16_t)((r->base + off) >> 1);
     ps_write_16(r->base + off, v);
   }
-  for (uint32_t off = 0; off < size; off += 2) {
+  for(uint32_t off = 0; off < size; off += 2) {
     uint16_t exp = (uint16_t)((r->base + off) >> 1);
     uint16_t got = ps_read_16(r->base + off);
-    if (got != exp) {
+    if(got != exp) {
       total_errors += report_error(r->base + off, exp, got, &printed, 16);
     }
   }
 
   // Walking 1s/0s
   printf("  Walking bits...\n");
-  for (int bit = 0; bit < 16; bit++) {
+  for(int bit = 0; bit < 16; bit++) {
     uint16_t pat = (uint16_t)(1u << bit);
-    for (uint32_t off = 0; off < size; off += 2) ps_write_16(r->base + off, pat);
-    for (uint32_t off = 0; off < size; off += 2) {
+    for(uint32_t off = 0; off < size; off += 2) {
+      ps_write_16(r->base + off, pat);
+    }
+    for(uint32_t off = 0; off < size; off += 2) {
       uint16_t got = ps_read_16(r->base + off);
-      if (got != pat) total_errors += report_error(r->base + off, pat, got, &printed, 16);
+      if(got != pat) {
+        total_errors += report_error(r->base + off, pat, got, &printed, 16);
+      }
     }
     pat = (uint16_t)~pat;
-    for (uint32_t off = 0; off < size; off += 2) ps_write_16(r->base + off, pat);
-    for (uint32_t off = 0; off < size; off += 2) {
+    for(uint32_t off = 0; off < size; off += 2) {
+      ps_write_16(r->base + off, pat);
+    }
+    for(uint32_t off = 0; off < size; off += 2) {
       uint16_t got = ps_read_16(r->base + off);
-      if (got != pat) total_errors += report_error(r->base + off, pat, got, &printed, 16);
+      if(got != pat) {
+        total_errors += report_error(r->base + off, pat, got, &printed, 16);
+      }
     }
   }
 
   // Fixed patterns
   const uint16_t patterns[] = {0x0000, 0xFFFF, 0xAAAA, 0x5555, 0xA5A5, 0x5A5A};
   printf("  Fixed patterns...\n");
-  for (size_t p = 0; p < sizeof(patterns) / sizeof(patterns[0]); p++) {
+  for(size_t p = 0; p < sizeof(patterns) / sizeof(patterns[0]); p++) {
     uint16_t pat = patterns[p];
-    for (uint32_t off = 0; off < size; off += 2) ps_write_16(r->base + off, pat);
-    for (uint32_t off = 0; off < size; off += 2) {
+    for(uint32_t off = 0; off < size; off += 2) {
+      ps_write_16(r->base + off, pat);
+    }
+    for(uint32_t off = 0; off < size; off += 2) {
       uint16_t got = ps_read_16(r->base + off);
-      if (got != pat) total_errors += report_error(r->base + off, pat, got, &printed, 16);
+      if(got != pat) {
+        total_errors += report_error(r->base + off, pat, got, &printed, 16);
+      }
     }
   }
 
@@ -577,18 +653,20 @@ static int memtest_region(const struct region *r) {
   unsigned int seed = (unsigned int)time(NULL);
   printf("  Random pattern (seed=%u)...\n", seed);
   srand(seed);
-  for (uint32_t off = 0; off < size; off += 2) {
+  for(uint32_t off = 0; off < size; off += 2) {
     uint16_t pat = (uint16_t)rand();
     ps_write_16(r->base + off, pat);
   }
   srand(seed);
-  for (uint32_t off = 0; off < size; off += 2) {
+  for(uint32_t off = 0; off < size; off += 2) {
     uint16_t pat = (uint16_t)rand();
     uint16_t got = ps_read_16(r->base + off);
-    if (got != pat) total_errors += report_error(r->base + off, pat, got, &printed, 16);
+    if(got != pat) {
+      total_errors += report_error(r->base + off, pat, got, &printed, 16);
+    }
   }
 
-  if (total_errors == 0) {
+  if(total_errors == 0) {
     printf("  OK\n");
   } else {
     printf("  FAIL: %u errors (showing first %u)\n", total_errors, printed);
@@ -599,11 +677,13 @@ static int memtest_region(const struct region *r) {
 static int parse_region_arg(const char *arg, struct region *out) {
   // format: name:hex_base:size_kb (e.g., fast:0x200000:4096)
   char *tmp = strdup(arg);
-  if (!tmp) return -1;
+  if(!tmp) {
+    return -1;
+  }
   char *name = strtok(tmp, ":");
   char *base = strtok(NULL, ":");
   char *size = strtok(NULL, ":");
-  if (!name || !base || !size) {
+  if(!name || !base || !size) {
     free(tmp);
     return -1;
   }
@@ -621,7 +701,7 @@ static void usage(const char *prog) {
 }
 
 int main(int argc, char *argv[]) {
-  if (check_emulator()) {
+  if(check_emulator()) {
     printf("PiStorm emulator running, please stop this before running benchmark\n");
     return 1;
   }
@@ -640,53 +720,59 @@ int main(int argc, char *argv[]) {
   int sweep_burst = 16;
   int pacing_mode = PACING_TXN;
 
-  for (int i = 1; i < argc; i++) {
-    if (!strcmp(argv[i], "--chip-kb") && i + 1 < argc) {
+  for(int i = 1; i < argc; i++) {
+    if(!strcmp(argv[i], "--chip-kb") && i + 1 < argc) {
       chip_kb = (uint32_t)strtoul(argv[++i], NULL, 0);
-    } else if (!strcmp(argv[i], "--region") && i + 1 < argc) {
-      if (region_count < (int)(sizeof(regions) / sizeof(regions[0]))) {
-        if (parse_region_arg(argv[++i], &regions[region_count]) == 0) {
+    } else if(!strcmp(argv[i], "--region") && i + 1 < argc) {
+      if(region_count < (int)(sizeof(regions) / sizeof(regions[0]))) {
+        if(parse_region_arg(argv[++i], &regions[region_count]) == 0) {
           region_count++;
         } else {
           printf("Invalid --region format\n");
           return 1;
         }
       }
-    } else if (!strcmp(argv[i], "--repeat") && i + 1 < argc) {
+    } else if(!strcmp(argv[i], "--repeat") && i + 1 < argc) {
       repeats = atoi(argv[++i]);
-      if (repeats < 1) repeats = 1;
-    } else if (!strcmp(argv[i], "--burst") && i + 1 < argc) {
+      if(repeats < 1) {
+        repeats = 1;
+      }
+    } else if(!strcmp(argv[i], "--burst") && i + 1 < argc) {
       burst_count = 0;
       int b = atoi(argv[++i]);
-      if (b < 1) b = 1;
+      if(b < 1) {
+        b = 1;
+      }
       burst_sizes[burst_count++] = b;
-    } else if (!strcmp(argv[i], "--pacing-us") && i + 1 < argc) {
+    } else if(!strcmp(argv[i], "--pacing-us") && i + 1 < argc) {
       pacing_us = atoi(argv[++i]);
-      if (pacing_us < 0) pacing_us = 0;
-    } else if (!strcmp(argv[i], "--pacing-mode") && i + 1 < argc) {
+      if(pacing_us < 0) {
+        pacing_us = 0;
+      }
+    } else if(!strcmp(argv[i], "--pacing-mode") && i + 1 < argc) {
       const char *mode = argv[++i];
-      if (strcmp(mode, "txn") == 0) {
+      if(strcmp(mode, "txn") == 0) {
         pacing_mode = PACING_TXN;
-      } else if (strcmp(mode, "burst") == 0) {
+      } else if(strcmp(mode, "burst") == 0) {
         pacing_mode = PACING_BURST;
       } else {
         printf("Invalid --pacing-mode, expected txn|burst\n");
         return 1;
       }
-    } else if (!strcmp(argv[i], "--pacing-kind") && i + 1 < argc) {
+    } else if(!strcmp(argv[i], "--pacing-kind") && i + 1 < argc) {
       const char *kind = argv[++i];
-      if (strcmp(kind, "sleep") == 0) {
+      if(strcmp(kind, "sleep") == 0) {
         g_pacing_kind = PACING_SLEEP;
-      } else if (strcmp(kind, "spin") == 0) {
+      } else if(strcmp(kind, "spin") == 0) {
         g_pacing_kind = PACING_SPIN;
       } else {
         printf("Invalid --pacing-kind, expected sleep|spin\n");
         return 1;
       }
-    } else if (!strcmp(argv[i], "--pacing-sweep") && i + 1 < argc) {
+    } else if(!strcmp(argv[i], "--pacing-sweep") && i + 1 < argc) {
       const char *spec = argv[++i];
       int a = 0, b = 0, c = 0;
-      if (sscanf(spec, "%d:%d:%d", &a, &b, &c) != 3 || c <= 0 || a < 0 || b < a) {
+      if(sscanf(spec, "%d:%d:%d", &a, &b, &c) != 3 || c <= 0 || a < 0 || b < a) {
         printf("Invalid --pacing-sweep format, expected min:max:step\n");
         return 1;
       }
@@ -694,16 +780,20 @@ int main(int argc, char *argv[]) {
       sweep_min = a;
       sweep_max = b;
       sweep_step = c;
-    } else if (!strcmp(argv[i], "--sweep-burst") && i + 1 < argc) {
+    } else if(!strcmp(argv[i], "--sweep-burst") && i + 1 < argc) {
       sweep_burst = atoi(argv[++i]);
-      if (sweep_burst < 1) sweep_burst = 1;
-    } else if (!strcmp(argv[i], "--wait-sample") && i + 1 < argc) {
+      if(sweep_burst < 1) {
+        sweep_burst = 1;
+      }
+    } else if(!strcmp(argv[i], "--wait-sample") && i + 1 < argc) {
       int s = atoi(argv[++i]);
-      if (s < 1) s = 1;
+      if(s < 1) {
+        s = 1;
+      }
       g_wait_timing_stride = (uint32_t)s;
-    } else if (!strcmp(argv[i], "--smoke")) {
+    } else if(!strcmp(argv[i], "--smoke")) {
       smoke = 1;
-    } else if (!strcmp(argv[i], "--memtest")) {
+    } else if(!strcmp(argv[i], "--memtest")) {
       memtest = 1;
     } else {
       usage(argv[0]);
@@ -716,29 +806,29 @@ int main(int argc, char *argv[]) {
   write8(0xbfe201, 0x01); // CIA OVL
   write8(0xbfe001, 0x0000); // CIA OVL LOW
 
-  if (region_count == 0) {
+  if(region_count == 0) {
     regions[0].name = "chip";
     regions[0].base = 0x000000u;
     regions[0].size = chip_kb * SIZE_KILO;
     region_count = 1;
   }
 
-  if (smoke) {
+  if(smoke) {
     uint32_t size = 64 * SIZE_KILO;
     int burst = 16;
     printf("[SMOKE] starting\n");
     return run_smoke(regions[0].base, size, burst);
   }
 
-  if (memtest) {
+  if(memtest) {
     int any_fail = 0;
-    for (int i = 0; i < region_count; i++) {
+    for(int i = 0; i < region_count; i++) {
       any_fail |= memtest_region(&regions[i]);
     }
     return any_fail ? 1 : 0;
   }
 
-  if (sweep_enabled) {
+  if(sweep_enabled) {
     const struct region *r = &regions[0];
     uint32_t size = r->size & ~3u;
     uint32_t sink = 0;
@@ -757,11 +847,11 @@ int main(int argc, char *argv[]) {
            r->name, r->base, size / SIZE_KILO, burst, repeats, g_wait_timing_stride);
     printf("[SWEEP] pacing_us w16 r16 w32 r32 r32_16eq wait_p95 wait_max txns16 txns32 exp_delay_us16 exp_delay_us32\n");
 
-    for (int p = sweep_min; p <= sweep_max; p += sweep_step) {
+    for(int p = sweep_min; p <= sweep_max; p += sweep_step) {
       double best_w16 = 1e9, best_r16 = 1e9, best_w32 = 1e9, best_r32 = 1e9;
       uint32_t p95 = 0, max_us = 0;
 
-      for (int i = 0; i < repeats; i++) {
+      for(int i = 0; i < repeats; i++) {
         stats_init(&st_w16, size / 2u, samples_w16, 10000);
         stats_init(&st_r16, size / 2u, samples_r16, 10000);
         stats_init(&st_w32, size / 4u, samples_w32, 10000);
@@ -770,25 +860,49 @@ int main(int argc, char *argv[]) {
         double tr16 = bench_read16(r->base, size, burst, p, pacing_mode, &st_r16, &sink);
         double tw32 = bench_write32(r->base, size, burst, p, pacing_mode, &st_w32);
         double tr32 = bench_read32(r->base, size, burst, p, pacing_mode, &st_r32, &sink);
-        if (tw16 < best_w16) best_w16 = tw16;
-        if (tr16 < best_r16) best_r16 = tr16;
-        if (tw32 < best_w32) best_w32 = tw32;
-        if (tr32 < best_r32) best_r32 = tr32;
+        if(tw16 < best_w16) {
+          best_w16 = tw16;
+        }
+        if(tr16 < best_r16) {
+          best_r16 = tr16;
+        }
+        if(tw32 < best_w32) {
+          best_w32 = tw32;
+        }
+        if(tr32 < best_r32) {
+          best_r32 = tr32;
+        }
       }
 
       char tmp[64];
       stats_report(&st_w16, tmp, sizeof(tmp));
-      if (st_w16.last_p95 > p95) p95 = st_w16.last_p95;
-      if (st_w16.max_us > max_us) max_us = st_w16.max_us;
+      if(st_w16.last_p95 > p95) {
+        p95 = st_w16.last_p95;
+      }
+      if(st_w16.max_us > max_us) {
+        max_us = st_w16.max_us;
+      }
       stats_report(&st_r16, tmp, sizeof(tmp));
-      if (st_r16.last_p95 > p95) p95 = st_r16.last_p95;
-      if (st_r16.max_us > max_us) max_us = st_r16.max_us;
+      if(st_r16.last_p95 > p95) {
+        p95 = st_r16.last_p95;
+      }
+      if(st_r16.max_us > max_us) {
+        max_us = st_r16.max_us;
+      }
       stats_report(&st_w32, tmp, sizeof(tmp));
-      if (st_w32.last_p95 > p95) p95 = st_w32.last_p95;
-      if (st_w32.max_us > max_us) max_us = st_w32.max_us;
+      if(st_w32.last_p95 > p95) {
+        p95 = st_w32.last_p95;
+      }
+      if(st_w32.max_us > max_us) {
+        max_us = st_w32.max_us;
+      }
       stats_report(&st_r32, tmp, sizeof(tmp));
-      if (st_r32.last_p95 > p95) p95 = st_r32.last_p95;
-      if (st_r32.max_us > max_us) max_us = st_r32.max_us;
+      if(st_r32.last_p95 > p95) {
+        p95 = st_r32.last_p95;
+      }
+      if(st_r32.max_us > max_us) {
+        max_us = st_r32.max_us;
+      }
 
       double mb = (double)size / (1024.0 * 1024.0);
       double w16_mbs = (best_w16 > 0.0) ? (mb / best_w16) : 0.0;
@@ -800,7 +914,7 @@ int main(int argc, char *argv[]) {
       uint32_t bursts32 = (txns32 + (uint32_t)burst - 1u) / (uint32_t)burst;
       uint64_t exp_delay_us16 = 0;
       uint64_t exp_delay_us32 = 0;
-      if (pacing_mode == PACING_BURST) {
+      if(pacing_mode == PACING_BURST) {
         exp_delay_us16 = (uint64_t)bursts16 * (uint64_t)p;
         exp_delay_us32 = (uint64_t)bursts32 * (uint64_t)p;
       } else {
@@ -817,8 +931,8 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  for (int i = 0; i < region_count; i++) {
-    for (int b = 0; b < burst_count; b++) {
+  for(int i = 0; i < region_count; i++) {
+    for(int b = 0; b < burst_count; b++) {
       run_region(&regions[i], repeats, burst_sizes[b], pacing_us, pacing_mode);
     }
   }

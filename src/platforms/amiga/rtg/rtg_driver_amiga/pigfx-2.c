@@ -42,7 +42,7 @@
 #endif
 
 #ifndef CHIP_RAM_SIZE
-#define CHIP_RAM_SIZE   0x00200000u  /* default: 1MB chip RAM offset */
+#define CHIP_RAM_SIZE   0x00200000u  /* default: 2MB chip RAM offset */
 #endif
 
 #define IRTGCMD_OFFSET  (CARD_OFFSET + 0x60)
@@ -56,8 +56,10 @@
 #define WRITELONG(cmd, val)   *(volatile unsigned long  *)(CARD_OFFSET + (cmd)) = (unsigned long)(val);
 #define WRITEBYTE(cmd, val)   *(volatile unsigned char  *)(CARD_OFFSET + (cmd)) = (unsigned char)(val);
 
-#define READSHORT(cmd, var)   (var) = *(volatile unsigned short *)(CARD_OFFSET + (cmd));
-#define READLONG(cmd, var)    (var) = *(volatile unsigned long  *)(CARD_OFFSET + (cmd));
+#define READSHORT(cmd, var)   (var) = *(volatile unsigned short *)(CARD_OFFSET + (cmd)
+    );
+#define READLONG(cmd, var)    (var) = *(volatile unsigned long  *)(CARD_OFFSET + (cmd)
+    );
 
 #define RTG_DEBUGME(val)      *(volatile unsigned long  *)(CARD_OFFSET + RTG_DEBUGME) = (unsigned long)(val);
 #define IWRITECMD(val)        *(volatile unsigned short *)(IRTGCMD_OFFSET) = (unsigned short)(val);
@@ -78,47 +80,251 @@ struct GFXBase {
 
 struct ExecBase *SysBase;
 
-int FindCard(__REGA0(struct BoardInfo* b));
-int InitCard(__REGA0(struct BoardInfo* b));
+int FindCard(
+    __REGA0(struct BoardInfo* b)
+    );
 
-void SetDAC (__REGA0(struct BoardInfo *b), __REGD7(RGBFTYPE format));
-void SetGC (__REGA0(struct BoardInfo *b), __REGA1(struct ModeInfo *mode_info), __REGD0(BOOL border));
-void SetColorArray (__REGA0(struct BoardInfo *b), __REGD0(UWORD start), __REGD1(UWORD num));
-void SetPanning (__REGA0(struct BoardInfo *b), __REGA1(UBYTE *addr), __REGD0(UWORD width), __REGD1(WORD x_offset), __REGD2(WORD y_offset), __REGD7(RGBFTYPE format));
-UWORD SetSwitch (__REGA0(struct BoardInfo *b), __REGD0(UWORD enabled));
-UWORD SetDisplay (__REGA0(struct BoardInfo *b), __REGD0(UWORD enabled));
+int InitCard(
+    __REGA0(struct BoardInfo* b)
+    );
 
-UWORD CalculateBytesPerRow (__REGA0(struct BoardInfo *b), __REGD0(UWORD width), __REGD7(RGBFTYPE format));
-APTR CalculateMemory (__REGA0(struct BoardInfo *b), __REGA1(unsigned long addr), __REGD7(RGBFTYPE format));
-ULONG GetCompatibleFormats (__REGA0(struct BoardInfo *b), __REGD7(RGBFTYPE format));
+void SetDAC (
+    __REGA0(struct BoardInfo *b), 
+    __REGD7(RGBFTYPE format)
+    );
 
-LONG ResolvePixelClock (__REGA0(struct BoardInfo *b), __REGA1(struct ModeInfo *mode_info), __REGD0(ULONG pixel_clock), __REGD7(RGBFTYPE format));
-ULONG GetPixelClock (__REGA0(struct BoardInfo *b), __REGA1(struct ModeInfo *mode_info), __REGD0(ULONG index), __REGD7(RGBFTYPE format));
-void SetClock (__REGA0(struct BoardInfo *b));
+void SetGC (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct ModeInfo *mode_info), 
+    __REGD0(BOOL border)
+    );
 
-void SetMemoryMode (__REGA0(struct BoardInfo *b), __REGD7(RGBFTYPE format));
-void SetWriteMask (__REGA0(struct BoardInfo *b), __REGD0(UBYTE mask));
-void SetClearMask (__REGA0(struct BoardInfo *b), __REGD0(UBYTE mask));
-void SetReadPlane (__REGA0(struct BoardInfo *b), __REGD0(UBYTE plane));
+void SetColorArray (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(UWORD start), 
+    __REGD1(UWORD num)
+    );
 
-void WaitVerticalSync (__REGA0(struct BoardInfo *b), __REGD0(BOOL toggle));
-BOOL GetVSyncState(__REGA0(struct BoardInfo *b), __REGD0(BOOL toggle));
+void SetPanning (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(UBYTE *addr), 
+    __REGD0(UWORD width), 
+    __REGD1(WORD x_offset), 
+    __REGD2(WORD y_offset), 
+    __REGD7(RGBFTYPE format)
+    );
 
-void FillRect (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __REGD0(WORD x), __REGD1(WORD y), __REGD2(WORD w), __REGD3(WORD h), __REGD4(ULONG color), __REGD5(UBYTE mask), __REGD7(RGBFTYPE format));
-void InvertRect (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __REGD0(WORD x), __REGD1(WORD y), __REGD2(WORD w), __REGD3(WORD h), __REGD4(UBYTE mask), __REGD7(RGBFTYPE format));
-void BlitRect (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __REGD0(WORD x), __REGD1(WORD y), __REGD2(WORD dx), __REGD3(WORD dy), __REGD4(WORD w), __REGD5(WORD h), __REGD6(UBYTE mask), __REGD7(RGBFTYPE format));
-void BlitRectNoMaskComplete (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *rs), __REGA2(struct RenderInfo *rt), __REGD0(WORD x), __REGD1(WORD y), __REGD2(WORD dx), __REGD3(WORD dy), __REGD4(WORD w), __REGD5(WORD h), __REGD6(UBYTE minterm), __REGD7(RGBFTYPE format));
-void BlitTemplate (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __REGA2(struct Template *t), __REGD0(WORD x), __REGD1(WORD y), __REGD2(WORD w), __REGD3(WORD h), __REGD4(UBYTE mask), __REGD7(RGBFTYPE format));
-void BlitPattern (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __REGA2(struct Pattern *p), __REGD0(WORD x), __REGD1(WORD y), __REGD2(WORD w), __REGD3(WORD h), __REGD4(UBYTE mask), __REGD7(RGBFTYPE format));
-void DrawLine (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __REGA2(struct Line *l), __REGD0(UBYTE mask), __REGD7(RGBFTYPE format));
+UWORD SetSwitch (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(UWORD enabled)
+    );
 
-void BlitPlanar2Chunky (__REGA0(struct BoardInfo *b), __REGA1(struct BitMap *bm), __REGA2(struct RenderInfo *r), __REGD0(SHORT x), __REGD1(SHORT y), __REGD2(SHORT dx), __REGD3(SHORT dy), __REGD4(SHORT w), __REGD5(SHORT h), __REGD6(UBYTE minterm), __REGD7(UBYTE mask));
-void BlitPlanar2Direct (__REGA0(struct BoardInfo *b), __REGA1(struct BitMap *bmp), __REGA2(struct RenderInfo *r), __REGA3(struct ColorIndexMapping *clut), __REGD0(SHORT x), __REGD1(SHORT y), __REGD2(SHORT dx), __REGD3(SHORT dy), __REGD4(SHORT w), __REGD5(SHORT h), __REGD6(UBYTE minterm), __REGD7(UBYTE mask));
+UWORD SetDisplay (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(UWORD enabled)
+    );
 
-void SetSprite (__REGA0(struct BoardInfo *b), __REGD0(BOOL what), __REGD7(RGBFTYPE format));
-void SetSpritePosition (__REGA0(struct BoardInfo *b), __REGD0(WORD x), __REGD1(WORD y), __REGD7(RGBFTYPE format));
-void SetSpriteImage (__REGA0(struct BoardInfo *b), __REGD7(RGBFTYPE format));
-void SetSpriteColor (__REGA0(struct BoardInfo *b), __REGD0(UBYTE idx), __REGD1(UBYTE R), __REGD2(UBYTE G), __REGD3(UBYTE B), __REGD7(RGBFTYPE format));
+UWORD CalculateBytesPerRow (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(UWORD width), 
+    __REGD7(RGBFTYPE format)
+    );
+
+APTR CalculateMemory (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(unsigned long addr), 
+    __REGD7(RGBFTYPE format)
+    );
+
+ULONG GetCompatibleFormats (
+    __REGA0(struct BoardInfo *b), 
+    __REGD7(RGBFTYPE format)
+    );
+
+LONG ResolvePixelClock (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct ModeInfo *mode_info), 
+    __REGD0(ULONG pixel_clock), 
+    __REGD7(RGBFTYPE format)
+    );
+
+ULONG GetPixelClock (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct ModeInfo *mode_info), 
+    __REGD0(ULONG index), 
+    __REGD7(RGBFTYPE format)
+    );
+
+void SetClock (
+    __REGA0(struct BoardInfo *b)
+    );
+
+void SetMemoryMode (
+    __REGA0(struct BoardInfo *b), 
+    __REGD7(RGBFTYPE format)
+    );
+
+void SetWriteMask (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(UBYTE mask)
+    );
+
+void SetClearMask (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(UBYTE mask)
+    );
+
+void SetReadPlane (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(UBYTE plane)
+    );
+
+void WaitVerticalSync (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(BOOL toggle)
+    );
+BOOL GetVSyncState(
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(BOOL toggle)
+    );
+
+void FillRect (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct RenderInfo *r), 
+    __REGD0(WORD x), 
+    __REGD1(WORD y), 
+    __REGD2(WORD w), 
+    __REGD3(WORD h), 
+    __REGD4(ULONG color), 
+    __REGD5(UBYTE mask), 
+    __REGD7(RGBFTYPE format)
+    );
+
+void InvertRect (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct RenderInfo *r), 
+    __REGD0(WORD x), 
+    __REGD1(WORD y), 
+    __REGD2(WORD w), 
+    __REGD3(WORD h), 
+    __REGD4(UBYTE mask), 
+    __REGD7(RGBFTYPE format)
+    );
+
+void BlitRect (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct RenderInfo *r), 
+    __REGD0(WORD x), 
+    __REGD1(WORD y), 
+    __REGD2(WORD dx), 
+    __REGD3(WORD dy), 
+    __REGD4(WORD w), 
+    __REGD5(WORD h), 
+    __REGD6(UBYTE mask), 
+    __REGD7(RGBFTYPE format)
+    );
+
+void BlitRectNoMaskComplete (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct RenderInfo *rs), 
+    __REGA2(struct RenderInfo *rt), 
+    __REGD0(WORD x), 
+    __REGD1(WORD y), 
+    __REGD2(WORD dx), 
+    __REGD3(WORD dy), 
+    __REGD4(WORD w), 
+    __REGD5(WORD h), 
+    __REGD6(UBYTE minterm), 
+    __REGD7(RGBFTYPE format)
+    );
+
+void BlitTemplate (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct RenderInfo *r), 
+    __REGA2(struct Template *t), 
+    __REGD0(WORD x), 
+    __REGD1(WORD y), 
+    __REGD2(WORD w), 
+    __REGD3(WORD h), 
+    __REGD4(UBYTE mask), 
+    __REGD7(RGBFTYPE format)
+    );
+
+void BlitPattern (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct RenderInfo *r), 
+    __REGA2(struct Pattern *p), 
+    __REGD0(WORD x), 
+    __REGD1(WORD y), 
+    __REGD2(WORD w), 
+    __REGD3(WORD h), 
+    __REGD4(UBYTE mask), 
+    __REGD7(RGBFTYPE format)
+    );
+
+void DrawLine (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct RenderInfo *r), 
+    __REGA2(struct Line *l), 
+    __REGD0(UBYTE mask), 
+    __REGD7(RGBFTYPE format)
+    );
+
+void BlitPlanar2Chunky (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct BitMap *bm), 
+    __REGA2(struct RenderInfo *r), 
+    __REGD0(SHORT x), 
+    __REGD1(SHORT y), 
+    __REGD2(SHORT dx), 
+    __REGD3(SHORT dy), 
+    __REGD4(SHORT w), 
+    __REGD5(SHORT h), 
+    __REGD6(UBYTE minterm), 
+    __REGD7(UBYTE mask)
+    );
+
+void BlitPlanar2Direct (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct BitMap *bmp), 
+    __REGA2(struct RenderInfo *r), 
+    __REGA3(struct ColorIndexMapping *clut), 
+    __REGD0(SHORT x), 
+    __REGD1(SHORT y), 
+    __REGD2(SHORT dx), 
+    __REGD3(SHORT dy), 
+    __REGD4(SHORT w), 
+    __REGD5(SHORT h), 
+    __REGD6(UBYTE minterm), 
+    __REGD7(UBYTE mask)
+    );
+
+void SetSprite (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(BOOL what), 
+    __REGD7(RGBFTYPE format)
+    );
+
+void SetSpritePosition (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(WORD x), 
+    __REGD1(WORD y), 
+    __REGD7(RGBFTYPE format)
+    );
+
+void SetSpriteImage (
+    __REGA0(struct BoardInfo *b), 
+    __REGD7(RGBFTYPE format)
+    );
+
+void SetSpriteColor (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(UBYTE idx), 
+    __REGD1(UBYTE R), 
+    __REGD2(UBYTE G), 
+    __REGD3(UBYTE B), 
+    __REGD7(RGBFTYPE format)
+    );
 
 #define DEVICE_VERSION 43
 #define DEVICE_REVISION 20
@@ -128,8 +334,7 @@ void SetSpriteColor (__REGA0(struct BoardInfo *b), __REGD0(UBYTE idx), __REGD1(U
 #define DEVICE_DATE "(29 May 2021)"
 
 
-int __attribute__((no_reorder)) _start()
-{
+int __attribute__((no_reorder)) _start() {
         return -1;
 }
 
@@ -149,13 +354,25 @@ asm("romtag:                                    \n"
 char device_name[] = DEVICE_NAME;
 char device_id_string[] = DEVICE_ID_STRING;
 
-__saveds struct GFXBase* OpenLib(__REGA6(struct GFXBase *gfxbase));
-BPTR __saveds CloseLib(__REGA6(struct GFXBase *gfxbase));
-BPTR __saveds ExpungeLib(__REGA6(struct GFXBase *exb));
+__saveds struct GFXBase* OpenLib(
+    __REGA6(struct GFXBase *gfxbase)
+    );
+
+BPTR __saveds CloseLib(
+    __REGA6(struct GFXBase *gfxbase)
+    );
+
+BPTR __saveds ExpungeLib(
+    __REGA6(struct GFXBase *exb)
+    );
+
 ULONG ExtFuncLib(void);
-__saveds struct GFXBase* InitLib(__REGA6(struct ExecBase *sysbase),
-                                                                 __REGA0(BPTR seglist),
-                                                                 __REGD0(struct GFXBase *exb));
+
+__saveds struct GFXBase* InitLib(
+    __REGA6(struct ExecBase *sysbase),                                                                 
+    __REGA0(BPTR seglist),                                                                 
+    __REGD0(struct GFXBase *exb)
+    );
 
 #define CLOCK_HZ 100000000
 
@@ -163,27 +380,26 @@ static struct GFXBase *_gfxbase;
 const char *gfxname = "PiStorm RTG";
 char dummies[128];
 
-__saveds struct GFXBase* __attribute__((used)) InitLib(__REGA6(struct ExecBase *sysbase),
-                                                       __REGA0(BPTR seglist),
-                                                       __REGD0(struct GFXBase *exb))
-{
+__saveds struct GFXBase* __attribute__((used)) InitLib(
+    __REGA6(struct ExecBase *sysbase),                                                       
+    __REGA0(BPTR seglist),                                                       
+    __REGD0(struct GFXBase *exb)
+    ) {
     _gfxbase = exb;
     SysBase = *(struct ExecBase **)4L;
     return _gfxbase;
 }
 
-__saveds struct GFXBase* __attribute__((used)) OpenLib(__REGA6(struct GFXBase *gfxbase))
-{
+__saveds struct GFXBase* __attribute__((used)) OpenLib(
+    __REGA6(struct GFXBase *gfxbase)) {
     gfxbase->libNode.lib_OpenCnt++;
     gfxbase->libNode.lib_Flags &= ~LIBF_DELEXP;
-
     return gfxbase;
 }
 
-BPTR __saveds __attribute__((used)) CloseLib(__REGA6(struct GFXBase *gfxbase))
-{
+BPTR __saveds __attribute__((used)) CloseLib(
+    __REGA6(struct GFXBase *gfxbase)) {
     gfxbase->libNode.lib_OpenCnt--;
-
     if (!gfxbase->libNode.lib_OpenCnt) {
         if (gfxbase->libNode.lib_Flags & LIBF_DELEXP) {
             return (ExpungeLib(gfxbase));
@@ -192,8 +408,8 @@ BPTR __saveds __attribute__((used)) CloseLib(__REGA6(struct GFXBase *gfxbase))
     return 0;
 }
 
-BPTR __saveds __attribute__((used)) ExpungeLib(__REGA6(struct GFXBase *exb))
-{
+BPTR __saveds __attribute__((used)) ExpungeLib(
+    __REGA6(struct GFXBase *exb)) {
     BPTR seglist;
     struct ExecBase *SysBase = *(struct ExecBase **)4L;
 
@@ -218,8 +434,7 @@ BPTR __saveds __attribute__((used)) ExpungeLib(__REGA6(struct GFXBase *exb))
     return 0;
 }
 
-ULONG ExtFuncLib(void)
-{
+ULONG ExtFuncLib(void) {
     return 0;
 }
 
@@ -228,7 +443,8 @@ ULONG ExtFuncLib(void)
         return 0; \
     } \
 
-int __attribute__((used)) FindCard(__REGA0(struct BoardInfo* b)) {
+int __attribute__((used)) FindCard(
+    __REGA0(struct BoardInfo* b)) {
     uint16_t card_check = CHECKRTG;
     if (card_check != 0xFFCF) {
         // RTG not enabled
@@ -236,14 +452,14 @@ int __attribute__((used)) FindCard(__REGA0(struct BoardInfo* b)) {
     }
 
     struct IORequest io;
-    if (OpenDevice((STRPTR)"input.device", 0, &io, 0) == 0)
-    {
+    if (OpenDevice((STRPTR)"input.device", 0, &io, 0) == 0) {
         struct Library *InputBase = (struct Library *)io.io_Device;
         UWORD qual = PeekQualifier();
         CloseDevice(&io);
 
-        if (qual & (IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT))
+        if (qual & (IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT)) {
             return(FALSE);
+        }
     }
 
     struct ExpansionBase *ExpansionBase = NULL;
@@ -261,7 +477,8 @@ int __attribute__((used)) FindCard(__REGA0(struct BoardInfo* b)) {
     return 1;
 }
 
-int __attribute__((used)) InitCard(__REGA0(struct BoardInfo* b)) {
+int __attribute__((used)) InitCard(
+    __REGA0(struct BoardInfo* b)) {
     int i;
 
     b->CardBase = (struct CardBase *)_gfxbase;
@@ -352,12 +569,17 @@ int __attribute__((used)) InitCard(__REGA0(struct BoardInfo* b)) {
     return 1;
 }
 
-void SetDAC (__REGA0(struct BoardInfo *b), __REGD7(RGBFTYPE format)) {
+void SetDAC (
+    __REGA0(struct BoardInfo *b), 
+    __REGD7(RGBFTYPE format)) {
     // Used to set the color format of the video card's RAMDAC.
     // This needs no handling, since the PiStorm doesn't really have a RAMDAC or a video card chipset.
 }
 
-void SetGC (__REGA0(struct BoardInfo *b), __REGA1(struct ModeInfo *mode_info), __REGD0(BOOL border)) {
+void SetGC (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct ModeInfo *mode_info), 
+    __REGD0(BOOL border)) {
     b->ModeInfo = mode_info;
     // Send width, height and format to the RaspberryPi Targetable Graphics.
     WRITESHORT(RTG_X1, mode_info->Width);
@@ -367,7 +589,10 @@ void SetGC (__REGA0(struct BoardInfo *b), __REGA1(struct ModeInfo *mode_info), _
 }
 
 int setswitch = -1;
-UWORD SetSwitch (__REGA0(struct BoardInfo *b), __REGD0(UWORD enabled)) {
+UWORD SetSwitch (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(UWORD enabled)
+    ) {
     if (setswitch != enabled) {
         setswitch = enabled;
     }
@@ -379,12 +604,19 @@ UWORD SetSwitch (__REGA0(struct BoardInfo *b), __REGD0(UWORD enabled)) {
     return 1 - enabled;
 }
 
-void SetPanning (__REGA0(struct BoardInfo *b), __REGA1(UBYTE *addr), __REGD0(UWORD width), __REGD1(WORD x_offset), __REGD2(WORD y_offset), __REGD7(RGBFTYPE format)) {
+void SetPanning (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(UBYTE *addr), 
+    __REGD0(UWORD width), 
+    __REGD1(WORD x_offset), 
+    __REGD2(WORD y_offset), 
+    __REGD7(RGBFTYPE format)) {
     // Set the panning offset, or the offset used for the current display area on the Pi.
     // The address needs to have CARD_BASE subtracted from it to be used as an offset on the Pi side.
 #ifndef IRTG
-    if (!b)
+    if (!b) {
         return;
+    }
 
     b->XOffset = x_offset;
     b->YOffset = y_offset;
@@ -400,10 +632,14 @@ void SetPanning (__REGA0(struct BoardInfo *b), __REGA1(UBYTE *addr), __REGD0(UWO
 #endif
 }
 
-void SetColorArray (__REGA0(struct BoardInfo *b), __REGD0(UWORD start), __REGD1(UWORD num)) {
+void SetColorArray (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(UWORD start), 
+    __REGD1(UWORD num)) {
     // Sets the color components of X color components for 8-bit paletted display modes.
-    if (!b->CLUT)
+    if (!b->CLUT) {
         return;
+    }
     
     int j = start + num;
     
@@ -418,12 +654,15 @@ void SetColorArray (__REGA0(struct BoardInfo *b), __REGD0(UWORD start), __REGD1(
     }
 }
 
-UWORD CalculateBytesPerRow(__REGA0(struct BoardInfo *b),
-                           __REGD0(UWORD width),
-                           __REGD7(RGBFTYPE format))
-{
-    if (!b)
+UWORD CalculateBytesPerRow(
+    __REGA0(struct BoardInfo *b),
+                           
+    __REGD0(UWORD width),
+                           
+    __REGD7(RGBFTYPE format)) {
+    if (!b) {
         return 0;
+    }
 
     switch (format) {
     case RGBFB_CLUT:
@@ -461,23 +700,34 @@ UWORD CalculateBytesPerRow(__REGA0(struct BoardInfo *b),
 
 
 
-APTR CalculateMemory (__REGA0(struct BoardInfo *b), __REGA1(unsigned long addr), __REGD7(RGBFTYPE format)) {
-    /*if (!b)
+APTR CalculateMemory (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(unsigned long addr), 
+    __REGD7(RGBFTYPE format)
+    ) {
+    /* was commented out */ 
+    if (!b){
         return (APTR)addr;
+    }
 
     if (addr > (unsigned int)b->MemoryBase && addr < (((unsigned int)b->MemoryBase) + b->MemorySize)) {
         addr = ((addr + 0x1000) & 0xFFFFF000);
-    }*/
+    } /* was commented out */ 
 
     return (APTR)addr;
 }
 
-ULONG GetCompatibleFormats (__REGA0(struct BoardInfo *b), __REGD7(RGBFTYPE format)) {
+ULONG GetCompatibleFormats (
+    __REGA0(struct BoardInfo *b), 
+    __REGD7(RGBFTYPE format)) {
     return 0xFFFFFFFF;
 }
 
 //static int display_enabled = 0;
-UWORD SetDisplay (__REGA0(struct BoardInfo *b), __REGD0(UWORD enabled)) {
+UWORD SetDisplay (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(UWORD enabled)
+    ) {
     // Enables or disables the display.
     WRITEBYTE(RTG_U82, (unsigned char)enabled);
     WRITESHORT(RTG_COMMAND, RTGCMD_SETDISPLAY);
@@ -485,7 +735,12 @@ UWORD SetDisplay (__REGA0(struct BoardInfo *b), __REGD0(UWORD enabled)) {
     return 1;
 }
 
-LONG ResolvePixelClock (__REGA0(struct BoardInfo *b), __REGA1(struct ModeInfo *mode_info), __REGD0(ULONG pixel_clock), __REGD7(RGBFTYPE format)) {
+LONG ResolvePixelClock (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct ModeInfo *mode_info), 
+    __REGD0(ULONG pixel_clock), 
+    __REGD7(RGBFTYPE format)
+    ) {
     mode_info->PixelClock = CLOCK_HZ;
     mode_info->pll1.Clock = 0;
     mode_info->pll2.ClockDivide = 1;
@@ -493,45 +748,79 @@ LONG ResolvePixelClock (__REGA0(struct BoardInfo *b), __REGA1(struct ModeInfo *m
     return 0;
 }
 
-ULONG GetPixelClock (__REGA0(struct BoardInfo *b), __REGA1(struct ModeInfo *mode_info), __REGD0(ULONG index), __REGD7(RGBFTYPE format)) {
+ULONG GetPixelClock (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct ModeInfo *mode_info), 
+    __REGD0(ULONG index), 
+    __REGD7(RGBFTYPE format)
+    ) {
     // Just return 100MHz.
     return CLOCK_HZ;
 }
 
 // None of these five really have to do anything.
-void SetClock (__REGA0(struct BoardInfo *b)) {
+void SetClock (
+    __REGA0(struct BoardInfo *b)
+    ) { /*nothing to do here*/ }
+
+void SetMemoryMode (
+    __REGA0(struct BoardInfo *b), 
+    __REGD7(RGBFTYPE format)
+    ) { /*nothing to do here*/ }
+
+
+void SetWriteMask (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(UBYTE mask)) {
 }
 
-void SetMemoryMode (__REGA0(struct BoardInfo *b), __REGD7(RGBFTYPE format)) {
-}
+void SetClearMask (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(UBYTE mask)
+    ) { /*nothing to do here*/ }
 
-void SetWriteMask (__REGA0(struct BoardInfo *b), __REGD0(UBYTE mask)) {
-}
 
-void SetClearMask (__REGA0(struct BoardInfo *b), __REGD0(UBYTE mask)) {
-}
+void SetReadPlane (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(UBYTE plane)
+    ) { /*nothing to do here*/ }
 
-void SetReadPlane (__REGA0(struct BoardInfo *b), __REGD0(UBYTE plane)) {
-}
 
 static uint16_t vblank;
 
-void WaitVerticalSync (__REGA0(struct BoardInfo *b), __REGD0(BOOL toggle)) {
+void WaitVerticalSync (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(BOOL toggle)
+    ) {
     vblank = 0;
     do {
         READSHORT(RTG_WAITVSYNC, vblank);
     } while (!vblank);
 }
 
-BOOL GetVSyncState(__REGA0(struct BoardInfo *b), __REGD0(BOOL toggle)) {
+BOOL GetVSyncState(
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(BOOL toggle)
+    ) {
     READSHORT(RTG_INVBLANK, vblank);
     return vblank;
 }
 
-void FillRect (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __REGD0(WORD x), __REGD1(WORD y), __REGD2(WORD w), __REGD3(WORD h), __REGD4(ULONG color), __REGD5(UBYTE mask), __REGD7(RGBFTYPE format)) {
+void FillRect (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct RenderInfo *r), 
+    __REGD0(WORD x), 
+    __REGD1(WORD y), 
+    __REGD2(WORD w), 
+    __REGD3(WORD h), 
+    __REGD4(ULONG color), 
+    __REGD5(UBYTE mask), 
+    __REGD7(RGBFTYPE format)
+    ) {
 #ifndef IRTG
-    if (!r)
+    if (!r) {
         return;
+    }
 
     WRITELONG(RTG_ADDR1, (unsigned long)r->Memory);
     
@@ -549,10 +838,20 @@ void FillRect (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __RE
 #endif
 }
 
-void InvertRect (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __REGD0(WORD x), __REGD1(WORD y), __REGD2(WORD w), __REGD3(WORD h), __REGD4(UBYTE mask), __REGD7(RGBFTYPE format)) {
+void InvertRect (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct RenderInfo *r), 
+    __REGD0(WORD x), 
+    __REGD1(WORD y), 
+    __REGD2(WORD w), 
+    __REGD3(WORD h), 
+    __REGD4(UBYTE mask), 
+    __REGD7(RGBFTYPE format)
+    ) {
 #ifndef IRTG
-    if (!r)
+    if (!r) {
         return;
+    }
     
     WRITELONG(RTG_ADDR1, (unsigned long)r->Memory);
     
@@ -569,10 +868,22 @@ void InvertRect (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __
 #endif
 }
 
-void BlitRect (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __REGD0(WORD x), __REGD1(WORD y), __REGD2(WORD dx), __REGD3(WORD dy), __REGD4(WORD w), __REGD5(WORD h), __REGD6(UBYTE mask), __REGD7(RGBFTYPE format)) {
+void BlitRect (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct RenderInfo *r), 
+    __REGD0(WORD x), 
+    __REGD1(WORD y), 
+    __REGD2(WORD dx), 
+    __REGD3(WORD dy), 
+    __REGD4(WORD w), 
+    __REGD5(WORD h), 
+    __REGD6(UBYTE mask), 
+    __REGD7(RGBFTYPE format)
+    ) {
 #ifndef IRTG    
-    if (!r)
+    if (!r) {
         return;
+    }
 
     WRITELONG(RTG_ADDR1, (unsigned long)r->Memory);
 
@@ -591,10 +902,22 @@ void BlitRect (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __RE
 #endif
 }
 
-void BlitRectNoMaskComplete (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *rs), __REGA2(struct RenderInfo *rt), __REGD0(WORD x), __REGD1(WORD y), __REGD2(WORD dx), __REGD3(WORD dy), __REGD4(WORD w), __REGD5(WORD h), __REGD6(UBYTE minterm), __REGD7(RGBFTYPE format)) {
+void BlitRectNoMaskComplete (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct RenderInfo *rs), 
+    __REGA2(struct RenderInfo *rt), 
+    __REGD0(WORD x), 
+    __REGD1(WORD y), 
+    __REGD2(WORD dx), 
+    __REGD3(WORD dy), 
+    __REGD4(WORD w), 
+    __REGD5(WORD h), 
+    __REGD6(UBYTE minterm), 
+    __REGD7(RGBFTYPE format)) {
 #ifndef IRTG
-    if (!rs || !rt)
+    if (!rs || !rt) {
         return;
+    }
 
     WRITESHORT(RTG_FORMAT, rgbf_to_rtg[format]);
     WRITELONG(RTG_ADDR1, (unsigned long)rs->Memory);
@@ -614,10 +937,23 @@ void BlitRectNoMaskComplete (__REGA0(struct BoardInfo *b), __REGA1(struct Render
 #endif
 }
 
-void BlitTemplate (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __REGA2(struct Template *t), __REGD0(WORD x), __REGD1(WORD y), __REGD2(WORD w), __REGD3(WORD h), __REGD4(UBYTE mask), __REGD7(RGBFTYPE format)) {
+void BlitTemplate (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct RenderInfo *r), 
+    __REGA2(struct Template *t), 
+    __REGD0(WORD x), 
+    __REGD1(WORD y), 
+    __REGD2(WORD w), 
+    __REGD3(WORD h), 
+    __REGD4(UBYTE mask), 
+    __REGD7(RGBFTYPE format)) {
 #ifndef IRTG
-    if (!r || !t) return;
-    if (w < 1 || h < 1) return;
+    if (!r || !t) {
+        return;
+    }
+    if (w < 1 || h < 1) {
+        return;
+    }
 
     WRITELONG(RTG_ADDR2, (unsigned long)r->Memory);
 
@@ -631,10 +967,10 @@ void BlitTemplate (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), 
 
     if ((unsigned long)t->Memory > CHIP_RAM_SIZE) {
         WRITELONG(RTG_ADDR1, (unsigned long)t->Memory);
-    }
-    else {
+    } else {
         unsigned long dest = CARD_SCRATCH;
-        memcpy((unsigned char *)dest, t->Memory, (t->BytesPerRow * h));
+        memcpy((unsigned char *)dest, t->Memory, (t->BytesPerRow * h)
+    );
         WRITELONG(RTG_ADDR1, (unsigned long)dest);
         WRITELONG(RTG_ADDR3, (unsigned long)t->Memory);
     }
@@ -653,10 +989,23 @@ void BlitTemplate (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), 
 #endif
 }
 
-void BlitPattern (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __REGA2(struct Pattern *p), __REGD0(WORD x), __REGD1(WORD y), __REGD2(WORD w), __REGD3(WORD h), __REGD4(UBYTE mask), __REGD7(RGBFTYPE format)) {
+void BlitPattern (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct RenderInfo *r), 
+    __REGA2(struct Pattern *p), 
+    __REGD0(WORD x), 
+    __REGD1(WORD y), 
+    __REGD2(WORD w), 
+    __REGD3(WORD h), 
+    __REGD4(UBYTE mask), 
+    __REGD7(RGBFTYPE format)) {
 #ifndef IRTG
-    if (!r || !p) return;
-    if (w < 1 || h < 1) return;
+    if (!r || !p) {
+        return;
+    }
+    if (w < 1 || h < 1) {
+        return;
+    }
 
     WRITELONG(RTG_ADDR2, (unsigned long)r->Memory);
 
@@ -670,10 +1019,10 @@ void BlitPattern (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), _
 
     if ((unsigned long)p->Memory > CHIP_RAM_SIZE) {
         WRITELONG(RTG_ADDR1, (unsigned long)p->Memory);
-    }
-    else {
+    } else {
         unsigned long dest = CARD_SCRATCH;
-        memcpy((unsigned char *)dest, p->Memory, (2 * (1 << p->Size)));
+        memcpy((unsigned char *)dest, p->Memory, (2 * (1 << p->Size))
+    );
         WRITELONG(RTG_ADDR1, (unsigned long)dest);
     }
 
@@ -681,20 +1030,29 @@ void BlitPattern (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), _
     WRITELONG(RTG_RGB2, p->BgPen);
 
     WRITESHORT(RTG_X4, r->BytesPerRow);
-    WRITESHORT(RTG_X5, (1 << p->Size));
+    WRITESHORT(RTG_X5, (1 << p->Size)
+    );
 
     WRITEBYTE(RTG_U81, mask);
     WRITEBYTE(RTG_U82, p->DrawMode);
-    WRITEBYTE(RTG_U83, (1 << p->Size));
+    WRITEBYTE(RTG_U83, (1 << p->Size)
+    );
     WRITESHORT(RTG_COMMAND, RTGCMD_BLITPATTERN);
 #else
     IWRITECMD(RTGCMD_BLITPATTERN);
 #endif
 }
 
-void DrawLine (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __REGA2(struct Line *l), __REGD0(UBYTE mask), __REGD7(RGBFTYPE format)) {
+void DrawLine (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct RenderInfo *r), 
+    __REGA2(struct Line *l), 
+    __REGD0(UBYTE mask), 
+    __REGD7(RGBFTYPE format)) {
 #ifndef IRTG
-    if (!r || !b) return;
+    if (!r || !b) {
+        return;
+    }
 
     WRITELONG(RTG_ADDR1, (unsigned long)r->Memory);
 
@@ -723,7 +1081,18 @@ void DrawLine (__REGA0(struct BoardInfo *b), __REGA1(struct RenderInfo *r), __RE
 #endif
 }
 
-void BlitPlanar2Chunky (__REGA0(struct BoardInfo *b), __REGA1(struct BitMap *bm), __REGA2(struct RenderInfo *r), __REGD0(SHORT x), __REGD1(SHORT y), __REGD2(SHORT dx), __REGD3(SHORT dy), __REGD4(SHORT w), __REGD5(SHORT h), __REGD6(UBYTE minterm), __REGD7(UBYTE mask)) {
+void BlitPlanar2Chunky (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct BitMap *bm), 
+    __REGA2(struct RenderInfo *r), 
+    __REGD0(SHORT x), 
+    __REGD1(SHORT y), 
+    __REGD2(SHORT dx), 
+    __REGD3(SHORT dy), 
+    __REGD4(SHORT w), 
+    __REGD5(SHORT h), 
+    __REGD6(UBYTE minterm), 
+    __REGD7(UBYTE mask)) {
 // iRTG path disabled for now, since it's really slow, see note in rtg-gfx.c.
 //#ifndef IRTG    
     if (!b || !r)
@@ -755,8 +1124,7 @@ void BlitPlanar2Chunky (__REGA0(struct BoardInfo *b), __REGA1(struct BitMap *bm)
         if ((uint32_t)bm->Planes[i] == 0xFFFFFFFF) {
             uint8_t* dest = (uint8_t*)((uint32_t)template_addr);
             memset(dest, 0xFF, output_plane_size);
-        }
-        else if (bm->Planes[i] != NULL) {
+        } else if (bm->Planes[i] != NULL) {
             uint8_t* bmp_mem = (uint8_t*)bm->Planes[i] + (y * bm->BytesPerRow) + x_offset;
             uint8_t* dest = (uint8_t*)((uint32_t)template_addr);
             for (int16_t y_line = 0; y_line < h; y_line++) {
@@ -764,22 +1132,23 @@ void BlitPlanar2Chunky (__REGA0(struct BoardInfo *b), __REGA1(struct BitMap *bm)
                 dest += line_size;
                 bmp_mem += bm->BytesPerRow;
             }
-        }
-        else {
+        } else {
             plane_mask &= (cur_plane ^ 0xFF);
         }
         cur_plane <<= 1;
         template_addr += output_plane_size;
     }
 
-    WRITESHORT(RTG_X1, (x & 0x07));
+    WRITESHORT(RTG_X1, (x & 0x07)
+    );
     WRITESHORT(RTG_X2, dx);
     WRITESHORT(RTG_X3, w);
     WRITESHORT(RTG_Y1, 0);
     WRITESHORT(RTG_Y2, dy);
     WRITESHORT(RTG_Y3, h);
 
-    WRITESHORT(RTG_U1, (plane_mask << 8 | ff_mask));
+    WRITESHORT(RTG_U1, (plane_mask << 8 | ff_mask)
+    );
     WRITEBYTE(RTG_U83, bm->Depth);
 
     WRITESHORT(RTG_COMMAND, RTGCMD_P2C);
@@ -788,9 +1157,22 @@ void BlitPlanar2Chunky (__REGA0(struct BoardInfo *b), __REGA1(struct BitMap *bm)
 //#endif
 }
 
-void BlitPlanar2Direct (__REGA0(struct BoardInfo *b), __REGA1(struct BitMap *bm), __REGA2(struct RenderInfo *r), __REGA3(struct ColorIndexMapping *clut), __REGD0(SHORT x), __REGD1(SHORT y), __REGD2(SHORT dx), __REGD3(SHORT dy), __REGD4(SHORT w), __REGD5(SHORT h), __REGD6(UBYTE minterm), __REGD7(UBYTE mask)) {
-    if (!b || !r)
+void BlitPlanar2Direct (
+    __REGA0(struct BoardInfo *b), 
+    __REGA1(struct BitMap *bm), 
+    __REGA2(struct RenderInfo *r), 
+    __REGA3(struct ColorIndexMapping *clut), 
+    __REGD0(SHORT x), 
+    __REGD1(SHORT y), 
+    __REGD2(SHORT dx), 
+    __REGD3(SHORT dy), 
+    __REGD4(SHORT w), 
+    __REGD5(SHORT h), 
+    __REGD6(UBYTE minterm), 
+    __REGD7(UBYTE mask)) {
+    if (!b || !r) {
         return;
+    }
 
     //uint32_t plane_size = bm->BytesPerRow * bm->Rows;
 
@@ -813,7 +1195,8 @@ void BlitPlanar2Direct (__REGA0(struct BoardInfo *b), __REGA1(struct BitMap *bm)
     WRITEBYTE(RTG_U81, mask);
     WRITEBYTE(RTG_U82, minterm);
 
-    memcpy((uint8_t*)((uint32_t)template_addr), clut->Colors, (256 << 2));
+    memcpy((uint8_t*)((uint32_t)template_addr), clut->Colors, (256 << 2)
+    );
     template_addr += (256 << 2);
 
     for (int16_t i = 0; i < bm->Depth; i++) {
@@ -821,8 +1204,7 @@ void BlitPlanar2Direct (__REGA0(struct BoardInfo *b), __REGA1(struct BitMap *bm)
         if ((uint32_t)bm->Planes[i] == 0xFFFFFFFF) {
             uint8_t* dest = (uint8_t*)((uint32_t)template_addr);
             memset(dest, 0xFF, output_plane_size);
-        }
-        else if (bm->Planes[i] != NULL) {
+        } else if (bm->Planes[i] != NULL) {
             uint8_t* bmp_mem = (uint8_t*)bm->Planes[i] + (y * bm->BytesPerRow) + x_offset;
             uint8_t* dest = (uint8_t*)((uint32_t)template_addr);
             for (int16_t y_line = 0; y_line < h; y_line++) {
@@ -830,40 +1212,50 @@ void BlitPlanar2Direct (__REGA0(struct BoardInfo *b), __REGA1(struct BitMap *bm)
                 dest += line_size;
                 bmp_mem += bm->BytesPerRow;
             }
-        }
-        else {
+        } else {
             plane_mask &= (cur_plane ^ 0xFF);
         }
         cur_plane <<= 1;
         template_addr += output_plane_size;
     }
 
-    WRITESHORT(RTG_X1, (x & 0x07));
+    WRITESHORT(RTG_X1, (x & 0x07)
+    );
     WRITESHORT(RTG_X2, dx);
     WRITESHORT(RTG_X3, w);
     WRITESHORT(RTG_Y1, 0);
     WRITESHORT(RTG_Y2, dy);
     WRITESHORT(RTG_Y3, h);
 
-    WRITESHORT(RTG_U1, (plane_mask << 8 | ff_mask));
+    WRITESHORT(RTG_U1, (plane_mask << 8 | ff_mask)
+    );
     WRITEBYTE(RTG_U83, bm->Depth);
 
     WRITESHORT(RTG_COMMAND, RTGCMD_P2D);
 }
 
-void SetSprite (__REGA0(struct BoardInfo *b), __REGD0(BOOL enable), __REGD7(RGBFTYPE format)) {
+void SetSprite (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(BOOL enable), 
+    __REGD7(RGBFTYPE format)) {
     WRITESHORT(RTG_U1, enable);
     WRITESHORT(RTG_COMMAND, RTGCMD_SETSPRITE);
 }
 
-void SetSpritePosition (__REGA0(struct BoardInfo *b), __REGD0(WORD x), __REGD1(WORD y), __REGD7(RGBFTYPE format)) {
+void SetSpritePosition (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(WORD x), 
+    __REGD1(WORD y), 
+    __REGD7(RGBFTYPE format)) {
     WRITESHORT(RTG_X1, x);
     WRITESHORT(RTG_Y1, y);
 
     WRITESHORT(RTG_COMMAND, RTGCMD_SETSPRITEPOS);
 }
 
-void SetSpriteImage (__REGA0(struct BoardInfo *b), __REGD7(RGBFTYPE format)) {
+void SetSpriteImage (
+    __REGA0(struct BoardInfo *b), 
+    __REGD7(RGBFTYPE format)) {
     WRITESHORT(RTG_X1, b->XOffset);
     WRITESHORT(RTG_Y1, b->YOffset);
     WRITEBYTE(RTG_U81, b->MouseWidth);
@@ -883,7 +1275,13 @@ void SetSpriteImage (__REGA0(struct BoardInfo *b), __REGD7(RGBFTYPE format)) {
     WRITESHORT(RTG_COMMAND, RTGCMD_SETSPRITEIMAGE);
 }
 
-void SetSpriteColor (__REGA0(struct BoardInfo *b), __REGD0(UBYTE idx), __REGD1(UBYTE R), __REGD2(UBYTE G), __REGD3(UBYTE B), __REGD7(RGBFTYPE format)) {
+void SetSpriteColor (
+    __REGA0(struct BoardInfo *b), 
+    __REGD0(UBYTE idx), 
+    __REGD1(UBYTE R), 
+    __REGD2(UBYTE G), 
+    __REGD3(UBYTE B), 
+    __REGD7(RGBFTYPE format)) {
     WRITEBYTE(RTG_U81, R);
     WRITEBYTE(RTG_U82, G);
     WRITEBYTE(RTG_U83, B);
@@ -902,8 +1300,7 @@ static uint32_t device_vectors[] = {
     -1
 };
 
-struct InitTable
-{
+struct InitTable {
     ULONG LibBaseSize;
     APTR  FunctionTable;
     APTR  DataTable;

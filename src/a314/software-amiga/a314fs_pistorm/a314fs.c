@@ -74,12 +74,13 @@ void MyNewList(struct List* l) {
 
 struct MsgPort* MyCreatePort(char* name, long pri) {
   int sigbit = AllocSignal(-1);
-  if (sigbit == -1)
+  if(sigbit == -1) {
     return NULL;
+  }
 
   struct MsgPort* port =
       (struct MsgPort*)AllocMem(sizeof(struct MsgPort), MEMF_PUBLIC | MEMF_CLEAR);
-  if (!port) {
+  if(!port) {
     FreeSignal(sigbit);
     return NULL;
   }
@@ -91,21 +92,24 @@ struct MsgPort* MyCreatePort(char* name, long pri) {
   port->mp_SigBit = sigbit;
   port->mp_SigTask = FindTask(NULL);
 
-  if (name)
+  if(name) {
     AddPort(port);
-  else
+  } else {
     MyNewList(&(port->mp_MsgList));
+  }
 
   return port;
 }
 
 struct IORequest* MyCreateExtIO(struct MsgPort* ioReplyPort, ULONG size) {
-  if (!ioReplyPort)
+  if(!ioReplyPort) {
     return NULL;
+  }
 
   struct IORequest* ioReq = (struct IORequest*)AllocMem(size, MEMF_PUBLIC | MEMF_CLEAR);
-  if (!ioReq)
+  if(!ioReq) {
     return NULL;
+  }
 
   ioReq->io_Message.mn_Node.ln_Type = NT_MESSAGE;
   ioReq->io_Message.mn_Length = size;
@@ -159,35 +163,35 @@ void dbg(const char* fmt, ...) {
   va_start(args, fmt);
   while (*p != 0) {
     char c = *p++;
-    if (c == '$') {
+    if(c == '$') {
       c = *p++;
-      if (c == 'b') {
+      if(c == 'b') {
         UBYTE x = va_arg(args, UBYTE);
         *q++ = '$';
         for (int i = 0; i < 2; i++) {
           int ni = (x >> ((1 - i) * 4)) & 0xf;
           *q++ = (ni >= 10) ? ('a' + (ni - 10)) : ('0' + ni);
         }
-      } else if (c == 'w') {
+      } else if(c == 'w') {
         UWORD x = va_arg(args, UWORD);
         *q++ = '$';
         for (int i = 0; i < 4; i++) {
           int ni = (x >> ((3 - i) * 4)) & 0xf;
           *q++ = (ni >= 10) ? ('a' + (ni - 10)) : ('0' + ni);
         }
-      } else if (c == 'l') {
+      } else if(c == 'l') {
         ULONG x = va_arg(args, ULONG);
         *q++ = '$';
         for (int i = 0; i < 8; i++) {
           int ni = (x >> ((7 - i) * 4)) & 0xf;
           *q++ = (ni >= 10) ? ('a' + (ni - 10)) : ('0' + ni);
         }
-      } else if (c == 'S') {
+      } else if(c == 'S') {
         unsigned char* s = (unsigned char*)va_arg(args, ULONG);
         int l = *s++;
         for (int i = 0; i < l; i++)
           *q++ = *s++;
-      } else if (c == 's') {
+      } else if(c == 's') {
         unsigned char* s = (unsigned char*)va_arg(args, ULONG);
         while (*s)
           *q++ = *s++;
@@ -296,7 +300,7 @@ void startup_fs_handler(struct DosPacket* dp) {
 
   timer_mp = MyCreatePort(NULL, 0);
   tr = (struct timerequest*)MyCreateExtIO(timer_mp, sizeof(struct timerequest));
-  if (OpenDevice(TIMERNAME, UNIT_MICROHZ, (struct IORequest*)tr, 0) != 0) {
+  if(OpenDevice(TIMERNAME, UNIT_MICROHZ, (struct IORequest*)tr, 0) != 0) {
     // If this happens, there's nothing we can do.
     // For now, assume this does not happen.
     dbg("Fatal error: unable to open timer.device\n");
@@ -305,7 +309,7 @@ void startup_fs_handler(struct DosPacket* dp) {
 
   a314_mp = MyCreatePort(NULL, 0);
   a314_ior = (struct A314_IORequest*)MyCreateExtIO(a314_mp, sizeof(struct A314_IORequest));
-  if (OpenDevice(A314_NAME, 0, (struct IORequest*)a314_ior, 0) != 0) {
+  if(OpenDevice(A314_NAME, 0, (struct IORequest*)a314_ior, 0) != 0) {
     // If this fails, there's nothing we can do.
     // For now, assume this does not happen.
     dbg("Fatal error: unable to open a314.device\n");
@@ -314,7 +318,7 @@ void startup_fs_handler(struct DosPacket* dp) {
 
   A314Base = &(a314_ior->a314_Request.io_Device->dd_Library);
 
-  if (a314_connect("a314fs") != A314_CONNECT_OK) {
+  if(a314_connect("a314fs") != A314_CONNECT_OK) {
     dbg("Fatal error: unable to connect to a314fs on rasp\n");
     // This COULD happen.
     // If it DOES happen, we just wait for a bit and try again.
@@ -339,7 +343,7 @@ void startup_fs_handler(struct DosPacket* dp) {
 
 void wait_for_response() {
   for (unsigned long i = 0; 1; i++) {
-    if (*request_buffer) {
+    if(*request_buffer) {
       dbg("--Got response after $l sleeps\n", i);
       return;
     }
@@ -397,7 +401,7 @@ void action_locate_object(struct DosPacket* dp) {
   write_req_and_wait_for_res(sizeof(struct LocateObjectRequest) + nlen);
 
   struct LocateObjectResponse* res = (struct LocateObjectResponse*)request_buffer;
-  if (!res->success) {
+  if(!res->success) {
     dbg("  Failed, error code $l\n", (LONG)res->error_code);
     dp->dp_Res1 = DOSFALSE;
     dp->dp_Res2 = res->error_code;
@@ -419,7 +423,7 @@ void action_free_lock(struct DosPacket* dp) {
   dbg("ACTION_FREE_LOCK\n");
   dbg("  lock = $l\n", lock);
 
-  if (lock != NULL) {
+  if(lock != NULL) {
     struct FreeLockRequest* req = (struct FreeLockRequest*)request_buffer;
     req->has_response = 0;
     req->type = dp->dp_Type;
@@ -431,12 +435,13 @@ void action_free_lock(struct DosPacket* dp) {
     // struct FreeLockResponse *res = (struct FreeLockResponse *)request_buffer;
 
     Forbid();
-    if (my_volume->dl_Lock == arg1)
+    if(my_volume->dl_Lock == arg1) {
       my_volume->dl_Lock = lock->fl_Link;
-    else {
+    } else {
       struct FileLock* prev = (struct FileLock*)BADDR(my_volume->dl_Lock);
-      while (prev->fl_Link != arg1)
+      while (prev->fl_Link != arg1) {
         prev = (struct FileLock*)BADDR(prev->fl_Link);
+      }
       prev->fl_Link = lock->fl_Link;
     }
     Permit();
@@ -454,7 +459,7 @@ void action_copy_dir(struct DosPacket* dp) {
   dbg("ACTION_COPY_DIR\n");
   dbg("  lock to duplicate = $l\n", parent);
 
-  if (parent == NULL) {
+  if(parent == NULL) {
     dp->dp_Res1 = 0;
     dp->dp_Res2 = 0;
   } else {
@@ -466,7 +471,7 @@ void action_copy_dir(struct DosPacket* dp) {
     write_req_and_wait_for_res(sizeof(struct CopyDirRequest));
 
     struct CopyDirResponse* res = (struct CopyDirResponse*)request_buffer;
-    if (!res->success) {
+    if(!res->success) {
       dbg("  Failed, error code $l\n", (LONG)res->error_code);
       dp->dp_Res1 = DOSFALSE;
       dp->dp_Res2 = res->error_code;
@@ -488,7 +493,7 @@ void action_parent(struct DosPacket* dp) {
   dbg("ACTION_PARENT\n");
   dbg("  lock = $l\n", prev_lock);
 
-  if (prev_lock == NULL) {
+  if(prev_lock == NULL) {
     dp->dp_Res1 = DOSFALSE;
     dp->dp_Res2 = ERROR_INVALID_LOCK;
   } else {
@@ -500,11 +505,11 @@ void action_parent(struct DosPacket* dp) {
     write_req_and_wait_for_res(sizeof(struct ParentRequest));
 
     struct ParentResponse* res = (struct ParentResponse*)request_buffer;
-    if (!res->success) {
+    if(!res->success) {
       dbg("  Failed, error code $l\n", (LONG)res->error_code);
       dp->dp_Res1 = DOSFALSE;
       dp->dp_Res2 = res->error_code;
-    } else if (res->key == 0) {
+    } else if(res->key == 0) {
       dp->dp_Res1 = 0;
       dp->dp_Res2 = 0;
     } else {
@@ -535,7 +540,7 @@ void action_examine_object(struct DosPacket* dp) {
   write_req_and_wait_for_res(sizeof(struct ExamineObjectRequest));
 
   struct ExamineObjectResponse* res = (struct ExamineObjectResponse*)request_buffer;
-  if (!res->success) {
+  if(!res->success) {
     dbg("  Failed, error code $l\n", (LONG)res->error_code);
     dp->dp_Res1 = DOSFALSE;
     dp->dp_Res2 = res->error_code;
@@ -582,7 +587,7 @@ void action_examine_next(struct DosPacket* dp) {
   write_req_and_wait_for_res(sizeof(struct ExamineNextRequest));
 
   struct ExamineNextResponse* res = (struct ExamineNextResponse*)request_buffer;
-  if (!res->success) {
+  if(!res->success) {
     dbg("  Failed, error code $l\n", (LONG)res->error_code);
     dp->dp_Res1 = DOSFALSE;
     dp->dp_Res2 = res->error_code;
@@ -628,7 +633,7 @@ void action_examine_fh(struct DosPacket* dp) {
   write_req_and_wait_for_res(sizeof(struct ExamineFhRequest));
 
   struct ExamineFhResponse* res = (struct ExamineFhResponse*)request_buffer;
-  if (!res->success) {
+  if(!res->success) {
     dbg("  Failed, error code $l\n", (LONG)res->error_code);
     dp->dp_Res1 = DOSFALSE;
     dp->dp_Res2 = res->error_code;
@@ -663,12 +668,13 @@ void action_findxxx(struct DosPacket* dp) {
   struct FileLock* lock = (struct FileLock*)BADDR(dp->dp_Arg2);
   unsigned char* name = (unsigned char*)BADDR(dp->dp_Arg3);
 
-  if (dp->dp_Type == ACTION_FINDUPDATE)
+  if(dp->dp_Type == ACTION_FINDUPDATE) {
     dbg("ACTION_FINDUPDATE\n");
-  else if (dp->dp_Type == ACTION_FINDINPUT)
+  } else if(dp->dp_Type == ACTION_FINDINPUT) {
     dbg("ACTION_FINDINPUT\n");
-  else if (dp->dp_Type == ACTION_FINDOUTPUT)
+  } else if(dp->dp_Type == ACTION_FINDOUTPUT) {
     dbg("ACTION_FINDOUTPUT\n");
+  }
 
   dbg("  file handle = $l\n", fh);
   dbg("  lock = $l\n", lock);
@@ -685,7 +691,7 @@ void action_findxxx(struct DosPacket* dp) {
   write_req_and_wait_for_res(sizeof(struct FindXxxRequest) + nlen);
 
   struct FindXxxResponse* res = (struct FindXxxResponse*)request_buffer;
-  if (!res->success) {
+  if(!res->success) {
     dbg("  Failed, error code $l\n", (LONG)res->error_code);
     dp->dp_Res1 = DOSFALSE;
     dp->dp_Res2 = res->error_code;
@@ -710,7 +716,7 @@ void action_read(struct DosPacket* dp) {
   dbg("  arg1 = $l\n", arg1);
   dbg("  length = $l\n", length);
 
-  if (length == 0) {
+  if(length == 0) {
     dp->dp_Res1 = -1;
     dp->dp_Res2 = ERROR_INVALID_LOCK; // This is not the correct error.
     reply_packet(dp);
@@ -720,8 +726,9 @@ void action_read(struct DosPacket* dp) {
   int total_read = 0;
   while (length) {
     int to_read = length;
-    if (to_read > BUFFER_SIZE)
+    if(to_read > BUFFER_SIZE) {
       to_read = BUFFER_SIZE;
+    }
 
     struct ReadRequest* req = (struct ReadRequest*)request_buffer;
     req->has_response = 0;
@@ -733,7 +740,7 @@ void action_read(struct DosPacket* dp) {
     write_req_and_wait_for_res(sizeof(struct ReadRequest));
 
     struct ReadResponse* res = (struct ReadResponse*)request_buffer;
-    if (!res->success) {
+    if(!res->success) {
       dbg("  Failed, error code $l\n", (LONG)res->error_code);
       dp->dp_Res1 = -1;
       dp->dp_Res2 = res->error_code;
@@ -741,15 +748,16 @@ void action_read(struct DosPacket* dp) {
       return;
     }
 
-    if (res->actual) {
+    if(res->actual) {
       memcpy(dst, data_buffer, res->actual);
       dst += res->actual;
       total_read += res->actual;
       length -= res->actual;
     }
 
-    if (res->actual < to_read)
+    if(res->actual < to_read) {
       break;
+    }
   }
 
   dp->dp_Res1 = total_read;
@@ -769,8 +777,9 @@ void action_write(struct DosPacket* dp) {
   int total_written = 0;
   while (length) {
     int to_write = length;
-    if (to_write > BUFFER_SIZE)
+    if(to_write > BUFFER_SIZE) {
       to_write = BUFFER_SIZE;
+    }
 
     memcpy(data_buffer, src, to_write);
 
@@ -784,7 +793,7 @@ void action_write(struct DosPacket* dp) {
     write_req_and_wait_for_res(sizeof(struct WriteRequest));
 
     struct WriteResponse* res = (struct WriteResponse*)request_buffer;
-    if (!res->success) {
+    if(!res->success) {
       dbg("  Failed, error code $l\n", (LONG)res->error_code);
       dp->dp_Res1 = total_written;
       dp->dp_Res2 = res->error_code;
@@ -792,14 +801,15 @@ void action_write(struct DosPacket* dp) {
       return;
     }
 
-    if (res->actual) {
+    if(res->actual) {
       src += res->actual;
       total_written += res->actual;
       length -= res->actual;
     }
 
-    if (res->actual < to_write)
+    if(res->actual < to_write) {
       break;
+    }
   }
 
   dp->dp_Res1 = total_written;
@@ -827,7 +837,7 @@ void action_seek(struct DosPacket* dp) {
   write_req_and_wait_for_res(sizeof(struct SeekRequest));
 
   struct SeekResponse* res = (struct SeekResponse*)request_buffer;
-  if (!res->success) {
+  if(!res->success) {
     dbg("  Failed, error code $l\n", (LONG)res->error_code);
     dp->dp_Res1 = -1;
     dp->dp_Res2 = res->error_code;
@@ -878,7 +888,7 @@ void action_delete_object(struct DosPacket* dp) {
   write_req_and_wait_for_res(sizeof(struct DeleteObjectRequest) + nlen);
 
   struct DeleteObjectResponse* res = (struct DeleteObjectResponse*)request_buffer;
-  if (!res->success) {
+  if(!res->success) {
     dbg("  Failed, error code $l\n", (LONG)res->error_code);
     dp->dp_Res1 = DOSFALSE;
     dp->dp_Res2 = res->error_code;
@@ -922,7 +932,7 @@ void action_rename_object(struct DosPacket* dp) {
   write_req_and_wait_for_res(sizeof(struct RenameObjectRequest) + nlen + nnlen);
 
   struct RenameObjectResponse* res = (struct RenameObjectResponse*)request_buffer;
-  if (!res->success) {
+  if(!res->success) {
     dbg("  Failed, error code $l\n", (LONG)res->error_code);
     dp->dp_Res1 = DOSFALSE;
     dp->dp_Res2 = res->error_code;
@@ -953,7 +963,7 @@ void action_create_dir(struct DosPacket* dp) {
   write_req_and_wait_for_res(sizeof(struct CreateDirRequest) + nlen);
 
   struct CreateDirResponse* res = (struct CreateDirResponse*)request_buffer;
-  if (!res->success) {
+  if(!res->success) {
     dbg("  Failed, error code $l\n", (LONG)res->error_code);
     dp->dp_Res1 = DOSFALSE;
     dp->dp_Res2 = res->error_code;
@@ -990,7 +1000,7 @@ void action_set_protect(struct DosPacket* dp) {
   write_req_and_wait_for_res(sizeof(struct SetProtectRequest) + nlen);
 
   struct SetProtectResponse* res = (struct SetProtectResponse*)request_buffer;
-  if (!res->success) {
+  if(!res->success) {
     dbg("  Failed, error code $l\n", (LONG)res->error_code);
     dp->dp_Res1 = DOSFALSE;
     dp->dp_Res2 = res->error_code;
@@ -1031,7 +1041,7 @@ void action_set_comment(struct DosPacket* dp) {
   write_req_and_wait_for_res(sizeof(struct SetCommentRequest) + nlen + clen);
 
   struct SetCommentResponse* res = (struct SetCommentResponse*)request_buffer;
-  if (!res->success) {
+  if(!res->success) {
     dbg("  Failed, error code $l\n", (LONG)res->error_code);
     dp->dp_Res1 = DOSFALSE;
     dp->dp_Res2 = res->error_code;

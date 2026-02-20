@@ -62,8 +62,7 @@ BOOL stream_closed = FALSE;
 ULONG vblank_counter = 0;
 ULONG req_next_frame_at = 0;
 
-struct VBlankData
-{
+struct VBlankData {
 	struct Task *task;
 	ULONG signal;
 };
@@ -74,8 +73,7 @@ struct Interrupt vblank_interrupt;
 
 struct MsgPort *mp;
 
-void start_a314_cmd(struct A314_IORequest *msg, UWORD command, char *buffer, int length)
-{
+void start_a314_cmd(struct A314_IORequest *msg, UWORD command, char *buffer, int length) {
 	msg->a314_Request.io_Command = command;
 	msg->a314_Request.io_Error = 0;
 
@@ -86,40 +84,34 @@ void start_a314_cmd(struct A314_IORequest *msg, UWORD command, char *buffer, int
 	SendIO((struct IORequest *)msg);
 }
 
-LONG a314_connect(char *name)
-{
+LONG a314_connect(char *name) {
 	socket = time(NULL);
 	start_a314_cmd(cmsg, A314_CONNECT, name, strlen(name));
 	return WaitIO((struct IORequest *)cmsg);
 }
 
-void start_a314_read()
-{
+void start_a314_read() {
 	start_a314_cmd(rmsg, A314_READ, arbuf, 255);
 	pending_a314_read = TRUE;
 }
 
-void start_a314_write(int length)
-{
+void start_a314_write(int length) {
 	start_a314_cmd(wmsg, A314_WRITE, awbuf, length);
 	pending_a314_write = TRUE;
 }
 
-LONG sync_a314_write(int length)
-{
+LONG sync_a314_write(int length) {
 	start_a314_write(length);
 	pending_a314_write = FALSE;
 	return WaitIO((struct IORequest *)wmsg);
 }
 
-void start_a314_reset()
-{
+void start_a314_reset() {
 	start_a314_cmd(cmsg, A314_RESET, NULL, 0);
 	pending_a314_reset = TRUE;
 }
 
-LONG sync_a314_reset()
-{
+LONG sync_a314_reset() {
 	start_a314_reset();
 	pending_a314_reset = FALSE;
 	return WaitIO((struct IORequest *)cmsg);
@@ -127,27 +119,24 @@ LONG sync_a314_reset()
 
 
 
-void handle_a314_read_completed()
-{
+void handle_a314_read_completed() {
 	pending_a314_read = FALSE;
 
-	if (stream_closed)
+	if(stream_closed) {
 		return;
+	}
 
 	int res = rmsg->a314_Request.io_Error;
-	if (res == A314_READ_OK)
-	{
+	if(res == A314_READ_OK) {
 		waiting_for_frame_response = FALSE;
 
-		if (close_after_next_frame_response)
-		{
+		if(close_after_next_frame_response) {
 			start_a314_reset();
 			stream_closed = TRUE;
 			return;
 		}
 
-		if (*((UWORD *)&arbuf[0]) == 0)
-		{
+		if(*((UWORD *)&arbuf[0]) == 0) {
 			printf("No more frames, ending now.\n");
 			no_more_frames = TRUE;
 			return;
@@ -155,14 +144,16 @@ void handle_a314_read_completed()
 
 		UWORD *pal = (UWORD *)(&arbuf[2]);
 		UWORD *ct = (UWORD *)(screen->ViewPort.ColorMap->ColorTable);
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 16; i++) {
 			ct[i] = pal[i];
+		}
 
 		UBYTE *bpl_ptr;
-		if (curr_bpl == 0)
+		if(curr_bpl == 0) {
 			bpl_ptr = bpl_ptr1;
-		else
+		} else {
 			bpl_ptr = bpl_ptr2;
+		}
 
 		screen->BitMap.Planes[0] = &bpl_ptr[10240*0];
 		screen->BitMap.Planes[1] = &bpl_ptr[10240*1];
@@ -173,36 +164,30 @@ void handle_a314_read_completed()
 		RethinkDisplay();
 
 		start_a314_read();
-	}
-	else if (res == A314_READ_RESET)
-	{
+	} else if(res == A314_READ_RESET) {
 		stream_closed = TRUE;
 	}
 }
 
-void handle_a314_write_completed()
-{
+void handle_a314_write_completed() {
 	pending_a314_write = FALSE;
 
-	if (stream_closed)
+	if(stream_closed) {
 		return;
+	}
 
 	int res = wmsg->a314_Request.io_Error;
-	if (res == A314_WRITE_RESET)
-	{
+	if(res == A314_WRITE_RESET) {
 		stream_closed = TRUE;
 	}
 }
 
-void handle_a314_reset_completed()
-{
+void handle_a314_reset_completed() {
 	pending_a314_reset = FALSE;
 }
 
-void handle_vblank_signal()
-{
-	if (req_next_frame_at <= vblank_counter && !waiting_for_frame_response && !no_more_frames)
-	{
+void handle_vblank_signal() {
+	if(req_next_frame_at <= vblank_counter && !waiting_for_frame_response && !no_more_frames) {
 		curr_bpl = (curr_bpl + 1) & 1;
 
 		*((UBYTE *)&awbuf[0]) = (UBYTE)curr_bpl;
@@ -214,16 +199,14 @@ void handle_vblank_signal()
 	vblank_counter += 1;
 }
 
-int main()
-{
+int main() {
 	IntuitionBase = (struct IntuitionBase *)OpenLibrary("intuition.library", 0);
 	GfxBase = (struct GfxBase *)OpenLibrary("graphics.library", 0);
 
 	mp = CreatePort(NULL, 0);
 	cmsg = (struct A314_IORequest *)CreateExtIO(mp, sizeof(struct A314_IORequest));
 
-	if (OpenDevice(A314_NAME, 0, (struct IORequest *)cmsg, 0) != 0)
-	{
+	if(OpenDevice(A314_NAME, 0, (struct IORequest *)cmsg, 0) != 0) {
 		printf("Unable to open a314.device\n");
 		goto fail_out1;
 	}
@@ -235,16 +218,14 @@ int main()
 	memcpy(wmsg, cmsg, sizeof(struct A314_IORequest));
 	memcpy(rmsg, cmsg, sizeof(struct A314_IORequest));
 
-	if (a314_connect("videoplayer") != A314_CONNECT_OK)
-	{
+	if(a314_connect("videoplayer") != A314_CONNECT_OK) {
 		printf("Unable to connect to videoplayer\n");
 		goto fail_out2;
 	}
 
 	bpl_ptr1 = AllocMem(10240*4, MEMF_A314 | MEMF_CHIP);
 	bpl_ptr2 = AllocMem(10240*4, MEMF_A314 | MEMF_CHIP);
-	if (bpl_ptr1 == NULL || bpl_ptr2 == NULL)
-	{
+	if(bpl_ptr1 == NULL || bpl_ptr2 == NULL) {
 		printf("Unable to allocate A314 chip memory\n");
 		sync_a314_reset();
 		goto fail_out3;
@@ -255,8 +236,7 @@ int main()
 
 	sync_a314_write(8);
 
-	struct BitMap bmp =
-	{
+	struct BitMap bmp =	{
 		40, 256, 0, 4, 0,
 		{NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
 	};
@@ -266,8 +246,7 @@ int main()
 	bmp.Planes[2] = &bpl_ptr1[10240*2];
 	bmp.Planes[3] = &bpl_ptr1[10240*3];
 
-	struct NewScreen new_screen =
-	{
+	struct NewScreen new_screen = {
 		0, 0,
 		320, 256, 4,
 		0, 1,
@@ -276,8 +255,7 @@ int main()
 	};
 
 	screen = OpenScreen(&new_screen);
-	if (screen == NULL)
-	{
+	if(screen == NULL) {
 		printf("Unable to create screen\n");
 		sync_a314_reset();
 		goto fail_out3;
@@ -303,41 +281,37 @@ int main()
 
 	printf("Press ctrl-c to exit...\n");
 
-	while (TRUE)
-	{
+	while (TRUE) {
 		ULONG signal = Wait(vblanksig | portsig | SIGBREAKF_CTRL_C);
-		if (signal & vblanksig)
-		{
+		if(signal & vblanksig) {
 			handle_vblank_signal();
 		}
 
-		if (signal & portsig)
-		{
+		if(signal & portsig) {
 			struct Message *msg;
-			while (msg = GetMsg(mp))
-			{
-				if (msg == (struct Message *)rmsg)
+			while (msg = GetMsg(mp)) {
+				if(msg == (struct Message *)rmsg) {
 					handle_a314_read_completed();
-				else if (msg == (struct Message *)wmsg && wmsg->a314_Request.io_Command == A314_WRITE)
+				} else if(msg == (struct Message *)wmsg && wmsg->a314_Request.io_Command == A314_WRITE) {
 					handle_a314_write_completed();
-				else if (msg == (struct Message *)cmsg && cmsg->a314_Request.io_Command == A314_RESET)
+				} else if(msg == (struct Message *)cmsg && cmsg->a314_Request.io_Command == A314_RESET) {
 					handle_a314_reset_completed();
+				}
 			}
 		}
 
-		if (signal & SIGBREAKF_CTRL_C)
-		{
+		if(signal & SIGBREAKF_CTRL_C) {
 			close_after_next_frame_response = TRUE;
 
-			if (!waiting_for_frame_response)
-			{
+			if(!waiting_for_frame_response) {
 				start_a314_reset();
 				stream_closed = TRUE;
 			}
 		}
 
-		if (stream_closed && !pending_a314_read && !pending_a314_write && !pending_a314_reset)
+		if(stream_closed && !pending_a314_read && !pending_a314_write && !pending_a314_reset) {
 			break;
+		}
 	}
 
 	RemIntServer(INTB_VERTB, &vblank_interrupt);
@@ -345,10 +319,12 @@ int main()
 	CloseScreen(screen);
 
 fail_out3:
-	if (bpl_ptr2)
+	if(bpl_ptr2) {
 		FreeMem(bpl_ptr2, 10240*4);
-	if (bpl_ptr1)
+	}
+	if(bpl_ptr1) {
 		FreeMem(bpl_ptr1, 10240*4);
+	}
 
 fail_out2:
 	CloseDevice((struct IORequest *)cmsg);

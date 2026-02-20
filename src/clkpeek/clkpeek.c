@@ -48,11 +48,13 @@ static void on_sigint(int sig) {
 }
 
 static uint32_t parse_u32(const char *s) {
-    if (!s || !*s) return 0;
+    if(!s || !*s) {
+        return 0;
+    }
     char *end = NULL;
     errno = 0;
     uint64_t v = strtoull(s, &end, 0);
-    if (errno || end == s || *end != '\0' || v > 0xFFFFFFFFULL) {
+    if(errno || end == s || *end != '\0' || v > 0xFFFFFFFFULL) {
         fprintf(stderr, "Invalid number: %s\n", s);
         exit(2);
     }
@@ -81,30 +83,42 @@ static void hexdump16(uint32_t base, uint32_t count, bool quiet) {
     for (uint32_t i = 0; i < count; i++) {
         uint32_t addr = base + (i * 2);
         uint16_t v = ps_read_16(addr);
-        if (quiet) {
+        if(quiet) {
             printf("%04x\n", v);
             continue;
         }
-        if ((i % 8) == 0) printf("%08" PRIx32 ": ", addr);
+        if((i % 8) == 0) {
+            printf("%08" PRIx32 ": ", addr);
+        }
         printf("%04x ", v);
-        if ((i % 8) == 7) printf("\n");
+        if((i % 8) == 7) {
+            printf("\n");
+        }
     }
-    if (!quiet && (count % 8) != 0) printf("\n");
+    if(!quiet && (count % 8) != 0) {
+        printf("\n");
+    }
 }
 
 static void hexdump32(uint32_t base, uint32_t count, bool quiet) {
     for (uint32_t i = 0; i < count; i++) {
         uint32_t addr = base + (i * 4);
         uint32_t v = ps_read_32(addr);
-        if (quiet) {
+        if(quiet) {
             printf("%08" PRIx32 "\n", v);
             continue;
         }
-        if ((i % 4) == 0) printf("%08" PRIx32 ": ", addr);
+        if((i % 4) == 0) {
+            printf("%08" PRIx32 ": ", addr);
+        }
         printf("%08" PRIx32 " ", v);
-        if ((i % 4) == 3) printf("\n");
+        if((i % 4) == 3) {
+            printf("\n");
+        }
     }
-    if (!quiet && (count % 4) != 0) printf("\n");
+    if(!quiet && (count % 4) != 0) {
+        printf("\n");
+    }
 }
 
 static void sleep_ms(uint32_t ms) {
@@ -132,39 +146,45 @@ int main(int argc, char **argv) {
     int i = 1;
     while (i < argc) {
         const char *a = argv[i];
-        if (!strcmp(a, "-h") || !strcmp(a, "--help")) {
+        if(!strcmp(a, "-h") || !strcmp(a, "--help")) {
             usage(argv[0]);
             return 0;
-        } else if (!strcmp(a, "-16")) {
+        } else if(!strcmp(a, "-16")) {
             use32 = false;
             i++;
-        } else if (!strcmp(a, "-32")) {
+        } else if(!strcmp(a, "-32")) {
             use32 = true;
             i++;
-        } else if (!strcmp(a, "-r")) {
+        } else if(!strcmp(a, "-r")) {
             do_reset = true;
             i++;
-        } else if (!strcmp(a, "-q")) {
+        } else if(!strcmp(a, "-q")) {
             quiet = true;
             i++;
-        } else if (!strcmp(a, "-p")) {
-            if (i + 1 >= argc) { usage(argv[0]); return 2; }
+        } else if(!strcmp(a, "-p")) {
+            if(i + 1 >= argc) { 
+                usage(argv[0]); return 2; 
+            }
             poll_ms = parse_u32(argv[i + 1]);
             i += 2;
-        } else if (!strcmp(a, "-w")) {
-            if (i + 2 >= argc) { usage(argv[0]); return 2; }
+        } else if(!strcmp(a, "-w")) {
+            if(i + 2 >= argc) { 
+                usage(argv[0]); return 2; 
+            }
             do_write16 = true;
             w_addr = parse_u32(argv[i + 1]);
             w_val = (uint16_t)parse_u32(argv[i + 2]);
             i += 3;
-        } else if (a[0] == '-') {
+        } else if(a[0] == '-') {
             fprintf(stderr, "Unknown option: %s\n", a);
             usage(argv[0]);
             return 2;
         } else {
             // positional: addr [count]
             base = parse_u32(argv[i]);
-            if (i + 1 < argc) count = parse_u32(argv[i + 1]);
+            if(i + 1 < argc) {
+                count = parse_u32(argv[i + 1]);
+            }
             break;
         }
     }
@@ -177,14 +197,14 @@ int main(int argc, char **argv) {
     // Always start from a clean state machine.
     ps_reset_state_machine();
 
-    if (do_reset) {
+    if(do_reset) {
         ps_pulse_reset();
         // Give the bus a moment to settle.
         usleep(5000);
     }
 
-    if (do_write16) {
-        if (!quiet) {
+    if(do_write16) {
+        if(!quiet) {
             fprintf(stderr, "[clkpeek] write16 %08" PRIx32 " <= %04x\n", w_addr, w_val);
         }
         ps_write_16(w_addr, w_val);
@@ -192,17 +212,20 @@ int main(int argc, char **argv) {
     }
 
     do {
-        if (!quiet) {
-            fprintf(stderr,
-                "[clkpeek] %s base=%08" PRIx32 " count=%" PRIu32 "%s\n",
-                use32 ? "32-bit" : "16-bit", base, count,
-                poll_ms ? " (polling)" : "");
+        if(!quiet) {
+            fprintf(stderr, "[clkpeek] %s base=%08" PRIx32 " count=%" PRIu32 "%s\n",
+                use32 ? "32-bit" : "16-bit", base, count, poll_ms ? " (polling)" : "");
         }
 
-        if (use32) hexdump32(base, count, quiet);
-        else       hexdump16(base, count, quiet);
+        if(use32) {
+            hexdump32(base, count, quiet);
+        } else {        
+            hexdump16(base, count, quiet);
+        }
 
-        if (poll_ms && !g_stop) sleep_ms(poll_ms);
+        if(poll_ms && !g_stop) {
+            sleep_ms(poll_ms);
+        }
 
     } while (poll_ms && !g_stop);
 

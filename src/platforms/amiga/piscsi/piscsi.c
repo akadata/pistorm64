@@ -46,8 +46,7 @@ static const char *op_type_names[4] = {
 extern unsigned int cpu_type;
 static __thread char piscsi_disasm_buf[256];
 
-static void piscsi_appendf(char *buf, size_t buf_sz, int *off, const char *fmt, ...)
-{
+static void piscsi_appendf(char *buf, size_t buf_sz, int *off, const char *fmt, ...) {
     if (!buf || !off || *off < 0 || (size_t)*off >= buf_sz) {
         return;
     }

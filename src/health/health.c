@@ -21,7 +21,9 @@ void health_init(void) {
 
 void health_poll_once(void) {
     rpi_health_t h;
-    if (rpi_read_health(&h) != 0) return;
+    if (rpi_read_health(&h) != 0) {
+        return;
+    }
 
     if (!health_inited) {
         last_h = h;
@@ -34,10 +36,18 @@ void health_poll_once(void) {
     const float TEMP_HYST = 1.0f;
 
     int changed = 0;
-    if (h.throttled != last_h.throttled) changed = 1;
-    if (fabsf(h.temp_c - last_h.temp_c) >= 2.0f) changed = 1;
-    if (h.arm_hz != last_h.arm_hz) changed = 1;
-    if (h.core_uv != last_h.core_uv) changed = 1;
+    if (h.throttled != last_h.throttled) {
+        changed = 1;
+    }
+    if (fabsf(h.temp_c - last_h.temp_c) >= 2.0f) {
+        changed = 1;
+    }
+    if (h.arm_hz != last_h.arm_hz) {
+        changed = 1;
+    }
+    if (h.core_uv != last_h.core_uv) {
+        changed = 1;
+    }
 
     if (h.throttled != 0) {
         log_health_event(&h, "THROTTLED!=0");

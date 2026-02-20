@@ -84,7 +84,7 @@ static void sigint_handler(int sig_num) {
   printf("Total number of transaction errors occured: %u\n",
          (unsigned int)total_errors);
   //ps_cleanup_protocol();
-  if (mem_fd) {
+  if(mem_fd) {
     close(mem_fd);
   }
   exit(0);
@@ -92,7 +92,7 @@ static void sigint_handler(int sig_num) {
 
 static int wait_txn_idle(const char* tag, int timeout_us) {
   while (timeout_us > 0) {
-    if (!(ps_gpio_lev() & (1u << PIN_TXN_IN_PROGRESS))) {
+    if(!(ps_gpio_lev() & (1u << PIN_TXN_IN_PROGRESS))) {
       return 0;
     }
     usleep(10u);
@@ -105,7 +105,7 @@ static int wait_txn_idle(const char* tag, int timeout_us) {
 static void warmup_bus(void) {
   for (int i = 0; i < 64; i++) {
     (void)ps_read_status_reg();
-    if ((i & 0x0f) == 0) {
+    if((i & 0x0f) == 0) {
       usleep(100u);
     }
   }
@@ -116,7 +116,7 @@ static void reset_amiga(const char* tag) {
     ps_reset_state_machine();
     ps_pulse_reset();
     usleep(1500u);
-    if (wait_txn_idle(tag, 20000) == 0) {
+    if(wait_txn_idle(tag, 20000) == 0) {
       warmup_bus();
       return;
     }
@@ -149,27 +149,27 @@ static int check_emulator(void) {
   FILE* fp = NULL;
   const char* name = "emulator";
 
-  if (!(dir = opendir("/proc"))) {
+  if(!(dir = opendir("/proc"))) {
     perror("can't open /proc, assuming emulator running");
     return 1;
   }
 
   while ((ent = readdir(dir)) != NULL) {
     long lpid = atol(ent->d_name);
-    if (lpid < 0) {
+    if(lpid < 0) {
       continue;
     }
     snprintf(buf, sizeof(buf), "/proc/%ld/stat", lpid);
     fp = fopen(buf, "r");
 
-    if (fp) {
-      if ((fscanf(fp, "%ld (%99[^)]) %c", &pid, pname, &state)) != 3) {
+    if(fp) {
+      if((fscanf(fp, "%ld (%99[^)]) %c", &pid, pname, &state)) != 3) {
         printf("fscanf failed, assuming emulator running\n");
         fclose(fp);
         closedir(dir);
         return 1;
       }
-      if (!strcmp(pname, name)) {
+      if(!strcmp(pname, name)) {
         fclose(fp);
         closedir(dir);
         return 1;
@@ -193,16 +193,16 @@ int main(int argc, char* argv[]) {
   for (int i = 1; i < argc; i++) {
     const char* arg = argv[i];
 
-    if (!end_of_options && arg[0] == '-' && arg[1] != '\0') {
-      if (strcmp(arg, "--") == 0) {
+    if(!end_of_options && arg[0] == '-' && arg[1] != '\0') {
+      if(strcmp(arg, "--") == 0) {
         end_of_options = 1;
         continue;
       }
-      if (strcmp(arg, "-h") == 0 || strcmp(arg, "--help") == 0) {
+      if(strcmp(arg, "-h") == 0 || strcmp(arg, "--help") == 0) {
         print_usage(progname);
         return 0;
       }
-      if (strcmp(arg, "-a") == 0 || strcmp(arg, "--about") == 0) {
+      if(strcmp(arg, "-a") == 0 || strcmp(arg, "--about") == 0) {
         print_about(progname);
         return 0;
       }
@@ -211,7 +211,7 @@ int main(int argc, char* argv[]) {
       return 1;
     }
 
-    if (size_arg != NULL) {
+    if(size_arg != NULL) {
       fprintf(stderr, "%s: too many arguments\n", progname);
       print_usage(progname);
       return 1;
@@ -219,7 +219,7 @@ int main(int argc, char* argv[]) {
     size_arg = arg;
   }
 
-  if (check_emulator()) {
+  if(check_emulator()) {
     printf("PiStorm emulator running, please stop this before running buptest\n");
     return 1;
   }
@@ -234,12 +234,12 @@ int main(int argc, char* argv[]) {
   write8(0xbfe201u, 0x01u); // CIA OVL
   write8(0xbfe001u, 0x0000u); // CIA OVL LOW
 
-  if (size_arg != NULL) {
-    if (strcmp(size_arg, "dumpkick") == 0) {
+  if(size_arg != NULL) {
+    if(strcmp(size_arg, "dumpkick") == 0) {
       printf("Dumping onboard Amiga kickstart from $F80000 to file kick.rom.\n");
       printf("Note that this will always dump 512KB of data, even if your Kickstart is 256KB.\n");
       FILE* out = fopen("kick.rom", "wb+");
-      if (out == NULL) {
+      if(out == NULL) {
         printf("Failed to open kick.rom for writing.\nKickstart has not been dumped.\n");
         return 1;
       }
@@ -254,10 +254,10 @@ int main(int argc, char* argv[]) {
       return 0;
     }
 
-    if (strcmp(size_arg, "dump") == 0) {
+    if(strcmp(size_arg, "dump") == 0) {
       printf("Dumping EVERYTHING to dump.bin.\n");
       FILE* out = fopen("dump.bin", "wb+");
-      if (out == NULL) {
+      if(out == NULL) {
         printf("Failed to open dump.bin for writing.\nEverything has not been dumped.\n");
         return 1;
       }
@@ -265,7 +265,7 @@ int main(int argc, char* argv[]) {
       for (size_t i = 0; i < 16u * SIZE_MEGA; i++) {
         unsigned char in = (unsigned char)dump_read_8(addr_from_size(i));
         fputc(in, out);
-        if ((i % 1024u) == 0u) {
+        if((i % 1024u) == 0u) {
           printf(".");
         }
       }
@@ -277,19 +277,19 @@ int main(int argc, char* argv[]) {
     }
 
     int input_kb = atoi(size_arg);
-    if (input_kb > 0) {
+    if(input_kb > 0) {
       test_size = (size_t)input_kb * SIZE_KILO;
     } else {
       test_size = 0u;
     }
-    if (test_size == 0 || test_size > 2u * SIZE_MEGA) {
+    if(test_size == 0 || test_size > 2u * SIZE_MEGA) {
       test_size = 512u * SIZE_KILO;
     }
     printf("Testing %zu KB of memory.\n", test_size / SIZE_KILO);
   }
 
   garbege_datas = malloc(test_size);
-  if (!garbege_datas) {
+  if(!garbege_datas) {
     printf("Failed to allocate memory for garbege datas.\n");
     return 1;
   }
@@ -306,8 +306,8 @@ test_loop:;
   printf("Reading back garbege datas, read8()...\n");
   for (size_t i = 0; i < test_size; i++) {
     uint8_t c = (uint8_t)read8(addr_from_size(i));
-    if (c != garbege_datas[i]) {
-      if (errors < 512u) {
+    if(c != garbege_datas[i]) {
+      if(errors < 512u) {
         printf("READ8: Garbege data mismatch at $%06zX: %02X should be %02X.\n", i,
                (unsigned int)c, (unsigned int)garbege_datas[i]);
       }
@@ -323,8 +323,8 @@ test_loop:;
   for (size_t i = 0; i < test_size - 2u; i += 2u) {
     uint16_t expected = load_u16(&garbege_datas[i]);
     uint16_t c = be16toh((uint16_t)read16(addr_from_size(i)));
-    if (c != expected) {
-      if (errors < 512u) {
+    if(c != expected) {
+      if(errors < 512u) {
         printf("READ16_EVEN: Garbege data mismatch at $%06zX: %04X should be %04X.\n", i,
                (unsigned int)c, (unsigned int)expected);
       }
@@ -342,8 +342,8 @@ test_loop:;
     uint16_t raw = (uint16_t)(((uint32_t)read8(addr_from_size(i)) << 8) |
                               (uint32_t)read8(addr_from_size(i + 1u)));
     uint16_t c = be16toh(raw);
-    if (c != expected) {
-      if (errors < 512u) {
+    if(c != expected) {
+      if(errors < 512u) {
         printf("READ16_ODD: Garbege data mismatch at $%06zX: %04X should be %04X.\n", i,
                (unsigned int)c, (unsigned int)expected);
       }
@@ -358,8 +358,8 @@ test_loop:;
   for (size_t i = 0; i < test_size - 4u; i += 2u) {
     uint32_t expected = load_u32(&garbege_datas[i]);
     uint32_t c = be32toh((uint32_t)read32(addr_from_size(i)));
-    if (c != expected) {
-      if (errors < 512u) {
+    if(c != expected) {
+      if(errors < 512u) {
         printf("READ32_EVEN: Garbege data mismatch at $%06zX: %08" PRIX32 " should be %08" PRIX32
                ".\n",
                i, c, expected);
@@ -378,8 +378,8 @@ test_loop:;
     uint32_t c = (uint32_t)read8(addr_from_size(i));
     c |= (uint32_t)be16toh((uint16_t)read16(addr_from_size(i + 1u))) << 8;
     c |= (uint32_t)read8(addr_from_size(i + 3u)) << 24;
-    if (c != expected) {
-      if (errors < 512u) {
+    if(c != expected) {
+      if(errors < 512u) {
         printf("READ32_ODD: Garbege data mismatch at $%06zX: %08" PRIX32 " should be %08" PRIX32
                ".\n",
                i, c, expected);
@@ -411,8 +411,8 @@ test_loop:;
     uint16_t raw = (uint16_t)(((uint32_t)read8(addr_from_size(i)) << 8) |
                               (uint32_t)read8(addr_from_size(i + 1u)));
     uint16_t c = be16toh(raw);
-    if (c != expected) {
-      if (errors < 512u) {
+    if(c != expected) {
+      if(errors < 512u) {
         printf("READ16_ODD: Garbege data mismatch at $%06zX: %04X should be %04X.\n", i,
                (unsigned int)c, (unsigned int)expected);
       }
@@ -444,8 +444,8 @@ test_loop:;
     uint32_t c = (uint32_t)read8(addr_from_size(i));
     c |= (uint32_t)be16toh((uint16_t)read16(addr_from_size(i + 1u))) << 8;
     c |= (uint32_t)read8(addr_from_size(i + 3u)) << 24;
-    if (c != expected) {
-      if (errors < 512u) {
+    if(c != expected) {
+      if(errors < 512u) {
         printf("READ32_ODD: Garbege data mismatch at $%06zX: %08" PRIX32 " should be %08" PRIX32
                ".\n",
                i, c, expected);
@@ -457,7 +457,7 @@ test_loop:;
   total_errors = (uint8_t)(total_errors + errors);
   errors = 0;
 
-  if (loop_tests) {
+  if(loop_tests) {
     printf("Loop %" PRIu32 " done. Begin loop %" PRIu32 ".\n", cur_loop + 1u, cur_loop + 2u);
     printf("Current total errors: %u.\n", (unsigned int)total_errors);
     goto test_loop;

@@ -78,7 +78,7 @@ static void write_be16(uint8_t* ptr, uint16_t val) {
 }
 
 static uint16_t janus_ring_used(uint16_t write_idx, uint16_t read_idx, uint16_t ring_size) {
-  if (write_idx >= read_idx) {
+  if(write_idx >= read_idx) {
     return (uint16_t)(write_idx - read_idx);
   }
   return (uint16_t)(ring_size - (read_idx - write_idx));
@@ -86,14 +86,14 @@ static uint16_t janus_ring_used(uint16_t write_idx, uint16_t read_idx, uint16_t 
 
 static void janus_ring_read(const uint8_t* data, uint16_t ring_size, uint16_t read_idx,
                             uint8_t* dst, uint16_t len) {
-  for (uint16_t i = 0; i < len; i++) {
+  for(uint16_t i = 0; i < len; i++) {
     dst[i] = data[(read_idx + i) % ring_size];
   }
 }
 
 static void janus_write_u16(uint32_t addr, uint16_t val) {
   uint8_t* ptr = get_mapped_data_pointer_by_address(cfg, addr);
-  if (ptr) {
+  if(ptr) {
     write_be16(ptr, val);
   } else {
     m68k_write_memory_16(addr, val);
@@ -103,15 +103,15 @@ static void janus_write_u16(uint32_t addr, uint16_t val) {
 static void janus_render_fractal(uint16_t width, uint16_t height, uint16_t stride,
                                  uint16_t max_iter, uint32_t dst_ptr, uint32_t status_ptr,
                                  int32_t cx, int32_t cy, uint32_t scale) {
-  if (width == 0 || height == 0 || stride == 0 || max_iter == 0) {
+  if(width == 0 || height == 0 || stride == 0 || max_iter == 0) {
     return;
   }
 
   uint8_t* dst = get_mapped_data_pointer_by_address(cfg, dst_ptr);
 
-  for (uint16_t y = 0; y < height; y++) {
+  for(uint16_t y = 0; y < height; y++) {
     int32_t dy = (int32_t)((int64_t)((int32_t)y - (int32_t)(height / 2)) * (int64_t)scale);
-    for (uint16_t x = 0; x < width; x++) {
+    for(uint16_t x = 0; x < width; x++) {
       int32_t dx = (int32_t)((int64_t)((int32_t)x - (int32_t)(width / 2)) * (int64_t)scale);
       int32_t cr = cx + dx;
       int32_t ci = cy + dy;
@@ -120,10 +120,10 @@ static void janus_render_fractal(uint16_t width, uint16_t height, uint16_t strid
       int32_t zy = 0;
       uint16_t iter = 0;
 
-      while (iter < max_iter) {
+      while(iter < max_iter) {
         int64_t zx2 = (int64_t)zx * (int64_t)zx;
         int64_t zy2 = (int64_t)zy * (int64_t)zy;
-        if ((zx2 + zy2) > (4LL << 32)) {
+        if((zx2 + zy2) > (4LL << 32)) {
           break;
         }
         int64_t zxy = (int64_t)zx * (int64_t)zy;
@@ -133,7 +133,7 @@ static void janus_render_fractal(uint16_t width, uint16_t height, uint16_t strid
       }
 
       uint8_t color = (iter >= max_iter) ? 0 : (uint8_t)(255 - ((iter * 255) / max_iter));
-      if (dst) {
+      if(dst) {
         dst[y * stride + x] = color;
       } else {
         m68k_write_memory_8(dst_ptr + (y * stride + x), color);
@@ -141,18 +141,18 @@ static void janus_render_fractal(uint16_t width, uint16_t height, uint16_t strid
     }
   }
 
-  if (status_ptr) {
+  if(status_ptr) {
     janus_write_u16(status_ptr, 1);
   }
 }
 
 static void janus_dump_ring(void) {
-  if (janus_ring_ptr == 0) {
+  if(janus_ring_ptr == 0) {
     return;
   }
 
   uint8_t* base = get_mapped_data_pointer_by_address(cfg, janus_ring_ptr);
-  if (!base) {
+  if(!base) {
     DEBUG("[JANUS] Ring pointer $%.8X not mapped.\n", janus_ring_ptr);
     return;
   }
@@ -162,20 +162,20 @@ static void janus_dump_ring(void) {
   uint16_t size = read_be16(base + 4);
   uint16_t ring_size = janus_ring_size ? janus_ring_size : size;
 
-  if (ring_size == 0) {
+  if(ring_size == 0) {
     DEBUG("[JANUS] Invalid ring size: %u\n", ring_size);
     return;
   }
 
   uint16_t used = janus_ring_used(write_idx, read_idx, ring_size);
 
-  if (used == 0) {
+  if(used == 0) {
     return;
   }
 
   const uint8_t* data = base + 8;
 
-  while (used >= JANUS_MSG_HEADER_LEN) {
+  while(used >= JANUS_MSG_HEADER_LEN) {
     uint8_t header[JANUS_MSG_HEADER_LEN];
     janus_ring_read(data, ring_size, read_idx, header, JANUS_MSG_HEADER_LEN);
 
@@ -183,17 +183,17 @@ static void janus_dump_ring(void) {
     uint16_t len = read_be16(header + JANUS_OFF_LEN);
     uint16_t total = (uint16_t)(JANUS_MSG_HEADER_LEN + len);
 
-    if (len == 0 || total > ring_size) {
+    if(len == 0 || total > ring_size) {
       DEBUG("[JANUS] Invalid message length: %u\n", len);
       break;
     }
 
-    if (used < total) {
+    if(used < total) {
       break;
     }
 
     uint8_t msg[64];
-    if (total > sizeof(msg)) {
+    if(total > sizeof(msg)) {
       DEBUG("[JANUS] Message too large: %u\n", total);
       read_idx = (uint16_t)((read_idx + total) % ring_size);
       used = janus_ring_used(write_idx, read_idx, ring_size);
@@ -202,7 +202,7 @@ static void janus_dump_ring(void) {
 
     janus_ring_read(data, ring_size, read_idx, msg, total);
 
-    if (cmd == JANUS_CMD_FRACTAL && len == JANUS_FRACTAL_PAYLOAD_LEN) {
+    if(cmd == JANUS_CMD_FRACTAL && len == JANUS_FRACTAL_PAYLOAD_LEN) {
       uint16_t width = read_be16(msg + JANUS_OFF_WIDTH);
       uint16_t height = read_be16(msg + JANUS_OFF_HEIGHT);
       uint16_t stride = read_be16(msg + JANUS_OFF_STRIDE);
@@ -217,11 +217,11 @@ static void janus_dump_ring(void) {
             max_iter, dst_ptr);
 
       janus_render_fractal(width, height, stride, max_iter, dst_ptr, status_ptr, cx, cy, scale);
-    } else if (cmd == JANUS_CMD_TEXT) {
+    } else if(cmd == JANUS_CMD_TEXT) {
       DEBUG("[JANUS] text: ");
-      for (uint16_t i = 0; i < len; i++) {
+      for(uint16_t i = 0; i < len; i++) {
         uint8_t ch = msg[JANUS_MSG_HEADER_LEN + i];
-        if (ch < 0x20 || ch > 0x7E) {
+        if(ch < 0x20 || ch > 0x7E) {
           ch = '.';
         }
         DEBUG("%c", ch);
@@ -241,13 +241,13 @@ static void janus_dump_ring(void) {
 static uint32_t parse_temp_c(const char* buf) {
   char* end = NULL;
   long val = strtol(buf, &end, 10);
-  if (end == buf) {
+  if(end == buf) {
     return 0;
   }
-  if (val > 1000) {
+  if(val > 1000) {
     val /= 1000;
   }
-  if (val < 0) {
+  if(val < 0) {
     return 0;
   }
   return (uint32_t)val;
@@ -261,8 +261,8 @@ static uint32_t grab_pi_temperature(void) {
   char path[128];
   char buf[64];
 
-  for (size_t p = 0; p < (sizeof(base_paths) / sizeof(base_paths[0])); p++) {
-    for (int i = 0; i < 8; i++) {
+  for(size_t p = 0; p < (sizeof(base_paths) / sizeof(base_paths[0])); p++) {
+    for(int i = 0; i < 8; i++) {
       // Format string is intentionally stored in variable for flexibility
       // Known-safe format strings: "/sys/class/thermal/thermal_zone%d/temp" and "/sys/devices/virtual/thermal/thermal_zone%d/temp"
 #pragma GCC diagnostic push
@@ -270,10 +270,10 @@ static uint32_t grab_pi_temperature(void) {
       snprintf(path, sizeof(path), base_paths[p], i);
 #pragma GCC diagnostic pop
       FILE* f = fopen(path, "r");
-      if (!f) {
+      if(!f) {
         continue;
       }
-      if (fgets(buf, sizeof(buf), f)) {
+      if(fgets(buf, sizeof(buf), f)) {
         fclose(f);
         return parse_temp_c(buf);
       }
@@ -288,22 +288,22 @@ static int32_t grab_amiga_string(uint32_t addr, uint8_t* dest, uint32_t str_max_
   int32_t r = get_mapped_item_by_address(cfg, addr);
   uint32_t index = 0;
 
-  if (r == -1) {
+  if(r == -1) {
     DEBUG("[GRAB_AMIGA_STRING] No mapped range found for address $%.8X. Grabbing string data over "
           "the bus.\n",
           addr);
     do {
       dest[index] = (unsigned char)m68k_read_memory_8(addr + index);
       index++;
-    } while (dest[index - 1] != 0x00 && index < str_max_len);
+    } while(dest[index - 1] != 0x00 && index < str_max_len);
   } else {
     uint8_t* src = cfg->map_data[r] + (addr - cfg->map_offset[r]);
     do {
       dest[index] = src[index];
       index++;
-    } while (dest[index - 1] != 0x00 && index < str_max_len);
+    } while(dest[index - 1] != 0x00 && index < str_max_len);
   }
-  if (index == str_max_len) {
+  if(index == str_max_len) {
     memset(dest, 0x00, str_max_len + 1);
     return -1;
   }
@@ -313,7 +313,7 @@ static int32_t grab_amiga_string(uint32_t addr, uint8_t* dest, uint32_t str_max_
 
 static int32_t amiga_transfer_file(uint32_t addr, char* filename) {
   FILE* in = fopen(filename, "rb");
-  if (in == NULL) {
+  if(in == NULL) {
     DEBUG("[AMIGA_TRANSFER_FILE] Failed to open file %s for reading.\n", filename);
     return -1;
   }
@@ -323,13 +323,13 @@ static int32_t amiga_transfer_file(uint32_t addr, char* filename) {
   uint32_t filesize = (uint32_t)ftell(in);
 
   fseek(in, 0, SEEK_SET);
-  if (r == -1) {
+  if(r == -1) {
     DEBUG("[GRAB_AMIGA_STRING] No mapped range found for address $%.8X. Transferring file data "
           "over the bus.\n",
           addr);
     uint8_t tmp_read = 0;
 
-    for (uint32_t i = 0; i < filesize; i++) {
+    for(uint32_t i = 0; i < filesize; i++) {
       tmp_read = (uint8_t)fgetc(in);
       m68k_write_memory_8(addr + i, tmp_read);
     }
@@ -370,7 +370,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
   case PI_DBG_VAL8:
     DEBUG("[PISTORM-DEV] Set DEBUG VALUE %d to %d ($%.8X)\n", (addr - PI_DBG_VAL1) / 4, val, val);
     pi_dbg_val[(addr - PI_DBG_VAL1) / 4] = val;
-    if (addr == PI_DBG_VAL1) {
+    if(addr == PI_DBG_VAL1) {
       janus_dump_ring();
     }
     break;
@@ -438,14 +438,14 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
 
   case PI_CMD_TRANSFERFILE:
     DEBUG("[PISTORM-DEV] Write to TRANSFERFILE.\n");
-    if (pi_string[0] == 0 || grab_amiga_string(pi_string[0], (uint8_t*)tmp_string, 255) == -1) {
+    if(pi_string[0] == 0 || grab_amiga_string(pi_string[0], (uint8_t*)tmp_string, 255) == -1) {
       LOG_WARN("[PISTORM-DEV] No or invalid filename for TRANSFERFILE. Aborting.\n");
       pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
-    } else if (pi_ptr[0] == 0) {
+    } else if(pi_ptr[0] == 0) {
       LOG_WARN("[PISTORM-DEV] Null pointer specified for TRANSFERFILE destination. Aborting.\n");
       pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
     } else {
-      if (amiga_transfer_file(pi_ptr[0], tmp_string) == -1) {
+      if(amiga_transfer_file(pi_ptr[0], tmp_string) == -1) {
         pi_cmd_result = (uint8_t)PI_RES_FAILED;
       } else {
         pi_cmd_result = (uint8_t)PI_RES_OK;
@@ -456,34 +456,34 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     break;
   case PI_CMD_MEMCPY_Q:
     DEBUG("CopyMemQuick.\n");
-    if ((pi_ptr[0] & 0x03) != 0) {
+    if((pi_ptr[0] & 0x03) != 0) {
       DEBUG("[!!!PISTORM-DEV] CopyMemQuick src not aligned: %.8X\n", pi_ptr[0]);
       break;
     }
-    if (pi_ptr[1] & 0x03) {
+    if(pi_ptr[1] & 0x03) {
       DEBUG("[!!!PISTORM-DEV] CopyMemQuick dst not aligned: %.8X\n", pi_ptr[1]);
       break;
     }
-    if (val & 0x03) {
+    if(val & 0x03) {
       DEBUG("[!!!PISTORM-DEV] CopyMemQuick size not aligned: %.8X\n", val);
       break;
     }
     // Fallthrough
   case PI_CMD_MEMCPY:
     // DEBUG("[PISTORM-DEV} Write to MEMCPY: %d (%.8X)\n", val, val);
-    if (pi_ptr[0] == 0 || pi_ptr[1] == 0) {
+    if(pi_ptr[0] == 0 || pi_ptr[1] == 0) {
       LOG_WARN("[PISTORM-DEV] MEMCPY from/to null pointer not allowed. Aborting.\n");
       pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
-    } else if (val == 0) {
+    } else if(val == 0) {
       LOG_WARN("[PISTORM-DEV] MEMCPY called with size 0. Aborting.\n");
       pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
     } else {
       // DEBUG("[PISTORM-DEV] Copy %d bytes from $%.8X to $%.8X\n", val, pi_ptr[0], pi_ptr[1]);
       int32_t src = get_mapped_item_by_address(cfg, pi_ptr[0]);
       int32_t dst = get_mapped_item_by_address(cfg, pi_ptr[1]);
-      if (cfg->map_type[dst] == MAPTYPE_ROM)
+      if(cfg->map_type[dst] == MAPTYPE_ROM)
         break;
-      if (dst != -1 && src != -1) {
+      if(dst != -1 && src != -1) {
         // DEBUG("super memcpy\n");
         uint8_t* src_ptr = &cfg->map_data[src][(pi_ptr[0] - cfg->map_offset[src])];
         uint8_t* dst_ptr = &cfg->map_data[dst][(pi_ptr[1] - cfg->map_offset[dst])];
@@ -492,25 +492,25 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
         // DEBUG("slow memcpy\n");
         uint8_t tmp = 0;
         uint16_t tmps = 0;
-        for (uint32_t i = 0; i < val; i++) {
-          while (i + 2 < val) {
-            if (src == -1)
+        for(uint32_t i = 0; i < val; i++) {
+          while(i + 2 < val) {
+            if(src == -1)
               tmps = (uint16_t)htobe16(m68k_read_memory_16(pi_ptr[0] + i));
             else
               memcpy(&tmps, &cfg->map_data[src][pi_ptr[0] - cfg->map_offset[src] + i], 2);
 
-            if (dst == -1)
+            if(dst == -1)
               m68k_write_memory_16(pi_ptr[1] + i, be16toh(tmps));
             else
               memcpy(&cfg->map_data[dst][pi_ptr[1] - cfg->map_offset[dst] + i], &tmps, 2);
             i += 2;
           }
-          if (src == -1)
+          if(src == -1)
             tmp = (uint8_t)m68k_read_memory_8(pi_ptr[0] + i);
           else
             tmp = cfg->map_data[src][pi_ptr[0] - cfg->map_offset[src] + i];
 
-          if (dst == -1)
+          if(dst == -1)
             m68k_write_memory_8(pi_ptr[1] + i, tmp);
           else
             cfg->map_data[dst][pi_ptr[1] - cfg->map_offset[dst] + i] = tmp;
@@ -521,21 +521,21 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     break;
   case PI_CMD_MEMSET:
     // DEBUG("[PISTORM-DEV} Write to MEMSET: %d (%.8X)\n", val, val);
-    if (pi_ptr[0] == 0) {
+    if(pi_ptr[0] == 0) {
       LOG_WARN("[PISTORM-DEV] MEMSET with null pointer not allowed. Aborting.\n");
       pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
-    } else if (val == 0) {
+    } else if(val == 0) {
       LOG_WARN("[PISTORM-DEV] MEMSET called with size 0. Aborting.\n");
       pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
     } else {
       int32_t dst = get_mapped_item_by_address(cfg, pi_ptr[0]);
-      if (cfg->map_type[dst] == MAPTYPE_ROM)
+      if(cfg->map_type[dst] == MAPTYPE_ROM)
         break;
-      if (dst != -1) {
+      if(dst != -1) {
         uint8_t* dst_ptr = &cfg->map_data[dst][(pi_ptr[0] - cfg->map_offset[dst])];
         memset(dst_ptr, pi_byte[0], val);
       } else {
-        for (uint32_t i = 0; i < val; i++) {
+        for(uint32_t i = 0; i < val; i++) {
           m68k_write_memory_8(pi_ptr[0] + i, pi_byte[0]);
         }
       }
@@ -543,26 +543,26 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     break;
   case PI_CMD_COPYRECT:
   case PI_CMD_COPYRECT_EX:
-    if (pi_ptr[0] == 0 || pi_ptr[1] == 0) {
+    if(pi_ptr[0] == 0 || pi_ptr[1] == 0) {
       DEBUG("[PISTORM-DEV] COPYRECT/EX from/to null pointer not allowed. Aborting.\n");
       pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
-    } else if (pi_word[2] == 0 || pi_word[3] == 0) {
+    } else if(pi_word[2] == 0 || pi_word[3] == 0) {
       DEBUG("[PISTORM-DEV] COPYRECT/EX called with a width/height of 0. Aborting.\n");
       pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
     } else {
       int32_t src = get_mapped_item_by_address(cfg, pi_ptr[0]);
       int32_t dst = get_mapped_item_by_address(cfg, pi_ptr[1]);
 
-      if (addr != PI_CMD_COPYRECT_EX) {
+      if(addr != PI_CMD_COPYRECT_EX) {
         // Clear out the src/dst coordinates in case something else set them previously.
         pi_word[4] = pi_word[5] = pi_word[6] = pi_word[7] = 0;
       }
 
-      if (dst != -1 && src != -1) {
+      if(dst != -1 && src != -1) {
         uint8_t* src_ptr = &cfg->map_data[src][(pi_ptr[0] - cfg->map_offset[src])];
         uint8_t* dst_ptr = &cfg->map_data[dst][(pi_ptr[1] - cfg->map_offset[dst])];
 
-        if (addr == PI_CMD_COPYRECT_EX) {
+        if(addr == PI_CMD_COPYRECT_EX) {
           /*DEBUG("COPYRECT_EX:\n");
           DEBUG("Src pitch: %d Dst Pitch: %d:\n", pi_word[0], pi_word[1]);
           DEBUG("Width: %d Height: %d:\n", pi_word[2], pi_word[3]);
@@ -573,7 +573,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
           dst_ptr += pi_word[6] + (pi_word[7] * pi_word[1]);
         }
 
-        for (int i = 0; i < pi_word[3]; i++) {
+        for(int i = 0; i < pi_word[3]; i++) {
           memcpy(dst_ptr, src_ptr, pi_word[2]);
 
           src_ptr += pi_word[0];
@@ -583,19 +583,19 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
         uint32_t src_offset = 0, dst_offset = 0;
         uint8_t tmp = 0;
 
-        if (addr == PI_CMD_COPYRECT_EX) {
+        if(addr == PI_CMD_COPYRECT_EX) {
           src_offset += pi_word[4] + (pi_word[5] * pi_word[0]);
           dst_offset += pi_word[6] + (pi_word[7] * pi_word[1]);
         }
 
-        for (uint32_t y = 0; y < pi_word[3]; y++) {
-          for (uint32_t x = 0; x < pi_word[2]; x++) {
-            if (src == -1)
+        for(uint32_t y = 0; y < pi_word[3]; y++) {
+          for(uint32_t x = 0; x < pi_word[2]; x++) {
+            if(src == -1)
               tmp = (unsigned char)m68k_read_memory_8(pi_ptr[0] + src_offset + x);
             else
               tmp = cfg->map_data[src][(pi_ptr[0] + src_offset + x) - cfg->map_offset[src]];
 
-            if (dst == -1)
+            if(dst == -1)
               m68k_write_memory_8(pi_ptr[1] + dst_offset + x, tmp);
             else
               cfg->map_data[dst][(pi_ptr[1] + dst_offset + x) - cfg->map_offset[dst]] = tmp;
@@ -607,10 +607,10 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     }
     break;
   case PI_CMD_COPYRECT_EX_MASK:
-    if (pi_ptr[0] == 0 || pi_ptr[1] == 0) {
+    if(pi_ptr[0] == 0 || pi_ptr[1] == 0) {
       DEBUG("[PISTORM-DEV] COPYRECT_EX_MASK from/to null pointer not allowed. Aborting.\n");
       pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
-    } else if (pi_word[2] == 0 || pi_word[3] == 0) {
+    } else if(pi_word[2] == 0 || pi_word[3] == 0) {
       DEBUG("[PISTORM-DEV] COPYRECT_EX_MASK called with a width/height of 0. Aborting.\n");
       pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
     } else {
@@ -623,16 +623,16 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
       int32_t src = get_mapped_item_by_address(cfg, pi_ptr[0]);
       int32_t dst = get_mapped_item_by_address(cfg, pi_ptr[1]);
 
-      if (dst != -1 && src != -1) {
+      if(dst != -1 && src != -1) {
         uint8_t* src_ptr = &cfg->map_data[src][(pi_ptr[0] - cfg->map_offset[src])];
         uint8_t* dst_ptr = &cfg->map_data[dst][(pi_ptr[1] - cfg->map_offset[dst])];
 
         src_ptr += pi_word[4] + (pi_word[5] * pi_word[0]);
         dst_ptr += pi_word[6] + (pi_word[7] * pi_word[1]);
 
-        for (int y = 0; y < pi_word[3]; y++) {
-          for (int x = 0; x < pi_word[2]; x++) {
-            if (src_ptr[x] != pi_byte[0]) {
+        for(int y = 0; y < pi_word[3]; y++) {
+          for(int x = 0; x < pi_word[2]; x++) {
+            if(src_ptr[x] != pi_byte[0]) {
               dst_ptr[x] = src_ptr[x];
             }
           }
@@ -647,15 +647,15 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
         src_offset += pi_word[4] + (pi_word[5] * pi_word[0]);
         dst_offset += pi_word[6] + (pi_word[7] * pi_word[1]);
 
-        for (uint32_t y = 0; y < pi_word[3]; y++) {
-          for (uint32_t x = 0; x < pi_word[2]; x++) {
-            if (src == -1)
+        for(uint32_t y = 0; y < pi_word[3]; y++) {
+          for(uint32_t x = 0; x < pi_word[2]; x++) {
+            if(src == -1)
               tmp = (unsigned char)m68k_read_memory_8(pi_ptr[0] + src_offset + x);
             else
               tmp = cfg->map_data[src][(pi_ptr[0] + src_offset + x) - cfg->map_offset[src]];
 
-            if (tmp != pi_byte[0]) {
-              if (dst == -1)
+            if(tmp != pi_byte[0]) {
+              if(dst == -1)
                 m68k_write_memory_8(pi_ptr[1] + dst_offset + x, tmp);
               else
                 cfg->map_data[dst][(pi_ptr[1] + dst_offset + x) - cfg->map_offset[dst]] = tmp;
@@ -668,10 +668,10 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     }
     break;
   case PI_CMD_FILLRECT:
-    if (pi_ptr[1] == 0) {
+    if(pi_ptr[1] == 0) {
       DEBUG("[PISTORM-DEV] FILLRECT to null pointer not allowed. Aborting.\n");
       pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
-    } else if (pi_word[2] == 0 || pi_word[3] == 0) {
+    } else if(pi_word[2] == 0 || pi_word[3] == 0) {
       DEBUG("[PISTORM-DEV] FILLRECT called with a width/height of 0. Aborting.\n");
       pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
     } else {
@@ -684,12 +684,12 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
 
       uint8_t tmp = (unsigned char)pi_longword[0];
 
-      if (dst != -1) {
+      if(dst != -1) {
         uint8_t* dst_ptr = &cfg->map_data[dst][(pi_ptr[1] - cfg->map_offset[dst])];
 
         dst_ptr += pi_word[6] + (pi_word[7] * pi_word[1]);
 
-        for (int y = 0; y < pi_word[3]; y++) {
+        for(int y = 0; y < pi_word[3]; y++) {
           memset(dst_ptr, tmp, pi_word[2]);
           dst_ptr += pi_word[1];
         }
@@ -697,9 +697,9 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
         uint32_t dst_offset = 0;
         dst_offset += pi_word[6] + (pi_word[7] * pi_word[1]);
 
-        for (uint32_t y = 0; y < pi_word[3]; y++) {
-          for (uint32_t x = 0; x < pi_word[2]; x++) {
-            if (dst == -1)
+        for(uint32_t y = 0; y < pi_word[3]; y++) {
+          for(uint32_t x = 0; x < pi_word[2]; x++) {
+            if(dst == -1)
               m68k_write_memory_8(pi_ptr[1] + dst_offset + x, tmp);
             else
               cfg->map_data[dst][(pi_ptr[1] + dst_offset + x) - cfg->map_offset[dst]] = tmp;
@@ -710,39 +710,39 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     }
     break;
   case PI_CMD_BLIT_NBPP:
-    if (pi_ptr[0] == 0 || pi_ptr[1] == 0) {
+    if(pi_ptr[0] == 0 || pi_ptr[1] == 0) {
       DEBUG("[PISTORM-DEV] BLIT_NBPP from/to null pointer not allowed. Aborting.\n");
       pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
-    } else if (pi_word[2] == 0 || pi_word[3] == 0) {
+    } else if(pi_word[2] == 0 || pi_word[3] == 0) {
       DEBUG("[PISTORM-DEV] BLIT_NBPP called with a width/height of 0. Aborting.\n");
       pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
     } else {
       int32_t src = get_mapped_item_by_address(cfg, pi_ptr[0]);
       int32_t dst = get_mapped_item_by_address(cfg, pi_ptr[1]);
 
-      if (dst != -1 && src != -1) {
+      if(dst != -1 && src != -1) {
         uint8_t* src_ptr = &cfg->map_data[src][(pi_ptr[0] - cfg->map_offset[src])];
         uint8_t* dst_ptr = &cfg->map_data[dst][(pi_ptr[1] - cfg->map_offset[dst])];
         uint8_t* pal_ptr = 0;
 
-        if (pi_ptr[2] != 0) {
+        if(pi_ptr[2] != 0) {
           pal_ptr = get_mapped_data_pointer_by_address(cfg, pi_ptr[2]);
         }
 
         uint8_t tmp = *src_ptr++;
         uint8_t num_bits = 8;
 
-        for (int y = 0; y < pi_word[3] && y + pi_word[4] < pi_word[5]; y++) {
-          for (int x = 0; x < pi_word[2]; x++) {
+        for(int y = 0; y < pi_word[3] && y + pi_word[4] < pi_word[5]; y++) {
+          for(int x = 0; x < pi_word[2]; x++) {
             int32_t color = (tmp >> (8 - val)) & 0xFF;
 
-            if (color && y + pi_word[4] >= 0) {
+            if(color && y + pi_word[4] >= 0) {
               *dst_ptr = (pal_ptr) ? pal_ptr[color] : (uint8_t)color;
             }
             dst_ptr++;
             tmp <<= val;
             num_bits -= val;
-            if (num_bits == 0) {
+            if(num_bits == 0) {
               tmp = *src_ptr++;
               num_bits = 8;
             }
@@ -763,12 +763,12 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     break;
   case PI_CMD_RTGSTATUS:
     DEBUG("[PISTORM-DEV] Write to RTGSTATUS: %d\n", val);
-    if (val == 1 && !rtg_enabled) {
+    if(val == 1 && !rtg_enabled) {
       init_rtg_data(cfg);
       rtg_enabled = 1;
       pi_cmd_result = (uint8_t)PI_RES_OK;
-    } else if (val == 0 && rtg_enabled) {
-      if (!rtg_on) {
+    } else if(val == 0 && rtg_enabled) {
+      if(!rtg_on) {
         shutdown_rtg();
         rtg_enabled = 0;
         pi_cmd_result = (uint8_t)PI_RES_OK;
@@ -783,7 +783,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     break;
   case PI_CMD_RTG_SCALING:
     DEBUG("[PISTORM-DEV] Write to RTG_SCALING: %d\n", val);
-    if (val == PIGFX_SCALE_CUSTOM || val == PIGFX_SCALE_CUSTOM_RECT) {
+    if(val == PIGFX_SCALE_CUSTOM || val == PIGFX_SCALE_CUSTOM_RECT) {
       rtg_set_scale_rect((uint16_t)val, (int16_t)pi_word[0], (int16_t)pi_word[1], (int16_t)pi_word[2],
                          (int16_t)pi_word[3]);
     } else {
@@ -807,7 +807,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     break;
   }
   case PI_CMD_JANUS_INIT:
-    if (pi_ptr[0] == 0 || pi_word[0] == 0) {
+    if(pi_ptr[0] == 0 || pi_word[0] == 0) {
       DEBUG("[PISTORM-DEV] Janus init with invalid ring params.\n");
       pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
     } else {
@@ -822,11 +822,11 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
 
   case PI_CMD_NETSTATUS:
     DEBUG("[PISTORM-DEV] Write to NETSTATUS: %d\n", val);
-    if (val == 1 && !pinet_enabled) {
+    if(val == 1 && !pinet_enabled) {
       pinet_init(NULL);
       pinet_enabled = 1;
       pi_cmd_result = (uint8_t)PI_RES_OK;
-    } else if (val == 0 && pinet_enabled) {
+    } else if(val == 0 && pinet_enabled) {
       pinet_shutdown();
       pinet_enabled = 0;
       pi_cmd_result = (uint8_t)PI_RES_OK;
@@ -840,7 +840,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     switch (val) {
     case PISCSI_CTRL_DISABLE:
       DEBUG("DISABLE\n");
-      if (piscsi_enabled) {
+      if(piscsi_enabled) {
         piscsi_shutdown();
         piscsi_enabled = 0;
         // Probably not OK... depends on if you booted from floppy, I guess.
@@ -851,7 +851,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
       break;
     case PISCSI_CTRL_ENABLE:
       DEBUG("ENABLE\n");
-      if (!piscsi_enabled) {
+      if(!piscsi_enabled) {
         piscsi_init();
         piscsi_enabled = 1;
         piscsi_refresh_drives();
@@ -862,12 +862,12 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
       break;
     case PISCSI_CTRL_MAP:
       DEBUG("MAP\n");
-      if (pi_string[0] == 0 || grab_amiga_string(pi_string[0], (uint8_t*)tmp_string, 255) == -1) {
+      if(pi_string[0] == 0 || grab_amiga_string(pi_string[0], (uint8_t*)tmp_string, 255) == -1) {
         LOG_WARN("[PISTORM-DEV] Failed to grab string for PISCSI drive filename. Aborting.\n");
         pi_cmd_result = (uint8_t)PI_RES_FAILED;
       } else {
         FILE* tmp = fopen(tmp_string, "rb");
-        if (tmp == NULL) {
+        if(tmp == NULL) {
           LOG_WARN("[PISTORM-DEV] Failed to open file %s for PISCSI drive mapping. Aborting.\n",
                    tmp_string);
           pi_cmd_result = (uint8_t)PI_RES_FILENOTFOUND;
@@ -884,11 +884,11 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
       break;
     case PISCSI_CTRL_UNMAP:
       DEBUG("UNMAP\n");
-      if ((uint8_t)pi_word[0] > 7) {
+      if((uint8_t)pi_word[0] > 7) {
         LOG_WARN("[PISTORM-DEV] Invalid drive ID %d for PISCSI unmap command.", (int)pi_word[0]);
         pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
       } else {
-        if (piscsi_get_dev((uint8_t)pi_word[0])->fd != -1) {
+        if(piscsi_get_dev((uint8_t)pi_word[0])->fd != -1) {
           piscsi_unmap_drive((uint8_t)pi_word[0]);
           pi_cmd_result = (uint8_t)PI_RES_OK;
         } else {
@@ -914,18 +914,18 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
 
   case PI_CMD_KICKROM:
     DEBUG("[PISTORM-DEV] Write to KICKROM.\n");
-    if (pi_string[0] == 0 || grab_amiga_string(pi_string[0], (uint8_t*)tmp_string, 255) == -1) {
+    if(pi_string[0] == 0 || grab_amiga_string(pi_string[0], (uint8_t*)tmp_string, 255) == -1) {
       LOG_WARN("[PISTORM-DEV] Failed to grab string KICKROM filename. Aborting.\n");
       pi_cmd_result = (uint8_t)PI_RES_FAILED;
     } else {
       FILE* tmp = fopen(tmp_string, "rb");
-      if (tmp == NULL) {
+      if(tmp == NULL) {
         LOG_WARN("[PISTORM-DEV] Failed to open file %s for KICKROM mapping. Aborting.\n",
                  tmp_string);
         pi_cmd_result = (uint8_t)PI_RES_FILENOTFOUND;
       } else {
         fclose(tmp);
-        if (get_named_mapped_item(cfg, "kickstart") != -1) {
+        if(get_named_mapped_item(cfg, "kickstart") != -1) {
           int32_t index = get_named_mapped_item(cfg, "kickstart");
           cfg_release_map_data(cfg, index);
           free(cfg->map_id[index]);
@@ -946,18 +946,18 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     break;
   case PI_CMD_EXTROM:
     DEBUG("[PISTORM-DEV] Write to EXTROM.\n");
-    if (pi_string[0] == 0 || grab_amiga_string(pi_string[0], (uint8_t*)tmp_string, 255) == -1) {
+    if(pi_string[0] == 0 || grab_amiga_string(pi_string[0], (uint8_t*)tmp_string, 255) == -1) {
       LOG_WARN("[PISTORM-DEV] Failed to grab string EXTROM filename. Aborting.\n");
       pi_cmd_result = (uint8_t)PI_RES_FAILED;
     } else {
       FILE* tmp = fopen(tmp_string, "rb");
-      if (tmp == NULL) {
+      if(tmp == NULL) {
         LOG_WARN("[PISTORM-DEV] Failed to open file %s for EXTROM mapping. Aborting.\n",
                  tmp_string);
         pi_cmd_result = (uint8_t)PI_RES_FILENOTFOUND;
       } else {
         fclose(tmp);
-        if (get_named_mapped_item(cfg, "extended") != -1) {
+        if(get_named_mapped_item(cfg, "extended") != -1) {
           int32_t index = get_named_mapped_item(cfg, "extended");
           cfg_release_map_data(cfg, index);
           free(cfg->map_id[index]);
@@ -988,7 +988,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     pi_cmd_result = shutdown_confirm;
     break;
   case PI_CMD_CONFIRMSHUTDOWN:
-    if (val != shutdown_confirm) {
+    if(val != shutdown_confirm) {
       DEBUG("[PISTORM-DEV] Attempted shutdown with wrong shutdown confirm value. Not shutting "
             "down.\n");
       shutdown_confirm = 0xFFFFFFFF;
@@ -1006,12 +1006,12 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     switch (val) {
     case PICFG_LOAD:
       DEBUG("LOAD\n");
-      if (pi_string[0] == 0 || grab_amiga_string(pi_string[0], (uint8_t*)cfg_filename, 255) == -1) {
+      if(pi_string[0] == 0 || grab_amiga_string(pi_string[0], (uint8_t*)cfg_filename, 255) == -1) {
         LOG_WARN("[PISTORM-DEV] Failed to grab string for CONFIG filename. Aborting.\n");
         pi_cmd_result = (uint8_t)PI_RES_FAILED;
       } else {
         FILE* tmp = fopen(cfg_filename, "rb");
-        if (tmp == NULL) {
+        if(tmp == NULL) {
           LOG_WARN("[PISTORM-DEV] Failed to open CONFIG file %s for reading. Aborting.\n",
                    cfg_filename);
           pi_cmd_result = (uint8_t)PI_RES_FILENOTFOUND;
@@ -1054,14 +1054,14 @@ uint32_t handle_pistorm_dev_read(uint32_t addr_, uint8_t type) {
   switch ((addr)) {
   case PI_CMD_FILESIZE:
     DEBUG("[PISTORM-DEV] %s read from FILESIZE.\n", op_type_names[type]);
-    if (pi_string[0] == 0 || grab_amiga_string(pi_string[0], (uint8_t*)tmp_string, 255) == -1) {
+    if(pi_string[0] == 0 || grab_amiga_string(pi_string[0], (uint8_t*)tmp_string, 255) == -1) {
       DEBUG("[PISTORM-DEV] Failed to grab string for FILESIZE command. Aborting.\n");
       pi_cmd_result = (uint8_t)PI_RES_FAILED;
       pi_longword[0] = 0;
       return 0;
     } else {
       FILE* tmp = fopen(tmp_string, "rb");
-      if (tmp == NULL) {
+      if(tmp == NULL) {
         DEBUG("[PISTORM-DEV] Failed to open file %s for FILESIZE command. Aborting.\n", tmp_string);
         pi_longword[0] = 0;
         pi_cmd_result = (uint8_t)PI_RES_FILENOTFOUND;

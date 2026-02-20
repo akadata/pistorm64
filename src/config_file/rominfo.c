@@ -12,8 +12,8 @@ static void getDiagRom(uint8_t* address, struct romInfo* info) {
   uint8_t* ptr = address + 0xC8;
   uint8_t data = *ptr;
   char* endptr = NULL;
-  if (data != 0x56) // V
-  {
+  if (data != 0x56)  {
+    // V
     return;
   }
   ptr++;
@@ -85,8 +85,7 @@ static void getRomInfo(uint8_t* address, size_t length, struct romInfo* info) {
   }
   ptr++;
   data = *ptr;
-  if (data != 0x4E) // 256K byte swapped
-  {
+  if (data != 0x4E) { // 256K byte swapped
     return;
   }
   // This is wrong endian for us

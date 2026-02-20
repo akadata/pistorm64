@@ -77,73 +77,73 @@ const uint8_t ide_magic[8] = {
   '1','D','E','D','1','5','C','0'
 };
 
-static char *charmap(uint8_t v)
-{
+static char *charmap(uint8_t v) {
   static char cbuf[3];
-  if (v < 32)
+  if (v < 32) {
     sprintf(cbuf, "^%c", '@'+v);
-  else if (v < 127)
+  } else if (v < 127) {
     sprintf(cbuf, " %c", v);
-  else if (v == 127)
+  } else if (v == 127) {
     sprintf(cbuf, "DL");
-  else if (v < 160)
+  } else if (v < 160) {
     sprintf(cbuf, ":%c", '@' + v - 128);
-  else if (v < 255)
+  } else if (v < 255) {
     sprintf(cbuf, "~%c", v - 128);
-  else
+  } else {
     sprintf(cbuf, "!D");
+  }
   return cbuf;
 }
 
-static void hexdump(uint8_t *bp)
-{
+static void hexdump(uint8_t *bp) {
   int i,j;
   for (i = 0; i < 512; i+= 16) {
-    for(j = 0; j < 16; j++)
+    for(j = 0; j < 16; j++) {
       fprintf(stderr, "%02X ", bp[i+j]);
+    }
     fprintf(stderr, "|");
-    for(j = 0; j < 16; j++)
+    for(j = 0; j < 16; j++) {
       fprintf(stderr, "%2s", charmap(bp[i+j]));
+    }
     fprintf(stderr, "\n");
   }
 }
 
 /* FIXME: use proper endian convertors! */
-static uint16_t le16(uint16_t v)
-{
+static uint16_t le16(uint16_t v) {
   uint8_t *p = (uint8_t *)&v;
   return p[0] | (p[1] << 8);
 }
 
-static void ide_xlate_errno(struct ide_taskfile *t, int len)
-{
+static void ide_xlate_errno(struct ide_taskfile *t, int len) {
   t->status |= ST_ERR;
   if (len == -1) {
-    if (errno == EIO)
+    if (errno == EIO) {
       t->error = ERR_UNC;
-    else
+    } else {
       t->error = ERR_AMNF;
-  } else
+    }
+  } else {
     t->error = ERR_AMNF;
+  }
 }
 
-static void ide_fault(struct ide_drive *d, const char *p)
-{
+static void ide_fault(struct ide_drive *d, const char *p) {
   fprintf(stderr, "ide: %s: %d: %s\n", d->controller->name,
 			(int)(d - d->controller->drive), p);
 }
 
 /* Disk translation */
-static off_t xlate_block(struct ide_taskfile *t)
-{
+static off_t xlate_block(struct ide_taskfile *t) {
   struct ide_drive *d = t->drive;
   uint16_t cyl;
 
   if (t->lba4 & DEVH_LBA) {
 /*    fprintf(stderr, "XLATE LBA %02X:%02X:%02X:%02X\n", 
       t->lba4, t->lba3, t->lba2, t->lba1);*/
-    if (d->lba)
+    if (d->lba) {
       return 2 + (((t->lba4 & DEVH_HEAD) << 24) | (t->lba3 << 16) | (t->lba2 << 8) | t->lba1);
+    }
     ide_fault(d, "LBA on non LBA drive");
   }
 
@@ -165,29 +165,25 @@ static off_t xlate_block(struct ide_taskfile *t)
 }
 
 /* Indicate the drive is ready */
-static void ready(struct ide_taskfile *tf)
-{
+static void ready(struct ide_taskfile *tf) {
   tf->status &= ~(ST_BSY|ST_DRQ);
   tf->status |= ST_DRDY;
   tf->drive->state = IDE_IDLE;
 }
 
 /* Return to idle state, completing a command */
-static void completed(struct ide_taskfile *tf)
-{
+static void completed(struct ide_taskfile *tf) {
   ready(tf);
   tf->drive->intrq = 1;
 }
 
-static void drive_failed(struct ide_taskfile *tf)
-{
+static void drive_failed(struct ide_taskfile *tf) {
   tf->status |= ST_ERR;
   tf->error = ERR_IDNF;
   ready(tf);
 }
 
-static void data_in_state(struct ide_taskfile *tf)
-{
+static void data_in_state(struct ide_taskfile *tf) {
   struct ide_drive *d = tf->drive;
   d->state = IDE_DATA_IN;
   d->dptr = d->data + 512;
@@ -198,8 +194,7 @@ static void data_in_state(struct ide_taskfile *tf)
   d->intrq = 1;			/* Double check */
 }
 
-static void data_out_state(struct ide_taskfile *tf)
-{
+static void data_out_state(struct ide_taskfile *tf) {
   struct ide_drive *d = tf->drive;
   d->state = IDE_DATA_OUT;
   d->dptr = d->data;
@@ -208,8 +203,7 @@ static void data_out_state(struct ide_taskfile *tf)
   d->intrq = 1;			/* Double check */
 }
 
-static void edd_setup(struct ide_taskfile *tf)
-{
+static void edd_setup(struct ide_taskfile *tf) {
   tf->error = 0x01;		/* All good */
   tf->lba1 = 0x01;		/* EDD always updates drive 0 */
   tf->lba2 = 0x00;
@@ -219,8 +213,7 @@ static void edd_setup(struct ide_taskfile *tf)
   ready(tf);
 }
 
-void ide_reset(struct ide_controller *c)
-{
+void ide_reset(struct ide_controller *c) {
   if (c->drive[0].present) {
     edd_setup(&c->drive[0].taskfile);
     /* A drive could clear busy then set DRDY up to 2 minutes later if its
@@ -236,44 +229,45 @@ void ide_reset(struct ide_controller *c)
   c->selected = 0;
 }
 
-void ide_reset_begin(struct ide_controller *c)
-{
-  if (c->drive[0].present)
+void ide_reset_begin(struct ide_controller *c) {
+  if (c->drive[0].present) {
     c->drive[0].taskfile.status |= ST_BSY;
-  if (c->drive[1].present)
+  }
+  if (c->drive[1].present) {
     c->drive[1].taskfile.status |= ST_BSY;
+  }
   /* Ought to be a time delay relative to reset or power on */
   ide_reset(c);
 }
 
-static void ide_srst_begin(struct ide_controller *c)
-{
+static void ide_srst_begin(struct ide_controller *c) {
   ide_reset(c);
-  if (c->drive[0].present)
+  if (c->drive[0].present) {
     c->drive[0].taskfile.status |= ST_BSY;
-  if (c->drive[1].present)
+  }
+  if (c->drive[1].present) {
     c->drive[1].taskfile.status |= ST_BSY;
+  }
 }  
 
-static void ide_srst_end(struct ide_controller *c)
-{
+static void ide_srst_end(struct ide_controller *c) {
   /* Could be time delays here */
   ready(&c->drive[0].taskfile);
   ready(&c->drive[1].taskfile);
 }
 
-static void cmd_edd_complete(struct ide_taskfile *tf)
-{
+static void cmd_edd_complete(struct ide_taskfile *tf) {
   struct ide_controller *c = tf->drive->controller;
-  if (c->drive[0].present)
+  if (c->drive[0].present) {
     edd_setup(&c->drive[0].taskfile);
-  if (c->drive[1].present)
+  }
+  if (c->drive[1].present) {
     edd_setup(&c->drive[1].taskfile);
+  }
   c->selected = 0;
 }
 
-static void cmd_identify_complete(struct ide_taskfile *tf)
-{
+static void cmd_identify_complete(struct ide_taskfile *tf) {
   struct ide_drive *d = tf->drive;
   memcpy(d->data, d->identify, 512);
   data_in_state(tf);
@@ -282,8 +276,7 @@ static void cmd_identify_complete(struct ide_taskfile *tf)
   d->length = 1;
 }
 
-static void cmd_initparam_complete(struct ide_taskfile *tf)
-{
+static void cmd_initparam_complete(struct ide_taskfile *tf) {
   struct ide_drive *d = tf->drive;
   /* We only support the current mapping */
   if (tf->count != d->sectors || (tf->lba4 & DEVH_HEAD) + 1 != d->heads) {
@@ -293,13 +286,13 @@ static void cmd_initparam_complete(struct ide_taskfile *tf)
 /*    fprintf(stderr, "geo is %d %d, asked for %d %d\n",
       d->sectors, d->heads, tf->count, (tf->lba4 & DEVH_HEAD) + 1); */
     ide_fault(d, "invalid geometry");
-  } else if (tf->drive->failed == 1)
+  } else if (tf->drive->failed == 1) {
     tf->drive->failed = 0;		/* Valid translation */
+  }
   completed(tf);
 }
 
-static void cmd_readsectors_complete(struct ide_taskfile *tf)
-{
+static void cmd_readsectors_complete(struct ide_taskfile *tf) {
   struct ide_drive *d = tf->drive;
   /* Move to data xfer */
   if (d->failed) {
@@ -326,8 +319,7 @@ static void cmd_readsectors_complete(struct ide_taskfile *tf)
   data_in_state(tf);
 }
 
-static void cmd_verifysectors_complete(struct ide_taskfile *tf)
-{
+static void cmd_verifysectors_complete(struct ide_taskfile *tf) {
   struct ide_drive *d = tf->drive;
   /* Move to data xfer */
   if (d->failed) {
@@ -346,8 +338,7 @@ static void cmd_verifysectors_complete(struct ide_taskfile *tf)
   completed(tf);
 }
 
-static void cmd_recalibrate_complete(struct ide_taskfile *tf)
-{
+static void cmd_recalibrate_complete(struct ide_taskfile *tf) {
   struct ide_drive *d = tf->drive;
   if (d->failed)
     drive_failed(tf);
@@ -360,11 +351,11 @@ static void cmd_recalibrate_complete(struct ide_taskfile *tf)
   completed(tf);
 }
 
-static void cmd_seek_complete(struct ide_taskfile *tf)
-{
+static void cmd_seek_complete(struct ide_taskfile *tf) {
   struct ide_drive *d = tf->drive;
-  if (d->failed)
+  if (d->failed) {
     drive_failed(tf);
+  }
   d->offset = xlate_block(tf);
   if (d->offset == -1 || lseek(d->fd, 512 * d->offset, SEEK_SET) == -1) {
     tf->status &= ~ST_DSC;
@@ -375,8 +366,7 @@ static void cmd_seek_complete(struct ide_taskfile *tf)
   completed(tf);
 }
 
-static void cmd_setfeatures_complete(struct ide_taskfile *tf)
-{
+static void cmd_setfeatures_complete(struct ide_taskfile *tf) {
   struct ide_drive *d = tf->drive;
   switch(tf->feature) {
     case 0x01:
@@ -399,8 +389,7 @@ static void cmd_setfeatures_complete(struct ide_taskfile *tf)
   completed(tf);
 }
 
-static void cmd_writesectors_complete(struct ide_taskfile *tf)
-{
+static void cmd_writesectors_complete(struct ide_taskfile *tf) {
   struct ide_drive *d = tf->drive;
   /* Move to data xfer */
   if (d->failed) {
@@ -424,8 +413,7 @@ static void cmd_writesectors_complete(struct ide_taskfile *tf)
   data_out_state(tf);
 }
 
-static void ide_set_error(struct ide_drive *d)
-{
+static void ide_set_error(struct ide_drive *d) {
   d->taskfile.lba4 &= ~DEVH_HEAD;
 
   if (d->taskfile.lba4 & DEVH_LBA) {
@@ -447,8 +435,7 @@ static void ide_set_error(struct ide_drive *d)
   completed(&d->taskfile);
 }
 
-static int ide_read_sector(struct ide_drive *d)
-{
+static int ide_read_sector(struct ide_drive *d) {
   int len;
 
   d->dptr = d->data;
@@ -464,8 +451,7 @@ static int ide_read_sector(struct ide_drive *d)
   return 0;
 }
 
-static int ide_write_sector(struct ide_drive *d)
-{
+static int ide_write_sector(struct ide_drive *d) {
   int len;
 
   d->dptr = d->data;
@@ -480,8 +466,7 @@ static int ide_write_sector(struct ide_drive *d)
   return 0;
 }
 
-static uint16_t ide_data_in(struct ide_drive *d, int len)
-{
+static uint16_t ide_data_in(struct ide_drive *d, int len) {
   uint16_t v;
   if (d->state == IDE_DATA_IN) {
     if (d->dptr == d->data + 512) {
@@ -492,11 +477,13 @@ static uint16_t ide_data_in(struct ide_drive *d, int len)
     }
     v = *d->dptr;
     if (!d->eightbit) {
-      if (len == 2)
+      if (len == 2) {
         v |= (d->dptr[1] << 8);
+      }
       d->dptr+=2;
-    } else
+    } else {
       d->dptr++;
+    }
     d->taskfile.data = v;
     if (d->dptr == d->data + 512) {
       d->length--;
@@ -506,16 +493,17 @@ static uint16_t ide_data_in(struct ide_drive *d, int len)
         completed(&d->taskfile);
       }
     }
-  } else
+  } else {
     ide_fault(d, "bad data read");
+  }
 
-  if (len == 1)
+  if (len == 1) {
     return d->taskfile.data & 0xFF;
+  }
   return d->taskfile.data;
 }
 
-static void ide_data_out(struct ide_drive *d, uint16_t v, int len)
-{
+static void ide_data_out(struct ide_drive *d, uint16_t v, int len) {
   if (d->state != IDE_DATA_OUT) {
     ide_fault(d, "bad data write");
     d->taskfile.data = v;
@@ -544,8 +532,7 @@ static void ide_data_out(struct ide_drive *d, uint16_t v, int len)
   }
 }
 
-static void ide_issue_command(struct ide_taskfile *t)
-{
+static void ide_issue_command(struct ide_taskfile *t) {
   t->status &= ~(ST_ERR|ST_DRDY);
   t->status |= ST_BSY;
   t->error = 0;
@@ -578,11 +565,12 @@ static void ide_issue_command(struct ide_taskfile *t)
       cmd_writesectors_complete(t);
       break;
     default:
-      if ((t->command & 0xF0) == IDE_CMD_CALIB)	/* 1x */
+      if ((t->command & 0xF0) == IDE_CMD_CALIB) {	/* 1x */
         cmd_recalibrate_complete(t);
-      else if ((t->command & 0xF0) == IDE_CMD_SEEK) /* 7x */
+      }
+      else if ((t->command & 0xF0) == IDE_CMD_SEEK) { /* 7x */
         cmd_seek_complete(t);
-      else {
+      } else {
         /* Unknown */
         t->status |= ST_ERR;
         t->error |= ERR_ABRT;
@@ -595,8 +583,7 @@ static void ide_issue_command(struct ide_taskfile *t)
  *	8bit IDE controller emulation
  */
 
-uint8_t ide_read8(struct ide_controller *c, uint8_t r)
-{
+uint8_t ide_read8(struct ide_controller *c, uint8_t r) {
   struct ide_drive *d = &c->drive[c->selected];
   struct ide_taskfile *t = &d->taskfile;
   switch(r) {
@@ -624,8 +611,7 @@ uint8_t ide_read8(struct ide_controller *c, uint8_t r)
   }
 }
 
-void ide_write8(struct ide_controller *c, uint8_t r, uint8_t v)
-{
+void ide_write8(struct ide_controller *c, uint8_t r, uint8_t v) {
   struct ide_drive *d = &c->drive[c->selected];
   struct ide_taskfile *t = &d->taskfile;
 
@@ -672,10 +658,11 @@ void ide_write8(struct ide_controller *c, uint8_t r, uint8_t v)
       /* ATA: "When the Device Control register is written, both devices
          respond to the write regardless of which device is selected" */
       if ((v ^ t->devctrl) & DCL_SRST) {
-        if (v & DCL_SRST)
+        if (v & DCL_SRST) {
           ide_srst_begin(c);
-        else
+        } else {
           ide_srst_end(c);
+        }
       }
       c->drive[0].taskfile.devctrl = v;	/* Check versus real h/w does this end up cleared */
       c->drive[1].taskfile.devctrl = v;
@@ -687,16 +674,15 @@ void ide_write8(struct ide_controller *c, uint8_t r, uint8_t v)
  *	16bit IDE controller emulation
  */
 
-uint16_t ide_read16(struct ide_controller *c, uint8_t r)
-{
+uint16_t ide_read16(struct ide_controller *c, uint8_t r) {
   struct ide_drive *d = &c->drive[c->selected];
-  if (r == ide_data)
+  if (r == ide_data) {
     return htons(ide_data_in(d,2));
+  }
   return ide_read8(c, r);
 }
 
-void ide_write16(struct ide_controller *c, uint8_t r, uint16_t v)
-{
+void ide_write16(struct ide_controller *c, uint8_t r, uint16_t v) {
   struct ide_drive *d = &c->drive[c->selected];
   struct ide_taskfile *t = &d->taskfile;
 
@@ -704,20 +690,21 @@ void ide_write16(struct ide_controller *c, uint8_t r, uint16_t v)
     ide_fault(d, "command written while busy");
     return;
   }
-  if (r == ide_data)
+  if (r == ide_data) {
     ide_data_out(d, ntohs(v), 2);
-  else
+  } else {
     ide_write8(c, r, v);
+  }
 }
 
 /*
  *	Allocate a new IDE controller emulation
  */
-struct ide_controller *ide_allocate(const char *name)
-{
+struct ide_controller *ide_allocate(const char *name) {
   struct ide_controller *c = calloc(1, sizeof(*c));
-  if (c == NULL)
+  if (c == NULL) {
     return NULL;
+  }
   c->name = strdup(name);
   if (c->name == NULL) {
     free(c);
@@ -733,8 +720,7 @@ struct ide_controller *ide_allocate(const char *name)
 /*
  *	Attach a file to a device on the controller
  */
-int ide_attach(struct ide_controller *c, int drive, int fd)
-{
+int ide_attach(struct ide_controller *c, int drive, int fd) {
   struct ide_drive *d = &c->drive[drive];
   if (d->present) {
     ide_fault(d, "double attach");
@@ -755,18 +741,18 @@ int ide_attach(struct ide_controller *c, int drive, int fd)
   d->heads = d->identify[3];
   d->sectors = d->identify[6];
   d->cylinders = le16(d->identify[1]);
-  if (d->identify[49] & le16(1 << 9))
+  if (d->identify[49] & le16(1 << 9)) {
     d->lba = 1;
-  else
+  } else {
     d->lba = 0;
+  }
   return 0;
 }
 
 /*
  *	Detach an IDE device from the interface (not hot pluggable)
  */
-void ide_detach(struct ide_drive *d)
-{
+void ide_detach(struct ide_drive *d) {
   close(d->fd);
   d->fd = -1;
   d->present = 0;
@@ -775,12 +761,13 @@ void ide_detach(struct ide_drive *d)
 /*
  *	Free up and release and IDE controller
  */  
-void ide_free(struct ide_controller *c)
-{
-  if (c->drive[0].present)
+void ide_free(struct ide_controller *c) {
+  if (c->drive[0].present) {
     ide_detach(&c->drive[0]);
-  if (c->drive[1].present)
+  }
+  if (c->drive[1].present) {
     ide_detach(&c->drive[1]);
+  }
   free((void *)c->name);
   free(c);
 }
@@ -789,11 +776,11 @@ void ide_free(struct ide_controller *c)
  *	Emulation interface for an 8bit controller using latches on the
  *	data register
  */
-uint8_t ide_read_latched(struct ide_controller *c, uint8_t reg)
-{
+uint8_t ide_read_latched(struct ide_controller *c, uint8_t reg) {
   uint16_t v;
-  if (reg == ide_data_latch)
+  if (reg == ide_data_latch) {
     return c->data_latch;
+  }
   v = ide_read16(c, reg);
   if (reg == ide_data) {
     c->data_latch = v >> 8;
@@ -802,21 +789,20 @@ uint8_t ide_read_latched(struct ide_controller *c, uint8_t reg)
   return v;
 }
 
-void ide_write_latched(struct ide_controller *c, uint8_t reg, uint8_t v)
-{
+void ide_write_latched(struct ide_controller *c, uint8_t reg, uint8_t v) {
   uint16_t d = v;
 
   if (reg == ide_data_latch) {
     c->data_latch = v;
     return;
   }
-  if (reg == ide_data)
+  if (reg == ide_data) {
     d |=  (c->data_latch << 8);
+  }
   ide_write16(c, reg, d);  
 }
 
-static void make_ascii(uint16_t *p, const char *t, int len)
-{
+static void make_ascii(uint16_t *p, const char *t, int len) {
   int i;
   char *d = (char *)p;
   strncpy(d, t, len);
@@ -829,28 +815,28 @@ static void make_ascii(uint16_t *p, const char *t, int len)
   }  
 }
 
-static void make_serial(uint16_t *p)
-{
+static void make_serial(uint16_t *p) {
   char buf[21];
   srand(getpid()^time(NULL));
   snprintf(buf, 21, "%08d%08d%04d", rand(), rand(), rand());
   make_ascii(p, buf, 20);
 }
 
-int ide_make_drive(uint8_t type, int fd)
-{
+int ide_make_drive(uint8_t type, int fd) {
   uint8_t s, h;
   uint16_t c;
   uint32_t sectors;
   uint16_t ident[256];
 
-  if (type < 1 || type > MAX_DRIVE_TYPE)
+  if (type < 1 || type > MAX_DRIVE_TYPE) {
     return -2;
+  }
   
   memset(ident, 0, 512);
   memcpy(ident, ide_magic, 8);
-  if (write(fd, ident, 512) != 512)
+  if (write(fd, ident, 512) != 512) {
     return -1;
+  }
 
   memset(ident, 0, 8);
   ident[0] = le16((1 << 15) | (1 << 6));	/* Non removable */
@@ -923,12 +909,14 @@ int ide_make_drive(uint8_t type, int fd)
   ident[58] = le16(sectors >> 16);
   ident[60] = ident[57];
   ident[61] = ident[58];
-  if (write(fd, ident, 512) != 512)
+  if (write(fd, ident, 512) != 512) {
     return -1;
+  }
   
   memset(ident, 0xE5, 512);
-  while(sectors--)
-    if (write(fd, ident, 512) != 512)
+  while(sectors--) 
+    if (write(fd, ident, 512) != 512) {
       return -1;  
+    }
   return 0;
 }

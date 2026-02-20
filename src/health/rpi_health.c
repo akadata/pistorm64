@@ -28,7 +28,9 @@
 
 static int mbox_call(uint32_t *buf, size_t bytes) {
     int fd = open("/dev/vcio", O_RDONLY);
-    if (fd < 0) return -1;
+    if (fd < 0) {
+        return -1;
+    }
     buf[0] = (uint32_t)bytes;
     buf[1] = 0;
     int rc = ioctl(fd, IOCTL_MBOX_PROPERTY, buf);
@@ -43,7 +45,9 @@ static int get_throttled(uint32_t *out) {
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;
-    if (mbox_call(buf, sizeof(buf)) != 0) return -1;
+    if (mbox_call(buf, sizeof(buf)) != 0) {
+        return -1;
+    }
     *out = buf[5];
     return 0;
 }
@@ -57,7 +61,9 @@ static int get_temperature_mC(uint32_t *out_mC) {
     buf[5] = TEMP_ID_SOC;
     buf[6] = 0;      // temp (mC)
     buf[7] = 0;
-    if (mbox_call(buf, sizeof(buf)) != 0) return -1;
+    if (mbox_call(buf, sizeof(buf)) != 0) {
+        return -1;
+    }
     *out_mC = buf[6];
     return 0;
 }
@@ -70,7 +76,9 @@ static int get_clock_rate_hz(uint32_t clock_id, uint32_t *out_hz) {
     buf[5] = clock_id;
     buf[6] = 0; // rate
     buf[7] = 0;
-    if (mbox_call(buf, sizeof(buf)) != 0) return -1;
+    if (mbox_call(buf, sizeof(buf)) != 0) {
+        return -1;
+    }
     *out_hz = buf[6];
     return 0;
 }
@@ -84,7 +92,9 @@ static int get_voltage_uv(uint32_t volt_id, uint32_t *out_uv) {
     buf[5] = volt_id;
     buf[6] = 0; // voltage
     buf[7] = 0;
-    if (mbox_call(buf, sizeof(buf)) != 0) return -1;
+    if (mbox_call(buf, sizeof(buf)) != 0) {
+        return -1;
+    }
     *out_uv = buf[6];
     return 0;
 }
@@ -94,17 +104,36 @@ const char *rpi_throttled_flags_to_string(uint32_t f) {
     static char s[256];
     s[0] = 0;
 
-    #define APPEND(msg) do { if (s[0]) strncat(s," | ",sizeof(s)-strlen(s)-1); strncat(s,msg,sizeof(s)-strlen(s)-1);} while(0)
-    if (f == 0) { snprintf(s, sizeof(s), "OK"); return s; }
+#define APPEND(msg) do { if (s[0]) strncat(s," | ",sizeof(s)-strlen(s)-1); strncat(s,msg,sizeof(s)-strlen(s)-1);} while(0)
+    if (f == 0) { 
+        snprintf(s, sizeof(s), "OK"); 
+        return s; 
+    }
 
-    if (f & (1u<<0))  APPEND("UNDER_VOLTAGE_NOW");
-    if (f & (1u<<1))  APPEND("FREQ_CAPPED_NOW");
-    if (f & (1u<<2))  APPEND("THROTTLED_NOW");
-    if (f & (1u<<3))  APPEND("SOFT_TEMP_LIMIT_NOW");
-    if (f & (1u<<16)) APPEND("UNDER_VOLTAGE_OCCURRED");
-    if (f & (1u<<17)) APPEND("FREQ_CAPPED_OCCURRED");
-    if (f & (1u<<18)) APPEND("THROTTLING_OCCURRED");
-    if (f & (1u<<19)) APPEND("SOFT_TEMP_LIMIT_OCCURRED");
+    if (f & (1u<<0)) {       
+        APPEND("UNDER_VOLTAGE_NOW");
+    }
+    if (f & (1u<<1))  {
+        APPEND("FREQ_CAPPED_NOW");
+    }
+    if (f & (1u<<2))  {
+        APPEND("THROTTLED_NOW");
+    }
+    if (f & (1u<<3))  {
+        APPEND("SOFT_TEMP_LIMIT_NOW");
+    }
+    if (f & (1u<<16)) {
+        APPEND("UNDER_VOLTAGE_OCCURRED");
+    }
+    if (f & (1u<<17)) {
+        APPEND("FREQ_CAPPED_OCCURRED");
+    }
+    if (f & (1u<<18)) {
+        APPEND("THROTTLING_OCCURRED");
+    }
+    if (f & (1u<<19)) {
+        APPEND("SOFT_TEMP_LIMIT_OCCURRED");
+    }
 
     char raw[64];
     snprintf(raw, sizeof(raw), "RAW=0x%08x", f);
@@ -113,15 +142,25 @@ const char *rpi_throttled_flags_to_string(uint32_t f) {
 }
 
 int rpi_read_health(rpi_health_t *out) {
-    if (!out) return -1;
+    if (!out) {
+        return -1;
+    }
     memset(out, 0, sizeof(*out));
 
     uint32_t t;
-    if (get_throttled(&out->throttled) != 0) return -2;
+    if (get_throttled(&out->throttled) != 0) {
+        return -2;
+    }
 
-    if (get_temperature_mC(&t) == 0) out->temp_c = (float)t / 1000.0f;
-    if (get_clock_rate_hz(CLOCK_ID_ARM, &out->arm_hz) == 0) { /* ok */ }
-    if (get_voltage_uv(VOLT_ID_CORE, &out->core_uv) == 0) { /* ok */ }
+    if (get_temperature_mC(&t) == 0) {
+        out->temp_c = (float)t / 1000.0f;
+    }
+    if (get_clock_rate_hz(CLOCK_ID_ARM, &out->arm_hz) == 0)  { 
+        /* ok */ 
+    }
+    if (get_voltage_uv(VOLT_ID_CORE, &out->core_uv) == 0) { 
+        /* ok */ 
+    }
 
     return 0;
 }

@@ -13,29 +13,26 @@
 #define COLORS 8
 #define CHUNKLEN 255
 
-struct _Node
-{
+struct _Node {
 	uint16_t children[COLORS];
 };
 typedef struct _Node Node;
 
 static Node *nodes;
 
-static void init_node(uint16_t code)
-{
+static void init_node(uint16_t code) {
 	Node *node = &nodes[code];
-	for (int i = 0; i < COLORS; i++)
+	for(int i = 0; i < COLORS; i++) {
 		node->children[i] = 0xffff;
+	}
 }
 
 static uint8_t *buffer;
 static int capacity;
 static int length;
 
-static void append_byte(uint8_t b)
-{
-	if (length == capacity)
-	{
+static void append_byte(uint8_t b) {
+	if(length == capacity) {
 		capacity *= 2;
 		buffer = realloc(buffer, capacity);
 	}
@@ -45,10 +42,8 @@ static void append_byte(uint8_t b)
 
 static int chunk_left = 0;
 
-static void flush_byte(uint8_t b)
-{
-	if (!chunk_left)
-	{
+static void flush_byte(uint8_t b) {
+	if(!chunk_left) {
 		append_byte(CHUNKLEN);
 		chunk_left = CHUNKLEN;
 	}
@@ -71,12 +66,12 @@ static int blen;
 
 static Node *prefix;
 
-static void begin_encode(void)
-{
+static void begin_encode(void) {
 	chunk_left = 0;
 
-	for (int i = 0; i < COLORS; i++)
+	for(int i = 0; i < COLORS; i++) {
 		init_node(i);
+	}
 
 	next_code = 258;
 	clen = 9;
@@ -90,48 +85,41 @@ static void begin_encode(void)
 	prefix = NULL;
 }
 
-static void end_encode(void)
-{
+static void end_encode(void) {
 	buf |= p2c(prefix) << blen;
 	blen += clen;
 
 	buf |= eoi_code << blen;
 	blen += clen;
 
-	while (blen > 0)
-	{
+	while (blen > 0) {
 		flush_byte(buf);
 		buf >>= 8;
 		blen -= 8;
 	}
 
-	if (chunk_left)
-	{
+	if(chunk_left) {
 		int used = CHUNKLEN - chunk_left;
 		buffer[length - used - 1] = used;
 	}
 }
 
-static void encode(uint8_t *pixels, int count)
-{
+static void encode(uint8_t *pixels, int count) {
 	uint32_t *cp = (uint32_t *)pixels;
 	uint32_t *end = (uint32_t *)(pixels + (count / 2));
 
 	uint32_t ibuf = *cp++;
 	int ilen = 8;
 
-	if (!prefix)
-	{
+	if(!prefix) {
 		uint8_t K = ibuf & 0xf;
 		ibuf >>= 4;
 		ilen--;
 		prefix = &nodes[K];
 	}
 
-	while (cp < end || ilen)
-	{
-		if (!ilen)
-		{
+	while (cp < end || ilen) {
+		if(!ilen) {
 			ibuf = *cp++;
 			ilen = 8;
 		}
@@ -140,36 +128,35 @@ static void encode(uint8_t *pixels, int count)
 		ibuf >>= 4;
 		ilen--;
 
-		if (prefix->children[K] != 0xffff)
+		if(prefix->children[K] != 0xffff)  {
 			prefix = c2p(prefix->children[K]);
-		else
-		{
+		} else {
 			buf |= p2c(prefix) << blen;
 			blen += clen;
 
 			init_node(next_code);
 			prefix->children[K] = next_code;
 
-			if (next_code == (1U << clen))
+			if(next_code == (1U << clen)) {
 				clen++;
+			}
 			next_code++;
 
 			prefix = &nodes[K];
 
-			if (next_code == 4095)
-			{
+			if(next_code == 4095) {
 				buf |= clear_code << blen;
 				blen += clen;
 
-				for (int i = 0; i < COLORS; i++)
+				for(int i = 0; i < COLORS; i++) {
 					init_node(i);
+				}
 
 				clen = 9;
 				next_code = 258;
 			}
 
-			while (blen >= 8)
-			{
+			while (blen >= 8) {
 				flush_byte(buf);
 				buf >>= 8;
 				blen -= 8;
@@ -186,24 +173,20 @@ static void encode(uint8_t *pixels, int count)
 
 static uint8_t pal[8*3] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-static void copy_bpls_to_pixels(uint8_t *pixels, uint8_t *bpls, int b)
-{
+static void copy_bpls_to_pixels(uint8_t *pixels, uint8_t *bpls, int b) {
 	memset(pixels, 0, W * BLOCK_HEIGHT / 2);
 
 	bpls += b * BLOCK_HEIGHT * W / 8;
-	for (int i = 0; i < BPL_COUNT; i++)
-	{
+	for(int i = 0; i < BPL_COUNT; i++) {
 		uint8_t *src = bpls;
 		uint32_t *dst = (uint32_t *)pixels;
 
 		int shift = 28 - (7 - i);
 
-		for (int j = 0; j < BLOCK_HEIGHT * W / 8; j++)
-		{
+		for(int j = 0; j < BLOCK_HEIGHT * W / 8; j++) {
 			uint8_t x = *src++;
 			uint32_t bits = 0;
-			for (int k = 0; k < 8; k++)
-			{
+			for(int k = 0; k < 8; k++) {
 				bits = (bits >> 4) | ((x & 0x80) << shift);
 				x <<= 1;
 			}
@@ -215,8 +198,7 @@ static void copy_bpls_to_pixels(uint8_t *pixels, uint8_t *bpls, int b)
 
 static uint8_t *pixels;
 
-static void write_gif(uint8_t *bpls)
-{
+static void write_gif(uint8_t *bpls) {
 	uint8_t *p = buffer;
 	memcpy(p, "GIF89a", 6);
 	p += 6;
@@ -244,8 +226,7 @@ static void write_gif(uint8_t *bpls)
 	length = p - buffer;
 
 	begin_encode();
-	for (int b = 0; b < H / BLOCK_HEIGHT; b++)
-	{
+	for(int b = 0; b < H / BLOCK_HEIGHT; b++) {
 		copy_bpls_to_pixels(pixels, bpls, b);
 		encode(pixels, W * BLOCK_HEIGHT);
 	}
@@ -261,15 +242,15 @@ static void write_gif(uint8_t *bpls)
 #define BYTEARRAY_FORMAT "s#"
 #endif
 
-static PyObject *b2g_set_palette(PyObject *self, PyObject *args)
-{
+static PyObject *b2g_set_palette(PyObject *self, PyObject *args) {
 	char *buf;
 	Py_ssize_t len;
 
-	if (!PyArg_ParseTuple(args, BYTEARRAY_FORMAT, &buf, &len))
+	if(!PyArg_ParseTuple(args, BYTEARRAY_FORMAT, &buf, &len)) {
 		return NULL;
+	}
 
-	if (len != 24) {
+	if(len != 24) {
 		PyErr_SetString(PyExc_RuntimeError, "Must be 8*3 = 24 bytes (r, g, b).");
 		return NULL;
 	}
@@ -280,15 +261,15 @@ static PyObject *b2g_set_palette(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject *b2g_encode(PyObject *self, PyObject *args)
-{
+static PyObject *b2g_encode(PyObject *self, PyObject *args) {
 	char *buf;
 	Py_ssize_t len;
 
-	if (!PyArg_ParseTuple(args, BYTEARRAY_FORMAT, &buf, &len))
+	if(!PyArg_ParseTuple(args, BYTEARRAY_FORMAT, &buf, &len)) {
 		return NULL;
+	}
 
-	if (len != 80*256*3) {
+	if(len != 80*256*3) {
 		PyErr_SetString(PyExc_RuntimeError, "Must be 3 bitplanes of 256 rows with 80 bytes per row (total of 61440 bytes).");
 		return NULL;
 	}
@@ -331,12 +312,14 @@ PyMODINIT_FUNC initbpls2gif(void)
 {
 #if PY_MAJOR_VERSION > 2
 	PyObject *m = PyModule_Create(&bpls2gif_module);
-	if (m == NULL)
+	if(m == NULL) {
 		return NULL;
+	}
 #else
 	PyObject *m = Py_InitModule3("bpls2gif", module_methods, module_docstring);
-	if (m == NULL)
+	if(m == NULL) {
 		return;
+	}
 #endif
 
 	nodes = malloc(4096 * sizeof(Node));

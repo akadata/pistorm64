@@ -19,8 +19,7 @@
 # Build defaults live in config.mk (override there or via make VAR=...)
 
 
-
-#EXTRA_CFLAGS ?= -g -O0
+#EXTRA_CFLAGS ?=  -g -O0
 #EXTRA_M68K_CFLAGS ?= -g -O0
 #EXTRA_LDFLAGS ?= -g -O0
 
@@ -115,9 +114,9 @@ endif
 EMU_WARNINGS  ?= $(WARNINGS) $(EMU_WARNINGS_EXTRA)
 
 ifeq ($(findstring clang,$(CC)),)
-OPT_LEVEL_DEFAULT ?= -O3 -ffast-math
+OPT_LEVEL_DEFAULT ?= -Os -ffast-math
 else
-OPT_LEVEL_DEFAULT ?= -O3 -ffast-math
+OPT_LEVEL_DEFAULT ?= -Os -ffast-math
 endif
 
 OPT_LEVEL ?= $(OPT_LEVEL_DEFAULT)
@@ -374,7 +373,7 @@ CXX ?= g++
 
 DEFINES  += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 
 # Allow command-line override of batching and rate limiting for performance tuning
-PISTORM_USE_DIRECT_OPS ?= 0
+PISTORM_USE_DIRECT_OPS ?= 1
 DEFINES  += -DPISTORM_ENABLE_BATCH=$(PISTORM_ENABLE_BATCH) -DPISTORM_IPL_RATELIMIT_US=$(PISTORM_IPL_RATELIMIT_US) -DPISTORM_USE_DIRECT_OPS=$(PISTORM_USE_DIRECT_OPS)
 DEFINES  += -DRTG_GFX_MEM=$(RTG_GFX_MEM) -DRTG_WIDTH=$(RTG_WIDTH) -DRTG_HEIGHT=$(RTG_HEIGHT)
 LD_GOLD   = $(if $(filter 1,$(USE_GOLD)),-fuse-ld=gold,)
@@ -457,7 +456,7 @@ ifneq ($(OPENSSL_LIBS),)
 BASE_LIBS += $(OPENSSL_LIBS)
 INCLUDES += $(OPENSSL_CFLAGS)
 endif
-RAYLIB_LIBS := $(RAYLIB_A) -lEGL -lGLESv2 -ldrm -lgbm
+RAYLIB_LIBS := $(RAYLIB_A) -lEGL -lGLESv2 -ldrm -lgbm  -lpthread -lvcos -lvchiq_arm -lbcm_host
 ifeq ($(USE_RAYLIB),0)
 RAYLIB_LIBS :=
 RAYLIB_INC    =
