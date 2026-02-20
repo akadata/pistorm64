@@ -834,7 +834,7 @@ MODULE_INFO(firmware, "N/A");
 MODULE_INFO(name, "pistorm");
 MODULE_INFO(alias, "pistorm");
 MODULE_INFO(url, "https://github.com/akadata/pistorm64");
-MODULE_INFO(known_working, "Pi Zero 2 W (BCM2837, Pi 3-class)");
+MODULE_INFO(known_working, "Pi 4-class (BCM2711) , Pi Zero 2 W (BCM2837, Pi 3-class)");
 MODULE_INFO(tested, "Pi 4-class (BCM2711) and Pi 3-class on Linux 6.12.62+rpt-rpi-v8");
 MODULE_INFO(targets, "BCM2837 (Pi 3-class), BCM2711 (Pi 4-class)");
 MODULE_INFO(intree, "N"); /* out-of-tree */

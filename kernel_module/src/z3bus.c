@@ -40,31 +40,33 @@ static struct pistorm_z3_device z3bus_devices[] = {
 static const int z3bus_device_count = sizeof(z3bus_devices) / sizeof(z3bus_devices[0]);
 
 static bool z3_id_match(const struct pistorm_z3_id *want,
-                        const struct pistorm_z3_id *have)
-{
-  if (want->vendor != PISTORM_Z3_ANY && want->vendor != have->vendor)
+                        const struct pistorm_z3_id *have) {
+  if (want->vendor != PISTORM_Z3_ANY && want->vendor != have->vendor) {
     return false;
-  if (want->product != PISTORM_Z3_ANY && want->product != have->product)
+  }
+  if (want->product != PISTORM_Z3_ANY && want->product != have->product) {
     return false;
-  if (want->revision != PISTORM_Z3_ANY && want->revision != have->revision)
+  }
+  if (want->revision != PISTORM_Z3_ANY && want->revision != have->revision) {
     return false;
+  }
   return true;
 }
 
 static const struct pistorm_z3_id *z3_find_id(const struct pistorm_z3_id *table,
-                                              const struct pistorm_z3_device *dev)
-{
-  if (!table)
+                                              const struct pistorm_z3_device *dev) {
+  if (!table) {
     return NULL;
+  }
   for (; table->vendor || table->product || table->revision; table++) {
-    if (z3_id_match(table, &dev->id))
+    if (z3_id_match(table, &dev->id)) {
       return table;
+    }
   }
   return NULL;
 }
 
-static void z3_probe_all(struct pistorm_z3_driver *drv)
-{
+static void z3_probe_all(struct pistorm_z3_driver *drv) {
   int i;
 
   for (i = 0; i < z3bus_device_count; i++) {
@@ -73,8 +75,9 @@ static void z3_probe_all(struct pistorm_z3_driver *drv)
 
     if (drv->id_table) {
       id = z3_find_id(drv->id_table, dev);
-      if (!id)
+      if (!id) {
         continue;
+      }
     }
 
     if (drv->probe) {
@@ -88,10 +91,10 @@ static void z3_probe_all(struct pistorm_z3_driver *drv)
   }
 }
 
-int pistorm_z3_register_driver(struct pistorm_z3_driver *drv)
-{
-  if (!drv || !drv->name)
+int pistorm_z3_register_driver(struct pistorm_z3_driver *drv) {
+  if (!drv || !drv->name) {
     return -EINVAL;
+  }
 
   mutex_lock(&z3bus_lock);
   list_add_tail(&drv->node, &z3bus_drivers);
@@ -102,10 +105,10 @@ int pistorm_z3_register_driver(struct pistorm_z3_driver *drv)
 }
 EXPORT_SYMBOL_GPL(pistorm_z3_register_driver);
 
-void pistorm_z3_unregister_driver(struct pistorm_z3_driver *drv)
-{
-  if (!drv)
+void pistorm_z3_unregister_driver(struct pistorm_z3_driver *drv) {
+  if (!drv) {
     return;
+  }
 
   mutex_lock(&z3bus_lock);
   list_del(&drv->node);
@@ -113,33 +116,34 @@ void pistorm_z3_unregister_driver(struct pistorm_z3_driver *drv)
 }
 EXPORT_SYMBOL_GPL(pistorm_z3_unregister_driver);
 
-int pistorm_z3_get_device_count(void)
-{
+int pistorm_z3_get_device_count(void) {
   return z3bus_device_count;
 }
 EXPORT_SYMBOL_GPL(pistorm_z3_get_device_count);
 
-const struct pistorm_z3_device *pistorm_z3_get_device(int index)
-{
-  if (index < 0 || index >= z3bus_device_count)
+const struct pistorm_z3_device *pistorm_z3_get_device(int index) {
+  if (index < 0 || index >= z3bus_device_count) {
     return NULL;
+  }
   return &z3bus_devices[index];
 }
 EXPORT_SYMBOL_GPL(pistorm_z3_get_device);
 
-static long z3bus_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
-{
+static long z3bus_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
   struct pistorm_z3bus_enum req;
   int i;
 
-  if (cmd != PISTORM_Z3BUS_IOC_ENUM)
+  if (cmd != PISTORM_Z3BUS_IOC_ENUM) {
     return -ENOTTY;
+  }
 
-  if (copy_from_user(&req, (void __user *)arg, sizeof(req)))
+  if (copy_from_user(&req, (void __user *)arg, sizeof(req))) {
     return -EFAULT;
+  }
 
-  if (req.count > PISTORM_Z3BUS_MAX_DEVS)
+  if (req.count > PISTORM_Z3BUS_MAX_DEVS) {
     req.count = PISTORM_Z3BUS_MAX_DEVS;
+  }
 
   for (i = 0; i < (int)req.count && i < z3bus_device_count; i++) {
     const struct pistorm_z3_device *dev = &z3bus_devices[i];
@@ -155,8 +159,9 @@ static long z3bus_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
   req.count = (z3bus_device_count < (int)req.count) ? z3bus_device_count : req.count;
 
-  if (copy_to_user((void __user *)arg, &req, sizeof(req)))
+  if (copy_to_user((void __user *)arg, &req, sizeof(req))) {
     return -EFAULT;
+  }
 
   return 0;
 }
@@ -173,8 +178,7 @@ static struct miscdevice z3bus_miscdev = {
   .fops = &z3bus_fops,
 };
 
-static int __init z3bus_init(void)
-{
+static int __init z3bus_init(void) {
   int rc;
   pr_info(Z3BUS_NAME ": skeleton bus loaded (%zu devices)\n",
           sizeof(z3bus_devices) / sizeof(z3bus_devices[0]));
@@ -186,8 +190,7 @@ static int __init z3bus_init(void)
   return 0;
 }
 
-static void __exit z3bus_exit(void)
-{
+static void __exit z3bus_exit(void) {
   misc_deregister(&z3bus_miscdev);
   pr_info(Z3BUS_NAME ": skeleton bus unloaded\n");
 }
