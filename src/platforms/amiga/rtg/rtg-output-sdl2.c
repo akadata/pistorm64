@@ -92,6 +92,14 @@ void* rtgThread(void* args) {
   rtg_share_data.memory = rtg_mem;
   rtg_share_data.running = &rtg_on;
   rtg_share_data.addr = &framebuffer_addr_adj;
+  rtg_share_data.vram_writes = NULL;
+  rtg_share_data.fb_writes = NULL;
+  rtg_share_data.fb_min_off = NULL;
+  rtg_share_data.fb_max_off = NULL;
+  rtg_share_data.fb_last_off = NULL;
+  rtg_share_data.vram_min_off = NULL;
+  rtg_share_data.vram_max_off = NULL;
+  rtg_share_data.vram_last_off = NULL;
   struct rtg_shared_data* data = &rtg_share_data;
 
   uint16_t width = rtg_display_width;
@@ -264,4 +272,11 @@ void rtg_init_display() {
 void rtg_shutdown_display() {
   printf("RTG display disabled.\n");
   rtg_on = 0;
+}
+
+void rtg_output_set_source(struct rtg_shared_data *data) {
+  (void)data;
+}
+
+void rtg_output_clear_source(void) {
 }

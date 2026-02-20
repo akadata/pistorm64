@@ -33,6 +33,8 @@
 #define CORE_RTG_REG_DISP_H    0x34u
 #define CORE_RTG_REG_SCALE_X   0x38u
 #define CORE_RTG_REG_SCALE_Y   0x3Cu
+#define CORE_RTG_REG_CLUT_INDEX 0x40u
+#define CORE_RTG_REG_CLUT_RGB   0x44u
 
 #define CORE_RTG_MAGIC         0x43525447u  // 'CRTG'
 #define CORE_RTG_VERSION       0x00010000u
@@ -41,12 +43,13 @@ typedef struct core_rtg_state {
   uint8_t *vram;
   uint32_t vram_size;
   uint32_t fb_addr;
-  uint32_t fb_pitch;
+  uint16_t fb_pitch;
   uint16_t fb_width;
   uint16_t fb_height;
   uint16_t fb_format;
   uint16_t pan_x;
   uint16_t pan_y;
+  uint32_t fb_addr_offset;
 
   uint16_t disp_width;
   uint16_t disp_height;
@@ -54,6 +57,15 @@ typedef struct core_rtg_state {
   uint32_t scale_y;
 
   uint8_t enabled;
+  uint8_t clut_index;
+
+  uint32_t fb_write_hits;
+  uint32_t fb_min_off;
+  uint32_t fb_max_off;
+  uint32_t fb_last_off;
+  uint32_t vram_min_off;
+  uint32_t vram_max_off;
+  uint32_t vram_last_off;
 } core_rtg_state_t;
 
 void core_rtg_register(zorro_bus_t bus);

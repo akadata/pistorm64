@@ -9,6 +9,7 @@
 #include "log.h"
 
 #include "raylib.h"
+#include "rlgl.h"
 
 #include <dirent.h>
 #include <endian.h>
@@ -193,17 +194,7 @@ static uint8_t pi_screen_height_set = 0;
 static const size_t rtg_mem_size = (size_t)RTG_GFX_MEM * SIZE_MEGA;
 
 
-struct rtg_shared_data {
-  uint16_t *width;
-  uint16_t *height;
-  uint16_t *format;
-  uint16_t *pitch;
-  uint16_t *offset_x;
-  uint16_t *offset_y;
-  uint8_t* memory;
-  uint32_t* addr;
-  uint8_t* running;
-};
+static struct rtg_shared_data* rtg_share_override = NULL;
 
 float scale_x = 1.0f;
 float scale_y = 1.0f;
@@ -216,6 +207,95 @@ static Rectangle dstscale;
 static Vector2 origin;
 static uint8_t scale_mode = PIGFX_SCALE_FULL;
 static uint8_t filter_mode = 0;
+static int force_opaque_32 = -1;
+static int log_each_frame = -1;
+
+static int rtg_format_is_32bpp(uint16_t format) {
+  switch (format) {
+  case RTGFMT_RGB32_ARGB:
+  case RTGFMT_RGB32_ABGR:
+  case RTGFMT_RGB32_RGBA:
+  case RTGFMT_RGB32_BGRA:
+    return 1;
+  default:
+    return 0;
+  }
+}
+
+static int rtg_format_alpha_offset(uint16_t format) {
+  switch (format) {
+  case RTGFMT_RGB32_ARGB:
+  case RTGFMT_RGB32_ABGR:
+    return 0;
+  case RTGFMT_RGB32_RGBA:
+  case RTGFMT_RGB32_BGRA:
+    return 3;
+  default:
+    return -1;
+  }
+}
+
+static int rtg_alpha_looks_zero(const uint8_t* base, size_t pitch, uint16_t width, uint16_t height,
+                                size_t bpp, int alpha_off) {
+  if (!base || bpp != 4 || alpha_off < 0 || width == 0 || height == 0 || pitch == 0) {
+    return 0;
+  }
+  uint16_t rows = (height < 4) ? height : 4;
+  uint16_t cols = (width < 64) ? width : 64;
+  uint16_t step = (cols > 0) ? (width / cols) : 1;
+  if (step == 0) {
+    step = 1;
+  }
+  for (uint16_t y = 0; y < rows; y++) {
+    const uint8_t* row = base + (size_t)pitch * y + alpha_off;
+    for (uint16_t x = 0; x < width; x += step) {
+      if (row[(size_t)x * bpp] != 0x00) {
+        return 0;
+      }
+    }
+  }
+  return 1;
+}
+
+static uint32_t rtg_frame_sample_hash(const uint8_t* base, size_t pitch, uint16_t width,
+                                      uint16_t height, size_t bpp) {
+  if (!base || width == 0 || height == 0 || bpp == 0 || pitch == 0) {
+    return 0;
+  }
+  uint16_t rows = (height < 16) ? height : 16;
+  uint16_t cols = (width < 16) ? width : 16;
+  uint16_t step_y = (rows > 0) ? (height / rows) : 1;
+  uint16_t step_x = (cols > 0) ? (width / cols) : 1;
+  if (step_y == 0) {
+    step_y = 1;
+  }
+  if (step_x == 0) {
+    step_x = 1;
+  }
+  uint32_t hash = 0;
+  uint16_t sampled_rows = 0;
+  for (uint16_t y = 0; y < height && sampled_rows < rows; y += step_y, sampled_rows++) {
+    const uint8_t* row = base + (size_t)pitch * y;
+    uint16_t sampled_cols = 0;
+    for (uint16_t x = 0; x < width && sampled_cols < cols; x += step_x, sampled_cols++) {
+      size_t off = (size_t)x * bpp;
+      if (off + bpp > pitch) {
+        break;
+      }
+      uint32_t v = 0;
+      if (bpp >= 4) {
+        memcpy(&v, row + off, sizeof(uint32_t));
+      } else if (bpp == 2) {
+        v = (uint32_t)row[off] | ((uint32_t)row[off + 1] << 8);
+      } else {
+        v = row[off];
+      }
+      hash = (hash << 5) | (hash >> 27);
+      hash ^= v;
+    }
+  }
+  return hash;
+}
 
 struct rtg_shared_data rtg_share_data;
 static uint32_t palette[256];
@@ -228,6 +308,14 @@ uint32_t clut_cursor_texture_data[256 * 256];
 extern void rtg_update_screen(void);
 extern void rtg_scale_output(uint16_t width, uint16_t height);
 extern void* rtgThread(void* args);
+
+void rtg_output_set_source(struct rtg_shared_data *data) {
+  rtg_share_override = data;
+}
+
+void rtg_output_clear_source(void) {
+  rtg_share_override = NULL;
+}
 extern void update_mouse_cursor(uint8_t* src);
 
 void rtg_update_screen(void) {
@@ -562,22 +650,38 @@ void* rtgThread(void* args) {
   uint16_t last_warn_pitch = 0;
   uint16_t last_warn_width = 0;
   uint16_t last_warn_format = 0;
+  int alpha_ignore_logged = 0;
+  uint32_t last_frame_hash = 0;
+  uint32_t last_vram_writes = 0;
+  uint32_t last_fb_writes = 0;
 
-  rtg_share_data.format = &rtg_display_format;
-  rtg_share_data.width = &rtg_display_width;
-  rtg_share_data.height = &rtg_display_height;
-  rtg_share_data.pitch = &rtg_pitch;
-  rtg_share_data.offset_x = &rtg_offset_x;
-  rtg_share_data.offset_y = &rtg_offset_y;
-  rtg_share_data.memory = rtg_mem;
-  rtg_share_data.running = &rtg_on;
-  rtg_share_data.addr = &framebuffer_addr_adj;
   struct rtg_shared_data* data = &rtg_share_data;
+  if (rtg_share_override) {
+    data = rtg_share_override;
+  } else {
+    rtg_share_data.format = &rtg_display_format;
+    rtg_share_data.width = &rtg_display_width;
+    rtg_share_data.height = &rtg_display_height;
+    rtg_share_data.pitch = &rtg_pitch;
+    rtg_share_data.offset_x = &rtg_offset_x;
+    rtg_share_data.offset_y = &rtg_offset_y;
+    rtg_share_data.memory = rtg_mem;
+    rtg_share_data.running = &rtg_on;
+    rtg_share_data.addr = &framebuffer_addr_adj;
+    rtg_share_data.vram_writes = NULL;
+    rtg_share_data.fb_writes = NULL;
+    rtg_share_data.fb_min_off = NULL;
+    rtg_share_data.fb_max_off = NULL;
+    rtg_share_data.fb_last_off = NULL;
+    rtg_share_data.vram_min_off = NULL;
+    rtg_share_data.vram_max_off = NULL;
+    rtg_share_data.vram_last_off = NULL;
+  }
 
-  uint16_t width = rtg_display_width;
-  uint16_t height = rtg_display_height;
-  uint16_t format = rtg_display_format;
-  uint16_t pitch = rtg_pitch;
+  uint16_t width = *data->width;
+  uint16_t height = *data->height;
+  uint16_t format = *data->format;
+  uint16_t pitch = *data->pitch;
 
   Texture raylib_texture = {0};
   Texture raylib_cursor_texture = {0};
@@ -610,6 +714,21 @@ void* rtgThread(void* args) {
     clut_cpu_mode = (env && *env && atoi(env) != 0) ? 1 : 0;
     if (clut_cpu_mode) {
       LOG_INFO("[RTG/RAYLIB] CPU CLUT conversion enabled via PISTORM_RTG_CLUT_CPU.\n");
+    }
+  }
+  if (force_opaque_32 < 0) {
+    const char* env = getenv("PISTORM_RTG_FORCE_OPAQUE");
+    if (env && *env) {
+      force_opaque_32 = (atoi(env) != 0) ? 1 : 0;
+      LOG_INFO("[RTG/RAYLIB] 32bpp alpha override %s via PISTORM_RTG_FORCE_OPAQUE.\n",
+               force_opaque_32 ? "enabled" : "disabled");
+    }
+  }
+  if (log_each_frame < 0) {
+    const char* env = getenv("PISTORM_RTG_LOG_EACH_FRAME");
+    log_each_frame = (env && *env && atoi(env) != 0) ? 1 : 0;
+    if (log_each_frame) {
+      LOG_INFO("[RTG/RAYLIB] Per-frame logging enabled via PISTORM_RTG_LOG_EACH_FRAME.\n");
     }
   }
 
@@ -955,6 +1074,31 @@ reinit_raylib:;
           old_filter_mode = -1;
         }
       }
+      int ignore_alpha = 0;
+      if (rtg_format_is_32bpp(current_format)) {
+        if (force_opaque_32 == 1) {
+          ignore_alpha = 1;
+        } else if (force_opaque_32 < 0) {
+          size_t current_addr_offset = (size_t)current_addr;
+          size_t current_frame_needed = (size_t)current_pitch * current_height;
+          if (current_pitch > 0 && current_height > 0 &&
+              current_addr_offset < rtg_mem_size &&
+              current_frame_needed <= rtg_mem_size - current_addr_offset) {
+            int alpha_off = rtg_format_alpha_offset(current_format);
+            if (alpha_off >= 0) {
+              const uint8_t* base = data->memory + current_addr_offset;
+              if (rtg_alpha_looks_zero(base, current_pitch, current_width, current_height,
+                                       current_bpp, alpha_off)) {
+                ignore_alpha = 1;
+                if (!alpha_ignore_logged) {
+                  LOG_INFO("[RTG/RAYLIB] 32bpp alpha appears unused; disabling blending.\n");
+                  alpha_ignore_logged = 1;
+                }
+              }
+            }
+          }
+        }
+      }
       BeginDrawing();
       ClearBackground(black);
       rtg_output_in_vblank = 0;
@@ -991,7 +1135,13 @@ reinit_raylib:;
         break;
       }
 
+      if (ignore_alpha) {
+        rlDisableColorBlend();
+      }
       DrawTexturePro(raylib_texture, srcrect, dstscale, origin, 0.0f, RAYWHITE);
+      if (ignore_alpha) {
+        rlEnableColorBlend();
+      }
 
       switch (format) {
       case RTGFMT_8BIT_CLUT:
@@ -1298,6 +1448,55 @@ reinit_raylib:;
       }
       if(frame_no < 3) {
         LOG_DEBUG("[RTG/RAYLIB] Frame %u end\n", frame_no);
+      }
+      if (log_each_frame) {
+        size_t sample_off = (size_t)current_addr;
+        uint32_t frame_hash = 0;
+        if (sample_off < rtg_mem_size) {
+          const uint8_t* base = data->memory + sample_off;
+          frame_hash = rtg_frame_sample_hash(base, current_pitch, current_width, current_height,
+                                             current_bpp);
+        }
+        const char* hash_marker = (frame_hash != last_frame_hash) ? " *" : "";
+        uint32_t vram_writes = data->vram_writes ? *data->vram_writes : 0;
+        uint32_t vram_delta = data->vram_writes ? (vram_writes - last_vram_writes) : 0;
+        uint32_t fb_writes = data->fb_writes ? *data->fb_writes : 0;
+        uint32_t fb_delta = data->fb_writes ? (fb_writes - last_fb_writes) : 0;
+        uint32_t fb_min = data->fb_min_off ? *data->fb_min_off : 0xFFFFFFFFu;
+        uint32_t fb_max = data->fb_max_off ? *data->fb_max_off : 0u;
+        uint32_t fb_last = data->fb_last_off ? *data->fb_last_off : 0u;
+        uint32_t vram_min = data->vram_min_off ? *data->vram_min_off : 0xFFFFFFFFu;
+        uint32_t vram_max = data->vram_max_off ? *data->vram_max_off : 0u;
+        uint32_t vram_last = data->vram_last_off ? *data->vram_last_off : 0u;
+        uint16_t min_x = 0, min_y = 0, max_x = 0, max_y = 0, last_x = 0, last_y = 0;
+        if (fb_min != 0xFFFFFFFFu && current_pitch && current_bpp) {
+          min_y = (uint16_t)(fb_min / current_pitch);
+          min_x = (uint16_t)((fb_min % current_pitch) / current_bpp);
+        }
+        if (current_pitch && current_bpp) {
+          max_y = (uint16_t)(fb_max / current_pitch);
+          max_x = (uint16_t)((fb_max % current_pitch) / current_bpp);
+          last_y = (uint16_t)(fb_last / current_pitch);
+          last_x = (uint16_t)((fb_last % current_pitch) / current_bpp);
+        }
+        if (sample_off + 4 <= rtg_mem_size) {
+          const uint8_t* sample = data->memory + sample_off;
+          LOG_DEBUG("[RTG/RAYLIB] Frame %u drawn: addr=0x%08X fmt=%u pitch=%u sample=%02X %02X %02X %02X hash=0x%08X%s vram_writes=%u (+%u) fb_writes=%u (+%u) fb_min=%u,%u fb_max=%u,%u fb_last=%u,%u vram_min=0x%08X vram_max=0x%08X vram_last=0x%08X\n",
+                    frame_no, current_addr, current_format, current_pitch,
+                    sample[0], sample[1], sample[2], sample[3], frame_hash, hash_marker,
+                    vram_writes, vram_delta, fb_writes, fb_delta,
+                    min_x, min_y, max_x, max_y, last_x, last_y,
+                    vram_min, vram_max, vram_last);
+        } else {
+          LOG_DEBUG("[RTG/RAYLIB] Frame %u drawn: addr=0x%08X fmt=%u pitch=%u sample=OOB hash=0x%08X%s vram_writes=%u (+%u) fb_writes=%u (+%u) fb_min=%u,%u fb_max=%u,%u fb_last=%u,%u vram_min=0x%08X vram_max=0x%08X vram_last=0x%08X\n",
+                    frame_no, current_addr, current_format, current_pitch, frame_hash, hash_marker,
+                    vram_writes, vram_delta, fb_writes, fb_delta,
+                    min_x, min_y, max_x, max_y, last_x, last_y,
+                    vram_min, vram_max, vram_last);
+        }
+        last_vram_writes = vram_writes;
+        last_fb_writes = fb_writes;
+        last_frame_hash = frame_hash;
       }
       frame_no++;
       updating_screen = 0;

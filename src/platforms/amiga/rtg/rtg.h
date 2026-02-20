@@ -22,6 +22,26 @@
 #include <string.h>
 #include "rtg_enums.h"
 
+struct rtg_shared_data {
+  uint16_t *width;
+  uint16_t *height;
+  uint16_t *format;
+  uint16_t *pitch;
+  uint16_t *offset_x;
+  uint16_t *offset_y;
+  uint8_t* memory;
+  uint32_t* addr;
+  uint8_t* running;
+  uint32_t* vram_writes;
+  uint32_t* fb_writes;
+  uint32_t* fb_min_off;
+  uint32_t* fb_max_off;
+  uint32_t* fb_last_off;
+  uint32_t* vram_min_off;
+  uint32_t* vram_max_off;
+  uint32_t* vram_last_off;
+};
+
 struct emulator_config;
 
 static inline uint8_t* rtg_pixel_at(uint8_t *base, size_t index, uint16_t format) {
@@ -140,6 +160,8 @@ void rtg_set_clut_cursor(uint8_t* bmp, uint32_t* pal, int16_t offs_x, int16_t of
                          uint16_t h, uint8_t mask_color);
 uint16_t rtg_get_scale_filter(void);
 void rtg_palette_debug(uint8_t enable);
+void rtg_output_set_source(struct rtg_shared_data *data);
+void rtg_output_clear_source(void);
 
 int init_rtg_data(struct emulator_config* cfg);
 void shutdown_rtg(void);

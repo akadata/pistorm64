@@ -1159,7 +1159,7 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
   }
 
   for (int16_t line_y = 0; line_y < h; line_y++) {
-    for (int16_t x = dx; x < dx + w; x++) {
+    for (int16_t px = 0; px < w; px++) {
       u8_fg = 0;
       if (minterm & 0x01) {
         for (int i = 0; i < bm->Depth; i++) {
@@ -1194,11 +1194,11 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
       }
 
       if (mask == 0xFF && (draw_mode == MINTERM_SRC || draw_mode == MINTERM_NOTSRC)) {
-        dptr[x] = (uint8_t)u8_fg;
+        dptr[px] = (uint8_t)u8_fg;
         goto skip;
       }
 
-      HANDLE_MINTERM_PIXEL(u8_fg, dptr[(size_t)x], RTGFMT_8BIT_CLUT);
+      HANDLE_MINTERM_PIXEL(u8_fg, dptr[(size_t)px], RTGFMT_8BIT_CLUT);
 
     skip:;
       if ((cur_bit >>= 1) == 0) {
@@ -1269,7 +1269,7 @@ void rtg_p2c(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
   }
 
   for (int16_t line_y = 0; line_y < h; line_y++) {
-    for (int16_t x = dx; x < dx + w; x++) {
+    for (int16_t px = 0; px < w; px++) {
       u8_fg = 0;
       if (draw_mode & 0x01) {
         DECODE_INVERTED_PLANAR_PIXEL(u8_fg)
@@ -1278,11 +1278,11 @@ void rtg_p2c(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
       }
 
       if (mask == 0xFF && (draw_mode == MINTERM_SRC || draw_mode == MINTERM_NOTSRC)) {
-        dptr[x] = (uint8_t)u8_fg;
+        dptr[px] = (uint8_t)u8_fg;
         goto skip;
       }
 
-      HANDLE_MINTERM_PIXEL(u8_fg, dptr[(size_t)x], rtg_format);
+      HANDLE_MINTERM_PIXEL(u8_fg, dptr[(size_t)px], rtg_format);
 
     skip:;
       if ((cur_bit >>= 1) == 0) {
@@ -1361,7 +1361,7 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
   bmp_data_src += (256 * 4);
 
   for (int16_t line_y = 0; line_y < h; line_y++) {
-    for (int16_t x = dx; x < dx + w; x++) {
+    for (int16_t px = 0; px < w; px++) {
       u8_fg = 0;
       if (draw_mode & 0x01) {
         DECODE_INVERTED_PLANAR_PIXEL(u8_fg)
@@ -1381,14 +1381,14 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
         case RTGFMT_BGR555_LE:
           {
             uint16_t color16 = (fg_color >> 16);
-            store_u16_be(&dptr[(size_t)x * sizeof(uint16_t)], color16);
+            store_u16_be(&dptr[(size_t)px * sizeof(uint16_t)], color16);
           }
           break;
         case RTGFMT_RGB32_ABGR:
         case RTGFMT_RGB32_ARGB:
         case RTGFMT_RGB32_BGRA:
         case RTGFMT_RGB32_RGBA:
-          store_u32_be(&dptr[(size_t)x * sizeof(uint32_t)], fg_color);
+          store_u32_be(&dptr[(size_t)px * sizeof(uint32_t)], fg_color);
           break;
         }
         goto skip;

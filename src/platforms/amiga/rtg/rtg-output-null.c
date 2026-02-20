@@ -89,3 +89,10 @@ uint16_t rtg_get_scale_filter(void) {
 void rtg_palette_debug(uint8_t enable) {
   (void)enable;
 }
+
+void rtg_output_set_source(struct rtg_shared_data *data) {
+  (void)data;
+}
+
+void rtg_output_clear_source(void) {
+}
