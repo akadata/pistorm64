@@ -432,6 +432,16 @@ static void rtg_copy_tight_rows(uint8_t* dst, const uint8_t* src, size_t row_byt
   }
 }
 
+static int rtg_mode_is_valid(uint16_t width, uint16_t height, uint16_t format) {
+  if(format >= RTGFMT_NUM) {
+    return 0;
+  }
+  if(width == 0 || height == 0) {
+    return 0;
+  }
+  return rtg_pixel_size[format] != 0;
+}
+
 void rtg_scale_output(uint16_t width, uint16_t height) {
   static uint8_t center = 1;
   float screen_w = (float)pi_screen_width;
@@ -551,6 +561,7 @@ void* rtgThread(void* args) {
   size_t tight_buf_size = 0;
   uint32_t last_frame_addr = 0;
   uint32_t frame_no = 0;
+  uint8_t waiting_for_valid_mode = 0;
 
   rtg_share_data.format = &rtg_display_format;
   rtg_share_data.width = &rtg_display_width;
@@ -657,8 +668,6 @@ reinit_raylib:;
     reinit = 0;
   }
 
-  LOG_INFO("Creating %dx%d raylib window...\n", width, height);
-
   LOG_DEBUG("Setting up raylib framebuffer image.\n");
   if(format >= RTGFMT_NUM) {
     LOG_ERROR("[RTG/RAYLIB] Invalid RTG format: %u\n", format);
@@ -668,11 +677,37 @@ reinit_raylib:;
 
   size_t bpp = rtg_pixel_size[format];
   if(width == 0 || height == 0 || bpp == 0) {
-    LOG_ERROR("[RTG/RAYLIB] Invalid framebuffer params: %ux%u bpp=%zu format=%u\n", width, height,
-              bpp, format);
-    reinit = 1;
-    goto shutdown_raylib;
+    uint16_t fb_width = width ? width : 640;
+    uint16_t fb_height = height ? height : 480;
+    uint16_t fb_format = format;
+    if(fb_format >= RTGFMT_NUM || rtg_pixel_size[fb_format] == 0 || fb_format == RTGFMT_4BIT_PLANAR) {
+      fb_format = RTGFMT_8BIT_CLUT;
+    }
+    size_t fb_bpp = rtg_pixel_size[fb_format];
+    if(fb_bpp == 0) {
+      fb_format = RTGFMT_RGB32_BGRA;
+      fb_bpp = rtg_pixel_size[fb_format];
+    }
+    size_t min_pitch = (size_t)fb_width * fb_bpp;
+    uint16_t fb_pitch = pitch;
+    if(fb_pitch < min_pitch) {
+      fb_pitch = (uint16_t)min_pitch;
+    }
+    if(!waiting_for_valid_mode) {
+      LOG_WARN("[RTG/RAYLIB] Invalid startup mode %ux%u bpp=%zu fmt=%u; using temporary fallback "
+               "%ux%u fmt=%u pitch=%u.\n",
+               width, height, bpp, format, fb_width, fb_height, fb_format, fb_pitch);
+      waiting_for_valid_mode = 1;
+    }
+    width = fb_width;
+    height = fb_height;
+    format = fb_format;
+    pitch = fb_pitch;
+    bpp = fb_bpp;
   }
+  LOG_DEBUG("[RTG/RAYLIB] Creating framebuffer texture for %ux%u fmt=%u pitch=%u\n", width, height,
+            format, pitch);
+  waiting_for_valid_mode = 0;
 
   if(width > SIZE_MAX / bpp) {
     LOG_ERROR("[RTG/RAYLIB] Framebuffer width overflow: %u bpp=%zu\n", width, bpp);
@@ -849,6 +884,17 @@ reinit_raylib:;
         reinit = 1;
         goto shutdown_raylib;
       }
+
+      if(!rtg_mode_is_valid(current_width, current_height, current_format)) {
+        if(!waiting_for_valid_mode) {
+          LOG_WARN("[RTG/RAYLIB] Ignoring transient invalid mode: %ux%u fmt=%u pitch=%u\n",
+                   current_width, current_height, current_format, current_pitch);
+          waiting_for_valid_mode = 1;
+        }
+        usleep(2000);
+        continue;
+      }
+      waiting_for_valid_mode = 0;
 
       if(current_width != width || current_height != height || current_format != format ||
           current_pitch != pitch) {
@@ -1224,9 +1270,21 @@ reinit_raylib:;
     }
     if(pitch != *data->pitch || height != *data->height || width != *data->width ||
         format != *data->format) {
-      LOG_INFO("[RTG/RAYLIB] Mode change detected after frame; reinitializing.\n");
-      reinit = 1;
-      goto shutdown_raylib;
+      uint16_t next_width = *data->width;
+      uint16_t next_height = *data->height;
+      uint16_t next_format = *data->format;
+      uint16_t next_pitch = *data->pitch;
+      if(rtg_mode_is_valid(next_width, next_height, next_format)) {
+        LOG_INFO("[RTG/RAYLIB] Mode change detected after frame; reinitializing.\n");
+        reinit = 1;
+        goto shutdown_raylib;
+      }
+      if(!waiting_for_valid_mode) {
+        LOG_WARN("[RTG/RAYLIB] Deferring reinit until mode is valid: %ux%u fmt=%u pitch=%u\n",
+                 next_width, next_height, next_format, next_pitch);
+        waiting_for_valid_mode = 1;
+      }
+      usleep(2000);
     }
     if(emulator_exiting) {
       goto shutdown_raylib;

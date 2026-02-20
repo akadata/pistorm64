@@ -341,7 +341,8 @@ static inline int TEST_CONDITION(m68ki_cpu_core *state, int condition) {
 		case 0x1f:
 		case 0x0f:	
 			return 1;					// True
-		default:		fatalerror("M68kFPU: test_condition: unhandled condition %02X\n", condition);
+		default:		
+			fatalerror("M68kFPU: test_condition: unhandled condition %02X\n", condition);
 	}
 
 	return r;
@@ -359,11 +360,11 @@ static uint8 READ_EA_8(m68ki_cpu_core *state, int ea) {
 			uint32 ea = REG_A[reg];
 			return m68ki_read_8(state, ea);
 		}
-		case 3: {  // (An)+
+		case 3: { // (An)+
 			uint32 ea = EA_AY_PI_8();
 			return m68ki_read_8(state, ea);
 		}
-		case 4:  {  // -(An)
+		case 4: { // -(An)
 			uint32 ea = EA_AY_PD_8();
 			return m68ki_read_8(state, ea);
 		}
@@ -371,7 +372,7 @@ static uint8 READ_EA_8(m68ki_cpu_core *state, int ea) {
 			uint32 ea = EA_AY_DI_8();
 			return m68ki_read_8(state, ea);
 		}
-		case 6:	{	// (An) + (Xn) + d8
+		case 6: {	// (An) + (Xn) + d8
 			uint32 ea = EA_AY_IX_8();
 			return m68ki_read_8(state, ea);
 		}
@@ -387,15 +388,15 @@ static uint8 READ_EA_8(m68ki_cpu_core *state, int ea) {
 					uint32 ea = (d1 << 16) | d2;
 					return m68ki_read_8(state, ea);
 				}
-				case 2: {    // (d16, PC)
+				case 2: { // (d16, PC)
 					uint32 ea = EA_PCDI_8();
 					return m68ki_read_8(state, ea);
 				}
-				case 3:   {  // (PC) + (Xn) + d8
+				case 3: { // (PC) + (Xn) + d8
 					uint32 ea = EA_PCIX_8();
 					return m68ki_read_8(state, ea);
 				}
-				case 4:	{	// #<data>
+				case 4: {	// #<data>
 					return OPER_I_8(state);
 				}
 				default:	
@@ -415,51 +416,51 @@ static uint16 READ_EA_16(m68ki_cpu_core *state, int ea) {
 	int reg = (ea & 0x7);
 
 	switch (mode) {
-		case 0:	{	// Dn
+		case 0: {	// Dn
 			return (uint16)(REG_D[reg]);
 		}
-		case 2:	{ 	// (An)
+		case 2: { 	// (An)
 			uint32 ea = REG_A[reg];
 			return m68ki_read_16(state, ea);
 		}
-		case 3: {   // (An)+
+		case 3: { // (An)+
 
 			uint32 ea = EA_AY_PI_16();
 			return m68ki_read_16(state, ea);
 		}
-		case 4: {  // -(An)
+		case 4: { // -(An)
 			uint32 ea = EA_AY_PD_16();
 			return m68ki_read_16(state, ea);
 		}
-		case 5:	 {	// (d16, An)
+		case 5: {	// (d16, An)
 			uint32 ea = EA_AY_DI_16();
 			return m68ki_read_16(state, ea);
 		}
-		case 6:	{	// (An) + (Xn) + d8
+		case 6: {	// (An) + (Xn) + d8
 			uint32 ea = EA_AY_IX_16();
 			return m68ki_read_16(state, ea);
 		}
-		case 7:	{
+		case 7: {
 			switch (reg) {
 				case 0: {	// (xxx).W
 					uint32 ea = (uint32) OPER_I_16(state);
 					return m68ki_read_16(state, ea);
 				}
-				case 1:	{	// (xxx).L
+				case 1: {	// (xxx).L
 					uint32 d1 = OPER_I_16(state);
 					uint32 d2 = OPER_I_16(state);
 					uint32 ea = (d1 << 16) | d2;
 					return m68ki_read_16(state, ea);
 				}
-				case 2:  { // (d16, PC)
+				case 2: { // (d16, PC)
 					uint32 ea = EA_PCDI_16();
 					return m68ki_read_16(state, ea);
 				}
-				case 3:   { // (PC) + (Xn) + d8
+				case 3: { // (PC) + (Xn) + d8
 					uint32 ea =  EA_PCIX_16();
 					return m68ki_read_16(state, ea);
 				}
-				case 4:	{	// #<data>
+				case 4: {	// #<data>
 					return OPER_I_16(state);
 				}
 
@@ -480,18 +481,18 @@ static uint32 READ_EA_32(m68ki_cpu_core *state, int ea) {
 	int reg = (ea & 0x7);
 
 	switch (mode) {
-		case 0:	{		// Dn
+		case 0: {		// Dn
 			return REG_D[reg];
 		}
-		case 2:	 {	// (An)
+		case 2: {	// (An)
 			uint32 ea = REG_A[reg];
 			return m68ki_read_32(state, ea);
 		}
-		case 3:	{	// (An)+
+		case 3: {	// (An)+
 			uint32 ea = EA_AY_PI_32();
 			return m68ki_read_32(state, ea);
 		}
-		case 4:	{ 	// -(An)
+		case 4: { 	// -(An)
 			uint32 ea = EA_AY_PD_32();
 			return m68ki_read_32(state, ea);
 		}
@@ -499,23 +500,23 @@ static uint32 READ_EA_32(m68ki_cpu_core *state, int ea) {
 			uint32 ea = EA_AY_DI_32();
 			return m68ki_read_32(state, ea);
 		}
-		case 6:	{ // (An) + (Xn) + d8
+		case 6: { // (An) + (Xn) + d8
 			uint32 ea = EA_AY_IX_32();
 			return m68ki_read_32(state, ea);
 		}
 		case 7: {
 			switch (reg) {
-				case 0:	{ // (xxx).W
+				case 0: { // (xxx).W
 					uint32 ea = (uint32) OPER_I_16(state);
 					return m68ki_read_32(state, ea);
 				}
-				case 1:	{	// (xxx).L
+				case 1: {	// (xxx).L
 					uint32 d1 = OPER_I_16(state);
 					uint32 d2 = OPER_I_16(state);
 					uint32 ea = (d1 << 16) | d2;
 					return m68ki_read_32(state, ea);
 				}
-				case 2:	{// (d16, PC)
+				case 2: { // (d16, PC)
 					uint32 ea = EA_PCDI_32();
 					return m68ki_read_32(state, ea);
 				}
@@ -523,7 +524,7 @@ static uint32 READ_EA_32(m68ki_cpu_core *state, int ea) {
 					uint32 ea =  EA_PCIX_32();
 					return m68ki_read_32(state, ea);
 				}
-				case 4:	{// #<data>
+				case 4: { // #<data>
 					return OPER_I_32(state);
 				}
 				default:	
@@ -543,33 +544,33 @@ static uint64 READ_EA_64(m68ki_cpu_core *state, int ea) {
 	uint32 h1, h2;
 
 	switch (mode) {
-		case 2:	{ 	// (An) 
+		case 2: { 	// (An) 
 			uint32 ea = REG_A[reg];
 			h1 = m68ki_read_32(state, ea + 0);
 			h2 = m68ki_read_32(state, ea + 4);
 			return  (uint64)(h1) << 32 | (uint64)(h2);
 		}
-		case 3:	{	// (An)+
+		case 3: {	// (An)+
 			uint32 ea = REG_A[reg];
 			REG_A[reg] += 8;
 			h1 = m68ki_read_32(state, ea + 0);
 			h2 = m68ki_read_32(state, ea + 4);
 			return  (uint64)(h1) << 32 | (uint64)(h2);
 		}
-		case 4:  {    // -(An) 
+		case 4: { // -(An) 
 			uint32 ea = REG_A[reg]-8;
 			REG_A[reg] -= 8;
 			h1 = m68ki_read_32(state, ea + 0);
 			h2 = m68ki_read_32(state, ea + 4);
 			return  (uint64)(h1) << 32 | (uint64)(h2);
 		}
-		case 5:	 {	// (d16, An)
+		case 5: {	// (d16, An)
 			uint32 ea = EA_AY_DI_32();
 			h1 = m68ki_read_32(state, ea + 0);
 			h2 = m68ki_read_32(state, ea + 4);
 			return  (uint64)(h1) << 32 | (uint64)(h2);
 		}
-		case 6: {    // (An) + (Xn) + d8
+		case 6: { // (An) + (Xn) + d8
 			uint32 ea = EA_AY_IX_32();
 			h1 = m68ki_read_32(state, ea + 0);
 			h2 = m68ki_read_32(state, ea + 4);
@@ -578,13 +579,13 @@ static uint64 READ_EA_64(m68ki_cpu_core *state, int ea) {
 		case 7:
 		{
 			switch (reg) {
-				case 1:  {  // (xxx).L
+				case 1: { // (xxx).L
 					uint32 d1 = OPER_I_16(state);
 					uint32 d2 = OPER_I_16(state);
 					uint32 ea = (d1 << 16) | d2;
 					return (uint64)(m68ki_read_32(state, ea)) << 32 | (uint64)(m68ki_read_32(state, ea + 4));
 				}
-				case 3:  { // (PC) + (Xn) + d8
+				case 3: { // (PC) + (Xn) + d8
 					uint32 ea =  EA_PCIX_32();
 					h1 = m68ki_read_32(state, ea + 0);
 					h2 = m68ki_read_32(state, ea + 4);
@@ -596,7 +597,7 @@ static uint64 READ_EA_64(m68ki_cpu_core *state, int ea) {
 					h2 = OPER_I_32(state);
 					return  (uint64)(h1) << 32 | (uint64)(h2);
 				}
-				case 2:	{	// (d16, PC)
+				case 2: {	// (d16, PC)
 					uint32 ea = EA_PCDI_32();
 					h1 = m68ki_read_32(state, ea + 0);
 					h2 = m68ki_read_32(state, ea + 4);
@@ -622,40 +623,40 @@ static floatx80 READ_EA_FPE(m68ki_cpu_core *state, uint32 ea) {
 	int reg = (ea & 0x7);
 
 	switch (mode) {
-		case 2:	{	// (An) 
+		case 2: {	// (An) 
 			uint32 ea = REG_A[reg];
 			fpr = load_extended_float80(state, ea);
 			break;
 		}
 
-		case 3:		{	// (An)+
+		case 3: {	// (An)+
 			uint32 ea = REG_A[reg];
 			REG_A[reg] += 12;
 			fpr = load_extended_float80(state, ea);
 			break;
 		}
-		case 4:    {  // -(An)
+		case 4: { // -(An)
 			uint32 ea = REG_A[reg]-12;
 			REG_A[reg] -= 12;
 			fpr = load_extended_float80(state, ea);
 			break;
 		}
-      case 5:	 {	// (d16, An)
+      case 5: {	// (d16, An)
 			// FIXME: will fail for fmovem
 			uint32 ea = EA_AY_DI_32();
 			fpr = load_extended_float80(state, ea);
 	  	break;
 		}
-		case 6:   		{  // (An) + (Xn) + d8
+		case 6: { // (An) + (Xn) + d8
 			// FIXME: will fail for fmovem
 			uint32 ea = EA_AY_IX_32();
 			fpr = load_extended_float80(state, ea);
 			break;
 		}
 
-		case 7:			{// extended modes
+		case 7: { // extended modes
 			switch (reg) {
-				case 1:  	{   // (xxx)
+				case 1: { // (xxx)
 						uint32 d1 = OPER_I_16(state);
 						uint32 d2 = OPER_I_16(state);
 						uint32 ea = (d1 << 16) | d2;
@@ -709,16 +710,16 @@ static floatx80 READ_EA_PACK(m68ki_cpu_core *state, int ea) {
 			break;
 		}
 
-		case 3:		{		// (An)+
+		case 3: {		// (An)+
 			uint32 ea = REG_A[reg];
 			REG_A[reg] += 12;
 			fpr = load_pack_float80(state, ea);
 			break;
 		}
 
-		case 7:	{// extended modes
+		case 7: { // extended modes
 			switch (reg) {
-				case 3:		{	// (d16,PC,Dx.w)
+				case 3: {	// (d16,PC,Dx.w)
 						uint32 ea = EA_PCIX_32();
 						fpr = load_pack_float80(state, ea);
 					}
@@ -743,45 +744,45 @@ static void WRITE_EA_8(m68ki_cpu_core *state, int ea, uint8 data) {
 	int reg = (ea & 0x7);
 
 	switch (mode) {
-		case 0:		{// Dn
+		case 0: { // Dn
 			REG_D[reg] = data;
 			break;
 		}
-		case 2:	 {	// (An)
+		case 2: {	// (An)
 			uint32 ea = REG_A[reg];
 			m68ki_write_8(state, ea, data);
 			break;
 		}
-		case 3:			{	// (An)+
+		case 3: {	// (An)+
 			uint32 ea = EA_AY_PI_8();
 			m68ki_write_8(state, ea, data);
 			break;
 		}
-		case 4:	 {	// -(An)
+		case 4: {	// -(An)
 			uint32 ea = EA_AY_PD_8();
 			m68ki_write_8(state, ea, data);
 			break;
 		}
-		case 5:	{	// (d16, An) 
+		case 5: {	// (d16, An) 
 			uint32 ea = EA_AY_DI_8();
 			m68ki_write_8(state, ea, data);
 			break;
 		}
-		case 6:	{	// (An) + (Xn) + d8
+		case 6: {	// (An) + (Xn) + d8
 			uint32 ea = EA_AY_IX_8();
 			m68ki_write_8(state, ea, data);
 			break;
 		}
-		case 7:		{
+		case 7: {
 			switch (reg) {
-				case 1:	{	// (xxx).B
+				case 1: {	// (xxx).B
 					uint32 d1 = OPER_I_16(state);
 					uint32 d2 = OPER_I_16(state);
 					uint32 ea = (d1 << 16) | d2;
 					m68ki_write_8(state, ea, data);
 					break;
 				}
-				case 2:	{	// (d16, PC)
+				case 2: {	// (d16, PC)
 					uint32 ea = EA_PCDI_16();
 					m68ki_write_8(state, ea, data);
 					break;
@@ -806,41 +807,41 @@ static void WRITE_EA_16(m68ki_cpu_core *state, int ea, uint16 data) {
 			REG_D[reg] = data;
 			break;
 		}
-		case 2:	 {	// (An)
+		case 2: {	// (An)
 			uint32 ea = REG_A[reg];
 			m68ki_write_16(state, ea, data);
 			break;
 		}
-		case 3:	{	// (An)+
+		case 3: {	// (An)+
 			uint32 ea = EA_AY_PI_16();
 			m68ki_write_16(state, ea, data);
 			break;
 		}
-		case 4:	 {	// -(An)
+		case 4: {	// -(An)
 			uint32 ea = EA_AY_PD_16();
 			m68ki_write_16(state, ea, data);
 			break;
 		}
-		case 5:{		// (d16, An) 
+		case 5: {		// (d16, An) 
 			uint32 ea = EA_AY_DI_16();
 			m68ki_write_16(state, ea, data);
 			break;
 		}
-		case 6:	{// (An) + (Xn) + d8
+		case 6: { // (An) + (Xn) + d8
 			uint32 ea = EA_AY_IX_16();
 			m68ki_write_16(state, ea, data);
 			break;
 		}
-		case 7:		{
+		case 7: {
 			switch (reg) {
-				case 1:	{	// (xxx).W
+				case 1: {	// (xxx).W
 					uint32 d1 = OPER_I_16(state);
 					uint32 d2 = OPER_I_16(state);
 					uint32 ea = (d1 << 16) | d2;
 					m68ki_write_16(state, ea, data);
 					break;
 				}
-				case 2:	{	// (d16, PC)
+				case 2: {	// (d16, PC)
 					uint32 ea = EA_PCDI_16();
 					m68ki_write_16(state, ea, data);
 					break;
@@ -860,54 +861,54 @@ static void WRITE_EA_32(m68ki_cpu_core *state, int ea, uint32 data) {
 	int reg = (ea & 0x7);
 
 	switch (mode) {
-		case 0:	{	// Dn
+		case 0: {	// Dn
 			REG_D[reg] = data;
 			break;
 		}
-		case 1:	{	// An
+		case 1: {	// An
 			REG_A[reg] = data;
 			break;
 		}
-		case 2:	{	// (An) 
+		case 2: {	// (An) 
 			uint32 ea = REG_A[reg];
 			m68ki_write_32(state, ea, data);
 			break;
 		}
-		case 3:	{		// (An)+
+		case 3: {		// (An)+
 			uint32 ea = EA_AY_PI_32();
 			m68ki_write_32(state, ea, data);
 			break;
 		}
-		case 4:	 {	// -(An)
+		case 4: {	// -(An)
 			uint32 ea = EA_AY_PD_32();
 			m68ki_write_32(state, ea, data);
 			break;
 		}
-		case 5:	{	// (d16, An) 
+		case 5: {	// (d16, An) 
 			uint32 ea = EA_AY_DI_32();
 			m68ki_write_32(state, ea, data);
 			break;
 		}
-		case 6:	{	// (An) + (Xn) + d8
+		case 6: {	// (An) + (Xn) + d8
 			uint32 ea = EA_AY_IX_32();
 			m68ki_write_32(state, ea, data);
 			break;
 		}
-		case 7:		{
+		case 7: {
 			switch (reg) {
-				case 0:	{     // (xxx).W
+				case 0: { // (xxx).W
 					uint32 ea = OPER_I_16(state);
 					m68ki_write_32(state, ea, data);
 					break;
 				}
-				case 1:	{	// (xxx).L
+				case 1: {	// (xxx).L
 					uint32 d1 = OPER_I_16(state);
 					uint32 d2 = OPER_I_16(state);
 					uint32 ea = (d1 << 16) | d2;
 					m68ki_write_32(state, ea, data);
 					break;
 				}
-				case 2:	{	// (d16, PC)
+				case 2: {	// (d16, PC)
 					uint32 ea = EA_PCDI_32();
 					m68ki_write_32(state, ea, data);
 					break;
@@ -927,13 +928,13 @@ static void WRITE_EA_64(m68ki_cpu_core *state, int ea, uint64 data) {
 	int reg = (ea & 0x7);
 
 	switch (mode) {
-		case 2:	{	// (An) 
+		case 2: {	// (An) 
 			uint32 ea = REG_A[reg];
 			m68ki_write_32(state, ea, (uint32) (data >> 32));
 			m68ki_write_32(state, ea + 4, (uint32) (data));
 			break;
 		}
-		case 3:  	{   // (An)+
+		case 3: { // (An)+
 			uint32 ea = REG_A[reg];
 			REG_A[reg] += 8;
 			m68ki_write_32(state, ea + 0, (uint32) (data >> 32));
@@ -954,15 +955,15 @@ static void WRITE_EA_64(m68ki_cpu_core *state, int ea, uint64 data) {
 			m68ki_write_32(state, ea + 4, (uint32) (data));
 			break;
 		}
-		case 6: 		{    // (An) + (Xn) + d8
+		case 6: 		{ // (An) + (Xn) + d8
 			uint32 ea = EA_AY_IX_32();
 			m68ki_write_32(state, ea + 0, (uint32) (data >> 32));
 			m68ki_write_32(state, ea + 4, (uint32) (data));
 			break;
 		}
-		case 7:		{
+		case 7: {
 			switch (reg) {
-				case 1: 	{    // (xxx).L
+				case 1: { // (xxx).L
 					uint32 d1 = OPER_I_16(state);
 					uint32 d2 = OPER_I_16(state);
 					uint32 ea = (d1 << 16) | d2;
@@ -970,7 +971,7 @@ static void WRITE_EA_64(m68ki_cpu_core *state, int ea, uint64 data) {
 					m68ki_write_32(state, ea + 4, (uint32) (data));
 					break;
 				}
-				case 2:  	{   // (d16, PC)
+				case 2: { // (d16, PC)
 					uint32 ea = EA_PCDI_32();
 					m68ki_write_32(state, ea + 0, (uint32) (data >> 32));
 					m68ki_write_32(state, ea + 4, (uint32) (data));
@@ -991,14 +992,14 @@ static void WRITE_EA_FPE(m68ki_cpu_core *state, uint32 ea, floatx80 fpr) {
 	int reg = (ea & 0x7);
 
 	switch (mode) {
-		case 2:	 {// (An)
+		case 2: { // (An)
 			uint32 ea;
 			ea = REG_A[reg];
 			store_extended_float80(state, ea, fpr);
 			break;
 		}
 
-		case 3:	{		// (An)+
+		case 3: {		// (An)+
 			uint32 ea;
 			ea = REG_A[reg];
 			store_extended_float80(state, ea, fpr);
@@ -1006,7 +1007,7 @@ static void WRITE_EA_FPE(m68ki_cpu_core *state, uint32 ea, floatx80 fpr) {
 			break;
 		}
 
-		case 4:	 {	// -(An)
+		case 4: {	// -(An)
 			uint32 ea;
 			REG_A[reg] -= 12;
 			ea = REG_A[reg];
@@ -1019,7 +1020,7 @@ static void WRITE_EA_FPE(m68ki_cpu_core *state, uint32 ea, floatx80 fpr) {
 	 	 break;
 
 		}
-		case 7:	{
+		case 7: {
 			switch (reg) {
 				default:	
 					fatalerror("M68kFPU: WRITE_EA_FPE: unhandled mode %d, reg %d, at %08X\n", mode, reg, REG_PC);
@@ -1043,7 +1044,7 @@ static void WRITE_EA_PACK(m68ki_cpu_core *state, int ea, int k, floatx80 fpr) {
 			break;
 		}
 
-		case 3:		{	// (An)+
+		case 3: {	// (An)+
 			uint32 ea;
 			ea = REG_A[reg];
 			store_pack_float80(state, ea, k, fpr);
@@ -1051,7 +1052,7 @@ static void WRITE_EA_PACK(m68ki_cpu_core *state, int ea, int k, floatx80 fpr) {
 			break;
 		}
 
-		case 4:	 {	// -(An)
+		case 4: {	// -(An)
 			uint32 ea;
 			REG_A[reg] -= 12;
 			ea = REG_A[reg];
@@ -1059,7 +1060,7 @@ static void WRITE_EA_PACK(m68ki_cpu_core *state, int ea, int k, floatx80 fpr) {
 			break;
 		}
 
-		case 7:	{
+		case 7: {
 			switch (reg) {
 				default:	
 					fatalerror("M68kFPU: WRITE_EA_PACK: unhandled mode %d, reg %d, at %08X\n", mode, reg, REG_PC);
@@ -1086,41 +1087,41 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2) {
 
 	if (rm) {
 		switch (src) {
-			case 0:	{	// Long-Word Integer
+			case 0: {	// Long-Word Integer
 				sint32 d = READ_EA_32(state, ea);
 				source = int32_to_floatx80(d);
 				break;
 			}
-			case 1:	{	// Single-precision Real
+			case 1: {	// Single-precision Real
 				uint32 d = READ_EA_32(state, ea);
 				source = float32_to_floatx80(d, &status);
 				break;
 			}
-			case 2:	{	// Extended-precision Real
+			case 2: {	// Extended-precision Real
 				source = READ_EA_FPE(state, ea);
 				break;
 			}
-			case 3:	{		// Packed-decimal Real
+			case 3: {		// Packed-decimal Real
 				source = READ_EA_PACK(state, ea);
 				break;
 			}
-			case 4:	{		// Word Integer
+			case 4: {		// Word Integer
 				sint16 d = READ_EA_16(state, ea);
 				source = int32_to_floatx80((sint32)d);
 				break;
 			}
-			case 5:	{	// Double-precision Real
+			case 5: {	// Double-precision Real
 				uint64 d = READ_EA_64(state, ea);
 
 				source = float64_to_floatx80(d, &status);
 				break;
 			}
-			case 6:	{	// Byte Integer
+			case 6: {	// Byte Integer
 				sint8 d = READ_EA_8(state, ea);
 				source = int32_to_floatx80((sint32)d);
 				break;
 			}
-			case 7:	{	// FMOVECR load from constant ROM
+			case 7: {	// FMOVECR load from constant ROM
 				switch (w2 & 0x7f)		{
 					case 0x0:	// Pi
 						source.high = 0x4000;
@@ -1252,7 +1253,7 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2) {
 	switch (opmode) {
 		case 0x44:		// FDMOVE
 		case 0x40:		// FSMOVE
-		case 0x00:	{	// FMOVE
+		case 0x00: {	// FMOVE
 			REG_FP[dst] = source;
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(4);
@@ -1267,13 +1268,13 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2) {
 			USE_CYCLES(4);
 			break;
 		}
-		case 0x02:	{	// FSINH
+		case 0x02: {	// FSINH
 			REG_FP[dst] = floatx80_sinh(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
 		}
-		case 0x03:		{		// FINTRZ
+		case 0x03: {		// FINTRZ
 			sint32 temp;
 			temp = floatx80_to_int32_round_to_zero(source, &status);
 			REG_FP[dst] = int32_to_floatx80(temp);
@@ -1284,33 +1285,33 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2) {
 		case 0x45:		// FDSQRT
 		case 0x41:		// FSSQRT
 		case 0x04:		// FSQRT
-		case 0x05:	{	// FSQRT
+		case 0x05: {	// FSQRT
 			REG_FP[dst] = floatx80_sqrt(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(109);
 			break;
 		}
 		case 0x06:      // FLOGNP1
-		case 0x07: 	{     // FLOGNP1
+		case 0x07: { // FLOGNP1
 			REG_FP[dst] = floatx80_lognp1 (source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(594); // for MC68881
 			break;
 		}
-		case 0x08:  {    // FETOXM1
+		case 0x08: { // FETOXM1
 			REG_FP[dst] = floatx80_etoxm1(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(6);
 			break;
 		}
-		case 0x09: 	{     // FTANH
+		case 0x09: { // FTANH
 			REG_FP[dst] = floatx80_tanh(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
 		}
 		case 0x0a:      // FATAN
-		case 0x0b: 	{     // FATAN
+		case 0x0b: { // FATAN
 			REG_FP[dst] = floatx80_atan(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
@@ -1322,57 +1323,57 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2) {
 			USE_CYCLES(75);
 			break;
 		}
-		case 0x0d: 	{     // FATANH
+		case 0x0d: { // FATANH
 			REG_FP[dst] = floatx80_atanh(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
 		}
-		case 0x0e: 	{     // FSIN
+		case 0x0e: { // FSIN
 			REG_FP[dst] = floatx80_sin(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
 		}
-		case 0x0f:	{      // FTAN
+		case 0x0f: { // FTAN
 			REG_FP[dst] = floatx80_tan(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
 		}
-		case 0x10:	{      // FETOX
+		case 0x10: { // FETOX
 			REG_FP[dst] = floatx80_etox(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
 		}
-		case 0x11:	{      // FTWOTOX
+		case 0x11: { // FTWOTOX
 			REG_FP[dst] = floatx80_twotox(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
 		}
 		case 0x12:      // FTENTOX
-		case 0x13:	{      // FTENTOX
+		case 0x13: { // FTENTOX
 			REG_FP[dst] = floatx80_tentox(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
 		}
-		case 0x14:	{      // FLOGN
+		case 0x14: { // FLOGN
 			REG_FP[dst] = floatx80_logn(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(548); // for MC68881
 			break;
 		}
-		case 0x15: {     // FLOG10
+		case 0x15: { // FLOG10
 			REG_FP[dst] = floatx80_log10(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(604); // for MC68881
 			break;
 		}
 		case 0x16:      // FLOG2
-		case 0x17: 	{     // FLOG2
+		case 0x17: { // FLOG2
 			REG_FP[dst] = floatx80_log2(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(604); // for MC68881
@@ -1380,14 +1381,14 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2) {
 		}
 		case 0x5C:		// FDABS
 		case 0x58:		// FSABS
-		case 0x18:	{	// FABS
+		case 0x18: {	// FABS
 			REG_FP[dst] = source;
 			REG_FP[dst].high &= 0x7fff;
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(3);
 			break;
 		}
-		case 0x19: 	{     // FCOSH
+		case 0x19: { // FCOSH
 			REG_FP[dst] = floatx80_cosh(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(64);
@@ -1396,33 +1397,33 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2) {
 		case 0x5e:		// FDNEG
 		case 0x5a:		// FSNEG
 		case 0x1a:		// FNEG
-		case 0x1b:	{	// FNEG
+		case 0x1b: {	// FNEG
 			REG_FP[dst] = source;
 			REG_FP[dst].high ^= 0x8000;
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(3);
 			break;
 		}
-		case 0x1c: 	{     // FACOS
+		case 0x1c: { // FACOS
 			REG_FP[dst] = floatx80_acos(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(604); // for MC68881
 			break;
 			break;
 		}
-		case 0x1d:	{      // FCOS
+		case 0x1d: { // FCOS
 			REG_FP[dst] = floatx80_cos(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
 		}
-		case 0x1e:		{	// FGETEXP
+		case 0x1e: {	// FGETEXP
 			REG_FP[dst] = floatx80_getexp(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(6);
 			break;
 		}
-		case 0x1f:  {    // FGETMAN
+		case 0x1f: { // FGETMAN
 			REG_FP[dst] = floatx80_getman(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(6);
@@ -1430,14 +1431,14 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2) {
 		}
 		case 0x64:		// FDDIV
 		case 0x60:		// FSDIV
-		case 0x20:	{	// FDIV
+		case 0x20: {	// FDIV
 			REG_FP[dst] = floatx80_div(REG_FP[dst], source, &status);
 			//FIXME mame doesn't use SET_CONDITION_CODES here
 			SET_CONDITION_CODES(state, REG_FP[dst]); // JFF
 			USE_CYCLES(43);
 			break;
 		}
-		case 0x21: 	{     // FMOD
+		case 0x21: { // FMOD
 			sint8 const mode = status.float_rounding_mode;
 			status.float_rounding_mode = float_round_to_zero;
 			uint64_t q;
@@ -1450,7 +1451,7 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2) {
 		}
 		case 0x66:		// FDADD
 		case 0x62:		// FSADD
-		case 0x22:	{	// FADD
+		case 0x22: {	// FADD
 			REG_FP[dst] = floatx80_add(REG_FP[dst], source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(9);
@@ -1458,18 +1459,18 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2) {
 		}
 		case 0x67:		// FDMUL
 		case 0x63:		// FSMUL
-		case 0x23:	{		// FMUL
+		case 0x23: {		// FMUL
 			REG_FP[dst] = floatx80_mul(REG_FP[dst], source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(11);
 			break;
 		}
-		case 0x24:	{      // FSGLDIV
+		case 0x24: { // FSGLDIV
 			REG_FP[dst] = floatx80_sgldiv(REG_FP[dst], source, &status);
 			USE_CYCLES(43); //  // ? (value is from FDIV)
 			break;
 		}
-		case 0x25:	{		// FREM
+		case 0x25: {		// FREM
 			sint8 const mode = status.float_rounding_mode;
 			status.float_rounding_mode = float_round_nearest_even;
 			uint64_t q;
@@ -1480,13 +1481,13 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2) {
 			USE_CYCLES(43);	// guess
 			break;
 		}
-		case 0x26:	{      // FSCALE
+		case 0x26: { // FSCALE
 			REG_FP[dst] = floatx80_scale(REG_FP[dst], source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(46);   // (better?) guess
 			break;
 		}
-		case 0x27: 	{     // FSGLMUL
+		case 0x27: { // FSGLMUL
 			REG_FP[dst] = floatx80_sglmul(REG_FP[dst], source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(11); // ? (value is from FMUL)
@@ -1501,7 +1502,7 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2) {
 		case 0x2c:		// FSUB
 		case 0x2d:		// FSUB
 		case 0x2e:		// FSUB
-		case 0x2f:	{	// FSUB
+		case 0x2f: {	// FSUB
 			REG_FP[dst] = floatx80_sub(REG_FP[dst], source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(9);
@@ -1514,7 +1515,7 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2) {
 		case 0x34:      // FSINCOS
 		case 0x35:      // FSINCOS
 		case 0x36:      // FSINCOS
-		case 0x37:  	{    // FSINCOS
+		case 0x37: { // FSINCOS
 			REG_FP[dst] = floatx80_cos(source, &status);
 			REG_FP[w2&7] = floatx80_sin(source, &status);
 			SET_CONDITION_CODES(state, REG_FP[dst]);
@@ -1525,7 +1526,7 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2) {
 		case 0x38:		// FCMP
 		case 0x39:		// FCMP
 		case 0x3c:		// FCMP
-		case 0x3d:	{	// FCMP
+		case 0x3d: {	// FCMP
 			floatx80 res;
 			res = floatx80_sub(REG_FP[dst], source, &status);
 			SET_CONDITION_CODES(state, res);
@@ -1535,7 +1536,7 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2) {
 		case 0x3a:		// FTST
 		case 0x3b:		// FTST
 		case 0x3e:		// FTST
-		case 0x3f:		{	// FTST
+		case 0x3f: {	// FTST
 			floatx80 res;
 			res = source;
 			SET_CONDITION_CODES(state, res);
@@ -1555,27 +1556,27 @@ static void fmove_reg_mem(m68ki_cpu_core *state, uint16 w2) {
 	int k = (w2 & 0x7f);
 
 	switch (dst) {
-		case 0:		{// Long-Word Integer
+		case 0: { // Long-Word Integer
 			sint32 d = (sint32)floatx80_to_int32(REG_FP[src], &status);
 			WRITE_EA_32(state, ea, d);
 			break;
 		}
-		case 1:		{		// Single-precision Real
+		case 1: {		// Single-precision Real
 			uint32 d = floatx80_to_float32(REG_FP[src], &status);
 			WRITE_EA_32(state, ea, d);
 			break;
 		}
-		case 2:	{	// Extended-precision Real
+		case 2: {	// Extended-precision Real
 			WRITE_EA_FPE(state, ea, REG_FP[src]);
 			break;
 		}
-		case 3:	{	// Packed-decimal Real with Static K-factor
+		case 3: {	// Packed-decimal Real with Static K-factor
 			// sign-extend k
 			k = (k & 0x40) ? (k | 0xffffff80) : (k & 0x7f);
 			WRITE_EA_PACK(state, ea, k, REG_FP[src]);
 			break;
 		}
-		case 4:	{	// Word Integer
+		case 4: {	// Word Integer
 			sint32 value = floatx80_to_int32(REG_FP[src], &status);
 			if (value > 0x7fff || value < -0x8000 ) {
 				REG_FPSR |= FPES_OE | FPAE_IOP;
@@ -1583,7 +1584,7 @@ static void fmove_reg_mem(m68ki_cpu_core *state, uint16 w2) {
 			WRITE_EA_16(state, ea, (sint16) value);
 			break;
 		}
-		case 5:	{	// Double-precision Real
+		case 5: {	// Double-precision Real
 			uint64 d;
 
 			d = floatx80_to_float64(REG_FP[src], &status);
@@ -1591,7 +1592,7 @@ static void fmove_reg_mem(m68ki_cpu_core *state, uint16 w2) {
 			WRITE_EA_64(state, ea, d);
 			break;
 		}
-		case 6:	{	// Byte Integer
+		case 6: {	// Byte Integer
 			sint32 value = floatx80_to_int32(REG_FP[src], &status);
 			if (value > 127 || value < -128) {
 				REG_FPSR |= FPES_OE | FPAE_IOP;
@@ -1599,7 +1600,7 @@ static void fmove_reg_mem(m68ki_cpu_core *state, uint16 w2) {
 			WRITE_EA_8(state, ea, (sint8) value);
 			break;
 		}
-		case 7:		{	// Packed-decimal Real with Dynamic K-factor
+		case 7: {	// Packed-decimal Real with Dynamic K-factor
 			WRITE_EA_PACK(state, ea, REG_D[k >> 4], REG_FP[src]);
 			break;
 		}
@@ -1646,7 +1647,7 @@ static void fmove_fpcr(m68ki_cpu_core *state, uint16 w2) {
 			}
 		}
 	} else {
-		if (dir) {    // From system control reg to <ea>
+		if (dir) { // From system control reg to <ea>
 			if (regsel & 4) {
 				WRITE_EA_32(state, ea, REG_FPCR);
 			}
@@ -1656,7 +1657,7 @@ static void fmove_fpcr(m68ki_cpu_core *state, uint16 w2) {
 			if (regsel & 1)  {
 				WRITE_EA_32(state, ea, REG_FPIAR);
 			}
-		} else  {      // From <ea> to system control reg
+		} else  { // From <ea> to system control reg
 			if (regsel & 4)  {
 				REG_FPCR = READ_EA_32(state, ea);
 			}
@@ -1743,7 +1744,7 @@ static void fmovem(m68ki_cpu_core *state, uint16 w2) {
 				/* fall through */
 				/* no break */			
 			}
-			case 0:  {  // Static register list, predecrement or control addressing mode
+			case 0: { // Static register list, predecrement or control addressing mode
 				for (i=0; i < 8; i++) {
 					if (reglist & (1 << i)) {
 						switch (ea >> 3) {
@@ -1763,7 +1764,7 @@ static void fmovem(m68ki_cpu_core *state, uint16 w2) {
 				break;
 			}
 
-			case 2:	{	// Static register list, postdecrement or control addressing mode.     
+			case 2: {	// Static register list, postdecrement or control addressing mode.     
 				for (i=0; i < 8; i++) {		
 					if (reglist & (1 << i)) {
 						switch (ea >> 3) {
@@ -1790,13 +1791,13 @@ static void fmovem(m68ki_cpu_core *state, uint16 w2) {
 	else		// From mem to FP regs
 	{
 		switch (mode) {
-			case 3:{ // Dynamic register list, predecrement addressing mode.
+			case 3: { // Dynamic register list, predecrement addressing mode.
 				// FIXME: not really tested, but seems to work
 				reglist = REG_D[(reglist >> 4) & 7];
 				/* fall through */
 				/* no break */
 			}
-			case 2:	{	// Static register list, postincrement or control addressing mode
+			case 2: {	// Static register list, postincrement or control addressing mode
 				for (i=0; i < 8; i++) {
 					if (reglist & (1 << i)) {
 						switch (ea >> 3) {
@@ -1867,7 +1868,7 @@ void m68040_fpu_op0(m68ki_cpu_core *state) {
 			uint16 w2 = OPER_I_16(state);
 			switch ((w2 >> 13) & 0x7) {
 				case 0x0:	// FPU ALU FP, FP
-				case 0x2:{// FPU ALU ea, FP
+				case 0x2: { // FPU ALU ea, FP
 					fpgen_rm_reg(state, w2);
 					break;
 				}
@@ -1878,7 +1879,7 @@ void m68040_fpu_op0(m68ki_cpu_core *state) {
 				}
 
 				case 0x4:	// FMOVEM ea, FPCR
-				case 0x5:{  // FMOVEM FPCR, ea
+				case 0x5: { // FMOVEM FPCR, ea
 					fmove_fpcr(state, w2);
 					break;
 				}
@@ -1895,7 +1896,7 @@ void m68040_fpu_op0(m68ki_cpu_core *state) {
 			break;
 		}
 
-		case 1:  {     // FBcc disp16
+		case 1: { // FBcc disp16
 			switch ((REG_IR >> 3) & 0x7) {
 			case 1: // FDBcc
 				// TODO:
@@ -1908,11 +1909,11 @@ void m68040_fpu_op0(m68ki_cpu_core *state) {
 			fatalerror("M68kFPU: unimplemented main op %d with mode %d at %08X\n", (REG_IR >> 6) & 0x3, (REG_IR >> 3) & 0x7, REG_PC-4);
 			break;
 		}
-		case 2:  {  // FBcc disp16
+		case 2: { // FBcc disp16
 			fbcc16(state);
 			break;
 		}
-		case 3: {    // FBcc disp32
+		case 3: { // FBcc disp32
 			fbcc32(state);
 			break;
 		}
@@ -2079,31 +2080,31 @@ void m68040_fpu_op1(m68ki_cpu_core *state) {
 		case 1:		// FRESTORE <ea>
 		{
 			switch (mode) {
-				case 2: {// (An)
+				case 2: { // (An)
 					addr = REG_A[reg];
 					m68040_do_frestore(state, addr, -1);
 					break;
 				}
 
-				case 3:{	// (An)+
+				case 3: {	// (An)+
 					addr = EA_AY_PI_32();
 					m68040_do_frestore(state, addr, reg);
 					break;
 				}
 
-				case 5: {// (D16, An)
+				case 5: { // (D16, An)
 					addr = EA_AY_DI_16();
 					m68040_do_frestore(state, addr, -1);
 					break;
 				}
 
-				case 6: {// (An) + (Xn) + d8
+				case 6: { // (An) + (Xn) + d8
 					addr = EA_AY_IX_16();
 					m68040_do_frestore(state, addr, -1);
 					break;
 				}
 
-				case 7:	{
+				case 7: {
 					switch (reg) {
 						case 1:     // (abs32)
 						{
