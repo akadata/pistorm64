@@ -16,7 +16,7 @@
 #include "fix_mem_region.h"
 
 char device_name[] = A314_NAME;
-char id_string[] = A314_NAME " 1.0.2 (18 Feb 2026)";
+char id_string[] = A314_NAME " 1.1 (28 Nov 2020)";
 
 struct ExecBase* SysBase;
 BPTR saved_seg_list;

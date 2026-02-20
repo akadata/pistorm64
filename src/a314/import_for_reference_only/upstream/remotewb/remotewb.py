@@ -11,11 +11,6 @@ import websockets
 import socket
 import os
 import sys
-import importlib.util
-import importlib.util
-
-PISTORM_ROOT = os.environ["PISTORM_ROOT"]
-A314_ROOT = os.environ.get("PISTORM_A314", os.path.join(PISTORM_ROOT, "a314"))
 
 MSG_REGISTER_REQ		= 1
 MSG_REGISTER_RES		= 2
@@ -30,34 +25,6 @@ MSG_CONNECT_RESPONSE	        = 10
 MSG_DATA		    	= 11
 MSG_EOS			    	= 12
 MSG_RESET		    	= 13
-
-MAX_MESSAGE_SIZE = 1024 * 1024
-_bad_header_logged = False
-
-KNOWN_PTYPES = {
-    MSG_REGISTER_REQ,
-    MSG_REGISTER_RES,
-    MSG_DEREGISTER_REQ,
-    MSG_DEREGISTER_RES,
-    MSG_READ_MEM_REQ,
-    MSG_READ_MEM_RES,
-    MSG_WRITE_MEM_REQ,
-    MSG_WRITE_MEM_RES,
-    MSG_CONNECT,
-    MSG_CONNECT_RESPONSE,
-    MSG_DATA,
-    MSG_EOS,
-    MSG_RESET,
-}
-
-def _fail_bad_header(plen, stream_id, ptype):
-    global _bad_header_logged
-    if not _bad_header_logged:
-        print(
-            f'Bad A314d header (len={plen} stream={stream_id} type={ptype}). Check endian framing.'
-        )
-        _bad_header_logged = True
-    raise SystemExit(1)
 
 protocol = None
 
@@ -76,7 +43,7 @@ class MyProtocol(asyncio.Protocol):
         else:
             sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             name = 'remotewb'
-            msg = struct.pack('<IIB', len(name), 0, MSG_REGISTER_REQ) + name.encode()
+            msg = struct.pack('=IIB', len(name), 0, MSG_REGISTER_REQ) + name.encode()
             self.transport.write(msg)
 
         self.rbuf = b''
@@ -94,10 +61,10 @@ class MyProtocol(asyncio.Protocol):
                 self.transport.close()
         elif mtype == MSG_CONNECT:
             if self.active_stream_id is not None:
-                msg = struct.pack('<IIB', 0, self.active_stream_id, MSG_RESET)
+                msg = struct.pack('=IIB', 0, self.active_stream_id, MSG_RESET)
                 self.transport.write(msg)
             self.active_stream_id = stream_id
-            msg = struct.pack('<IIB', 1, self.active_stream_id, MSG_CONNECT_RESPONSE) + b'\x00'
+            msg = struct.pack('=IIB', 1, self.active_stream_id, MSG_CONNECT_RESPONSE) + b'\x00'
             self.transport.write(msg)
             self.first_msg = True
             print('Amiga connected')
@@ -119,7 +86,7 @@ class MyProtocol(asyncio.Protocol):
                     start_read_screenshot()
         elif mtype == MSG_EOS:
             if self.active_stream_id == stream_id:
-                msg = struct.pack('<IIB', 0, self.active_stream_id, MSG_EOS)
+                msg = struct.pack('=IIB', 0, self.active_stream_id, MSG_EOS)
                 self.transport.write(msg)
                 self.active_stream_id = None
         elif mtype == MSG_RESET:
@@ -135,9 +102,7 @@ class MyProtocol(asyncio.Protocol):
             if len(self.rbuf) < 9:
                 break
 
-            mlen, stream_id, mtype = struct.unpack('<IIB', self.rbuf[:9])
-            if mlen > MAX_MESSAGE_SIZE or mtype not in KNOWN_PTYPES:
-                _fail_bad_header(mlen, stream_id, mtype)
+            mlen, stream_id, mtype = struct.unpack('=IIB', self.rbuf[:9])
 
             if len(self.rbuf) < 9 + mlen:
                 break
@@ -150,11 +115,10 @@ class MyProtocol(asyncio.Protocol):
         print('Connection to driver lost', exc)
         if ws_server:
             ws_server.close()
-            loop.create_task(ws_server.wait_closed())
+            ws_server.wait_closed()
         loop.stop()
 
-loop = asyncio.new_event_loop()
-asyncio.set_event_loop(loop)
+loop = asyncio.get_event_loop()
 ws_server = None
 active_browser = None
 
@@ -191,41 +155,12 @@ if os.name == 'nt':
             contents = output.getvalue()
             return contents
 else:
-    b2g = None
-    b2g_error_logged = False
+    import bpls2gif as b2g
+
     pal_set = False
 
-    def load_bpls2gif():
-        try:
-            import bpls2gif as mod
-        except Exception:
-            mod = None
-
-        if mod and hasattr(mod, 'set_palette') and hasattr(mod, 'encode'):
-            return mod
-
-        base_dir = os.path.join(A314_ROOT, 'bpls2gif')
-        if os.path.isdir(base_dir):
-            for name in os.listdir(base_dir):
-                if name.startswith('bpls2gif') and name.endswith(('.so', '.pyd')):
-                    mod_path = os.path.join(base_dir, name)
-                    spec = importlib.util.spec_from_file_location('bpls2gif', mod_path)
-                    if spec and spec.loader:
-                        mod = importlib.util.module_from_spec(spec)
-                        spec.loader.exec_module(mod)
-                        if hasattr(mod, 'set_palette') and hasattr(mod, 'encode'):
-                            return mod
-        return None
-
-    b2g = load_bpls2gif()
-
     def bpls2gif(bpls):
-        global pal_set, b2g_error_logged
-        if not b2g:
-            if not b2g_error_logged:
-                print('bpls2gif module missing set_palette; build with: cd bpls2gif && python3 setup.py build_ext --inplace')
-                b2g_error_logged = True
-            raise RuntimeError('bpls2gif not available')
+        global pal_set
         if not pal_set:
             pal = []
             for i in range(8):
@@ -298,7 +233,7 @@ def send_buffered_events():
         lst += struct.pack('>HHH', x, y, b)
         last_sent = current_mouse
 
-    msg = struct.pack('<IIB', len(lst), protocol.active_stream_id, MSG_DATA) + lst
+    msg = struct.pack('=IIB', len(lst), protocol.active_stream_id, MSG_DATA) + lst
     protocol.transport.write(msg)
 
 def read_screenshot_completed(bpls):
@@ -314,12 +249,7 @@ def read_screenshot_completed(bpls):
                     dr = j*256 + i
                     dst[dr*80:(dr+1)*80] = src[sr*80:(sr+1)*80]
             bpls = bytes(dst)
-        try:
-            gif = bpls2gif(bpls)
-        except Exception as exc:
-            print(f'Failed to encode screenshot: {exc}')
-            send_buffered_events()
-            return
+        gif = bpls2gif(bpls)
         asyncio.ensure_future(send_img_to_active_browser(gif))
         send_buffered_events()
 
@@ -327,14 +257,12 @@ def start_read_screenshot():
     global last_read_started, is_reading_screen
     if active_browser is not None and protocol is not None and protocol.active_stream_id is not None and not is_reading_screen:
         is_reading_screen = True
-        msg = struct.pack('<IIBII', 8, 0, MSG_READ_MEM_REQ, protocol.ptr, 3*256*80)
+        msg = struct.pack('=IIBII', 8, 0, MSG_READ_MEM_REQ, protocol.ptr, 3*256*80)
         protocol.transport.write(msg)
 
-async def browser_handler(websocket, path=None):
+async def browser_handler(websocket, path):
     global active_browser
 
-    if path is None:
-        path = getattr(websocket, 'path', '')
     print('Connection to ', path, ' was made')
 
     is_active = active_browser is None
@@ -365,7 +293,7 @@ async def browser_handler(websocket, path=None):
 
 async def create_websockets_server():
     global ws_server
-    ws_server = await websockets.serve(browser_handler, '0.0.0.0', 6789)
+    ws_server = await websockets.serve(browser_handler, '0.0.0.0', 6789, loop = loop)
     print('Websocket server created')
 
 try:

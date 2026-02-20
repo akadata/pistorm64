@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2018-2021 Niklas Ekström
+# Copyright (c) 2018 Niklas Ekström
 
 import select
 import sys
@@ -21,17 +21,8 @@ logging.basicConfig(format = '%(levelname)s, %(asctime)s, %(name)s, line %(linen
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-PISTORM_ROOT = os.environ["PISTORM_ROOT"]
-A314_ROOT = os.environ.get("PISTORM_A314", os.path.join(PISTORM_ROOT, "a314"))
-A314_SHARED = os.environ.get("A314_SHARED", os.path.join(PISTORM_ROOT, "data", "a314-shared"))
-
-def _expand_vars(value):
-    if isinstance(value, str):
-        return os.path.expandvars(value)
-    return value
-
-FS_CFG_FILE = os.environ.get("A314_FS_CONF", os.path.join(A314_ROOT, "a314fs.conf"))
-PICMD_CFG_FILE = os.path.join(A314_ROOT, "picmd.conf")
+FS_CFG_FILE = '/etc/opt/a314/a314fs.conf'
+PICMD_CFG_FILE = '/etc/opt/a314/picmd.conf'
 
 volume_paths = {}
 search_path = ''
@@ -43,7 +34,7 @@ def load_cfg():
         cfg = json.load(f)
         devs = cfg['devices']
         for _, dev in devs.items():
-            volume_paths[dev['volume']] = _expand_vars(dev['path'])
+            volume_paths[dev['volume']] = dev['path']
 
     global search_path
     search_path = os.getenv('PATH')
@@ -87,7 +78,7 @@ def wait_for_msg():
             logger.error('Connection to a314d was closed, terminating.')
             exit(-1)
         header += data
-    (plen, stream_id, ptype) = struct.unpack('<IIB', header)
+    (plen, stream_id, ptype) = struct.unpack('=IIB', header)
     payload = b''
     while len(payload) < plen:
         data = drv.recv(plen - len(payload))
@@ -98,11 +89,11 @@ def wait_for_msg():
     return (stream_id, ptype, payload)
 
 def send_register_req(name):
-    m = struct.pack('<IIB', len(name), 0, MSG_REGISTER_REQ) + name
+    m = struct.pack('=IIB', len(name), 0, MSG_REGISTER_REQ) + name
     drv.sendall(m)
 
 def send_read_mem_req(address, length):
-    m = struct.pack('<IIBII', 8, 0, MSG_READ_MEM_REQ, address, length)
+    m = struct.pack('=IIBII', 8, 0, MSG_READ_MEM_REQ, address, length)
     drv.sendall(m)
 
 def read_mem(address, length):
@@ -114,7 +105,7 @@ def read_mem(address, length):
     return payload
 
 def send_write_mem_req(address, data):
-    m = struct.pack('<IIBI', 4 + len(data), 0, MSG_WRITE_MEM_REQ, address) + data
+    m = struct.pack('=IIBI', 4 + len(data), 0, MSG_WRITE_MEM_REQ, address) + data
     drv.sendall(m)
 
 def write_mem(address, data):
@@ -125,19 +116,19 @@ def write_mem(address, data):
         exit(-1)
 
 def send_connect_response(stream_id, result):
-    m = struct.pack('<IIBB', 1, stream_id, MSG_CONNECT_RESPONSE, result)
+    m = struct.pack('=IIBB', 1, stream_id, MSG_CONNECT_RESPONSE, result)
     drv.sendall(m)
 
 def send_data(stream_id, data):
-    m = struct.pack('<IIB', len(data), stream_id, MSG_DATA) + data
+    m = struct.pack('=IIB', len(data), stream_id, MSG_DATA) + data
     drv.sendall(m)
 
 def send_eos(stream_id):
-    m = struct.pack('<IIB', 0, stream_id, MSG_EOS)
+    m = struct.pack('=IIB', 0, stream_id, MSG_EOS)
     drv.sendall(m)
 
 def send_reset(stream_id):
-    m = struct.pack('<IIB', 0, stream_id, MSG_RESET)
+    m = struct.pack('=IIB', 0, stream_id, MSG_RESET)
     drv.sendall(m)
 
 sessions = {}
@@ -147,7 +138,7 @@ class PiCmdSession(object):
         self.stream_id = stream_id
         self.pid = 0
 
-        self.first_packet = True
+        self.start_msg = b''
         self.reset_after = None
 
         self.rasp_was_esc = False
@@ -189,20 +180,15 @@ class PiCmdSession(object):
             os.write(self.fd, out.encode('utf-8'))
 
     def process_msg_data(self, data):
-        if self.first_packet:
-            if len(data) != 8:
-                send_reset(self.stream_id)
-                del sessions[self.stream_id]
-            else:
-                address, length = struct.unpack('>II', data)
-                buf = read_mem(address, length)
+        if self.start_msg is not None:
+            self.start_msg += data
+            length = struct.unpack_from('>H', self.start_msg, 0)[0]
+            if len(self.start_msg) == length:
+                buf = self.start_msg
 
-                ind = 0
-                rows, cols = struct.unpack('>HH', buf[ind:ind+4])
-                ind += 4
+                rows, cols, component_count, arg_count = struct.unpack_from('>HHBB', buf, 2)
 
-                component_count = buf[ind]
-                ind += 1
+                ind = 8
 
                 components = []
                 for _ in range(component_count):
@@ -210,9 +196,6 @@ class PiCmdSession(object):
                     ind += 1
                     components.append(buf[ind:ind+n].decode('latin-1'))
                     ind += n
-
-                arg_count = buf[ind]
-                ind += 1
 
                 args = []
                 for _ in range(arg_count):
@@ -226,10 +209,10 @@ class PiCmdSession(object):
 
                 self.pid, self.fd = pty.fork()
                 if self.pid == 0:
-                    for key, val in env_vars.items():
-                        os.putenv(key, val)
                     os.putenv('PATH', search_path)
                     os.putenv('TERM', 'ansi')
+                    for key, val in env_vars.items():
+                        os.putenv(key, val)
                     winsize = struct.pack('HHHH', rows, cols, 0, 0)
                     fcntl.ioctl(sys.stdin, termios.TIOCSWINSZ, winsize)
                     if component_count != 0 and components[0] in volume_paths:
@@ -239,7 +222,7 @@ class PiCmdSession(object):
                         os.chdir(os.getenv('HOME', '/'))
                     os.execvp(args[0], args)
 
-                self.first_packet = False
+                self.start_msg = None
 
         elif self.pid:
             self.process_amiga_ansi(data)
@@ -384,7 +367,7 @@ while not done:
                     if len(rbuf) < 9:
                         break
 
-                    (plen, stream_id, ptype) = struct.unpack('<IIB', rbuf[:9])
+                    (plen, stream_id, ptype) = struct.unpack('=IIB', rbuf[:9])
                     if len(rbuf) < 9 + plen:
                         break
 

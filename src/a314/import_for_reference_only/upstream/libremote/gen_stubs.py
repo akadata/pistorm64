@@ -16,8 +16,8 @@ contents += f'#define SERVICE_NAME "{libdecl["service-name"]}"\n\n'
 contents += '''struct LibRemote;
 static ULONG null_func();
 static BPTR expunge();
-static BPTR close(struct LibRemote *lib __asm("a6"));
-static ULONG send_request(struct LibRemote *lib __asm("a6"), UBYTE *write_buf, ULONG write_length);
+static BPTR close(__reg("a6") struct LibRemote *lib);
+static ULONG send_request(__reg("a6") struct LibRemote *lib, UBYTE *write_buf, ULONG write_length);
 
 '''
 
@@ -25,13 +25,13 @@ contents += f'#define LVO_COUNT {len(funcs) + 4}\n\n'
 
 def gen_param(reg):
     if reg[0] == 'd':
-        return f'ULONG {reg} __asm("{reg}")'
+        return f'__reg("{reg}") ULONG {reg}'
     else:
-        return f'void *{reg} __asm("{reg}")'
+        return f'__reg("{reg}") void *{reg}'
 
 for i, func in enumerate(funcs):
     args = func.get('args', [])
-    contents += f'static ULONG func_{i}(struct LibRemote *lib __asm("a6")'
+    contents += f'static ULONG func_{i}(__reg("a6") struct LibRemote *lib'
     if len(args):
         contents += ', ' + ', '.join(gen_param(reg) for reg, _, _ in args)
     contents += ')\n{\n'
@@ -58,7 +58,7 @@ contents += '''};
 
 '''
 
-contents += '''static void fill_lvos(struct LibRemote *lib __asm("a6"))
+contents += '''static void fill_lvos(__reg("a6") struct LibRemote *lib)
 {
     for (int i = 0; i < LVO_COUNT; i++)
     {

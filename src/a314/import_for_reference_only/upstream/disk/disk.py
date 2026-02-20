@@ -9,11 +9,9 @@ logging.basicConfig(format='%(levelname)s, %(asctime)s, %(name)s, line %(lineno)
 import io
 import json
 import logging
-import os
 import select
 import socket
 import struct
-import sys
 from typing import Optional, Tuple, List, Dict
 
 from a314d import A314d
@@ -36,52 +34,7 @@ OP_RES_WRITE_PROTECTED = 2
 
 NUM_DRIVES = 4
 
-PISTORM_ROOT = os.environ["PISTORM_ROOT"]
-A314_ROOT = os.environ.get("PISTORM_A314", os.path.join(PISTORM_ROOT, "a314"))
-PISTORM_DATA = os.environ.get("PISTORM_DATA", os.path.join(PISTORM_ROOT, "data"))
-
-def _expand_vars(value):
-    if isinstance(value, str):
-        return os.path.expandvars(value)
-    return value
-
-DEFAULT_CONF_FILE = os.path.join(A314_ROOT, 'disk.conf')
-try:
-    idx = sys.argv.index('-conf-file')
-    CONF_FILE = sys.argv[idx + 1]
-except (ValueError, IndexError):
-    CONF_FILE = DEFAULT_CONF_FILE
-
-MAX_MESSAGE_SIZE = 1024 * 1024
-_bad_header_logged = False
-
-KNOWN_PTYPES = {
-    A314d.MSG_REGISTER_REQ,
-    A314d.MSG_REGISTER_RES,
-    A314d.MSG_DEREGISTER_REQ,
-    A314d.MSG_DEREGISTER_RES,
-    A314d.MSG_READ_MEM_REQ,
-    A314d.MSG_READ_MEM_RES,
-    A314d.MSG_WRITE_MEM_REQ,
-    A314d.MSG_WRITE_MEM_RES,
-    A314d.MSG_CONNECT,
-    A314d.MSG_CONNECT_RESPONSE,
-    A314d.MSG_DATA,
-    A314d.MSG_EOS,
-    A314d.MSG_RESET,
-}
-
-def _fail_bad_header(plen, stream_id, ptype):
-    global _bad_header_logged
-    if not _bad_header_logged:
-        logger.error(
-            'Bad A314d header (len=%d stream=%d type=%d). Check endian framing.',
-            plen,
-            stream_id,
-            ptype,
-        )
-        _bad_header_logged = True
-    raise SystemExit(1)
+CONF_FILE = "/etc/opt/a314/disk.conf"
 
 class Drive(object):
     def __init__(self, unit: int):
@@ -90,14 +43,13 @@ class Drive(object):
         self.writable = False
         self.geometry: Optional[Tuple[int, int, int]] = None
         self.geometry_sent = False
-        self.filename: Optional[str] = None
 
 class DiskService(object):
     def __init__(self):
         self.a314d = A314d(SERVICE_NAME)
 
         self.control_server_socket = socket.socket()
-        self.control_server_socket.bind(('0.0.0.0', 23890))
+        self.control_server_socket.bind(('localhost', 23890))
         self.control_server_socket.listen(10)
 
         self.control_sockets: List[socket.socket] = []
@@ -109,18 +61,13 @@ class DiskService(object):
         self.mem_write_queue = []
 
     def load_config(self):
-        try:
-            with open(CONF_FILE, 'rt') as f:
-                j = json.load(f)
-        except FileNotFoundError:
-            logger.warning('Disk config not found: %s', CONF_FILE)
-            return
-
-        for e in j.get('auto-insert', []):
-            unit: int = e['unit']
-            filename: str = _expand_vars(e['filename'])
-            rw: bool = e.get('rw', False)
-            self.auto_insert[unit] = (filename, rw)
+        with open(CONF_FILE, 'rt') as f:
+            j = json.load(f)
+            for e in j.get('auto-insert', []):
+                unit: int = e['unit']
+                filename: str = e['filename']
+                rw: bool = e.get('rw', False)
+                self.auto_insert[unit] = (filename, rw)
 
     def eject_adf(self, unit: int):
         drive = self.drives[unit]
@@ -129,7 +76,6 @@ class DiskService(object):
 
         drive.f.close()
         drive.f = None
-        drive.filename = None
 
         if self.current_stream_id is not None:
             self.a314d.send_data(self.current_stream_id, struct.pack('>BB', EJECT_NOTIFY, unit))
@@ -167,7 +113,6 @@ class DiskService(object):
         drive.f = f
         drive.writable = writable
         drive.geometry = geometry
-        drive.filename = filename
 
         if self.current_stream_id is not None:
             if not drive.geometry_sent:
@@ -176,20 +121,6 @@ class DiskService(object):
             self.a314d.send_data(self.current_stream_id, struct.pack('>BBB', INSERT_NOTIFY, unit, 1 if writable else 0))
 
         return f"Inserted disk file '{filename}' in unit {unit}"
-
-    def get_status(self):
-        units = []
-        for drive in self.drives:
-            units.append(
-                {
-                    "unit": drive.unit,
-                    "present": drive.f is not None,
-                    "writable": drive.writable,
-                    "filename": drive.filename,
-                    "geometry": drive.geometry,
-                }
-            )
-        return {"units": units}
 
     boot_code = bytes([
         0x43, 0xFA, 0x00, 0x18, 0x4E, 0xAE, 0xFF, 0xA0,
@@ -323,9 +254,7 @@ class DiskService(object):
             if len(self.rbuf) < 9:
                 break
 
-            (plen, stream_id, ptype) = struct.unpack('<IIB', self.rbuf[:9])
-            if plen > MAX_MESSAGE_SIZE or ptype not in KNOWN_PTYPES:
-                _fail_bad_header(plen, stream_id, ptype)
+            (plen, stream_id, ptype) = struct.unpack('=IIB', self.rbuf[:9])
             if len(self.rbuf) < 9 + plen:
                 break
 
@@ -354,8 +283,6 @@ class DiskService(object):
                 idx = 3 if rw else 2
                 fn = ' '.join(arr[idx:])
                 res = self.insert_adf(unit, fn, rw)
-            elif cmd == 'status':
-                res = json.dumps(self.get_status())
             else:
                 res = f"Unknown command '{cmd}'"
         except:

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2018-2021 Niklas Ekström
+# Copyright (c) 2018 Niklas Ekström
 
 import select
 import sys
@@ -17,29 +17,14 @@ logging.basicConfig(format = '%(levelname)s, %(asctime)s, %(name)s, line %(linen
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-PISTORM_ROOT = os.environ["PISTORM_ROOT"]
-A314_ROOT = os.environ.get("PISTORM_A314", os.path.join(PISTORM_ROOT, "a314"))
-A314_SHARED = os.environ.get("A314_SHARED", os.path.join(PISTORM_ROOT, "data", "a314-shared"))
-
-def _expand_vars(value):
-    if isinstance(value, str):
-        return os.path.expandvars(value)
-    return value
-
-try:
-    idx = sys.argv.index('-conf-file')
-    CONFIG_FILE_PATH = sys.argv[idx + 1]
-except (ValueError, IndexError):
-    CONFIG_FILE_PATH = os.environ.get("A314_FS_CONF", os.path.join(A314_ROOT, "a314fs.conf"))
-
-SHARED_DIRECTORY = A314_SHARED
+CONFIG_FILE_PATH = '/etc/opt/a314/a314fs.conf'
 METAFILE_EXTENSION = ':a314'
 
 with open(CONFIG_FILE_PATH, encoding='utf-8') as f:
     cfg = json.load(f)
     devs = cfg['devices']
     dev = devs['PI0']
-    SHARED_DIRECTORY = _expand_vars(dev.get('path', SHARED_DIRECTORY))
+    SHARED_DIRECTORY = dev['path']
 
 MSG_REGISTER_REQ        = 1
 MSG_REGISTER_RES        = 2
@@ -63,7 +48,7 @@ def wait_for_msg():
             logger.error('Connection to a314d was closed, terminating.')
             exit(-1)
         header += data
-    (plen, stream_id, ptype) = struct.unpack('<IIB', header)
+    (plen, stream_id, ptype) = struct.unpack('=IIB', header)
     payload = b''
     while len(payload) < plen:
         data = drv.recv(plen - len(payload))
@@ -74,11 +59,11 @@ def wait_for_msg():
     return (stream_id, ptype, payload)
 
 def send_register_req(name):
-    m = struct.pack('<IIB', len(name), 0, MSG_REGISTER_REQ) + name
+    m = struct.pack('=IIB', len(name), 0, MSG_REGISTER_REQ) + name
     drv.sendall(m)
 
 def send_read_mem_req(address, length):
-    m = struct.pack('<IIBII', 8, 0, MSG_READ_MEM_REQ, address, length)
+    m = struct.pack('=IIBII', 8, 0, MSG_READ_MEM_REQ, address, length)
     drv.sendall(m)
 
 def read_mem(address, length):
@@ -90,7 +75,7 @@ def read_mem(address, length):
     return payload
 
 def send_write_mem_req(address, data):
-    m = struct.pack('<IIBI', 4 + len(data), 0, MSG_WRITE_MEM_REQ, address) + data
+    m = struct.pack('=IIBI', 4 + len(data), 0, MSG_WRITE_MEM_REQ, address) + data
     drv.sendall(m)
 
 def write_mem(address, data):
@@ -101,19 +86,19 @@ def write_mem(address, data):
         exit(-1)
 
 def send_connect_response(stream_id, result):
-    m = struct.pack('<IIBB', 1, stream_id, MSG_CONNECT_RESPONSE, result)
+    m = struct.pack('=IIBB', 1, stream_id, MSG_CONNECT_RESPONSE, result)
     drv.sendall(m)
 
 def send_data(stream_id, data):
-    m = struct.pack('<IIB', len(data), stream_id, MSG_DATA) + data
+    m = struct.pack('=IIB', len(data), stream_id, MSG_DATA) + data
     drv.sendall(m)
 
 def send_eos(stream_id):
-    m = struct.pack('<IIB', 0, stream_id, MSG_EOS)
+    m = struct.pack('=IIB', 0, stream_id, MSG_EOS)
     drv.sendall(m)
 
 def send_reset(stream_id):
-    m = struct.pack('<IIB', 0, stream_id, MSG_RESET)
+    m = struct.pack('=IIB', 0, stream_id, MSG_RESET)
     drv.sendall(m)
 
 ACTION_NIL              = 0
@@ -638,7 +623,11 @@ def process_rename_object(key, name, target_dir, new_name):
         os.rename(from_path, to_path)
         if os.path.isfile(from_path + METAFILE_EXTENSION):
             os.rename(from_path + METAFILE_EXTENSION, to_path + METAFILE_EXTENSION)
-    except:
+    except OSError:
+        return struct.pack('>HH', 0, ERROR_OBJECT_IN_USE)
+    except Exception as e:
+        logger.warning('ACTION_RENAME unexpected exception')
+        logger.warning(e)
         return struct.pack('>HH', 0, ERROR_OBJECT_NOT_FOUND)
 
     return struct.pack('>HH', 1, 0)
@@ -699,26 +688,8 @@ def process_same_lock(key1, key2):
     else:
         return struct.pack('>HH', 0, LOCK_SAME_VOLUME)
 
-def process_set_date(req):
-    # rtype is already known (34)
-    logger.warning('ACTION_SET_DATE(34) raw=%s', req[:64].hex())
-
-    # common pattern in your code: args often start right after the 2-byte rtype
-    # try decoding both 3-arg and 7-arg layouts for visibility
-    if len(req) >= 14:
-        a = struct.unpack('>III', req[2:14])
-        logger.warning('ACTION_SET_DATE(34) args3: %08x %08x %08x', *a)
-
-    if len(req) >= 30:
-        a = struct.unpack('>7I', req[2:30])
-        logger.warning('ACTION_SET_DATE(34) args7: %s', ' '.join(f'{x:08x}' for x in a))
-
-    # ACK success so copying continues while you inspect logs
-    return struct.pack('>HH', 1, 0)
-
-
 def process_request(req):
-    logger.debug('len(req): %s, req: %s', len(req), list(req))
+    #logger.debug('len(req): %s, req: %s', len(req), list(req))
 
     (rtype,) = struct.unpack('>H', req[:2])
 
@@ -785,14 +756,8 @@ def process_request(req):
     elif rtype == ACTION_SAME_LOCK:
         key1, key2 = struct.unpack('>II', req[2:10])
         return process_same_lock(key1, key2)
-    elif rtype == ACTION_SET_DATE:
-        return process_set_date(req)
     elif rtype == ACTION_UNSUPPORTED:
         (dp_Type,) = struct.unpack('>H', req[2:4])
-        if dp_Type == ACTION_SET_DATE:
-            # No args are provided by sender; accept to prevent retries/spam
-            return struct.pack('>HH', 1, 0)
-            #    return process_set_date(req)   # your debug function
         logger.warning('Unsupported action %d (Amiga/a314fs)', dp_Type)
         return struct.pack('>HH', 0, ERROR_ACTION_NOT_KNOWN)
     else:
@@ -837,12 +802,10 @@ while not done:
             send_connect_response(stream_id, 3)
     elif ptype == MSG_DATA:
         address, length = struct.unpack('>II', payload)
-        #logger.debug('address: %s, length: %s', address, length)
         req = read_mem(address + 2, length - 2)
         res = process_request(req)
         write_mem(address + 2, res)
-        #write_mem(address, b'\xff\xff')
-        send_data(stream_id, b'\xff\xff')
+        send_data(stream_id, struct.pack('>I', len(res) + 2))
     elif ptype == MSG_EOS:
         if stream_id == current_stream_id:
             logger.debug('Got EOS, stream closed')
