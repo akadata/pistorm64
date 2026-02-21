@@ -797,7 +797,7 @@ static void handle_irtg_command(uint32_t cmd) {
     rtg_address_adj[1] = rtg_address[1] - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
 
     rtg_blitpattern(
-      (uint16_t)M68KR(M68K_REG_D0), 
+      (uint16_t)M68KR(M68K_REG_D0)/3, 
       (uint16_t)M68KR(M68K_REG_D1),
       (uint16_t)M68KR(M68K_REG_D2), 
       (uint16_t)M68KR(M68K_REG_D3), 
@@ -874,7 +874,9 @@ static void handle_irtg_command(uint32_t cmd) {
 }
 
 static void handle_rtg_command(uint32_t cmd) {
-  // printf("Handling RTG command %d (%.8X)\n", cmd, cmd);
+  if(cmd!=16) {
+   printf("Handling RTG command %d (%.8X)\n", cmd, cmd);
+  }
   switch (cmd) {
   case RTGCMD_SETGC:
     gdebug("SetGC\n");
@@ -944,97 +946,98 @@ static void handle_rtg_command(uint32_t cmd) {
     break;
   case RTGCMD_FILLRECT:
     if (rtg_u8[0] == 0xFF || rtg_format != RTGFMT_8BIT_CLUT) {
-      rtg_fillrect_solid(
-        (uint16_t)rtg_x[0], 
-        (uint16_t)rtg_y[0], 
-        (uint16_t)rtg_x[1], 
-        (uint16_t)rtg_y[1], 
-        rtg_rgb[0], 
-        (uint16_t)rtg_x[2], 
+      rtg_fillrect_solid( // done messes with workbench width, height 
+        (uint16_t)rtg_x[0],
+        (uint16_t)rtg_y[0],
+        (uint16_t)rtg_x[1],
+        (uint16_t)rtg_y[1],
+        rtg_rgb[0],
+        (uint16_t)rtg_x[2],
         rtg_format
         );
-      LOG_WARN("[RTG/RTGCMD_FILLRECT/FillRect Solid] rtg_x=%u \n", rtg_x[1]);
+      LOG_WARN("[RTG/RTGCMD_FILLRECT/FillRect Solid] rtg_x[0]=%u ,rtg_y[0]=%u ,rtg_x[1]=%u ,rtg_y[1]=%u ,rtg_x[2]=%u ,rtg_u8[0]=%u\n", rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_u8[0]);
       gdebug("FillRect Solid\n");
     } else {
       rtg_fillrect(
-        (uint16_t)rtg_x[0], 
-        (uint16_t)rtg_y[0], 
-        (uint16_t)rtg_x[1], 
-        (uint16_t)rtg_y[1], 
-        rtg_rgb[0], 
-        (uint16_t)rtg_x[2], 
-        rtg_format, 
+        (uint16_t)rtg_x[0],
+        (uint16_t)rtg_y[0],
+        (uint16_t)rtg_x[1],
+        (uint16_t)rtg_y[1],
+        rtg_rgb[0],
+        (uint16_t)rtg_x[2],
+        rtg_format,
         rtg_u8[0]
         );
 
-      LOG_WARN("[RTG/RTGCMD_FILLRECT/FillRect Masked] rtg_x=%u \n", rtg_x[1]);
+      LOG_WARN("[RTG/RTGCMD_FILLRECT/FillRect Masked] rtg_x[0]=%u ,rtg_y[0]=%u ,rtg_x[1]=%u ,rtg_y[1]=%u ,rtg_x[2]=%u ,rtg_u8[0]=%u\n", rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_u8[0]);
       gdebug("FillRect Masked\n");
     }
     break;
   case RTGCMD_INVERTRECT:
     rtg_invertrect(
-      (uint16_t)rtg_x[0], 
-      (uint16_t)rtg_y[0], 
-      (uint16_t)rtg_x[1], 
-      (uint16_t)rtg_y[1], 
-      (uint16_t)rtg_x[2], 
-      rtg_format, 
+      (uint16_t)rtg_x[0],
+      (uint16_t)rtg_y[0],
+      (uint16_t)rtg_x[1],
+      (uint16_t)rtg_y[1],
+      (uint16_t)rtg_x[2],
+      rtg_format,
       rtg_u8[0]
       );
-    LOG_WARN("[RTG/RTGCMD_INVERTRECT] rtg_x=%u \n", rtg_x[1]);
+    LOG_WARN("[RTG/RTGCMD_INVERTRECT] rtg_x[0]=%u ,rtg_y[0]=%u ,rtg_x[1]=%u ,rtg_y[1]=%u ,rtg_x[2]=%u ,rtg_u8[0]=%u\n", rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_u8[0]);
     gdebug("InvertRect\n");
     break;
   case RTGCMD_BLITRECT:
     if (rtg_u8[0] == 0xFF || rtg_format != RTGFMT_8BIT_CLUT) {
       rtg_blitrect_solid(
-        (uint16_t)rtg_x[0], 
-        (uint16_t)rtg_y[0], 
-        (uint16_t)rtg_x[1], 
-        (uint16_t)rtg_y[1], 
-        (uint16_t)rtg_x[2], 
-        (uint16_t)rtg_y[2], 
-        (uint16_t)rtg_x[3], 
+        (uint16_t)rtg_x[0],
+        (uint16_t)rtg_y[0],
+        (uint16_t)rtg_x[1],
+        (uint16_t)rtg_y[1],
+        (uint16_t)rtg_x[2],
+        (uint16_t)rtg_y[2],
+        (uint16_t)rtg_x[3],
         rtg_format
         );
-      LOG_WARN("[RTG/RTGCMD_BLITRECT] rtg_x=%u \n", rtg_x[1]);
+      LOG_WARN("[RTG/RTGCMD_BLITRECT/Solid] rtg_x[0]=%u ,rtg_y[0]=%u ,rtg_x[1]=%u ,rtg_y[1]=%u ,rtg_x[2]=%u ,rtg_y[2]=%u ,rtg_x[3]=%u ,rtg_u8[0]=%u\n", rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_y[2], rtg_x[3], rtg_u8[0]);
       gdebug("BlitRect Solid\n");
     } else {
       rtg_blitrect(
-        (uint16_t)rtg_x[0], 
-        (uint16_t)rtg_y[0], 
-        (uint16_t)rtg_x[1], 
+        (uint16_t)rtg_x[0],
+        (uint16_t)rtg_y[0],
+        (uint16_t)rtg_x[1],
         (uint16_t)rtg_y[1],
         (uint16_t)rtg_x[2],
-        (uint16_t)rtg_y[2], 
-        (uint16_t)rtg_x[3], 
-        rtg_format, 
+        (uint16_t)rtg_y[2],
+        (uint16_t)rtg_x[3],
+        rtg_format,
         rtg_u8[0]
         );
+      LOG_WARN("[RTG/RTGCMD_BLITRECT/Masked] rtg_x[0]=%u ,rtg_y[0]=%u ,rtg_x[1]=%u ,rtg_y[1]=%u ,rtg_x[2]=%u ,rtg_y[2]=%u ,rtg_x[3]=%u ,rtg_u8[0]=%u\n", rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_y[2], rtg_x[3], rtg_u8[0]);
       gdebug("BlitRect Masked\n");
     }
     break;
   case RTGCMD_BLITRECT_NOMASK_COMPLETE:
     rtg_blitrect_nomask_complete(
-      (uint16_t)rtg_x[0], 
-      (uint16_t)rtg_y[0], 
-      (uint16_t)rtg_x[1], 
-      (uint16_t)rtg_y[1], 
-      (uint16_t)rtg_x[2], 
-      (uint16_t)rtg_y[2], 
-      (uint16_t)rtg_x[3], 
-      (uint16_t)rtg_x[4], 
-      rtg_address[0], 
-      rtg_address[1], 
-      rtg_format, 
+      (uint16_t)rtg_x[0],
+      (uint16_t)rtg_y[0],
+      (uint16_t)rtg_x[1],
+      (uint16_t)rtg_y[1],
+      (uint16_t)rtg_x[2],
+      (uint16_t)rtg_y[2],
+      (uint16_t)rtg_x[3],
+      (uint16_t)rtg_x[4],
+      rtg_address[0],
+      rtg_address[1],
+      rtg_format,
       rtg_u8[0]
       );
-    LOG_WARN("[RTG/RTGCMD_BLITRECT_NOMASK_COMPLETE] rtg_x=%u \n", rtg_x[1]);
+    LOG_WARN("[RTG/RTGCMD_BLITRECT_NOMASK_COMPLETE] rtg_x[0]=%u ,rtg_y[0]=%u ,rtg_x[1]=%u ,rtg_y[1]=%u ,rtg_x[2]=%u ,rtg_y[2]=%u ,rtg_x[3]=%u ,rtg_x[4]=%u ,rtg_u8[0]=%u\n", rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_y[2], rtg_x[3], rtg_x[4], rtg_u8[0]);
     gdebug("BlitRectNoMaskComplete\n");
     break;
   case RTGCMD_BLITPATTERN:
     rtg_blitpattern((uint16_t)rtg_x[0], 
-      (uint16_t)rtg_y[0], 
-      (uint16_t)rtg_x[1], 
+      (uint16_t)rtg_y[0],  // scroll bar
+      (uint16_t)rtg_x[1],  // // dot pattern 
       (uint16_t)rtg_y[1],
       rtg_address[0], 
       rtg_rgb[0], 
@@ -1071,7 +1074,7 @@ static void handle_rtg_command(uint32_t cmd) {
     gdebug("BlitPattern\n");
     return;
   case RTGCMD_BLITTEMPLATE:
-    rtg_blittemplate(
+    rtg_blittemplate(  /// text etc
       (uint16_t)rtg_x[0], 
       (uint16_t)rtg_y[0], 
       (uint16_t)rtg_x[1], 
@@ -1086,105 +1089,109 @@ static void handle_rtg_command(uint32_t cmd) {
       rtg_u8[0], 
       rtg_u8[1]
       );
-    LOG_WARN("[RTG/RTGCMD_BLITTEMPLATE] rtg_x=%u \n", rtg_x[1]);
+    LOG_WARN("[RTG/RTGCMD_BLITTEMPLATE]  rtg_x[0]=%u ,rtg_y[0]=%u ,rtg_x[1]=%u ,rtg_y[1]=%u ,rtg_x[3]=%u ,rtg_x[4]=%u \n", rtg_x[0],rtg_y[0],rtg_x[1],rtg_y[1],rtg_x[3],rtg_x[4]);
     gdebug("BlitTemplate\n");
     break;
   case RTGCMD_DRAWLINE:
     if (rtg_u8[0] == 0xFF && rtg_y[2] == 0xFFFF) {
-      rtg_drawline_solid(
-        (int16_t)rtg_x[0], 
-        (int16_t)rtg_y[0], 
-        (int16_t)rtg_x[1], 
-        (int16_t)rtg_y[1], 
-        (uint16_t)rtg_x[2], 
-        rtg_rgb[0], 
-        (uint16_t)rtg_x[3], 
+      rtg_drawline_solid(  // tried! fail here
+        (int16_t)rtg_x[0],
+        (int16_t)rtg_y[0],
+        (int16_t)rtg_x[1],
+        (int16_t)rtg_y[1],
+        (uint16_t)rtg_x[2],
+        rtg_rgb[0],
+        (uint16_t)rtg_x[3],
         rtg_format
         );
-      LOG_WARN("[RTG/RTGCMD_DRAWLINE] rtg_x=%u \n", rtg_x[1]);
+      LOG_WARN("[RTG/RTGCMD_DRAWLINE/Solid] rtg_x[0]=%u ,rtg_y[0]=%u ,rtg_x[1]=%u ,rtg_y[1]=%u ,rtg_x[2]=%u ,rtg_x[3]=%u ,rtg_u8[0]=%u ,rtg_y[2]=%u\n", rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_x[3], rtg_u8[0], rtg_y[2]);
     }  else {
       rtg_drawline(
-        (int16_t)rtg_x[0], 
-        (int16_t)rtg_y[0], 
-        (int16_t)rtg_x[1], 
-        (int16_t)rtg_y[1], 
-        (uint16_t)rtg_x[2], 
-        (uint16_t)rtg_y[2], 
-        (uint16_t)rtg_x[4], 
-        rtg_rgb[0], 
-        rtg_rgb[1], 
-        (uint16_t)rtg_x[3], 
-        rtg_format, 
-        rtg_u8[0], 
+        (int16_t)rtg_x[0],
+        (int16_t)rtg_y[0],
+        (int16_t)rtg_x[1],
+        (int16_t)rtg_y[1],
+        (uint16_t)rtg_x[2],
+        (uint16_t)rtg_y[2],
+        (uint16_t)rtg_x[4],
+        rtg_rgb[0],
+        rtg_rgb[1],
+        (uint16_t)rtg_x[3],
+        rtg_format,
+        rtg_u8[0],
         rtg_u8[1]);
+      LOG_WARN("[RTG/RTGCMD_DRAWLINE/Masked] rtg_x[0]=%u ,rtg_y[0]=%u ,rtg_x[1]=%u ,rtg_y[1]=%u ,rtg_x[2]=%u ,rtg_y[2]=%u ,rtg_x[3]=%u ,rtg_x[4]=%u ,rtg_u8[0]=%u ,rtg_u8[1]=%u\n", rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_y[2], rtg_x[3], rtg_x[4], rtg_u8[0], rtg_u8[1]);
     }
 
     gdebug("DrawLine\n");
     break;
   case RTGCMD_P2C:
-    rtg_p2c((int16_t)rtg_x[0], 
-      (int16_t)rtg_y[0], 
+    rtg_p2c((int16_t)rtg_x[0],
+      (int16_t)rtg_y[0],
       (int16_t)rtg_x[1]/2, // THIS IS FAKENATIVEMODE! /2 to place icons in the correct place on the screeen
-      (int16_t)rtg_y[1],   
-      (int16_t)rtg_x[2], 
-      (int16_t)rtg_y[2], 
-      rtg_u8[1], 
-      rtg_u8[2], 
-      rtg_u8[0], 
-      (uint8_t)(rtg_user[0] >> 0x8), 
-      (uint16_t)rtg_x[4], 
+      (int16_t)rtg_y[1],
+      (int16_t)rtg_x[2], // icon width
+      (int16_t)rtg_y[2],
+      rtg_u8[1],
+      rtg_u8[2],
+      rtg_u8[0],
+      (uint8_t)(rtg_user[0] >> 0x8),
+      (uint16_t)rtg_x[4], // icon width
       (uint8_t*)&rtg_mem[rtg_address_adj[1]]
       );
-     LOG_WARN("[RTG/RTGCMD_P2C] rtg_x=%u \n", rtg_x[1]);
+     LOG_WARN("[RTG/RTGCMD_P2C] rtg_x[0]=%u ,rtg_y[0]=%u ,rtg_x[1]=%u ,rtg_y[1]=%u ,rtg_x[2]=%u ,rtg_y[2]=%u ,rtg_x[4]=%u ,rtg_u8[0]=%u ,rtg_u8[1]=%u ,rtg_u8[2]=%u\n", rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_y[2], rtg_x[4], rtg_u8[0], rtg_u8[1], rtg_u8[2]);
     gdebug("Planar2Chunky\n");
     break;
   case RTGCMD_P2D:
-    /// found it!!!
-    rtg_p2d(
-      (int16_t)rtg_x[0], 
-      (int16_t)rtg_y[0], 
-      (int16_t)(rtg_x[1]/2),   // this is PiGFX Mode /2 to make decorations be in the right place. 
-      (int16_t)rtg_y[1], 
-      (int16_t)rtg_x[2], 
-      (int16_t)rtg_y[2], 
-      rtg_u8[1], 
+    // found it!!!
+    rtg_p2d( // done images not
+      (int16_t)rtg_x[0],
+      (int16_t)rtg_y[0],
+      (int16_t)(rtg_x[1]/2),   // this is PiGFX Mode /2 to make decorations be in the right place.
+      (int16_t)rtg_y[1],
+      (int16_t)rtg_x[2],
+      (int16_t)rtg_y[2],
+      rtg_u8[1],
       rtg_u8[2],
-      rtg_u8[0], 
-      (uint8_t)(rtg_user[0] >> 0x8), 
-      (uint16_t)rtg_x[4], 
+      rtg_u8[0],
+      (uint8_t)(rtg_user[0] >> 0x8),
+      (uint16_t)rtg_x[4],
       (uint8_t*)&rtg_mem[rtg_address_adj[1]]
       );
-    LOG_WARN("[RTG/RTGCMD_P2D] rtg_x=%u \n", rtg_x[1]);
+    LOG_WARN("[RTG/RTGCMD_P2D] rtg_x[0]=%u ,rtg_y[0]=%u ,rtg_x[1]=%u ,rtg_y[1]=%u ,rtg_x[2]=%u ,rtg_y[2]=%u ,rtg_x[4]=%u ,rtg_u8[0]=%u ,rtg_u8[1]=%u ,rtg_u8[2]=%u\n", rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_y[2], rtg_x[4], rtg_u8[0], rtg_u8[1], rtg_u8[2]);
     gdebug("Planar2Direct\n");
     break;
   case RTGCMD_SETSPRITE:
     rtg_enable_mouse_cursor(
       (uint8_t)rtg_user[0]
       );
+    LOG_WARN("[RTG/RTGCMD_SETSPRITE] rtg_user[0]=%u\n", rtg_user[0]);
     gdebug("SetSprite\n");
     break;
   case RTGCMD_SETSPRITECOLOR:
     rtg_set_cursor_clut_entry(
-      rtg_u8[0], 
-      rtg_u8[1], 
-      rtg_u8[2], 
+      rtg_u8[0],
+      rtg_u8[1],
+      rtg_u8[2],
       rtg_u8[3]
       );
+    LOG_WARN("[RTG/RTGCMD_SETSPRITECOLOR] rtg_u8[0]=%u ,rtg_u8[1]=%u ,rtg_u8[2]=%u ,rtg_u8[3]=%u\n", rtg_u8[0], rtg_u8[1], rtg_u8[2], rtg_u8[3]);
     gdebug("SetSpriteColor\n");
     break;
   case RTGCMD_SETSPRITEPOS:
     rtg_set_mouse_cursor_pos(
-      (int16_t)rtg_x[0], 
+      (int16_t)rtg_x[0],
       (int16_t)rtg_y[0]
       );
     gdebug("SetSpritePos\n");
     break;
   case RTGCMD_SETSPRITEIMAGE:
     rtg_set_mouse_cursor_image(
-      &rtg_mem[rtg_address_adj[1]], 
-      rtg_u8[0], 
+      &rtg_mem[rtg_address_adj[1]],
+      rtg_u8[0],
       rtg_u8[1]
       );
+    LOG_WARN("[RTG/RTGCMD_SETSPRITEIMAGE] rtg_address_adj[1]=%u ,rtg_u8[0]=%u ,rtg_u8[1]=%u\n", rtg_address_adj[1], rtg_u8[0], rtg_u8[1]);
     gdebug("SetSpriteImage\n");
     break;
   case RTGCMD_DEBUGME:
