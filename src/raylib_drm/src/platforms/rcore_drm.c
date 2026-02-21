@@ -53,6 +53,11 @@
 #include <termios.h> // POSIX terminal control definitions - tcgetattr(), tcsetattr()
 #include <pthread.h> // POSIX threads management (inputs reading)
 #include <dirent.h>  // POSIX directory browsing
+#include <poll.h>    // POSIX poll()
+#include <errno.h>   // errno
+#include <string.h>  // strerror()
+#include <stdlib.h>  // getenv(), atoi()
+#include <time.h>    // clock_gettime()
 
 #include <sys/ioctl.h>      // Required for: ioctl() - UNIX System call for device-specific input/output operations
 #include <linux/kd.h>       // Linux: KDSKBMODE, K_MEDIUMRAM constants definition
@@ -135,6 +140,17 @@ typedef struct {
 extern CoreData CORE;                   // Global CORE state context
 
 static PlatformData platform = { 0 };   // Platform specific data
+
+typedef struct {
+    uint32_t fb_id;
+} DrmFb;
+
+static unsigned long long DrmNowNs(void)
+{
+    struct timespec ts = { 0 };
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return ((unsigned long long)ts.tv_sec * 1000000000ull) + (unsigned long long)ts.tv_nsec;
+}
 
 //----------------------------------------------------------------------------------
 // Local Variables Definition
@@ -235,6 +251,8 @@ static void PollMouseEvents(void);              // Process evdev mouse events
 static int FindMatchingConnectorMode(const drmModeConnector *connector, const drmModeModeInfo *mode);                               // Search matching DRM mode in connector's mode list
 static int FindExactConnectorMode(const drmModeConnector *connector, uint width, uint height, uint fps, bool allowInterlaced);      // Search exactly matching DRM connector mode in connector's list
 static int FindNearestConnectorMode(const drmModeConnector *connector, uint width, uint height, uint fps, bool allowInterlaced);    // Search the nearest matching DRM connector mode in connector's list
+static DrmFb *GetDrmFbFromBo(struct gbm_bo *bo);
+static void DrmPageFlipHandler(int fd, unsigned int frame, unsigned int sec, unsigned int usec, void *data);
 
 //----------------------------------------------------------------------------------
 // Module Functions Declaration
@@ -544,31 +562,189 @@ void DisableCursor(void)
 // Swap back buffer with front buffer (screen drawing)
 void SwapScreenBuffer(void)
 {
+    static int warned_no_flip_once = 0;
+    static int warned_timeout_once = 0;
+    static int perf_cfg = -1;
+    static unsigned long long perf_last_ns = 0;
+    static unsigned long long perf_frames = 0;
+    static unsigned long long perf_egl_ns = 0;
+    static unsigned long long perf_lock_ns = 0;
+    static unsigned long long perf_flip_ns = 0;
+    static unsigned long long perf_total_ns = 0;
+    if (perf_cfg < 0)
+    {
+        const char *env = getenv("PISTORM_DRM_PERF");
+        perf_cfg = (env && *env && atoi(env) != 0) ? 1 : 0;
+    }
+    unsigned long long t0 = 0, t1 = 0, t2 = 0, t3 = 0;
+    if (perf_cfg)
+    {
+        t0 = DrmNowNs();
+        if (perf_last_ns == 0) perf_last_ns = t0;
+    }
+
     eglSwapBuffers(platform.device, platform.surface);
+    if (perf_cfg) t1 = DrmNowNs();
 
     if (!platform.gbmSurface || (-1 == platform.fd) || !platform.connector || !platform.crtc) TRACELOG(LOG_ERROR, "DISPLAY: DRM initialization failed to swap");
 
     struct gbm_bo *bo = gbm_surface_lock_front_buffer(platform.gbmSurface);
     if (!bo) TRACELOG(LOG_ERROR, "DISPLAY: Failed GBM to lock front buffer");
 
-    uint32_t fb = 0;
-    int result = drmModeAddFB(platform.fd, platform.connector->modes[platform.modeIndex].hdisplay, platform.connector->modes[platform.modeIndex].vdisplay, 24, 32, gbm_bo_get_stride(bo), gbm_bo_get_handle(bo).u32, &fb);
-    if (result != 0) TRACELOG(LOG_ERROR, "DISPLAY: drmModeAddFB() failed with result: %d", result);
-
-    result = drmModeSetCrtc(platform.fd, platform.crtc->crtc_id, fb, 0, 0, &platform.connector->connector_id, 1, &platform.connector->modes[platform.modeIndex]);
-    if (result != 0) TRACELOG(LOG_ERROR, "DISPLAY: drmModeSetCrtc() failed with result: %d", result);
-
-    if (platform.prevFB)
+    DrmFb *fb = GetDrmFbFromBo(bo);
+    if (!fb)
     {
-        result = drmModeRmFB(platform.fd, platform.prevFB);
-        if (result != 0) TRACELOG(LOG_ERROR, "DISPLAY: drmModeRmFB() failed with result: %d", result);
+        if (bo) gbm_surface_release_buffer(platform.gbmSurface, bo);
+        return;
+    }
+    if (perf_cfg) t2 = DrmNowNs();
+
+    int result = 0;
+    if (!platform.prevBO)
+    {
+        // First frame: make CRTC point to our FB.
+        result = drmModeSetCrtc(platform.fd, platform.crtc->crtc_id, fb->fb_id, 0, 0,
+            &platform.connector->connector_id, 1, &platform.connector->modes[platform.modeIndex]);
+        if (result != 0) TRACELOG(LOG_ERROR, "DISPLAY: drmModeSetCrtc() failed with result: %d", result);
+    }
+    else
+    {
+        int waiting_for_flip = 1;
+        drmEventContext ev = { 0 };
+        ev.version = DRM_EVENT_CONTEXT_VERSION;
+        ev.page_flip_handler = DrmPageFlipHandler;
+
+        result = drmModePageFlip(platform.fd, platform.crtc->crtc_id, fb->fb_id,
+            DRM_MODE_PAGE_FLIP_EVENT, &waiting_for_flip);
+
+        if (result != 0)
+        {
+            if (!warned_no_flip_once)
+            {
+                TRACELOG(LOG_WARNING, "DISPLAY: drmModePageFlip() failed (%d), falling back to drmModeSetCrtc()", result);
+                warned_no_flip_once = 1;
+            }
+            result = drmModeSetCrtc(platform.fd, platform.crtc->crtc_id, fb->fb_id, 0, 0,
+                &platform.connector->connector_id, 1, &platform.connector->modes[platform.modeIndex]);
+            if (result != 0) TRACELOG(LOG_ERROR, "DISPLAY: drmModeSetCrtc() fallback failed with result: %d", result);
+            waiting_for_flip = 0;
+        }
+
+        while (waiting_for_flip)
+        {
+            struct pollfd pfd = { 0 };
+            pfd.fd = platform.fd;
+            pfd.events = POLLIN;
+
+            int pr = poll(&pfd, 1, 1000);
+            if (pr < 0)
+            {
+                if (errno == EINTR) continue;
+                TRACELOG(LOG_ERROR, "DISPLAY: poll() failed waiting for page flip: %s", strerror(errno));
+                break;
+            }
+            if (pr == 0)
+            {
+                if (!warned_timeout_once)
+                {
+                    TRACELOG(LOG_WARNING, "DISPLAY: page flip wait timed out");
+                    warned_timeout_once = 1;
+                }
+                break;
+            }
+
+            if (drmHandleEvent(platform.fd, &ev) != 0)
+            {
+                TRACELOG(LOG_ERROR, "DISPLAY: drmHandleEvent() failed: %s", strerror(errno));
+                break;
+            }
+        }
     }
 
-    platform.prevFB = fb;
+    platform.prevFB = fb->fb_id;
 
     if (platform.prevBO) gbm_surface_release_buffer(platform.gbmSurface, platform.prevBO);
 
     platform.prevBO = bo;
+    if (perf_cfg)
+    {
+        t3 = DrmNowNs();
+        perf_frames++;
+        perf_egl_ns += (t1 - t0);
+        perf_lock_ns += (t2 - t1);
+        perf_flip_ns += (t3 - t2);
+        perf_total_ns += (t3 - t0);
+        if ((t3 - perf_last_ns) >= 1000000000ull)
+        {
+            double frames = (double)(perf_frames ? perf_frames : 1);
+            double fps = ((double)perf_frames * 1e9) / (double)(t3 - perf_last_ns);
+            TRACELOG(LOG_INFO,
+                     "DISPLAY: DRM PERF %.1f fps avg_ms total=%.2f egl=%.2f lock=%.2f flip=%.2f",
+                     fps,
+                     (double)perf_total_ns / frames / 1e6,
+                     (double)perf_egl_ns / frames / 1e6,
+                     (double)perf_lock_ns / frames / 1e6,
+                     (double)perf_flip_ns / frames / 1e6);
+            perf_last_ns = t3;
+            perf_frames = 0;
+            perf_egl_ns = 0;
+            perf_lock_ns = 0;
+            perf_flip_ns = 0;
+            perf_total_ns = 0;
+        }
+    }
+}
+
+static void DrmPageFlipHandler(int fd, unsigned int frame, unsigned int sec, unsigned int usec, void *data)
+{
+    (void)fd;
+    (void)frame;
+    (void)sec;
+    (void)usec;
+    int *waiting = (int *)data;
+    if (waiting) *waiting = 0;
+}
+
+static void DrmFbDestroyCallback(struct gbm_bo *bo, void *data)
+{
+    (void)bo;
+    DrmFb *fb = (DrmFb *)data;
+    if (!fb) return;
+    if (fb->fb_id != 0 && platform.fd != -1)
+    {
+        drmModeRmFB(platform.fd, fb->fb_id);
+    }
+    free(fb);
+}
+
+static DrmFb *GetDrmFbFromBo(struct gbm_bo *bo)
+{
+    DrmFb *fb = (DrmFb *)gbm_bo_get_user_data(bo);
+    if (fb) return fb;
+
+    fb = (DrmFb *)calloc(1, sizeof(*fb));
+    if (!fb)
+    {
+        TRACELOG(LOG_ERROR, "DISPLAY: Failed to allocate DRM FB metadata");
+        return NULL;
+    }
+
+    int result = drmModeAddFB(platform.fd,
+        platform.connector->modes[platform.modeIndex].hdisplay,
+        platform.connector->modes[platform.modeIndex].vdisplay,
+        24, 32,
+        gbm_bo_get_stride(bo),
+        gbm_bo_get_handle(bo).u32,
+        &fb->fb_id);
+    if (result != 0)
+    {
+        TRACELOG(LOG_ERROR, "DISPLAY: drmModeAddFB() failed with result: %d", result);
+        free(fb);
+        return NULL;
+    }
+
+    gbm_bo_set_user_data(bo, fb, DrmFbDestroyCallback);
+    return fb;
 }
 
 //----------------------------------------------------------------------------------
@@ -1014,6 +1190,23 @@ int InitPlatform(void)
     // Check surface and context activation
     if (result != EGL_FALSE)
     {
+        int swap_interval = 0;
+        const char *swap_env = getenv("PISTORM_DRM_SWAP_INTERVAL");
+        if (swap_env && *swap_env)
+        {
+            swap_interval = atoi(swap_env);
+            if (swap_interval < 0) swap_interval = 0;
+            if (swap_interval > 4) swap_interval = 4;
+        }
+        if (eglSwapInterval(platform.device, swap_interval) == EGL_FALSE)
+        {
+            TRACELOG(LOG_WARNING, "DISPLAY: eglSwapInterval(%d) failed: 0x%04x", swap_interval, eglGetError());
+        }
+        else
+        {
+            TRACELOG(LOG_INFO, "DISPLAY: EGL swap interval set to %d (PISTORM_DRM_SWAP_INTERVAL)", swap_interval);
+        }
+
         CORE.Window.ready = true;
 
         CORE.Window.render.width = CORE.Window.screen.width;
@@ -1078,17 +1271,12 @@ int InitPlatform(void)
 // Close platform
 void ClosePlatform(void)
 {
-    if (platform.prevFB)
-    {
-        drmModeRmFB(platform.fd, platform.prevFB);
-        platform.prevFB = 0;
-    }
-
     if (platform.prevBO)
     {
         gbm_surface_release_buffer(platform.gbmSurface, platform.prevBO);
         platform.prevBO = NULL;
     }
+    platform.prevFB = 0;
 
     if (platform.gbmSurface)
     {

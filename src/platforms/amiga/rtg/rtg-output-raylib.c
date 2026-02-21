@@ -19,7 +19,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+#include <sched.h>
 #include <unistd.h>
+#include <time.h>
 
 // Helper functions for safe unaligned memory access
 static inline uint16_t load_u16_be(const uint8_t *p) {
@@ -84,6 +87,43 @@ static inline uint32_t rtg_yuv601_to_rgba(uint8_t y, uint8_t u, uint8_t v) {
     int g = (298 * c - 100 * d - 208 * e + 128) >> 8;
     int b = (298 * c + 516 * d + 128) >> 8;
     return rtg_pack_rgba(clamp_u8(r), clamp_u8(g), clamp_u8(b));
+}
+
+static inline uint64_t rtg_now_ns(void) {
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  return ((uint64_t)ts.tv_sec * 1000000000ull) + (uint64_t)ts.tv_nsec;
+}
+
+static void rtg_apply_thread_tuning(void) {
+  const char* core_env = getenv("PISTORM_RTG_CORE");
+  if(core_env && *core_env) {
+    int core = atoi(core_env);
+    if(core >= 0) {
+      cpu_set_t cpuset;
+      CPU_ZERO(&cpuset);
+      CPU_SET(core, &cpuset);
+      if(pthread_setaffinity_np(pthread_self(), sizeof(cpuset), &cpuset) == 0) {
+        LOG_INFO("[RTG/RAYLIB] Thread pinned to core %d via PISTORM_RTG_CORE.\n", core);
+      } else {
+        LOG_WARN("[RTG/RAYLIB] Failed to pin thread to core %d (errno=%d).\n", core, errno);
+      }
+    }
+  }
+
+  const char* prio_env = getenv("PISTORM_RTG_RT_PRIO");
+  if(prio_env && *prio_env) {
+    int prio = atoi(prio_env);
+    if(prio < 1) prio = 1;
+    if(prio > 99) prio = 99;
+    struct sched_param sp = {0};
+    sp.sched_priority = prio;
+    if(pthread_setschedparam(pthread_self(), SCHED_RR, &sp) == 0) {
+      LOG_INFO("[RTG/RAYLIB] Thread set to SCHED_RR prio %d via PISTORM_RTG_RT_PRIO.\n", prio);
+    } else {
+      LOG_WARN("[RTG/RAYLIB] Failed to set SCHED_RR prio %d (errno=%d).\n", prio, errno);
+    }
+  }
 }
 
 static const char* rtg_resolve_shader_path(const char* filename, char* buf, size_t buf_len) {
@@ -535,6 +575,7 @@ void rtg_scale_output(uint16_t width, uint16_t height) {
 void* rtgThread(void* args) {
 
   LOG_INFO("[RTG] Thread running\n");
+  rtg_apply_thread_tuning();
 
   int reinit = 0;
   int old_filter_mode = -1;
@@ -581,7 +622,17 @@ void* rtgThread(void* args) {
   LOG_INFO("[RTG/RAYLIB] Output resolution: %dx%d\n", pi_screen_width, pi_screen_height);
 
   InitWindow(pi_screen_width, pi_screen_height, "Pistorm RTG");
-  SetWindowState(FLAG_VSYNC_HINT);
+  int enable_vsync = 1;
+  const char* vsync_env = getenv("PISTORM_RTG_VSYNC");
+  if(vsync_env && *vsync_env && atoi(vsync_env) == 0) {
+    enable_vsync = 0;
+  }
+  if(enable_vsync) {
+    SetWindowState(FLAG_VSYNC_HINT);
+  } else {
+    ClearWindowState(FLAG_VSYNC_HINT);
+    LOG_INFO("[RTG/RAYLIB] VSync disabled via PISTORM_RTG_VSYNC=0.\n");
+  }
 
   if(!IsWindowReady()) {
     LOG_ERROR("[RTG/RAYLIB] InitWindow failed for %dx%d; disabling RTG output.\n", pi_screen_width,
@@ -592,7 +643,19 @@ void* rtgThread(void* args) {
     return args;
   }
   HideCursor();
-  SetTargetFPS(60);
+  int target_fps = 60;
+  const char* fps_env = getenv("PISTORM_RTG_TARGET_FPS");
+  if(fps_env && *fps_env) {
+    target_fps = atoi(fps_env);
+    if(target_fps < 0) target_fps = 0;
+    if(target_fps > 240) target_fps = 240;
+  }
+  SetTargetFPS(target_fps);
+  int mon = GetCurrentMonitor();
+  LOG_INFO("[RTG/RAYLIB] Monitor=%d mode=%dx%d refresh=%dHz vsync=%s\n", mon,
+           GetMonitorWidth(mon), GetMonitorHeight(mon), GetMonitorRefreshRate(mon),
+           enable_vsync ? "on" : "off");
+  LOG_INFO("[RTG/RAYLIB] Target FPS=%d (PISTORM_RTG_TARGET_FPS)\n", target_fps);
 
   if (clut_cpu_mode < 0) {
     const char* env = getenv("PISTORM_RTG_CLUT_CPU");
@@ -655,6 +718,22 @@ reinit_raylib:;
     UnloadTexture(raylib_texture);
     old_filter_mode = -1;
     reinit = 0;
+  }
+
+  // Mode registers can transiently be 0 during RTG startup/mode switches.
+  // Wait for a valid mode instead of thrashing reinit/logging.
+  while (!shutdown) {
+    if (rtg_on && width > 0 && height > 0 && format < RTGFMT_NUM && rtg_pixel_size[format] > 0) {
+      break;
+    }
+    width = rtg_display_width;
+    height = rtg_display_height;
+    format = rtg_display_format;
+    pitch = rtg_pitch;
+    usleep(1000);
+  }
+  if (shutdown) {
+    goto shutdown_raylib;
   }
 
   LOG_INFO("Creating %dx%d raylib window...\n", width, height);
@@ -835,8 +914,16 @@ reinit_raylib:;
   rtg_scale_output(width, height);
   LOG_DEBUG("rtg_scale_output complete.\n");
   force_filter_mode = 0;
+  uint64_t perf_report_ns = rtg_now_ns();
+  uint64_t perf_frames = 0;
+  uint64_t perf_draw_ns = 0;
+  uint64_t perf_render_ns = 0;
+  uint64_t perf_end_ns = 0;
+  uint64_t perf_update_ns = 0;
+  uint64_t perf_total_ns = 0;
 
   while (1) {
+    uint64_t frame_begin_ns = rtg_now_ns();
     if(rtg_on) {
       uint16_t current_width = *data->width;
       uint16_t current_height = *data->height;
@@ -899,6 +986,7 @@ reinit_raylib:;
           old_filter_mode = -1;
         }
       }
+      uint64_t draw_begin_ns = rtg_now_ns();
       BeginDrawing();
       ClearBackground(black);
       rtg_output_in_vblank = 0;
@@ -970,10 +1058,16 @@ reinit_raylib:;
         DrawFPS(pi_screen_width - 128, 0);
       }
 
+      uint64_t render_end_ns = rtg_now_ns();
       EndDrawing();
+      uint64_t draw_end_ns = rtg_now_ns();
+      perf_draw_ns += (draw_end_ns - draw_begin_ns);
+      perf_render_ns += (render_end_ns - draw_begin_ns);
+      perf_end_ns += (draw_end_ns - render_end_ns);
 
       rtg_output_in_vblank = 1;
       cur_rtg_frame++;
+      uint64_t update_begin_ns = draw_end_ns;
       size_t frame_addr_offset = (size_t)current_addr;
       size_t addr_offset = frame_addr_offset;
       size_t frame_needed = (size_t)current_pitch * height;
@@ -1214,6 +1308,8 @@ reinit_raylib:;
       if(frame_no < 3) {
         LOG_DEBUG("[RTG/RAYLIB] Frame %u end\n", frame_no);
       }
+      uint64_t update_end_ns = rtg_now_ns();
+      perf_update_ns += (update_end_ns - update_begin_ns);
       frame_no++;
       updating_screen = 0;
     } else {
@@ -1233,6 +1329,27 @@ reinit_raylib:;
     }
     if(shutdown) {
       break;
+    }
+    uint64_t frame_end_ns = rtg_now_ns();
+    perf_total_ns += (frame_end_ns - frame_begin_ns);
+    perf_frames++;
+    if(frame_end_ns - perf_report_ns >= 1000000000ull) {
+      double frames = (double)(perf_frames ? perf_frames : 1);
+      double fps = ((double)perf_frames * 1e9) / (double)(frame_end_ns - perf_report_ns);
+      double draw_ms = (double)perf_draw_ns / frames / 1e6;
+      double render_ms = (double)perf_render_ns / frames / 1e6;
+      double end_ms = (double)perf_end_ns / frames / 1e6;
+      double update_ms = (double)perf_update_ns / frames / 1e6;
+      double frame_ms = (double)perf_total_ns / frames / 1e6;
+      LOG_INFO("[RTG/RAYLIB][PERF] %.1f fps avg_ms frame=%.2f draw=%.2f render=%.2f end=%.2f post=%.2f fmt=%u %ux%u pitch=%u\n",
+               fps, frame_ms, draw_ms, render_ms, end_ms, update_ms, format, width, height, pitch);
+      perf_report_ns = frame_end_ns;
+      perf_frames = 0;
+      perf_draw_ns = 0;
+      perf_render_ns = 0;
+      perf_end_ns = 0;
+      perf_update_ns = 0;
+      perf_total_ns = 0;
     }
   }
 

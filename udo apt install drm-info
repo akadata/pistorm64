@@ -1,0 +1,207 @@
+[32mconvlit[0m/stable 1.8-7 arm64
+  convert Microsoft Reader .LIT files to HTML
+
+[32mdrm-info[0m/stable 2.6.0-2+b1 arm64
+  Small utility to dump info about DRM devices
+
+[32medid-decode[0m/stable 0.1~git20241119.5332a3b-1 arm64
+  decode the binary EDID information from monitors
+
+[32mfbreader[0m/stable 0.99.4+dfsg-6+b1 arm64
+  e-book reader
+
+[32mglmark2-drm[0m/stable 2023.01+dfsg-2 arm64
+  OpenGL 2.0 benchmark suite
+
+[32mglmark2-es2-drm[0m/stable 2023.01+dfsg-2 arm64
+  OpenGL 2.0 benchmark suite
+
+[32mgridengine-client[0m/stable 8.1.9+dfsg-13.1 arm64
+  Utilities for Grid Engine queue management
+
+[32mgridengine-common[0m/stable,stable 8.1.9+dfsg-13.1 all
+  Distributed resource management - common files
+
+[32mgridengine-dev[0m/stable,stable 8.1.9+dfsg-13.1 all
+  Distributed resource management - development files
+
+[32mgridengine-drmaa-dev[0m/stable 8.1.9+dfsg-13.1 arm64
+  Distributed resource management Application API library - development files
+
+[32mgridengine-drmaa1.0[0m/stable 8.1.9+dfsg-13.1 arm64
+  Distributed resource management Application API library
+
+[32mgridengine-exec[0m/stable 8.1.9+dfsg-13.1 arm64
+  Distributed resource management - Execution Server
+
+[32mgridengine-master[0m/stable 8.1.9+dfsg-13.1 arm64
+  Distributed resource management - Master Server
+
+[32mgridengine-qmon[0m/stable 8.1.9+dfsg-13.1 arm64
+  Graphical utilities for Grid Engine queue management
+
+[32mhdrmerge[0m/stable 0.5+git20200117-4.1 arm64
+  HDR exposure merging
+
+[32mhugin-tools[0m/stable 2024.0.1+dfsg-1+b1 arm64
+  panorama photo stitcher - commandline tools
+
+[32mkms++-utils[0m/stable,now 0~git20250807.1813ada-1 arm64 [installed]
+  C++ library for kernel mode setting - utilities
+
+[32mkmscube[0m/stable 0.0.0~git20210103-1+b3 arm64
+  Example KMS/GBM/EGL application
+
+[32mkodi-inputstream-adaptive[0m/stable 21.5.9+ds-1 arm64
+  Adaptive inputstream addon for Kodi
+
+[32mkodi-inputstream-ffmpegdirect[0m/stable 21.3.7+ds-2 arm64
+  FFmpegDirect inputstream addon for Kodi
+
+[32mlibdmrconf-dev[0m/stable 0.12.1-1 arm64
+  Header files for libdmrconf
+
+[32mlibdrm-amdgpu1[0m/stable,now 2.4.124-2 arm64 [installed,automatic]
+  Userspace interface to amdgpu-specific kernel DRM services -- runtime
+
+[32mlibdrm-common[0m/stable,stable,now 2.4.124-2 all [installed,automatic]
+  Userspace interface to kernel DRM services -- common files
+
+[32mlibdrm-dev[0m/stable,now 2.4.124-2 arm64 [installed]
+  Userspace interface to kernel DRM services -- development files
+
+[32mlibdrm-etnaviv1[0m/stable,now 2.4.124-2 arm64 [installed,automatic]
+  Userspace interface to etnaviv-specific kernel DRM services -- runtime
+
+[32mlibdrm-exynos1[0m/stable 2.4.124-2 armhf
+  Userspace interface to exynos-specific kernel DRM services -- runtime
+
+[32mlibdrm-freedreno1[0m/stable,now 2.4.124-2 arm64 [installed,automatic]
+  Userspace interface to msm/kgsl kernel DRM services -- runtime
+
+[32mlibdrm-intel1[0m/stable 2.4.124-2 arm64
+  Userspace interface to intel-specific kernel DRM services -- runtime
+
+[32mlibdrm-nouveau2[0m/stable,now 2.4.124-2 arm64 [installed,automatic]
+  Userspace interface to nouveau-specific kernel DRM services -- runtime
+
+[32mlibdrm-omap1[0m/stable 2.4.124-2 armhf
+  Userspace interface to omap-specific kernel DRM services -- runtime
+
+[32mlibdrm-radeon1[0m/stable,now 2.4.124-2 arm64 [installed,automatic]
+  Userspace interface to radeon-specific kernel DRM services -- runtime
+
+[32mlibdrm-tegra0[0m/stable,now 2.4.124-2 arm64 [installed,automatic]
+  Userspace interface to tegra-specific kernel DRM services -- runtime
+
+[32mlibdrm-tests[0m/stable 2.4.124-2 arm64
+  Testing tools from the libdrm project
+
+[32mlibdrm2[0m/stable,now 2.4.124-2 arm64 [installed,automatic]
+  Userspace interface to kernel DRM services -- runtime
+
+[32mlibdrmaa1.0-java[0m/stable,stable 8.1.9+dfsg-13.1 all
+  Distributed resource management Application API library - Java bindings
+
+[32mlibdrmaa1.0-java-doc[0m/stable,stable 8.1.9+dfsg-13.1 all
+  Distributed resource management Application API library - Java bindings docs
+
+[32mlibdrmaa1.0-ruby[0m/stable,stable 8.1.9+dfsg-13.1 all
+  Distributed resource management Application API library - Ruby bindings
+
+[32mlibebook-tools-perl[0m/stable,stable 0.5.4-2 all
+  E-Book manipulation tool and Perl libraries
+
+[32mlibecore-drm2-1[0m/stable 1.28.1-1 arm64
+  Ecore functions for DRM
+
+[32mlibelput1[0m/stable 1.28.1-1 arm64
+  EFL abstraction for libinput
+
+[32mlibevas1-engines-drm[0m/stable 1.28.1-1 arm64
+  Evas module providing the DRM engine
+
+[32mlibfaac0t64[0m/stable 1.31.1+dfsg-1 arm64
+  AAC audio encoder (library)
+
+[32mlibfaad2[0m/stable 2.11.2-1 arm64
+  freeware Advanced Audio Decoder - runtime files
+
+[32mlibgbm-dev[0m/stable,now 25.0.7-2+rpt3 arm64 [installed]
+  generic buffer management API -- development files
+
+[32mlibgbm1[0m/stable,now 25.0.7-2+rpt3 arm64 [installed,automatic]
+  generic buffer management API -- runtime
+
+[32mlibmobi-tools[0m/stable 0.12+dfsg-1 arm64
+  Tools for handling Mobipocket/Kindle ebook format documents
+
+[32mlibrust-drm-dev[0m/stable 0.14.1-1 arm64
+  Safe, low-level bindings to the Direct Rendering Manager API - Rust source code
+
+[32mlibrust-drm-ffi-dev[0m/stable 0.9.0-1 arm64
+  Safe, low-level bindings to the Direct Rendering Manager API - Rust source code
+
+[32mlibrust-drm-fourcc-dev[0m/stable 2.2.0-3 arm64
+  Provides an enum with every valid Direct Rendering Manager (DRM) format fourcc - Rust source code
+
+[32mlibrust-drm-sys-dev[0m/stable 0.8.0-1 arm64
+  Bindings to the Direct Rendering Manager API - Rust source code
+
+[32mlibsrm-dev[0m/stable 0.8.0~2-1 arm64
+  Simple Rendering Manager (development files)
+
+[32mlibsrm-examples[0m/stable 0.8.0~2-1 arm64
+  Simple Rendering Manager (examples)
+
+[32mlibsrm0[0m/stable 0.8.0~2-1 arm64
+  Simple Rendering Manager (shared library)
+
+[32mlibva-drm2[0m/stable,now 2.22.0-3 arm64 [installed,automatic]
+  Video Acceleration (VA) API for Linux -- DRM runtime
+
+[32mlibwidevinecdm0[0m/stable,now 4.10.2662.3+1 arm64 [installed,automatic]
+  Widevine CDM
+
+[32mmesa-drm-shim[0m/stable 25.0.7-2+rpt3 arm64
+  DRM shim libraries
+
+[32mmesa-drm-shim-dbgsym[0m/stable 25.0.7-2+rpt3 arm64
+  debug symbols for mesa-drm-shim
+
+[32mplay.it[0m/stable,stable 2.32.4-1 all
+  Installer for DRM-free commercial games
+
+[32mplay.it-adventure[0m/stable,stable 2025-03-03-2 all
+  Collection of game scripts used by ./play.it
+
+[32mplay.it-community[0m/stable,stable 2025-03-05-2 all
+  ./play.it game scripts collection - Community-maintained games collection
+
+[32mplay.it-puzzle[0m/stable,stable 2025-03-03-1 all
+  ./play.it game scripts collection - Puzzle games
+
+[32mplay.it-vv221[0m/stable,stable 2025-03-03-2 all
+  ./play.it game scripts collection - vv221ʼs games collection
+
+[32mpython3-drms[0m/stable,stable 0.9.0-1 all
+  Access HMI, AIA and MDI data with Python
+
+[32mpython3-m3u8[0m/stable,stable 6.0.0-2 all
+  Python m3u8 parser - Python 3.x
+
+[32mr-cran-rcmdrmisc[0m/stable,stable 2.9-1-1 all
+  GNU R package for miscellaneous Rcmdr utilities
+
+[32mrpi-imager-embedded[0m/stable 2.0.0 arm64
+  Raspberry Pi Imaging utility for embedded systems
+
+[32msmifb2-dkms[0m/stable,stable 2.4.1-1 all
+  SiliconMotion SM750/SM768 Graphics PCI-E DRM Driver
+
+[32mtexlive-fonts-extra[0m/stable,stable 2024.20250309-2 all
+  TeX Live: Additional fonts
+
+[32mwidevine-installer[0m/stable-backports 0.0~git20240811.eab8c66-3~bpo13+1 arm64
+  installer script for Widevine on arm64 systems
+
