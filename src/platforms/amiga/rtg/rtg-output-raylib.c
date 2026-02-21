@@ -145,16 +145,6 @@ static const char* rtg_resolve_shader_path(const char* filename, char* buf, size
     return filename;
 }
 
-// Default configuration for VideoCore / TV service support (Raspberry Pi only).
-// Makefile can override with -DUSE_VC=1 when vc_tvservice is available.
-#ifndef USE_VC
-#define USE_VC 0
-#endif
-
-#if USE_VC
-#include "interface/vmcs_host/vc_tvservice.h"
-#endif
-
 #define RTG_INIT_ERR(a) { LOG_ERROR("%s", a); *data->running = 0; }
 
 #define DEBUG_RAYLIB_RTG
@@ -643,7 +633,7 @@ void* rtgThread(void* args) {
     return args;
   }
   HideCursor();
-  int target_fps = 60;
+  int target_fps = 120;
   const char* fps_env = getenv("PISTORM_RTG_TARGET_FPS");
   if(fps_env && *fps_env) {
     target_fps = atoi(fps_env);
@@ -1428,12 +1418,6 @@ void rtg_init_display(void) {
   rtg_on = 1;
 
   if(!rtg_initialized) {
-#if USE_VC
-    if(rtg_dpms) {
-      vc_tv_hdmi_power_on_preferred();
-    }
-#endif
-
     err = pthread_create(&thread_id, NULL, &rtgThread, (void*)&rtg_share_data);
     if(err != 0) {
       rtg_on = 0;
@@ -1459,12 +1443,6 @@ void rtg_shutdown_display(void) {
   }
 
   shutdown = 1;
-
-#if USE_VC
-  if(rtg_dpms) {
-    vc_tv_power_off();
-  }
-#endif
 
   pthread_join(thread_id, NULL);
 
