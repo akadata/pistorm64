@@ -106,7 +106,7 @@ static void rtg_apply_thread_tuning(void) {
       if(pthread_setaffinity_np(pthread_self(), sizeof(cpuset), &cpuset) == 0) {
         LOG_INFO("[RTG/RAYLIB] Thread pinned to core %d via PISTORM_RTG_CORE.\n", core);
       } else {
-        LOG_WARN("[RTG/RAYLIB] Failed to pin thread to core %d (errno=%d).\n", core, errno);
+        LOG_DEBUG("[RTG/RAYLIB] Failed to pin thread to core %d (errno=%d).\n", core, errno);
       }
     }
   }
@@ -121,7 +121,7 @@ static void rtg_apply_thread_tuning(void) {
     if(pthread_setschedparam(pthread_self(), SCHED_RR, &sp) == 0) {
       LOG_INFO("[RTG/RAYLIB] Thread set to SCHED_RR prio %d via PISTORM_RTG_RT_PRIO.\n", prio);
     } else {
-      LOG_WARN("[RTG/RAYLIB] Failed to set SCHED_RR prio %d (errno=%d).\n", prio, errno);
+      LOG_DEBUG("[RTG/RAYLIB] Failed to set SCHED_RR prio %d (errno=%d).\n", prio, errno);
     }
   }
 }
@@ -412,7 +412,7 @@ static void rtg_autodetect_screen_size(void) {
     return;
   }
   if(req_w > 0 && req_h > 0 && !req_supported) {
-    LOG_WARN("[RTG/RAYLIB] Output mode %dx%d not available; falling back to %dx%d\n", req_w, req_h,
+    LOG_DEBUG("[RTG/RAYLIB] Output mode %dx%d not available; falling back to %dx%d\n", req_w, req_h,
              auto_w, auto_h);
   }
   pi_screen_width = auto_w;
@@ -784,7 +784,7 @@ reinit_raylib:;
   raylib_fb.data = NULL;
 
   if(!addr_ok) {
-    LOG_WARN("[RTG/RAYLIB] Framebuffer bounds invalid: addr=0x%08X pitch=%u width=%u height=%u "
+    LOG_DEBUG("[RTG/RAYLIB] Framebuffer bounds invalid: addr=0x%08X pitch=%u width=%u height=%u "
              "bpp=%zu needed=%zu\n",
              frame_addr, pitch, width, height, bpp, needed);
     if(tight_buf_size < tight_size) {
@@ -817,7 +817,7 @@ reinit_raylib:;
             format == RTGFMT_RGB555_LE || format == RTGFMT_BGR565_LE ||
             format == RTGFMT_BGR555_LE) {
     if((pitch % 2) != 0) {
-      LOG_WARN("[RTG/RAYLIB] 16-bit pitch not aligned: pitch=%u\n", pitch);
+      LOG_DEBUG("[RTG/RAYLIB] 16-bit pitch not aligned: pitch=%u\n", pitch);
       reinit = 1;
       goto shutdown_raylib;
     }
@@ -1073,10 +1073,10 @@ reinit_raylib:;
       size_t frame_needed = (size_t)current_pitch * height;
 
       if(current_pitch < row_bytes) {
-        LOG_WARN("[RTG/RAYLIB] Frame pitch too small: pitch=%u row_bytes=%zu\n", current_pitch,
+        LOG_DEBUG("[RTG/RAYLIB] Frame pitch too small: pitch=%u row_bytes=%zu\n", current_pitch,
                  row_bytes);
       } else if(frame_addr_offset >= rtg_mem_size || frame_needed > rtg_mem_size - frame_addr_offset) {
-        LOG_WARN("[RTG/RAYLIB] Framebuffer OOB: addr=0x%08X needed=%zu limit=%zu\n", current_addr,
+        LOG_DEBUG("[RTG/RAYLIB] Framebuffer OOB: addr=0x%08X needed=%zu limit=%zu\n", current_addr,
                  frame_needed, rtg_mem_size);
       } else if(rtg_format_is_yuv(current_format)) {
         size_t yuv_bytes = (size_t)width * height * sizeof(uint32_t);
@@ -1204,7 +1204,7 @@ reinit_raylib:;
                 current_format == RTGFMT_RGB555_LE || current_format == RTGFMT_BGR565_LE ||
                 current_format == RTGFMT_BGR555_LE) {
         if((current_pitch % 2) != 0) {
-          LOG_WARN("[RTG/RAYLIB] 16-bit pitch not aligned: pitch=%u\n", current_pitch);
+          LOG_DEBUG("[RTG/RAYLIB] 16-bit pitch not aligned: pitch=%u\n", current_pitch);
         } else {
           if(indexed_buf_size < tight_size) {
             void* resized = realloc(indexed_buf, tight_size);
@@ -1605,7 +1605,7 @@ void rtg_set_scale_mode(uint16_t _scale_mode) {
     break;
   case PIGFX_SCALE_CUSTOM:
   case PIGFX_SCALE_CUSTOM_RECT:
-    LOG_WARN("[!!!RTG] Tried to set RTG scale mode to custom or custom rect using the wrong "
+    LOG_DEBUG("[!!!RTG] Tried to set RTG scale mode to custom or custom rect using the wrong "
              "function. Ignored.\n");
     break;
   }

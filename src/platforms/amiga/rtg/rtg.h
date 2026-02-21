@@ -193,54 +193,54 @@ int init_rtg_data(struct emulator_config* cfg);
 
 void shutdown_rtg(void);
 
-void rtg_fillrect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, 
-  uint32_t color, uint16_t pitch, uint16_t format, uint8_t mask);
+void rtg_fillrect(uint16_t dst_x, uint16_t dst_y, uint16_t width, uint16_t height, 
+  uint32_t color, uint16_t dst_pitch, uint16_t pixel_format, uint8_t color_mask);
 
-void rtg_fillrect_solid(uint16_t x, uint16_t y, uint16_t w, uint16_t h, 
-  uint32_t color, uint16_t pitch, uint16_t format);
+void rtg_fillrect_solid(uint16_t dst_x, uint16_t dst_y, uint16_t width, uint16_t height, 
+  uint32_t color, uint16_t dst_pitch, uint16_t pixel_format);
 
-void rtg_invertrect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, 
-  uint16_t pitch, uint16_t format, uint8_t mask);
+void rtg_invertrect(uint16_t dst_x, uint16_t dst_y, uint16_t width, uint16_t height, 
+  uint16_t dst_pitch, uint16_t pixel_format, uint8_t color_mask);
 
-void rtg_blitrect(uint16_t x, uint16_t y, uint16_t dx, uint16_t dy, 
-  uint16_t w, uint16_t h, uint16_t pitch, uint16_t format, uint8_t mask);
+void rtg_blitrect(uint16_t src_x, uint16_t src_y, uint16_t dst_x, uint16_t dst_y, 
+  uint16_t width, uint16_t height, uint16_t line_pitch, uint16_t pixel_format, uint8_t color_mask);
 
-void rtg_blitrect_solid(uint16_t x, uint16_t y, uint16_t dx, uint16_t dy, 
-  uint16_t w, uint16_t h, uint16_t pitch, int16_t format);
+void rtg_blitrect_solid(uint16_t src_x, uint16_t src_y, uint16_t dst_x, uint16_t dst_y, 
+  uint16_t width, uint16_t height, uint16_t line_pitch, int16_t pixel_format);
 
-void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, 
-  uint16_t dy, uint16_t w, uint16_t h, uint16_t srcpitch,  uint16_t dstpitch,                                  
-  uint32_t src_addr, uint32_t dst_addr,uint16_t format, int8_t minterm);
+void rtg_blitrect_nomask_complete(uint16_t src_x, uint16_t src_y, uint16_t dst_x, 
+  uint16_t dst_y, uint16_t width, uint16_t height, uint16_t src_pitch,  uint16_t dst_pitch,                                  
+  uint32_t src_addr, uint32_t dst_addr, uint16_t pixel_format, int8_t minterm);
 
-void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, 
-  uint32_t src_addr, uint32_t fgcol, uint32_t bgcol, uint16_t pitch, 
-  uint16_t t_pitch, uint16_t format, uint16_t offset_x, uint8_t mask, 
+void rtg_blittemplate(uint16_t dst_x, uint16_t dst_y, uint16_t width, uint16_t height, 
+  uint32_t src_addr, uint32_t fg_color_raw, uint32_t bg_color_raw, uint16_t dst_pitch, 
+  uint16_t template_pitch, uint16_t pixel_format, uint16_t offset_x, uint8_t color_mask, 
   uint8_t draw_mode);
 
-void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, 
-  uint32_t src_addr, uint32_t fgcol, uint32_t bgcol, uint16_t pitch, 
-  uint16_t format, uint16_t offset_x, uint16_t offset_y, uint8_t mask, 
+void rtg_blitpattern(uint16_t dst_x, uint16_t dst_y, uint16_t width, uint16_t height, 
+  uint32_t src_addr, uint32_t fg_color_raw, uint32_t bg_color_raw, uint16_t dst_pitch, 
+  uint16_t pixel_format, uint16_t offset_x, uint16_t offset_y, uint8_t mask, 
   uint8_t draw_mode, uint8_t loop_rows);
 
-void rtg_drawline_solid(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, 
-  uint16_t len, uint32_t fgcol, uint16_t pitch, uint16_t format);
+void rtg_drawline_solid(int16_t start_x, int16_t start_y, int16_t delta_x, int16_t delta_y, 
+  uint16_t length, uint32_t fg_color_raw, uint16_t dst_pitch, uint16_t pixel_format);
 
 void rtg_drawline(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, 
   uint16_t len, uint16_t pattern, uint16_t pattern_offset, 
   uint32_t fgcol, uint32_t bgcol, uint16_t pitch, uint16_t format, 
   uint8_t mask, uint8_t draw_mode);
 
-void rtg_p2c(int16_t sx, int16_t sy, int16_t dx,int16_t dy,   
-  int16_t w, int16_t h, uint8_t draw_mode, uint8_t planes, 
+void rtg_p2c(int16_t src_x, int16_t src_y, int16_t dst_x, int16_t dst_y,   
+  int16_t width, int16_t height, uint8_t draw_mode, uint8_t planes, 
   uint8_t mask, uint8_t layer_mask,  uint16_t src_line_pitch, 
   uint8_t* bmp_data_src);
 
-void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t h,
+void rtg_p2d(int16_t src_x, int16_t src_y, int16_t dst_x, int16_t dst_y, int16_t width, int16_t height,
              uint8_t draw_mode, uint8_t planes, uint8_t mask, uint8_t layer_mask,
              uint16_t src_line_pitch, uint8_t* bmp_data_src);
 
 struct BitMap;
-void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t h,
+void rtg_p2c_ex(int16_t src_x, int16_t src_y, int16_t dst_x, int16_t dst_y, int16_t width, int16_t height,
                 uint8_t minterm, struct BitMap* bm, uint8_t mask, uint16_t dst_pitch,   
                 uint16_t src_pitch);
 

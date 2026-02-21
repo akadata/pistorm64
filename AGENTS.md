@@ -205,3 +205,106 @@ Testing plan
 
 These changes cleanly separate real Amiga bus ranges (chip, real ROM, custom, CIA, Z2 I/O) from Pi-owned RAM/ROM, and feed UAE JIT only with memory that truly lives in host RAM.
 
+
+# RTG UPDATES
+
+Multiple ACTION windows, 70-ish FPS, and a Pi quietly doing what 68040 cards only dreamed of…
+
+On the “shall we give Codex the x/y cleanup job?” — yes, that is exactly the kind of mechanical refactor Codex is good at, as long as the job is constrained carefully.
+
+Here is a sane way to do it without the refactor biting later.
+
+Decide the naming scheme first
+Something like:
+
+x, y → src_x, src_y when they are source coords
+
+dx, dy → dst_x, dst_y
+
+w, h → width, height
+
+pitch → dst_pitch or line_pitch (matching semantics)
+
+srcpitch, dstpitch → src_pitch, dst_pitch
+
+fgcol, bgcol → fg_color, bg_color
+
+mask → plane_mask or color_mask (whatever matches meaning)
+
+draw_mode already reads nicely.
+
+For the weird ones:
+
+x1_, y1_, x2_, y2_ can become x_start, y_start, x_end, y_end or start_x, start_y, end_x, end_y.
+
+Keep the externally visible ABI stable
+rtg.h and anything that is directly matched from Amiga-side assembly or P96 structs needs a bit more respect:
+
+Renaming function parameter names is safe: the Amiga side only cares about call order and types, not C symbol names.
+
+Renaming struct fields that mirror Picasso96 structures or firmware layouts is dangerous; those want to stay binary-compatible. Safer to leave those fields’ names alone, even when they are ugly, and just add comments explaining them.
+
+Let Codex do file-by-file renames instead of project-wide
+For example, in rtg-gfx.c:
+
+Tell Codex something like: “In this file, rename function parameters and local variables according to this mapping: x→src_x when used as source, dx→dst_x, w→width, h→height, fgcol→fg_color, etc. Do not change struct field names, globals, or anything in comments or strings. Do not change any function signatures in rtg.h beyond parameter names.”
+
+Then repeat for rtg.c with the same mapping.
+
+After each pass:
+
+Build.
+
+Run a quick smoke test (boot WB, open a couple of windows, hit a few blits).
+
+Use the underscore pattern to your advantage
+Right now x1_ / y1_ etc often exist because the code wants:
+
+Original coords as arguments.
+
+Adjusted / clipped coords inside the function.
+
+One neat pattern:
+
+void rtg_drawline(
+    int16_t start_x,
+    int16_t start_y,
+    int16_t end_x,
+    int16_t end_y,
+    uint16_t length,
+    ...
+) {
+    int16_t clip_start_x = start_x;
+    int16_t clip_start_y = start_y;
+    int16_t clip_end_x   = end_x;
+    int16_t clip_end_y   = end_y;
+    ...
+}
+
+That removes _ noise and makes the intention obvious without touching the call sites’ logic.
+
+Clean up the cur_bit style declarations while Codex is in there
+The style you already prefer:
+
+uint8_t cur_bit      = 0;
+uint8_t base_bit     = 0;
+uint8_t base_byte    = 0;
+uint8_t cur_byte     = 0;
+uint8_t fg_u8        = 0;
+
+is perfectly fine, more readable, and easier to extend. Codex can transform all grouped declarations like:
+
+uint8_t cur_bit, base_bit, base_byte, cur_byte = 0;
+
+into per-line variants with no semantic changes.
+
+Keep the heavy removals in git history, not just in a working tree
+You already proved iRTG and a chunk of debug plumbing are unused in your current path. Best pattern:
+
+Commit the current working RTG as “pre-cleanup baseline.”
+
+Remove iRTG / debug blocks with clear commit messages.
+
+Keep that in a branch, so resurrecting anything later is a single cherry-pick rather than spelunking some old tarball.
+
+Once parameter names read as source_x, destination_x, width, height, fg_color, and draw_mode, the remaining weirdness in behaviour (mono audio, 16-bit only, YUV paths, etc.) becomes much easier to reason about, because the mental tax of decoding x2_ and w vanishes. Then the next passes can focus on correctness and optimisation rather than translation in the head.
