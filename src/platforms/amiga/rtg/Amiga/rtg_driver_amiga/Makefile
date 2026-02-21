@@ -1,4 +1,4 @@
-include ../../../../../config.mk
+include ../../../../../../config.mk
 
 RTG_CFLAGS += -DRTG_GFX_MEM=$(RTG_GFX_MEM)
 
@@ -6,9 +6,9 @@ AMIGA_TOOLCHAIN ?= /opt/amiga
 AMIGA_PATH := $(AMIGA_TOOLCHAIN)/bin:$(PATH)
 
 M68K_GCC ?= m68k-amigaos-gcc
-P96DEV ?= ../../../../../amiga.dev/Picasso96Develop
+P96DEV ?= ../../../../../../amiga.dev/Picasso96Develop
 
-CPU ?= 040
+CPU ?= 030
 TARGET = pigfx.card
 ifeq ($(CPU),020)
 CPUFLAG = -m68020

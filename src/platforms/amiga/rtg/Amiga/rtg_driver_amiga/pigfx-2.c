@@ -19,7 +19,7 @@
 #include <string.h>
 #include <stdint.h>
 #include "boardinfo.h"
-#include "../rtg_enums.h"
+#include "../../rtg_enums.h"
 
 #define STR(s) #s
 #define XSTR(s) STR(s)
@@ -56,10 +56,8 @@
 #define WRITELONG(cmd, val)   *(volatile unsigned long  *)(CARD_OFFSET + (cmd)) = (unsigned long)(val);
 #define WRITEBYTE(cmd, val)   *(volatile unsigned char  *)(CARD_OFFSET + (cmd)) = (unsigned char)(val);
 
-#define READSHORT(cmd, var)   (var) = *(volatile unsigned short *)(CARD_OFFSET + (cmd)
-    );
-#define READLONG(cmd, var)    (var) = *(volatile unsigned long  *)(CARD_OFFSET + (cmd)
-    );
+#define READSHORT(cmd, var)   (var) = *(volatile unsigned short *)(CARD_OFFSET + (cmd)    );
+#define READLONG(cmd, var)    (var) = *(volatile unsigned long  *)(CARD_OFFSET + (cmd)    );
 
 #define RTG_DEBUGME(val)      *(volatile unsigned long  *)(CARD_OFFSET + RTG_DEBUGME) = (unsigned long)(val);
 #define IWRITECMD(val)        *(volatile unsigned short *)(IRTGCMD_OFFSET) = (unsigned short)(val);
@@ -331,7 +329,7 @@ void SetSpriteColor (
 #define DEVICE_PRIORITY 0
 #define DEVICE_ID_STRING "PiGFX " XSTR(DEVICE_VERSION) "." XSTR(DEVICE_REVISION) " " DEVICE_DATE
 #define DEVICE_NAME "pigfx.card"
-#define DEVICE_DATE "(29 May 2021)"
+#define DEVICE_DATE "(21 Feb 2026)"
 
 
 int __attribute__((no_reorder)) _start() {
@@ -374,7 +372,8 @@ __saveds struct GFXBase* InitLib(
     __REGD0(struct GFXBase *exb)
     );
 
-#define CLOCK_HZ 100000000
+#define CLOCK_HZ 25000000 
+// 100000000
 
 static struct GFXBase *_gfxbase;
 const char *gfxname = "PiStorm RTG";

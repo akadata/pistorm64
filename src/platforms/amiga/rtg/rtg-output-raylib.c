@@ -89,16 +89,16 @@ static inline uint32_t rtg_yuv601_to_rgba(uint8_t y, uint8_t u, uint8_t v) {
 static const char* rtg_resolve_shader_path(const char* filename, char* buf, size_t buf_len) {
     const char* root = getenv("PISTORM_ROOT");
     if (root && *root) {
-        snprintf(buf, buf_len, "%s/rtg/%s", root, filename);
+        snprintf(buf, buf_len, "%s/rtg/shaders/%s", root, filename);
         if (access(buf, R_OK) == 0) {
             return buf;
         }
-        snprintf(buf, buf_len, "%s/src/platforms/amiga/rtg/%s", root, filename);
+        snprintf(buf, buf_len, "%s/src/platforms/amiga/rtg/shaders/%s", root, filename);
         if (access(buf, R_OK) == 0) {
             return buf;
         }
     }
-    snprintf(buf, buf_len, "src/platforms/amiga/rtg/%s", filename);
+    snprintf(buf, buf_len, "src/platforms/amiga/rtg/shaders/%s", filename);
     if (access(buf, R_OK) == 0) {
         return buf;
     }
@@ -156,9 +156,9 @@ static uint8_t cursor_image_updated = 0;
 static uint8_t clut_cursor_enabled  = 0;
 static uint8_t updating_screen      = 0;
 static uint8_t debug_palette        = 0;
-static uint8_t show_fps             = 0;
+static uint8_t show_fps             = 1;
 static uint8_t palette_updated      = 0;
-static int clut_cpu_mode            = -1;
+static int clut_cpu_mode            = 0; // was -1
 static uint8_t yuv_log_once         = 0;
 
 static uint16_t mouse_cursor_w      = 16;

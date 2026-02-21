@@ -53,9 +53,14 @@ static inline size_t rtg_index_offset(int index, size_t element_size) {
 
 extern uint32_t rtg_address[8];
 extern uint32_t rtg_address_adj[8];
-extern uint8_t* rtg_mem; // FIXME
+
+extern uint8_t *rtg_mem;
+
 extern uint16_t rtg_user[8];
-extern uint16_t rtg_x[8], rtg_y[8];
+
+extern uint16_t rtg_x[8];
+extern uint16_t rtg_y[8];
+
 extern uint16_t rtg_format;
 extern uint16_t rtg_display_format;
 
@@ -64,8 +69,7 @@ extern uint32_t framebuffer_addr_adj;
 
 extern uint8_t realtime_graphics_debug;
 
-//static const size_t rtg_mem_size = 40u * SIZE_MEGA;
-//
+
 #ifndef RTG_GFX_MEM
 #define RTG_GFX_MEM 128u
 #endif
@@ -78,8 +82,8 @@ static const size_t rtg_mem_size = (size_t)RTG_GFX_MEM * SIZE_MEGA;
 
 static uint32_t rtg_oob_log_count = 0;
 
-static int rtg_calc_span(size_t x_bytes, uint16_t w, uint16_t h, uint16_t pitch, size_t bpp,
-                         size_t* out_span) {
+static int rtg_calc_span(size_t x_bytes, uint16_t w, uint16_t h, 
+  uint16_t pitch, size_t bpp, size_t* out_span) {
   if (w == 0 || h == 0 || bpp == 0 || pitch == 0) {
     return 0;
   }
@@ -94,8 +98,9 @@ static int rtg_calc_span(size_t x_bytes, uint16_t w, uint16_t h, uint16_t pitch,
   return 1;
 }
 
-static int rtg_check_bounds(size_t base, size_t span, const char* tag, uint16_t pitch, uint16_t w,
-                            uint16_t h, uint16_t format) {
+static int rtg_check_bounds(size_t base, size_t span, const char* tag, 
+  uint16_t pitch, uint16_t w, uint16_t h, uint16_t format) {
+
   if (base >= rtg_mem_size || span > rtg_mem_size - base) {
     if (rtg_oob_log_count < 20) {
       LOG_WARN("[RTG/OOB] %s base=0x%zx span=%zu pitch=%u w=%u h=%u fmt=%u\n", tag, base, span,
@@ -136,13 +141,15 @@ static int rtg_get_ptr_checked(uint32_t base_adj, uint16_t x, uint16_t y, uint16
   return 1;
 }
 
-void rtg_fillrect_solid(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t color,
-                        uint16_t pitch, uint16_t format) {
+void rtg_fillrect_solid(uint16_t x, uint16_t y, uint16_t w, uint16_t h, 
+  uint32_t color, uint16_t pitch, uint16_t format) {
   uint8_t* dptr = NULL;
-  if (!rtg_get_ptr_checked(rtg_address_adj[0], x, y, w, h, pitch, format, "fillrect_solid",
-                           &dptr)) {
+
+  if (!rtg_get_ptr_checked(rtg_address_adj[0], x, y, w, h, 
+    pitch, format, "fillrect_solid", &dptr)) {
     return;
   }
+
   switch (format) {
   case RTGFMT_8BIT_CLUT: {
     for (int xs = 0; xs < w; xs++) {
@@ -184,6 +191,7 @@ void rtg_fillrect_solid(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t
 void rtg_fillrect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t color, uint16_t pitch,
                   uint16_t format, uint8_t mask) {
   uint8_t* dptr = NULL;
+
   if (!rtg_get_ptr_checked(rtg_address_adj[0], x, y, w, h, pitch, format, "fillrect", &dptr)) {
     return;
   }
@@ -191,7 +199,7 @@ void rtg_fillrect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t color
   for (int ys = 0; ys < h; ys++) {
     for (int xs = 0; xs < w; xs++) {
       size_t offset = (size_t)xs * rtg_pixel_size[format];
-      SET_RTG_PIXEL_MASK(&dptr[offset], (color & 0xFF), format);
+      SET_RTG_PIXEL_MASK(&dptr[offset], color, format);
     }
     dptr += pitch;
   }
@@ -253,8 +261,7 @@ void rtg_blitrect(uint16_t x, uint16_t y, uint16_t dx, uint16_t dy, uint16_t w, 
   if (!rtg_get_ptr_checked(rtg_address_adj[0], x, y, w, h, pitch, format, "blitrect_src", &sptr)) {
     return;
   }
-  if (!rtg_get_ptr_checked(rtg_address_adj[0], dx, dy, w, h, pitch, format, "blitrect_dst",
-                           &dptr)) {
+  if (!rtg_get_ptr_checked(rtg_address_adj[0], dx, dy, w, h, pitch, format, "blitrect_dst", &dptr)) {
     return;
   }
 
@@ -1311,8 +1318,12 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
     return;
   }
 
-  uint8_t cur_bit, base_bit, base_byte, cur_byte = 0;
-  uint8_t u8_fg = 0;
+  uint8_t cur_bit      = 0;
+  uint8_t base_bit     = 0;
+  uint8_t base_byte    = 0;
+  uint8_t cur_byte     = 0;
+  uint8_t u8_fg = 0; 
+
   // uint32_t color_mask = 0xFFFFFFFF;
 
   uint32_t plane_size = (uint32_t)src_line_pitch * (uint32_t)h;
