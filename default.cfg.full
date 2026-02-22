@@ -2,6 +2,7 @@ cpu 68040
 platform amiga 500
 map type=rom address=0xF80000 size=0x80000 file=../Amiga/kick/Kickstart-v3.1-r40.068.rom ovl=0 id=kickstart autodump_mem
 map type=ram address=0x00100000 size=1M id=chipram_extra
+map type=ram address=0x08000000 size=256M id=cpu_slot_fastram
 map type=ram address=0x90000000 size=64M id=z3_autoconf_fast
 map type=ram address=0x00400000 size=4M   id=z2_autoconf_fast
 
