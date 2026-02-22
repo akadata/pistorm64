@@ -183,7 +183,7 @@ uint8_t rtg_initialized = 0;
 uint8_t emulator_exiting = 0;
 uint8_t rtg_output_in_vblank = 0;
 uint8_t rtg_dpms = 0;
-uint8_t shutdown = 0;
+uint8_t rtg_shutdown_requested = 0;
 
 extern uint8_t *rtg_mem;
 extern uint8_t display_enabled;
@@ -794,7 +794,7 @@ reinit_raylib:;
 
   // Mode registers can transiently be 0 during RTG startup/mode switches.
   // Wait for a valid mode instead of thrashing reinit/logging.
-  while (!shutdown) {
+  while (!rtg_shutdown_requested) {
     if (rtg_on && width > 0 && height > 0 && format < RTG_FMT_NUM && rtg_pixel_size[format] > 0) {
       break;
     }
@@ -804,7 +804,7 @@ reinit_raylib:;
     pitch = rtg_pitch;
     usleep(1000);
   }
-  if (shutdown) {
+  if (rtg_shutdown_requested) {
     goto shutdown_raylib;
   }
 
@@ -1574,7 +1574,7 @@ reinit_raylib:;
     if(emulator_exiting) {
       goto shutdown_raylib;
     }
-    if(shutdown) {
+    if(rtg_shutdown_requested) {
       break;
     }
     uint64_t frame_end_ns = rtg_now_ns();
@@ -1600,7 +1600,7 @@ reinit_raylib:;
     }
   }
 
-  shutdown = 0;
+  rtg_shutdown_requested = 0;
   rtg_initialized = 0;
   LOG_INFO("RTG thread shut down.\n");
 
@@ -1707,7 +1707,7 @@ void rtg_shutdown_display(void) {
     return;
   }
 
-  shutdown = 1;
+  rtg_shutdown_requested = 1;
 
   pthread_join(thread_id, NULL);
 

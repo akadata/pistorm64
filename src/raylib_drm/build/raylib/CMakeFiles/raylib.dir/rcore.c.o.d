@@ -139,6 +139,11 @@ raylib/CMakeFiles/raylib.dir/rcore.c.o: \
   /usr/include/aarch64-linux-gnu/bits/cpu-set.h \
   /usr/include/aarch64-linux-gnu/bits/setjmp.h \
   /usr/include/aarch64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
+  /usr/include/poll.h /usr/include/aarch64-linux-gnu/sys/poll.h \
+  /usr/include/aarch64-linux-gnu/bits/poll.h /usr/include/errno.h \
+  /usr/include/aarch64-linux-gnu/bits/errno.h /usr/include/linux/errno.h \
+  /usr/include/aarch64-linux-gnu/asm/errno.h \
+  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
   /usr/include/aarch64-linux-gnu/sys/ioctl.h \
   /usr/include/aarch64-linux-gnu/bits/ioctls.h \
   /usr/include/aarch64-linux-gnu/asm/ioctls.h \
@@ -170,11 +175,7 @@ raylib/CMakeFiles/raylib.dir/rcore.c.o: \
   /usr/include/inttypes.h /usr/include/interface/vcos/vcos_attr.h \
   /usr/include/interface/vcos/pthreads/vcos_platform.h \
   /usr/include/semaphore.h \
-  /usr/include/aarch64-linux-gnu/bits/semaphore.h /usr/include/errno.h \
-  /usr/include/aarch64-linux-gnu/bits/errno.h /usr/include/linux/errno.h \
-  /usr/include/aarch64-linux-gnu/asm/errno.h \
-  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
-  /usr/include/signal.h \
+  /usr/include/aarch64-linux-gnu/bits/semaphore.h /usr/include/signal.h \
   /usr/include/aarch64-linux-gnu/bits/signum-generic.h \
   /usr/include/aarch64-linux-gnu/bits/signum-arch.h \
   /usr/include/aarch64-linux-gnu/bits/types/sig_atomic_t.h \

@@ -63,7 +63,10 @@ struct LibRemote {
 #endif
 
 static uint32_t alloc_a314_buffer(uint32_t length) {
-    APTR buf = AllocMem(length, MEMF_PUBLIC | MEMF_CLEAR);
+    APTR buf = AllocMem(length, MEMF_A314 | MEMF_PUBLIC | MEMF_CLEAR);
+    if(!buf) {
+        buf = AllocMem(length, MEMF_PUBLIC | MEMF_CLEAR);
+    }
     return (uint32_t)buf;
 }
 

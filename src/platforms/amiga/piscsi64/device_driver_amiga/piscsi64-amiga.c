@@ -714,6 +714,10 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
   case SCSICMD_WRITE_6:
     write = 1;
   case SCSICMD_READ_6:
+    if (!scsi->scsi_Command || scsi->scsi_CmdLength < 6) {
+      err = piscsi64_scsi_fail(u, HFERR_BadStatus, PISCSI64_SENSE_ILLEGAL_REQUEST, PISCSI64_ASC_INVALID_CDB_FIELD, 0);
+      break;
+    }
     rw_is_6byte = 1;
     block = scsi->scsi_Command[1] & 0x1f;
     block = (block << 8) | scsi->scsi_Command[2];
@@ -729,6 +733,10 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
   case SCSICMD_WRITE_10:
     write = 1;
   case SCSICMD_READ_10:
+    if (!scsi->scsi_Command || scsi->scsi_CmdLength < 10) {
+      err = piscsi64_scsi_fail(u, HFERR_BadStatus, PISCSI64_SENSE_ILLEGAL_REQUEST, PISCSI64_ASC_INVALID_CDB_FIELD, 0);
+      break;
+    }
     debugval(PISCSI64_DBG_VAL1, (uint32_t)scsi->scsi_Command);
     debug(PISCSI64_DBG_MSG, DBG_SCSICMD_RW10);
     block = scsi->scsi_Command[2];
@@ -742,6 +750,10 @@ uint8_t piscsi64_scsi(struct piscsi64_unit* u, struct IORequest* io) {
   case SCSICMD_WRITE_12:
     write = 1;
   case SCSICMD_READ_12:
+    if (!scsi->scsi_Command || scsi->scsi_CmdLength < 12) {
+      err = piscsi64_scsi_fail(u, HFERR_BadStatus, PISCSI64_SENSE_ILLEGAL_REQUEST, PISCSI64_ASC_INVALID_CDB_FIELD, 0);
+      break;
+    }
     block = scsi->scsi_Command[2];
     block = (block << 8) | scsi->scsi_Command[3];
     block = (block << 8) | scsi->scsi_Command[4];

@@ -14,6 +14,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Legacy GPIO pin layout (still used by benchmarks/tests and some
  * debug paths; the kmod backend ignores these).
  */
@@ -94,5 +98,9 @@ static inline uint8_t  read_byte(uint32_t address)   { return ps_read_8(address)
 static inline void write_long(uint32_t address, uint32_t value) { ps_write_32(address, value); }
 static inline void write_word(uint32_t address, uint16_t value) { ps_write_16(address, value); }
 static inline void write_byte(uint32_t address, uint8_t  value) { ps_write_8(address, value); }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _PS_PROTOCOL_H */

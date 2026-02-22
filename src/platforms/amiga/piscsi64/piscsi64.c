@@ -2828,6 +2828,10 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
             }
             else if (cmd == PISCSI64_CMD_READ) {
                 uint32_t block = piscsi64_u32[0];
+                if (block == 0x444F5300u || block == 0x444F5301u ||
+                    block == 0x444F5302u || block == 0x444F5303u) {
+                    LOG_WARN("[PISCSI64] Suspicious READ LBA=0x%08X (looks like DOS\\x); possible CDB decode corruption.\n", block);
+                }
                 uint64_t file_offset = (uint64_t)block * d->block_size;
                 d->lba = block;
                 DEBUG("[PISCSI64-IO] Unit:%d CMD:READ io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%llX to_addr:0x%.8X\n", val, block, piscsi64_u32[1], block, (unsigned long long)file_offset, piscsi64_u32[2]);
@@ -2973,6 +2977,10 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
             }
             else if (cmd == PISCSI64_CMD_WRITE) {
                 uint32_t block = piscsi64_u32[0];
+                if (block == 0x444F5300u || block == 0x444F5301u ||
+                    block == 0x444F5302u || block == 0x444F5303u) {
+                    LOG_WARN("[PISCSI64] Suspicious WRITE LBA=0x%08X (looks like DOS\\x); possible CDB decode corruption.\n", block);
+                }
                 uint64_t file_offset = (uint64_t)block * d->block_size;
                 d->lba = block;
                 DEBUG("[PISCSI64-IO] Unit:%d CMD:WRITE io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%llX from_addr:0x%.8X\n", val, block, piscsi64_u32[1], block, (unsigned long long)file_offset, piscsi64_u32[2]);

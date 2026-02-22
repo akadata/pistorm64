@@ -40,11 +40,12 @@
 # USE_NO_PLT : set to 1 to pass -fno-plt for direct calls (glibc-specific; default off).
 # OMIT_FP    : set to 1 to omit frame pointers (-fomit-frame-pointer) for perf.
 # USE_PIPE   : set to 1 to add -pipe to compile steps.
+# BUILD_RAYLIB: set to 1 to force a clean CMake reconfigure/rebuild of raylib_drm.
 # M68K_WARN_SUPPRESS : extra warning suppressions for the generated Musashi core.
 #
-M68K_ENHANCE ?= 0 
+M68K_ENHANCE ?= 0
 # Set USE_GOLD=1 to link with gold if available.
-USE_GOLD   ?= 0
+USE_GOLD   ?= 1
 
 # Toggle RTG output backends: 1=raylib (default), 0=null stub.
 USE_RAYLIB ?= 1
@@ -66,11 +67,17 @@ ARCH_FEATURES ?=
 # Toggle Pi host (/opt/vc) support for dev tools.
 USE_VC     ?= 0
 # Perf toggles
-USE_LTO    ?= 0
+USE_LTO    ?= 1
 USE_NO_PLT ?= 1 
 OMIT_FP    ?= 1
 USE_PIPE   ?= 1
+BUILD_RAYLIB ?= 1
 include config.mk
+
+# Keep default invocation (`make`) on the full emulator build, even if
+# other targets are declared earlier in the file.
+.DEFAULT_GOAL := all
+
 # Base warnings
 VERBOSE ?= 0
 
@@ -82,10 +89,24 @@ else
 WARNINGS ?= $(WARNINGS_QUIET)
 endif
 
-# Default compilers (can still override with CC=... directly)
+# Default compilers (can still override with CC=... CXX=... directly)
+ifeq ($(origin CC), default)
+CC := gcc
+endif
 CC  ?= gcc
-CXX ?= g++
+CC_VERSION_TEXT := $(shell $(CC) --version 2>/dev/null | head -n 1)
+CC_IS_CLANG := $(if $(findstring clang,$(CC_VERSION_TEXT)),1,0)
+ifeq ($(origin CXX), default)
+ifeq ($(CC_IS_CLANG),1)
+CXX := clang++
+else
+CXX := g++
+endif
+endif
 AR  ?= ar
+RANLIB ?= ranlib
+AR_BIN := $(or $(shell command -v $(AR) 2>/dev/null),$(AR))
+RANLIB_BIN := $(or $(shell command -v $(RANLIB) 2>/dev/null),$(RANLIB))
 
 # Legacy shorthand: make C=clang or make C=gcc
 ifeq ($(C),clang)
@@ -114,9 +135,9 @@ endif
 EMU_WARNINGS  ?= $(WARNINGS) $(EMU_WARNINGS_EXTRA)
 
 ifeq ($(findstring clang,$(CC)),)
-OPT_LEVEL_DEFAULT ?= -Os -ffast-math
+OPT_LEVEL_DEFAULT ?= -O3 -ffast-math
 else
-OPT_LEVEL_DEFAULT ?= -Os -ffast-math
+OPT_LEVEL_DEFAULT ?= -O3 -ffast-math
 endif
 
 OPT_LEVEL ?= $(OPT_LEVEL_DEFAULT)
@@ -164,10 +185,10 @@ DEFINES += -D_GNU_SOURCE
 CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
 
 # Raylib paths can be swapped if you use a custom build.
-#RAYLIB_INC    ?= -I./src/raylib_drm #raylib
-#RAYLIB_LIBDIR ?= -L./src/raylib_drm #raylib_drm
+#RAYLIB_INC    ?= -I./src/raylib #raylib
+#RAYLIB_LIBDIR ?= -L./src/raylib #raylib
 
-RAYLIB_DIR := $(CURDIR)/src/raylib_drm
+RAYLIB_DIR := $(CURDIR)/src/raylib
 RAYLIB_INC := -I$(RAYLIB_DIR)/src
 RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
 
@@ -368,8 +389,17 @@ DEFINES += -DUSE_UAE_JIT
 endif
 
 
+ifeq ($(origin CC), default)
+CC := gcc
+endif
 CC  ?= gcc
-CXX ?= g++
+ifeq ($(origin CXX), default)
+ifeq ($(CC_IS_CLANG),1)
+CXX := clang++
+else
+CXX := g++
+endif
+endif
 
 DEFINES  += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 
 # Allow command-line override of batching and rate limiting for performance tuning
@@ -386,33 +416,33 @@ PIPE_FLAGS= $(if $(filter 1,$(USE_PIPE)),-pipe,)
 # Platform-specific tuning and raylib variants.
 ifeq ($(PLATFORM),PI4)
 CPUFLAGS = -mcpu=cortex-a72 -mtune=cortex-a72 -march=armv8-a+crc -mfpu=neon-fp-armv8 -mfloat-abi=hard
-RAYLIB_DIR := $(CURDIR)/src/raylib_drm
+RAYLIB_DIR := $(CURDIR)/src/raylib
 RAYLIB_INC := -I$(RAYLIB_DIR)/src
 RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
 DEFINES      += -DRPI4_TEST
 else ifeq ($(PLATFORM),PI4_64BIT)
 CPUFLAGS = -mcpu=cortex-a72 -mtune=cortex-a72 -march=armv8-a+crc
-RAYLIB_DIR := $(CURDIR)/src/raylib_drm
+RAYLIB_DIR := $(CURDIR)/src/raylib
 RAYLIB_INC := -I$(RAYLIB_DIR)/src
 RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
 DEFINES      += -DRPI4_TEST
 
 else ifeq ($(PLATFORM),PI4_64BIT_NATIVE)
 CPUFLAGS = -mcpu=native -mtune=native -march=native
-RAYLIB_DIR := $(CURDIR)/src/raylib_drm
+RAYLIB_DIR := $(CURDIR)/src/raylib
 RAYLIB_INC := -I$(RAYLIB_DIR)/src
 RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
 DEFINES += -DRPI4_TEST
 
 else ifeq ($(PLATFORM),PI4_NATIVE)
 CPUFLAGS = -march=native
-RAYLIB_DIR := $(CURDIR)/src/raylib_drm
+RAYLIB_DIR := $(CURDIR)/src/raylib
 RAYLIB_INC := -I$(RAYLIB_DIR)/src
 RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
 DEFINES      += -DRPI4_TEST
 else ifeq ($(PLATFORM),PI4_64BIT_DEBUG)
 CPUFLAGS = -mcpu=cortex-a72 -mtune=cortex-a72 -march=armv8-a+crc
-RAYLIB_DIR := $(CURDIR)/src/raylib_drm
+RAYLIB_DIR := $(CURDIR)/src/raylib
 RAYLIB_INC := -I$(RAYLIB_DIR)/src
 RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
 DEFINES      += -DRPI4_TEST
@@ -447,7 +477,17 @@ CPUFLAGS := $(patsubst -mcpu=%,-mcpu=%$(ARCH_FEATURES),$(CPUFLAGS))
 endif
 
 
-RAYLIB_A := $(RAYLIB_LIB)
+# Use a per-user build dir so stale root-owned raylib artifacts don't block builds.
+RAYLIB_BUILD_TAG ?= $(shell id -u)
+RAYLIB_BUILD_DIR ?= $(RAYLIB_DIR)/build.$(RAYLIB_BUILD_TAG)
+RAYLIB_A := $(RAYLIB_BUILD_DIR)/raylib/libraylib.a
+# Keep raylib archive in plain native object format. Mixing LTO IR between
+# toolchains (e.g. clang-produced archive linked by gcc/ld) can produce:
+# "error adding symbols: fileformat not recognized".
+RAYLIB_CMAKE_IPO := OFF
+RAYLIB_CMAKE_LINKER_FLAGS := $(if $(filter 1,$(USE_GOLD)),-fuse-ld=gold,)
+# raylib uses NAN/INF in some paths; avoid -ffast-math there to prevent UB warnings.
+RAYLIB_CMAKE_RELEASE_FLAGS := $(strip $(CPUFLAGS) $(filter-out -ffast-math,$(OPT_LEVEL)) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(NO_UNROLL_FLAGS))
 OPENSSL_CFLAGS := $(shell pkg-config --cflags openssl 2>/dev/null)
 OPENSSL_LIBS := $(shell pkg-config --libs openssl 2>/dev/null)
 
@@ -484,6 +524,16 @@ LDFLAGS      = $(WARNINGS) $(LD_GOLD) $(LDSEARCH) $(LTO_FLAGS) $(EXTRA_LDFLAGS)
 
 LDLIBS   = $(RAYLIB_LIBS) $(LIBS) $(LDLIBS_VC) $(LDLIBS_ALSA)
 
+ifeq ($(USE_RAYLIB),1)
+EXTRA_LINK_DEPS += $(RAYLIB_A)
+ifeq ($(BUILD_RAYLIB),1)
+.PHONY: raylib_force_rebuild
+$(RAYLIB_A): raylib_force_rebuild
+raylib_force_rebuild:
+	@true
+endif
+endif
+
 TARGET = $(EXENAME)$(EXE)
 INSTALL_DIR := $(DESTDIR)$(PREFIX)
 CONFIG_FILES := default.cfg amiga.cfg mac68k.cfg test.cfg x68k.cfg
@@ -494,6 +544,7 @@ MODULES_LOAD := etc/modules-load.d/pistorm.conf
 MODPROBE_CONF := etc/modprobe.d/pistorm.conf
 BOOT_FIRMWARE_DIR ?= /boot/firmware
 INSTALL_BOOT_FIRMWARE ?= 0
+INSTALL_SYSTEM ?= auto
 HELP_TARGETS = \
 	"make"                             "Build emulator (kmod backend default)" \
 	"make PISTORM_KMOD=0"             "Build emulator with legacy userspace GPIO" \
@@ -541,14 +592,38 @@ clean:
 	rm -f $(DELETEFILES) $(TARGET).tmp
 	$(MAKE) kernel_clean
 	rm -rf kernel_module/.tmp_versions
-	find . \( -name '*.o' -o -name '*.tmp' \) -print0 | xargs -0 -r rm -f --
+	-find . \( -name '*.o' -o -name '*.tmp' \) -print0 | xargs -0 -r rm -f --
 
 # Ensure generated m68k files are built before other files that depend on them
 # Link is atomic: write to $@.tmp then move into place on success.
 OBJS_LINK = $(filter %.o,$^)
 
 $(TARGET): $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) $(MUSASHIFILES:%.c=%.o) src/a314/a314.o $(EXTRA_CXX_OBJS) $(EXTRA_CXX_STUB_OBJS) $(EXTRA_LINK_DEPS)
-	$(CC) $(LDFLAGS) -o $@.tmp $(OBJS_LINK) $(UAE_LINK_FLAGS) $(LDLIBS) && mv -f $@.tmp $@
+	$(CXX) $(LDFLAGS) -o $@.tmp $(OBJS_LINK) $(UAE_LINK_FLAGS) $(LDLIBS) && mv -f $@.tmp $@
+
+ifeq ($(USE_RAYLIB),1)
+$(RAYLIB_A):
+ifeq ($(BUILD_RAYLIB),1)
+	rm -rf $(RAYLIB_BUILD_DIR)
+endif
+	cmake -S $(RAYLIB_DIR) -B $(RAYLIB_BUILD_DIR) \
+		-DPLATFORM=DRM \
+		-DBUILD_EXAMPLES=OFF \
+		-DBUILD_SHARED_LIBS=OFF \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_C_COMPILER="$(CC)" \
+		-DCMAKE_CXX_COMPILER="$(CXX)" \
+		-DCMAKE_AR="$(AR_BIN)" \
+		-DCMAKE_RANLIB="$(RANLIB_BIN)" \
+		-DCMAKE_POLICY_DEFAULT_CMP0069=NEW \
+		-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=$(RAYLIB_CMAKE_IPO) \
+		-DCMAKE_C_FLAGS_RELEASE="$(RAYLIB_CMAKE_RELEASE_FLAGS)" \
+		-DCMAKE_CXX_FLAGS_RELEASE="$(RAYLIB_CMAKE_RELEASE_FLAGS)" \
+		-DCMAKE_EXE_LINKER_FLAGS="$(RAYLIB_CMAKE_LINKER_FLAGS)" \
+		-DCMAKE_SHARED_LINKER_FLAGS="$(RAYLIB_CMAKE_LINKER_FLAGS)" \
+		-Wno-dev
+	cmake --build $(RAYLIB_BUILD_DIR) --target raylib --parallel
+endif
 
 uae-jit: $(UAE_TARGET)
 ifeq ($(USE_UAE_JIT),1)
@@ -660,13 +735,20 @@ $(MUSASHIGENCFILES) $(MUSASHIGENHFILES): $(MUSASHIGENERATOR)$(EXE)
 $(MUSASHIGENERATOR)$(EXE): src/musashi/$(MUSASHIGENERATOR).c
 	$(CC) -MMD -MP  -o $(MUSASHIGENERATOR)$(EXE) src/musashi/$(MUSASHIGENERATOR).c
 
-install: all amiga-piscsi amiga-piscsi64
+install-build: all amiga-piscsi amiga-piscsi64
+	$(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD) INSTALL_BOOT_FIRMWARE=$(INSTALL_BOOT_FIRMWARE) BOOT_FIRMWARE_DIR="$(BOOT_FIRMWARE_DIR)" install
+
+install:
 	$(INSTALL) -d $(INSTALL_DIR)
 	for bin in $(INSTALL_BINS); do \
-		[ -x $$bin ] && $(INSTALL) -m 755 $$bin $(INSTALL_DIR)/; \
+		if [ -x $$bin ]; then \
+			$(INSTALL) -m 755 $$bin $(INSTALL_DIR)/; \
+		fi; \
 	done
 	for cfg in $(CONFIG_FILES); do \
-		[ -f $$cfg ] && $(INSTALL) -m 644 $$cfg $(INSTALL_DIR)/; \
+		if [ -f $$cfg ]; then \
+			$(INSTALL) -m 644 $$cfg $(INSTALL_DIR)/; \
+		fi; \
 	done
 	$(INSTALL) -d $(INSTALL_DIR)/src/platforms/amiga/piscsi
 	$(INSTALL) -m 644 src/platforms/amiga/piscsi/piscsi.rom $(INSTALL_DIR)/src/platforms/amiga/piscsi/piscsi.rom
@@ -682,29 +764,35 @@ install: all amiga-piscsi amiga-piscsi64
 	$(INSTALL) -d $(INSTALL_DIR)/src/platforms/amiga/pirtg64/shaders
 	$(INSTALL) -m 644 src/platforms/amiga/pirtg64/shaders/*.shader $(INSTALL_DIR)/src/platforms/amiga/pirtg64/shaders/
 	[ -f pistorm.LICENSE ] && $(INSTALL) -m 644 pistorm.LICENSE $(INSTALL_DIR)/
+
+install-system:
+	@if [ "$(INSTALL_SYSTEM)" = "1" ] || [ "$(INSTALL_SYSTEM)" = "auto" -a "$$(id -u)" -eq 0 ]; then \
 		if [ -f $(UDEV_RULES) ]; then \
 			$(INSTALL) -d /etc/udev/rules.d; \
 			$(INSTALL) -m 644 $(UDEV_RULES) /etc/udev/rules.d/99-pistorm.rules; \
 			udevadm control --reload >/dev/null 2>&1 || true; \
 			udevadm trigger --subsystem-match=misc --attr-match=dev=10:262 >/dev/null 2>&1 || true; \
 			udevadm trigger --subsystem-match=block >/dev/null 2>&1 || true; \
-		fi
-	if [ -f $(LIMITS_CONF) ]; then \
-		$(INSTALL) -d /etc/security/limits.d; \
-		$(INSTALL) -m 644 $(LIMITS_CONF) /etc/security/limits.d/pistorm-rt.conf; \
-	fi
-	if [ -f $(MODULES_LOAD) ]; then \
-		$(INSTALL) -d /etc/modules-load.d; \
-		$(INSTALL) -m 644 $(MODULES_LOAD) /etc/modules-load.d/pistorm.conf; \
-	fi
-	if [ -f $(MODPROBE_CONF) ]; then \
-		$(INSTALL) -d /etc/modprobe.d; \
-		$(INSTALL) -m 644 $(MODPROBE_CONF) /etc/modprobe.d/pistorm.conf; \
-	fi
-	@if [ "$(INSTALL_BOOT_FIRMWARE)" = "1" ]; then \
-		$(MAKE) BOOT_FIRMWARE_DIR="$(BOOT_FIRMWARE_DIR)" install-boot-firmware; \
+		fi; \
+		if [ -f $(LIMITS_CONF) ]; then \
+			$(INSTALL) -d /etc/security/limits.d; \
+			$(INSTALL) -m 644 $(LIMITS_CONF) /etc/security/limits.d/pistorm-rt.conf; \
+		fi; \
+		if [ -f $(MODULES_LOAD) ]; then \
+			$(INSTALL) -d /etc/modules-load.d; \
+			$(INSTALL) -m 644 $(MODULES_LOAD) /etc/modules-load.d/pistorm.conf; \
+		fi; \
+		if [ -f $(MODPROBE_CONF) ]; then \
+			$(INSTALL) -d /etc/modprobe.d; \
+			$(INSTALL) -m 644 $(MODPROBE_CONF) /etc/modprobe.d/pistorm.conf; \
+		fi; \
+		if [ "$(INSTALL_BOOT_FIRMWARE)" = "1" ]; then \
+			$(MAKE) BOOT_FIRMWARE_DIR="$(BOOT_FIRMWARE_DIR)" install-boot-firmware; \
+		else \
+			echo "Skipping /boot/firmware update (INSTALL_BOOT_FIRMWARE=0)."; \
+		fi; \
 	else \
-		echo "Skipping /boot/firmware update (INSTALL_BOOT_FIRMWARE=0)."; \
+		echo "Skipping system install paths (/etc, /boot/firmware): run with sudo or INSTALL_SYSTEM=1 to enable."; \
 	fi
 
 install-boot-firmware:
@@ -873,7 +961,8 @@ endif
 	$(MAKE) amiga-piscsi amiga-piscsi64  amiga-pirtg64
 	$(MAKE) kernel_module
 	sudo $(MAKE) kernel_install
-	sudo $(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD) INSTALL_BOOT_FIRMWARE=$(INSTALL_BOOT_FIRMWARE) BOOT_FIRMWARE_DIR="$(BOOT_FIRMWARE_DIR)" install
+	$(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD) install
+	sudo $(MAKE) INSTALL_SYSTEM=1 INSTALL_BOOT_FIRMWARE=$(INSTALL_BOOT_FIRMWARE) BOOT_FIRMWARE_DIR="$(BOOT_FIRMWARE_DIR)" install-system
 	# Copy system configuration files
 	#sudo cp -f 10-hugepages.conf /etc/sysctl.d/10-hugepages.conf
 	sudo cp -f etc/modules-load.d/pistorm.conf /etc/modules-load.d/pistorm.conf
@@ -899,4 +988,4 @@ help:
 
 -include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d tools/piscsi64_remote/piscsi64_remote_server.d tools/piscsi64_remote/piscsi64_remote_client.d $(UAE_OBJS:%.o=%.d)
 
-.PHONY: all clean buptest pistorm_truth_test install install-boot-firmware uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-net64 amiga-piscsi amiga-piscsi64 amiga-pirtg64 amiga-ahi amiga-all amiga-clean
+.PHONY: all clean buptest pistorm_truth_test install-build install install-system install-boot-firmware uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-net64 amiga-piscsi amiga-piscsi64 amiga-pirtg64 amiga-ahi amiga-all amiga-clean

@@ -564,6 +564,8 @@ void SwapScreenBuffer(void)
 {
     static int warned_no_flip_once = 0;
     static int warned_timeout_once = 0;
+    static int warned_perm_once = 0;
+    static int skip_setcrtc_fallback = 0;
     static int perf_cfg = -1;
     static unsigned long long perf_last_ns = 0;
     static unsigned long long perf_frames = 0;
@@ -605,7 +607,22 @@ void SwapScreenBuffer(void)
         // First frame: make CRTC point to our FB.
         result = drmModeSetCrtc(platform.fd, platform.crtc->crtc_id, fb->fb_id, 0, 0,
             &platform.connector->connector_id, 1, &platform.connector->modes[platform.modeIndex]);
-        if (result != 0) TRACELOG(LOG_ERROR, "DISPLAY: drmModeSetCrtc() failed with result: %d", result);
+        if (result != 0)
+        {
+            int drm_err = (result < 0) ? -result : result;
+            if ((drm_err == EACCES || drm_err == EPERM) && !warned_perm_once)
+            {
+                TRACELOG(LOG_WARNING,
+                         "DISPLAY: drmModeSetCrtc() permission denied (%d). No DRM master/session; keeping RTG alive without CRTC fallback.",
+                         result);
+                warned_perm_once = 1;
+                skip_setcrtc_fallback = 1;
+            }
+            else if (drm_err != EACCES && drm_err != EPERM)
+            {
+                TRACELOG(LOG_ERROR, "DISPLAY: drmModeSetCrtc() failed with result: %d", result);
+            }
+        }
     }
     else
     {
@@ -619,14 +636,28 @@ void SwapScreenBuffer(void)
 
         if (result != 0)
         {
+            int drm_err = (result < 0) ? -result : result;
+
+            if ((drm_err == EACCES || drm_err == EPERM) && !warned_perm_once)
+            {
+                TRACELOG(LOG_WARNING,
+                         "DISPLAY: drmModePageFlip() permission denied (%d). Disabling drmModeSetCrtc fallback retries.",
+                         result);
+                warned_perm_once = 1;
+                skip_setcrtc_fallback = 1;
+            }
+
             if (!warned_no_flip_once)
             {
                 TRACELOG(LOG_WARNING, "DISPLAY: drmModePageFlip() failed (%d), falling back to drmModeSetCrtc()", result);
                 warned_no_flip_once = 1;
             }
-            result = drmModeSetCrtc(platform.fd, platform.crtc->crtc_id, fb->fb_id, 0, 0,
-                &platform.connector->connector_id, 1, &platform.connector->modes[platform.modeIndex]);
-            if (result != 0) TRACELOG(LOG_ERROR, "DISPLAY: drmModeSetCrtc() fallback failed with result: %d", result);
+            if (!skip_setcrtc_fallback)
+            {
+                result = drmModeSetCrtc(platform.fd, platform.crtc->crtc_id, fb->fb_id, 0, 0,
+                    &platform.connector->connector_id, 1, &platform.connector->modes[platform.modeIndex]);
+                if (result != 0) TRACELOG(LOG_ERROR, "DISPLAY: drmModeSetCrtc() fallback failed with result: %d", result);
+            }
             waiting_for_flip = 0;
         }
 
@@ -2113,13 +2144,19 @@ static int FindNearestConnectorMode(const drmModeConnector *connector, uint widt
             continue;
         }
 
-        const int widthDiff = abs(mode->hdisplay - width);
-        const int heightDiff = abs(mode->vdisplay - height);
-        const int fpsDiff = abs(mode->vrefresh - fps);
+        const int widthDiff = (mode->hdisplay >= width) ? (int)(mode->hdisplay - width) : (int)(width - mode->hdisplay);
+        const int heightDiff = (mode->vdisplay >= height) ? (int)(mode->vdisplay - height) : (int)(height - mode->vdisplay);
+        const int fpsDiff = (mode->vrefresh >= fps) ? (int)(mode->vrefresh - fps) : (int)(fps - mode->vrefresh);
 
-        const int nearestWidthDiff = abs(platform.connector->modes[nearestIndex].hdisplay - width);
-        const int nearestHeightDiff = abs(platform.connector->modes[nearestIndex].vdisplay - height);
-        const int nearestFpsDiff = abs(platform.connector->modes[nearestIndex].vrefresh - fps);
+        const int nearestWidthDiff = (platform.connector->modes[nearestIndex].hdisplay >= width)
+            ? (int)(platform.connector->modes[nearestIndex].hdisplay - width)
+            : (int)(width - platform.connector->modes[nearestIndex].hdisplay);
+        const int nearestHeightDiff = (platform.connector->modes[nearestIndex].vdisplay >= height)
+            ? (int)(platform.connector->modes[nearestIndex].vdisplay - height)
+            : (int)(height - platform.connector->modes[nearestIndex].vdisplay);
+        const int nearestFpsDiff = (platform.connector->modes[nearestIndex].vrefresh >= fps)
+            ? (int)(platform.connector->modes[nearestIndex].vrefresh - fps)
+            : (int)(fps - platform.connector->modes[nearestIndex].vrefresh);
 
         if ((widthDiff < nearestWidthDiff) || (heightDiff < nearestHeightDiff) || (fpsDiff < nearestFpsDiff)) nearestIndex = i;
     }

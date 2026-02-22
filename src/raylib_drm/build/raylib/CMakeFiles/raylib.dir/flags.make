@@ -6,5 +6,5 @@ C_DEFINES = -DEGL_NO_X11 -DGRAPHICS_API_OPENGL_ES2 -DPLATFORM_DRM -D_DEFAULT_SOU
 
 C_INCLUDES = -I/usr/include/libdrm -I/home/smalley/pistorm64/src/raylib_drm/src
 
-C_FLAGS = -fno-strict-aliasing -Werror=implicit-function-declaration -Werror=pointer-arith  -O3 -DNDEBUG -std=gnu99 -fPIC
+C_FLAGS = -fno-strict-aliasing -Werror=implicit-function-declaration -Werror=pointer-arith  -mcpu=native -mtune=native -march=native -O3 -fno-plt -fomit-frame-pointer -pipe -fno-unroll-loops -std=gnu99
 

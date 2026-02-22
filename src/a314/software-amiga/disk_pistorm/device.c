@@ -46,7 +46,10 @@
 #endif
 
 static ULONG alloc_a314_buffer(ULONG length) {
-    APTR buf = AllocMem(length, MEMF_PUBLIC | MEMF_CLEAR);
+    APTR buf = AllocMem(length, MEMF_A314 | MEMF_PUBLIC | MEMF_CLEAR);
+    if(!buf) {
+        buf = AllocMem(length, MEMF_PUBLIC | MEMF_CLEAR);
+    }
     if(!buf) {
         return INVALID_A314_ADDRESS;
     }

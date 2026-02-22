@@ -45,7 +45,6 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/smalley/pistorm64/src/raylib_drm/build/raylib/cmake_install.cmake")
-  include("/home/smalley/pistorm64/src/raylib_drm/build/examples/cmake_install.cmake")
 
 endif()
 

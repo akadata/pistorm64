@@ -40,6 +40,7 @@
 // Silence stupid warning
 #undef _GNU_SOURCE
 #include "config_file/config_file.h"
+#include "gpio/ps_protocol.h"
 
 extern "C" void m68k_set_irq(unsigned int irq);
 
@@ -112,10 +113,6 @@ static int server_socket = -1;
 
 static int epfd = -1;
 static int irq_fds[2];
-
-extern "C" unsigned int ps_read_8(unsigned int address);
-extern "C" void ps_write_8(unsigned int address, unsigned int value);
-extern "C" void ps_write_16(unsigned int address, unsigned int value);
 
 unsigned int a314_base;
 int a314_base_configured;
@@ -525,6 +522,67 @@ static void handle_msg_deregister_req(ClientConnection *cc) {
 
 static std::vector<uint8_t> manual_read_buf;
 
+static inline void a314_bus_read_fallback(uint32_t address, uint8_t *dst, size_t length)
+{
+    size_t i = 0;
+
+    while (i < length) {
+        const uint32_t cur = address + (uint32_t)i;
+        const size_t rem = length - i;
+
+        if ((cur & 3u) == 0u && rem >= 4u) {
+            const uint32_t v = (uint32_t)ps_read_32(cur);
+            dst[i + 0] = (uint8_t)((v >> 24) & 0xFFu);
+            dst[i + 1] = (uint8_t)((v >> 16) & 0xFFu);
+            dst[i + 2] = (uint8_t)((v >> 8) & 0xFFu);
+            dst[i + 3] = (uint8_t)(v & 0xFFu);
+            i += 4u;
+            continue;
+        }
+
+        if ((cur & 1u) == 0u && rem >= 2u) {
+            const uint32_t v = (uint32_t)ps_read_16(cur);
+            dst[i + 0] = (uint8_t)((v >> 8) & 0xFFu);
+            dst[i + 1] = (uint8_t)(v & 0xFFu);
+            i += 2u;
+            continue;
+        }
+
+        dst[i++] = (uint8_t)ps_read_8(cur);
+    }
+}
+
+static inline void a314_bus_write_fallback(uint32_t address, const uint8_t *src, size_t length)
+{
+    size_t i = 0;
+
+    while (i < length) {
+        const uint32_t cur = address + (uint32_t)i;
+        const size_t rem = length - i;
+
+        if ((cur & 3u) == 0u && rem >= 4u) {
+            const uint32_t v = ((uint32_t)src[i + 0] << 24) |
+                               ((uint32_t)src[i + 1] << 16) |
+                               ((uint32_t)src[i + 2] << 8)  |
+                               ((uint32_t)src[i + 3]);
+            ps_write_32(cur, v);
+            i += 4u;
+            continue;
+        }
+
+        if ((cur & 1u) == 0u && rem >= 2u) {
+            const uint32_t v = ((uint32_t)src[i + 0] << 8) |
+                               ((uint32_t)src[i + 1]);
+            ps_write_16(cur, v);
+            i += 2u;
+            continue;
+        }
+
+        ps_write_8(cur, src[i]);
+        i++;
+    }
+}
+
 static void handle_msg_read_mem_req(ClientConnection *cc) {
     if (cc->payload.size() != 8) {
         logger_warn("Invalid READ_MEM payload size (%zu bytes)\n", cc->payload.size());
@@ -559,9 +617,7 @@ static void handle_msg_read_mem_req(ClientConnection *cc) {
         create_and_send_msg(cc, MSG_READ_MEM_RES, 0, map, length);
     } else {
         manual_read_buf.resize(length);
-        for (size_t i = 0; i < length; i++) {
-            manual_read_buf[i] = static_cast<unsigned char>(ps_read_8(address + static_cast<uint32_t>(i)));
-        }
+        a314_bus_read_fallback(address, manual_read_buf.data(), length);
         create_and_send_msg(cc, MSG_READ_MEM_RES, 0, manual_read_buf.data(), length);
     }
 }
@@ -597,10 +653,7 @@ static void handle_msg_write_mem_req(ClientConnection *cc) {
         uint8_t *map = &cfg->map_data[index][address - cfg->map_offset[index]];
         memcpy(map, &(cc->payload[4]), length);
     } else {
-        // No idea if this actually works.
-        for (size_t i = 0; i < length; i++) {
-            ps_write_8(address + static_cast<uint32_t>(i), cc->payload[4 + i]);
-        }
+        a314_bus_write_fallback(address, &(cc->payload[4]), length);
     }
 
     create_and_send_msg(cc, MSG_WRITE_MEM_RES, 0, nullptr, 0);

@@ -1093,6 +1093,11 @@ void handle_reset_amiga(struct emulator_config* cfg) {
     net64_handle_reset();
   }
 
+  /* Ensure RTG output is dropped on Amiga reset so stale last-frame scanout
+   * does not remain visible when the guest power-cycles/resets.
+   */
+  rtg_shutdown_display();
+
   if (move_slow_to_chip && !force_move_slow_to_chip) {
     ps_write_16(VPOSW, 0x00); // Poke poke... wake up Agnus!
     int agnus_rev = ((ps_read_16(VPOSR) >> 8) & 0x6F);
