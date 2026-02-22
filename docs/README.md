@@ -1,19 +1,61 @@
-# PiStorm64 Documentation Index
+# PiStorm64
 
-This page is the top-level documentation entry for this repository.
+PiStorm64 is an Amiga-focused PiStorm fork with ongoing platform, storage, and tooling work.
 
-## Project Status Snapshot
+## Current Highlights
 
-- PiSCSI64 is live and is now the active storage path.
-- Remote PiSCSI64 mount and boot over 1Gb Ethernet is validated.
-- PiSCSI64 remote endpoints are validated on native IPv4 and native IPv6.
-- PiSCSI64 CD-ROM mounts from ISO are validated (`cdrom:` + `pi-scsi64.device` + `CDFileSystem`).
-- Dhrystone performance has passed the 64,000 mark on the validated Pi4 path.
-- RTG is usable, but there is a known window-decoration issue still being worked.
-- UAE JIT is still bring-up only and does not currently provide a reliable boot path.
-- Windows and macOS remote client builds exist, but full runtime validation is still pending.
+- PiSCSI64 remote disk mount and boot is validated.
+- PiSCSI64 ISO-backed CD-ROM mounts are validated.
+- Dhrystone has passed 64,000 on the validated Pi4 baseline.
+- RTG is functional with a known window-decoration issue under active investigation.
+- UAE JIT is still work in progress and is not considered a reliable runtime path yet.
 
-## Clock Guidance (Important)
+## Read This First
+
+- Main docs index: `docs/README.md`
+- Wiki home: `docs/wiki/Home.md`
+- PiSCSI64 guide and how-to: `docs/wiki/piscsi64.md`
+- Build/install: `docs/wiki/Build-and-Install.md`
+- Quickstart: `docs/wiki/Quickstart.md`
+- Known issues: `docs/wiki/Known-Issues.md`
+
+## PiSCSI64 Notes
+
+For storage setup, remote mounts, CD-ROM workflow, and operational examples, use:
+
+- `docs/wiki/piscsi64.md`
+
+Windows and macOS client builds exist for the remote tooling, but full validation is still pending.
+
+## DiagROM Credit
+
+**DiagROM is made by John "Chucky" Hertell.**
+
+**We do not take credit for DiagROM.**
+
+Official DiagROM site:
+
+- https://www.diagrom.com
+
+Repository attribution file:
+
+- `DiagROMV2/README.md`
+
+## Third-Party Development Materials
+
+- `amiga.dev/` contains development header/assets integration notes (including
+  Picasso96 develop materials). See `amiga.dev/README.md`.
+- AmigaOS NDK is **not** shipped in this repository; obtain it from official
+  distribution channels and install it locally in your toolchain path.
+
+These are third-party development resources; rights remain with their original
+authors/owners.
+
+## ROM/Workbench Media Policy
+
+This repository does **not** ship Amiga ROM images or Amiga Workbench system images.
+
+## Kernel Module Clock Defaults
 
 Use:
 
@@ -21,64 +63,4 @@ Use:
 sudo modprobe pistorm gpclk_src=5 gpclk_div=6
 ```
 
-Do not switch `gpclk_src` away from `5` unless you are actively debugging hardware timing.
-If a specific board needs a slower clock for stability testing, adjust `gpclk_div` carefully and document it.
-
-## Where To Start
-
-- Wiki home: `docs/wiki/Home.md`
-- Quickstart: `docs/wiki/Quickstart.md`
-- Build and install: `docs/wiki/Build-and-Install.md`
-- Configuration: `docs/wiki/Configuration.md`
-- PiSCSI64 guide: `docs/wiki/piscsi64.md`
-- Known issues: `docs/wiki/Known-Issues.md`
-
-## Complete Wiki Index
-
-- `docs/wiki/A314.md`
-- `docs/wiki/ADF-Read-Write.md`
-- `docs/wiki/Amiga-Primer.md`
-- `docs/wiki/Amiga.md`
-- `docs/wiki/Atari.md`
-- `docs/wiki/Audio-AHI.md`
-- `docs/wiki/Build-and-Install.md`
-- `docs/wiki/CPLD.md`
-- `docs/wiki/Changes-and-Comparison.md`
-- `docs/wiki/Compatibility.md`
-- `docs/wiki/Configuration.md`
-- `docs/wiki/Dev-Environment.md`
-- `docs/wiki/FC-Lines.md`
-- `docs/wiki/Home.md`
-- `docs/wiki/Introduction.md`
-- `docs/wiki/Janus-Bus-Engine.md`
-- `docs/wiki/Known-Issues.md`
-- `docs/wiki/Networking.md`
-- `docs/wiki/Pi0-Mounts.md`
-- `docs/wiki/Pi4-64bit-native-pistorm64-benchmarks.md`
-- `docs/wiki/PiSCSI.md`
-- `docs/wiki/Platform-Amiga.md`
-- `docs/wiki/Quickstart.md`
-- `docs/wiki/RNG-SSL-AES-Zorro-Design.md`
-- `docs/wiki/RTG.md`
-- `docs/wiki/RemoteWB.md`
-- `docs/wiki/Tools.md`
-- `docs/wiki/Troubleshooting.md`
-- `docs/wiki/UAE-JIT-Status.md`
-- `docs/wiki/Zorro-Devices.md`
-- `docs/wiki/piscsi64.md`
-- `docs/wiki/z3bus_roadmap.md`
-- `docs/wiki/z3bus_tasks.md`
-
-## Current Focus
-
-- Finish documentation alignment, then merge.
-- Continue RTG stabilization work (window decorations and related polish).
-- Continue UAE JIT bring-up behind explicit experimental flags.
-
-## Third-Party Materials and Media Policy
-
-- `amiga.dev/` is third-party development/support material; see:
-  - `amiga.dev/README.md`
-- AmigaOS NDK is not bundled in this repository. Install it from official
-  channels in your local toolchain environment (for example under `/opt/amiga`).
-- This repository does **not** ship Amiga ROM images or Amiga Workbench images.
+Changing `gpclk_src` from `5` is not recommended for normal users.
