@@ -33,6 +33,13 @@ void (*oldCopyMemQuick)(unsigned char* asm("a0"), unsigned char* asm("a1"), unsi
 APTR oldCopyMemPtr;
 APTR oldCopyMemQuickPtr;
 
+/* Exec SetFunction uses a legacy ULONG(*)() callback type. Keep the cast
+ * isolated here to avoid warning spam in callers.
+ */
+static APTR SetExecFunction(struct Library* lib, LONG offset, APTR fn) {
+  return (APTR)SetFunction(lib, offset, (ULONG(*)())fn);
+}
+
 struct Screen* (*oldOpenScreenTagList)(struct NewScreen* n asm("a0"), struct TagItem* asm("a1"));
 struct Screen* (*oldOpenScreen)(struct NewScreen* asm("a0"));
 
@@ -98,9 +105,8 @@ int main(int argc, char* argv[]) {
     pistorm_base_addr = pistorm_addr;
   }
 
-  oldCopyMemPtr = (APTR)SetFunction((struct Library*)SysBase, -0x270, pi_CopyMem);
-
-  oldCopyMemQuickPtr = (APTR)SetFunction((struct Library*)SysBase, -0x276, pi_CopyMemQuick);
+  oldCopyMemPtr = SetExecFunction((struct Library*)SysBase, -0x270, (APTR)pi_CopyMem);
+  oldCopyMemQuickPtr = SetExecFunction((struct Library*)SysBase, -0x276, (APTR)pi_CopyMemQuick);
   // oldCopyMemQuickPtr = (APTR)SetFunction((struct Library *)SysBase, -0x276, pi_CopyMem);
 
   do {

@@ -61,7 +61,12 @@ Note:
 
 ```bash
 cd /opt/amiga/src/m68k-amigaos-gcc
-make min vbcc vlink -j4 CC='gcc -D_DEFAULT_SOURCE -std=c9x'
+# IMPORTANT: clear host compiler overrides before cross targets
+unset CC CXX CPPFLAGS CFLAGS CXXFLAGS LDFLAGS
+make min vlink -j4
+
+# build vbcc separately with host-compiler workaround
+make vbcc CC='gcc -D_DEFAULT_SOURCE -std=c9x' -j4
 ```
 
 This builds:
@@ -113,7 +118,8 @@ Practical guidance for this project:
 
 - Do not run plain `make` from `build-*/binutils` (it triggers `all`, including GDB).
 - Build from the top-level using the recommended target set:
-  - `make min vbcc vlink -j4 CC='gcc -D_DEFAULT_SOURCE -std=c9x'`
+  - `unset CC ... && make min vlink -j4`
+  - `make vbcc CC='gcc -D_DEFAULT_SOURCE -std=c9x' -j4`
 - Only pursue GDB if you explicitly need it; otherwise skip it.
 
 ## Add toolchain to PATH
@@ -131,13 +137,13 @@ which vc
 which vlink
 
 m68k-amigaos-gcc --version
-vc.config
+vc
 ```
 
 Expected:
 
 - `m68k-amigaos-gcc`, `vc`, `vlink` all resolve from `/opt/amiga/bin`.
-- `vc.config` exists and prints config/help text.
+- Running `vc` should not fail with missing backend tools.
 
 ## Repo-specific checks
 
@@ -165,6 +171,8 @@ Note:
   - `vc` is not installed; run `make vbcc`.
 - `vc.config` exists but `vc` does not
   - previous toolchain build was partial; rebuild VBCC (`make vbcc CC='gcc -D_DEFAULT_SOURCE -std=c9x'`).
+- libnix fails with unknown `-m68020` / `-fbaserel`
+  - host `gcc` leaked into `CC`; run `unset CC CXX CPPFLAGS CFLAGS CXXFLAGS LDFLAGS` and rebuild `make libnix` or `make min`.
 - permissions problems under `/opt/amiga`
   - avoid mixed root/user ownership; fix with `sudo chown -R smalley:smalley /opt/amiga`.
 - headers/libs not found in Amiga builds

@@ -762,7 +762,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
   case PI_CMD_PALETTEDEBUG:
     rtg_palette_debug((uint8_t)val);
     break;
-  case PI_CMD_RTG_STATUS:
+  case PI_CMD_RTGSTATUS:
     DEBUG("[PISTORM-DEV] Write to RTG_STATUS: %d\n", val);
     if(val == 1 && !rtg_enabled) {
       init_rtg_data(cfg);
@@ -784,7 +784,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     break;
   case PI_CMD_RTG_SCALING:
     DEBUG("[PISTORM-DEV] Write to RTG_SCALING: %d\n", val);
-    if(val == RTG_SCALE_CUSTOM || val == RTG_SCALE_CUSTOM_RECT) {
+    if(val == PIGFX_SCALE_CUSTOM || val == PIGFX_SCALE_CUSTOM_RECT) {
       rtg_set_scale_rect((uint16_t)val, (int16_t)pi_word[0], (int16_t)pi_word[1], (int16_t)pi_word[2],
                          (int16_t)pi_word[3]);
     } else {
@@ -1088,7 +1088,7 @@ uint32_t handle_pistorm_dev_read(uint32_t addr_, uint8_t type) {
     DEBUG("[PISTORM-DEV] %s Read from SWREV\n", op_type_names[type]);
     return PIDEV_SWREV;
     break;
-  case PI_CMD_RTG_STATUS:
+  case PI_CMD_RTGSTATUS:
     DEBUG("[PISTORM-DEV] %s Read from RTG_STATUS\n", op_type_names[type]);
     return ((uint32_t)rtg_on << 1) | (uint32_t)rtg_enabled;
     break;

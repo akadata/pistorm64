@@ -20,7 +20,6 @@
 
 //#include <proto/ahi.h>
 #include <proto/ahi_sub.h>
-#include <clib/ahi_sub_protos.h>
 #include <clib/debug_protos.h>
 
 #include <math.h>
@@ -41,7 +40,7 @@
 #define DEVICE_PRIORITY 0
 
 struct ExecBase* SysBase;
-struct UtilityBase* UtilityBase;
+struct Library* UtilityBase;
 struct Library* AHIsubBase = NULL;
 struct DosLibrary* DOSBase = NULL;
 struct GfxBase* GraphicsBase = NULL;
@@ -108,7 +107,7 @@ static uint32_t __attribute__((used)) init(BPTR seg_list asm("a0"), struct Libra
   if (!(DOSBase = (struct DosLibrary*)OpenLibrary((STRPTR) "dos.library", 0)))
     return 0;
 
-  if (!(UtilityBase = (struct UtilityBase*)OpenLibrary((STRPTR) "utility.library", 0)))
+  if (!(UtilityBase = OpenLibrary((STRPTR) "utility.library", 0)))
     return 0;
 
   if (!pi_ahi_base) {
@@ -211,7 +210,6 @@ static uint32_t __attribute__((used)) PlayFunc(struct pi_ahi* ahi_data asm("a1")
 }
 
 static void __attribute__((used)) MixFunc() {
-  struct pi_ahi* ahi_data = pi_ahi_base;
   debugmsg(22);
 }
 
@@ -313,7 +311,7 @@ intAHIsub_AllocAudio(struct TagItem* tagList asm("a1"),
     DOSBase = (struct DosLibrary*)OpenLibrary((STRPTR) "dos.library", 37);
   }
   if (!UtilityBase) {
-    UtilityBase = (struct UtilityBase*)OpenLibrary((STRPTR) "utility.library", 37);
+    UtilityBase = OpenLibrary((STRPTR) "utility.library", 37);
   }
 
   debuglong(AHI_U321, sizeof(struct pi_ahi));

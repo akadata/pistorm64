@@ -13,9 +13,22 @@ PISTORM_SRCS  := gui_interact.c pistorm_dev.c
 REQTOOLS_INC ?= -Ireqtools
 REQTOOLS_LIB ?= reqtoolsnb.lib
 BUILD_PISTORM_GUI ?= 0
-VC_GUI_FLAGS ?= +kick13 -c99 -DNDEBUG -lamiga -lauto $(REQTOOLS_INC)
+KICK13_PROTO_HDR := $(AMIGA_TOOLCHAIN)/m68k-kick13/ndk-include/proto/intuition.h
+NDK13_PROTO_HDR  := $(AMIGA_TOOLCHAIN)/m68k-amigaos/ndk13-include/proto/intuition.h
 
-.PHONY: all clean
+# Some toolchain installs ship kick13.config but do not populate
+# /opt/amiga/m68k-kick13/ndk-include. In that case, add fallback includes.
+ifeq ($(wildcard $(KICK13_PROTO_HDR)),)
+ifneq ($(wildcard $(NDK13_PROTO_HDR)),)
+VC_KICK13_FALLBACK_INC ?= -I$(AMIGA_TOOLCHAIN)/m68k-amigaos/ndk-include -I$(AMIGA_TOOLCHAIN)/m68k-amigaos/ndk13-include
+endif
+endif
+
+VC_GUI_FLAGS ?= +kick13 -c99 -DNDEBUG -lamiga -lauto $(REQTOOLS_INC) $(VC_KICK13_FALLBACK_INC)
+INSTALL ?= install
+INSTALL_DIR ?= /opt/pistorm64/data/a314-shared
+
+.PHONY: all clean install
 
 all: PiSimple CopyMems
 ifeq ($(BUILD_PISTORM_GUI),1)
@@ -53,3 +66,14 @@ endif
 
 clean:
 	rm -f PiSimple PiStorm CopyMems *.o
+
+install: all
+	$(INSTALL) -d $(INSTALL_DIR)
+	$(INSTALL) -m 755 PiSimple $(INSTALL_DIR)/
+	$(INSTALL) -m 755 CopyMems $(INSTALL_DIR)/
+	@if [ -f PiStorm ]; then $(INSTALL) -m 755 PiStorm $(INSTALL_DIR)/; fi
+	@if [ -f PiStorm.info ]; then $(INSTALL) -m 644 PiStorm.info $(INSTALL_DIR)/; fi
+	@if [ -d libs13 ]; then cp -a libs13 $(INSTALL_DIR)/; fi
+	@if [ -d libs20 ]; then cp -a libs20 $(INSTALL_DIR)/; fi
+	@if [ -f libs13.info ]; then $(INSTALL) -m 644 libs13.info $(INSTALL_DIR)/; fi
+	@if [ -f libs20.info ]; then $(INSTALL) -m 644 libs20.info $(INSTALL_DIR)/; fi

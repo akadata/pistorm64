@@ -43,6 +43,7 @@ void print_usage(char* exe);
 int get_command(char* cmd);
 unsigned short get_scale_mode(char* mode);
 unsigned short get_scale_filter(char* mode);
+int parse_feature_state(const char* value);
 
 extern unsigned int pistorm_base_addr;
 
@@ -77,6 +78,60 @@ int __stdargs main(int argc, char* argv[]) {
   };
 
   switch (command) {
+  case PI_CMD_RTGSTATUS: {
+    int target = -1;
+    if (argc >= 3) {
+      target = parse_feature_state(argv[2]);
+      if (target < 0) {
+        printf("Invalid PiRTG64 state '%s' (use on/off/toggle/1/0).\n", argv[2]);
+        break;
+      }
+      if (target == 2) {
+        target = (pi_get_rtg_status() & 0x01) ? 0 : 1;
+      }
+    } else {
+      target = (pi_get_rtg_status() & 0x01) ? 0 : 1;
+    }
+    pi_enable_rtg((unsigned short)target);
+    printf("PiRTG64 %s\n", (pi_get_rtg_status() & 0x01) ? "enabled" : "disabled");
+    break;
+  }
+  case PI_CMD_NETSTATUS: {
+    int target = -1;
+    if (argc >= 3) {
+      target = parse_feature_state(argv[2]);
+      if (target < 0) {
+        printf("Invalid NET64 state '%s' (use on/off/toggle/1/0).\n", argv[2]);
+        break;
+      }
+      if (target == 2) {
+        target = pi_get_net_status() ? 0 : 1;
+      }
+    } else {
+      target = pi_get_net_status() ? 0 : 1;
+    }
+    pi_enable_net((unsigned short)target);
+    printf("NET64 %s\n", pi_get_net_status() ? "enabled" : "disabled");
+    break;
+  }
+  case PI_CMD_PISCSI_CTRL: {
+    int target = -1;
+    if (argc >= 3) {
+      target = parse_feature_state(argv[2]);
+      if (target < 0) {
+        printf("Invalid PiSCSI64 state '%s' (use on/off/toggle/1/0).\n", argv[2]);
+        break;
+      }
+      if (target == 2) {
+        target = pi_get_piscsi_status() ? 0 : 1;
+      }
+    } else {
+      target = pi_get_piscsi_status() ? 0 : 1;
+    }
+    pi_enable_piscsi((unsigned short)(target ? PISCSI_CTRL_ENABLE : PISCSI_CTRL_DISABLE));
+    printf("PiSCSI64 %s\n", pi_get_piscsi_status() ? "enabled" : "disabled");
+    break;
+  }
   case PI_CMD_RESET:
     if (argc >= 3)
       tmpshort = (unsigned short)atoi(argv[2]);
@@ -91,10 +146,10 @@ int __stdargs main(int argc, char* argv[]) {
     printf("PiStorm ----------------------------\n");
     printf("Hardware revision: %d.%d\n", (pi_get_hw_rev() >> 8), (pi_get_hw_rev() & 0xFF));
     printf("Software revision: %d.%d\n", (pi_get_sw_rev() >> 8), (pi_get_sw_rev() & 0xFF));
-    printf("RTG: %s - %s\n", (pi_get_rtg_status() & 0x01) ? "Enabled" : "Disabled",
+    printf("PiRTG64: %s - %s\n", (pi_get_rtg_status() & 0x01) ? "Enabled" : "Disabled",
            (pi_get_rtg_status() & 0x02) ? "In use" : "Not in use");
-    printf("NET: %s\n", pi_get_net_status() ? "Enabled" : "Disabled");
-    printf("PiSCSI: %s\n", pi_get_piscsi_status() ? "Enabled" : "Disabled");
+    printf("NET64: %s\n", pi_get_net_status() ? "Enabled" : "Disabled");
+    printf("PiSCSI64: %s\n", pi_get_piscsi_status() ? "Enabled" : "Disabled");
     break;
   case PI_CMD_SWITCHCONFIG:
     if (cmd_arg == PICFG_LOAD) {
@@ -216,6 +271,21 @@ int get_command(char* cmd) {
   if (strcmp(cmd, "--check") == 0 || strcmp(cmd, "--find") == 0 || strcmp(cmd, "--info") == 0) {
     return PI_CMD_SWREV;
   }
+  if (strcmp(cmd, "--rtg") == 0 || strcmp(cmd, "--pirtg") == 0 || strcmp(cmd, "--pirtg64") == 0 ||
+      strcmp(cmd, "--rtg-enable") == 0 || strcmp(cmd, "--rtg-disable") == 0 ||
+      strcmp(cmd, "--pirtg64-enable") == 0 || strcmp(cmd, "--pirtg64-disable") == 0) {
+    return PI_CMD_RTGSTATUS;
+  }
+  if (strcmp(cmd, "--net") == 0 || strcmp(cmd, "--net64") == 0 ||
+      strcmp(cmd, "--net-enable") == 0 || strcmp(cmd, "--net-disable") == 0 ||
+      strcmp(cmd, "--net64-enable") == 0 || strcmp(cmd, "--net64-disable") == 0) {
+    return PI_CMD_NETSTATUS;
+  }
+  if (strcmp(cmd, "--piscsi") == 0 || strcmp(cmd, "--piscsi64") == 0 ||
+      strcmp(cmd, "--piscsi-enable") == 0 || strcmp(cmd, "--piscsi-disable") == 0 ||
+      strcmp(cmd, "--piscsi64-enable") == 0 || strcmp(cmd, "--piscsi64-disable") == 0) {
+    return PI_CMD_PISCSI_CTRL;
+  }
   if (strcmp(cmd, "--config") == 0 || strcmp(cmd, "--config-file") == 0 ||
       strcmp(cmd, "--cfg") == 0) {
     cmd_arg = PICFG_LOAD;
@@ -304,6 +374,30 @@ void print_usage(char* exe) {
   printf("         Restarts the Amiga.\n");
   printf("         %s --check, --find or --info\n", exe);
   printf("         Finds the PiStorm device and prints some data.\n");
+  printf("         %s --pirtg64 [on|off|toggle]\n", exe);
+  printf("         Enable/disable/toggle PiRTG64.\n");
+  printf("         %s --net64 [on|off|toggle]\n", exe);
+  printf("         Enable/disable/toggle NET64.\n");
+  printf("         %s --piscsi64 [on|off|toggle]\n", exe);
+  printf("         Enable/disable/toggle PiSCSI64.\n");
 
   return;
+}
+
+int parse_feature_state(const char* value) {
+  if (value == NULL) {
+    return -1;
+  }
+  if (strcmp(value, "on") == 0 || strcmp(value, "enable") == 0 || strcmp(value, "enabled") == 0 ||
+      strcmp(value, "1") == 0) {
+    return 1;
+  }
+  if (strcmp(value, "off") == 0 || strcmp(value, "disable") == 0 ||
+      strcmp(value, "disabled") == 0 || strcmp(value, "0") == 0) {
+    return 0;
+  }
+  if (strcmp(value, "toggle") == 0) {
+    return 2;
+  }
+  return -1;
 }

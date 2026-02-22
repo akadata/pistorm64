@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: MIT
 
+#ifdef __VBCC__
+#pragma dontwarn 53
+#endif
+
 #include <proto/intuition.h>
 #include <proto/dos.h>
 #include <intuition/intuition.h>
@@ -393,7 +397,7 @@ struct Gadget ConfigFile = {&ConfigCommit,
 
 #define RTGSTATUS_TXT_SIZE 64
 
-UBYTE RTGStatus_buf[RTGSTATUS_TXT_SIZE] = "RTG status";
+UBYTE RTGStatus_buf[RTGSTATUS_TXT_SIZE] = "PiRTG64 status";
 
 struct IntuiText RTGStatus_text = {1, 0, JAM2, 1, 1, &font, (UBYTE*)RTGStatus_buf, NULL};
 
@@ -417,7 +421,7 @@ struct Gadget RTGStatus = {&ConfigFile,
 
 #define RTGENABLE_TXT_SIZE 64
 
-UBYTE RTG_buf[64] = "RTG Enable";
+UBYTE RTG_buf[64] = "PiRTG64 Enable";
 
 struct IntuiText RTG_text = {1, 0, JAM2, 8, 2, &font, (UBYTE*)RTG_buf, NULL};
 
@@ -515,15 +519,15 @@ static void WriteGadgetText(const char* text, UBYTE* buffer, struct Window* wind
 static void updateRTG(struct Window* window) {
   unsigned short rtg = pi_get_rtg_status();
   if (rtg & 0x01) {
-    WriteGadgetText("Disable RTG", RTG_buf, window, &RTGButton, RTGENABLE_TXT_SIZE);
+    WriteGadgetText("Disable PiRTG64", RTG_buf, window, &RTGButton, RTGENABLE_TXT_SIZE);
     if (rtg & 0x02) {
-      WriteGadgetText("RTG in use", RTGStatus_buf, window, &RTGStatus, RTGSTATUS_TXT_SIZE);
+      WriteGadgetText("PiRTG64 in use", RTGStatus_buf, window, &RTGStatus, RTGSTATUS_TXT_SIZE);
     } else {
-      WriteGadgetText("RTG not in use", RTGStatus_buf, window, &RTGStatus, RTGSTATUS_TXT_SIZE);
+      WriteGadgetText("PiRTG64 not in use", RTGStatus_buf, window, &RTGStatus, RTGSTATUS_TXT_SIZE);
     }
   } else {
-    WriteGadgetText("Enable RTG", RTG_buf, window, &RTGButton, RTGENABLE_TXT_SIZE);
-    WriteGadgetText("RTG disabled", RTGStatus_buf, window, &RTGStatus, RTGSTATUS_TXT_SIZE);
+    WriteGadgetText("Enable PiRTG64", RTG_buf, window, &RTGButton, RTGENABLE_TXT_SIZE);
+    WriteGadgetText("PiRTG64 disabled", RTGStatus_buf, window, &RTGStatus, RTGSTATUS_TXT_SIZE);
   }
   unsigned short filter = pi_get_rtg_scale_mode();
   switch (filter) {

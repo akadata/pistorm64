@@ -2,6 +2,10 @@
 
 #include "../pistorm-dev-enums.h"
 
+#ifdef __VBCC__
+#pragma dontwarn 53
+#endif
+
 #include <exec/types.h>
 #include <exec/resident.h>
 #include <exec/errors.h>
