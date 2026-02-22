@@ -1,0 +1,1000 @@
+ 1029  ./emulator --config min.cfg 
+ 1030  vim min.cfg 
+ 1031  ./emulator --config min.cfg 
+ 1032  vim min.cfg 
+ 1033  ./emulator --config min.cfg 
+ 1034  vim min.cfg 
+ 1035  ./emulator --config min.cfg 
+ 1036  vim min.cfg 
+ 1037  ./emulator --config min.cfg 
+ 1038  cp ../min.cfg  .
+ 1039  ./emulator --config min.cfg 
+ 1040  git branch
+ 1041  make clean;make -j4 full
+ 1042  hit branch
+ 1043  git branch
+ 1044  git merge hotfix/uncontrolled-data
+ 1045  make clean;make -j4 full
+ 1046  ls lah emulator 
+ 1047  ls -lah emulator 
+ 1048  ./emulator  --jit --config min.cfg 
+ 1049  vim min.cfg 
+ 1050  ./emulator --jit --config min.cfg 
+ 1051  make USE_UAE_JIT=1 full
+ 1052  ls -lah emulator 
+ 1053  ./emulator --jit --config min.cfg 
+ 1054  make USE_UAE_JIT=0 full
+ 1055  ./emulator  --config min.cfg 
+ 1056  make USE_UAE_JIT=0 full; ./emulator  --config min.cfg
+ 1057  make -j3 USE_UAE_JIT=0 full; ./emulator  --config min.cfg
+ 1058  make -j4 full; ./emulator  --config min.cfg
+ 1059  make -j4 emulator
+ 1060  make -j4 emulator; ./emulator  --config min.cfg
+ 1061  make -j4 emulator; timeout 5 ./emulator  --config min.cfg
+ 1062  make -j4 emulator; timeout 10 ./emulator  --config min.cfg
+ 1063  make -j4 emulator; timeout 5 ./emulator  --config min.cfgexit
+ 1064  exit
+ 1065  cd pistorm64
+ 1066  killall -9 emulator 
+ 1067  ./codex.resume 
+ 1068  ls
+ 1069  codex
+ 1070  git checkout hotfix/p96offset-bpissue
+ 1071  git add --all
+ 1072  git commit -m'last //{ in src/musashi/m68kfpu.c'
+ 1073  git push
+ 1074  git branch
+ 1075  git checkout [200~hotfix/p96offset-bpissue~
+ 1076  git checkout hotfix/p96offset-bpissue
+ 1077  ./codex.resume 
+ 1078  ls
+ 1079  cat codex.resume 
+ 1080  git checkout -b feaure/performance
+ 1081  git checkout feaure/performance
+ 1082  git pull
+ 1083  codex
+ 1084  codex --help
+ 1085  codex --dangerously-bypass-approvals-and-sandbox
+ 1086  codex --dangerously-bypass-approvals-and-sandbox resume 019c7b44-90c5-7430-bc7b-90eda7167cfc
+ 1087  qwen
+ 1088  cd src/platforms/amiga/rtg
+ 1089  rg dptr
+ 1090  rg x
+ 1091  rg x,
+ 1092  rg "x,"
+ 1093  rg \ x,
+ 1094  rg \ w,
+ 1095  rg \ h,
+ 1096  rg \ h=
+ 1097  ls
+ 1098  mkdir Amiga
+ 1099  mv rtg_driver_amiga/ PiGFX\ Install* Amiga/
+ 1100  ls
+ 1101  mkdir shaders
+ 1102  mv *.shader shaders/
+ 1103  ls
+ 1104  rg shader
+ 1105  rg PATH_MAX
+ 1106  ls
+ 1107  rg "safe_get_board_info" src/platforms/amiga/rtg
+ 1108  rg "safe_get_render_info" src/platforms/amiga/rtg
+ 1109  rg "safe_get_line"        src/platforms/amiga/rtg
+ 1110  rg "safe_get_bitmap"      src/platforms/amiga/rtg
+ 1111  rg "safe_get_template"    src/platforms/amiga/rtg
+ 1112  rg "safe_get_pattern"     src/platforms/amiga/rtg
+ 1113  rg "RGBF_D7"              src/platforms/amiga/rtg
+ 1114  rg "CMD_PITCH"            src/platforms/amiga/rtg
+ 1115  rg "cmd_mask"             src/platforms/amiga/rtg
+ 1116  rg "handle_irtg_command"  src
+ 1117  cd ~/pistorm64
+ 1118  rg "safe_get_board_info" src/platforms/amiga/rtg
+ 1119  rg "safe_get_render_info" src/platforms/amiga/rtg
+ 1120  rg "safe_get_line"        src/platforms/amiga/rtg
+ 1121  rg "safe_get_bitmap"      src/platforms/amiga/rtg
+ 1122  rg "safe_get_template"    src/platforms/amiga/rtg
+ 1123  rg "safe_get_pattern"     src/platforms/amiga/rtg
+ 1124  rg "RGBF_D7"              src/platforms/amiga/rtg
+ 1125  rg "CMD_PITCH"            src/platforms/amiga/rtg
+ 1126  rg "cmd_mask"             src/platforms/amiga/rtg
+ 1127  rg "handle_irtg_command"  src
+ 1128  cd src/platforms/amiga/rtg
+ 1129  cp rtg.c  rtg.c.orig
+ 1130  cp rtg.h  rtg.h.orig
+ 1131  rg "sleep" src/platforms/amiga/rtg
+ 1132  rg "usleep" src/platforms/amiga/rtg
+ 1133  rg "nanosleep" src/platforms/amiga/rtg
+ 1134  rg "sleep"
+ 1135  rg "usleep" 
+ 1136  rg "nanosleep"
+ 1137  rg "sleep"
+ 1138  rg "wait"
+ 1139  rg 100000000
+ 1140  rg 25000 ~/VideoCore.card/
+ 1141  rg "CLOCK_HZ" Amiga/rtg_driver_amiga/pigfx-2.c
+ 1142  ls
+ 1143  cd Amiga/
+ 1144  ls
+ 1145  cd rtg_driver_amiga/
+ 1146  ls
+ 1147  make
+ 1148  make clean
+ 1149  make install
+ 1150  ls
+ 1151  make clean
+ 1152  la
+ 1153  em PiGFX*.card
+ 1154  ls
+ 1155  rm PiGFX*.card
+ 1156  ls
+ 1157  make clean
+ 1158  make
+ 1159  ls
+ 1160  make install
+ 1161  rg wait_rtg_frame
+ 1162  cd ../..
+ 1163  rg wait_rtg_frame
+ 1164  rg SetWindowState
+ 1165  cd
+ 1166  cd pistorm64
+ 1167  codex
+ 1168  codex --help
+ 1169  codex --dangerously-bypass-approvals-and-sandbox resume 019c8074-165d-73f1-b14c-79f0d836d491
+ 1170  vim RTG_PLAN.md
+ 1171  codex --dangerously-bypass-approvals-and-sandbox resume 019c8074-165d-73f1-b14c-79f0d836d491
+ 1172  rm  /opt/pistorm64/data/a314-shared/*.avi
+ 1173  ls -lah /opt/pistorm64/data/a314-shared/
+ 1174  cp  /opt/pistorm64/data/a314-shared/ts.avi ~/
+ 1175  cd
+ 1176  history | grep fal
+ 1177  history | grep fa
+ 1178  fallocate -l 500M vfat.disk
+ 1179  ls -la
+ 1180  fdisk vfat.disk 
+ 1181  mkfs.vfat vfat.disk 
+ 1182  mkdir vfat
+ 1183  mount -o vfat.disk vfat
+ 1184  sudo mount -o vfat.disk vfat
+ 1185  sudo mount -o loop vfat.disk vfat
+ 1186  cp ts.avi vfat/
+ 1187  sudo cp ts.avi vfat/
+ 1188  umount vfat 
+ 1189  ls
+ 1190  sudo umount vfat 
+ 1191  ls
+ 1192  cd pistorm64
+ 1193  vim default.cfg
+ 1194  ./emulator 
+ 1195  vim default.cfg
+ 1196  ./emulator 
+ 1197  vim default.cfg
+ 1198  cat codex.resume 
+ 1199  history
+ 1200  codex --dangerously-bypass-approvals-and-sandbox resume 019c8074-165d-73f1-b14c-79f0d836d491
+ 1201  vim /opt/pistorm64/data/a314-shared/mountlist
+ 1202  cat /opt/pistorm64/data/a314-shared/mountlist
+ 1203  uptime
+ 1204  iostat 
+ 1205  top
+ 1206  killall -9 emulator
+ 1207  ls /opt/pistorm64/pirtg64/
+ 1208  ls /opt/pistorm64/
+ 1209  ls /opt/pistorm64/src/
+ 1210  ls /opt/pistorm64/src/platforms/
+ 1211  ls /opt/pistorm64/src/platforms/amiga/
+ 1212  ls /opt/pistorm64/src/platforms/amiga/piscsi
+ 1213  killall -9 emulator
+ 1214  ls /opt/pistorm64/data/a314-shared/
+ 1215  killall -9 emulator
+ 1216  cat ./codex.resume 
+ 1217  ./codex.resume 
+ 1218  cat codex.resume 
+ 1219  codex --dangerously-bypass-approvals-and-sandbox resume
+ 1220  git add --all
+ 1221  git commit -m'PiRTG64'
+ 1222  git push
+ 1223  git checkout main
+ 1224  git merge features/rtg_rock_8_16_24_32_bit_modes
+ 1225  git push
+ 1226  git branch
+ 1227  git rm .Trash-1000/ -rf
+ 1228  git push
+ 1229  ls
+ 1230  70 70FPS.jpg 
+ 1231  rm 70FPS.jpg 
+ 1232  git add --all
+ 1233  git commit -m'removed .Trash'
+ 1234  git push
+ 1235  vim .gitignore 
+ 1236  rm .git-rewrite/ -rf
+ 1237  git commit -m'removed .gtit-rewrite'
+ 1238  git push
+ 1239  git commit -a
+ 1240  y
+ 1241  git commit -a
+ 1242  git push
+ 1243  killall -9 emulator
+ 1244  make full
+ 1245  ./emulator 
+ 1246  make full -j4
+ 1247  ./emulator 
+ 1248  ./emulator --config min.cfg 
+ 1249  ./emulator 
+ 1250  ./emulator --config default.cfg
+ 1251  ./emulator --config default.cfg --log 68060.log --log-level debug 
+ 1252  echo ">68060.log; ./emulator --config default.cfg --log 68060.log --log-level debug " >run060; chmod +x run060
+ 1253  ./run060 
+ 1254  exit
+ 1255  killall -9 emulator
+ 1256  uptime
+ 1257  killall -9 emulator
+ 1258  find . -name pistorm.hdf
+ 1259  cp ./old/pistorm64_latest_pi4/src/platforms/amiga/pistorm.hdf pistorm64/src/platforms/amiga/
+ 1260  git add --all
+ 1261  cd pistorm64
+ 1262  git add --all
+ 1263  git commit -m'reveted pistorm.hdf drivers'
+ 1264  rm .Trash-1000/ -rf
+ 1265  git add --all
+ 1266  git commit -m'reveted pistorm.hdf drivers'
+ 1267  git push
+ 1268  killall -9 emulator
+ 1269  car /etc/debian_version 
+ 1270  cat /etc/debian_version 
+ 1271  killall -9 emulator
+ 1272  cat image.log 
+ 1273  killall -9 emulator
+ 1274  rg handle_irtg_command image.log 
+ 1275  killall -9 emulator
+ 1276  rg handle_irtg_command image.log 
+ 1277  killall -9 emulator
+ 1278  rg SetWindowState
+ 1279  rg supported rtg.log 
+ 1280  rg Supported rtg.log 
+ 1281  rg not rtg.log 
+ 1282  rg WARNING rtg.log 
+ 1283  killall -9 emulator
+ 1284  rg WARNING rtg.log 
+ 1285  killall -9 emulator
+ 1286  git branch
+ 1287  git add --all
+ 1288  git commit -m'rtg working nicely however 5-10 FPS only'
+ 1289  git push
+ 1290  killall emulator
+ 1291  killall -9 emulator
+ 1292  sudo apt install drm-info
+ 1293  killall -9 emulator
+ 1294  cp min.cfg default.cfg
+ 1295  killall -9 emulator
+ 1296  git add --all
+ 1297  git commit -m'RTG stable at 76FPS'
+ 1298  rm udo\ apt\ install\ drm-info 
+ 1299  sudo rm udo\ apt\ install\ drm-info 
+ 1300  rm udo\ apt\ install\ drm-info 
+ 1301  rm udo*
+ 1302  ls
+ 1303  rm *.log
+ 1304  ls
+ 1305  git add --all
+ 1306  git commit -m'RTG rock solid stable 1080p 16 bit 70+ FPS'
+ 1307  git push
+ 1308  vim AGENTS.md 
+ 1309  killall -9 emulator
+ 1310  git add --all
+ 1311  git commit -m'RTG rock solid stable 1080p 16 bit 70+ FPS refactor structs and consts''
+ 1312  git commit -m'RTG rock solid stable 1080p 16 bit 70+ FPS refactor structs and consts'
+ 1313  git push
+ 1314  rg fps
+ 1315  rg fps src/amiga/platforms/
+ 1316  ls
+ 1317  rg fps src/platforms/amiga/rtg
+ 1318  killall -9 emulator
+ 1319  cat /etc/debian_version 
+ 1320  cd src/platforms/amiga/rtg
+ 1321  rg USE_VC
+ 1322  cd 
+ 1323  cd pistorm6
+ 1324  ls Hardware/wiki.amigaos.net/
+ 1325  ls Hardware/wiki.amigaos.net/*
+ 1326  ls Hardware/wiki.amigaos.net/wiki/
+ 1327  git add --all
+ 1328  git commit -m' RTG is rocking its way towards main branch'
+ 1329  git push
+ 1330  git checout main
+ 1331  git checkout main
+ 1332  git merge feature/strip_rtg_unused_code
+ 1333  git push
+ 1334  git checkout -b features/rtg_rock_8_16_14_42_bit_modes
+ 1335  git push
+ 1336  killall -9 emulator
+ 1337  git branch -m features/rtg_rock_8_16_14_32_bit_modes
+ 1338  git branch
+ 1339  git branch -m features/rtg_rock_8_16_24_32_bit_modes
+ 1340  git branch
+ 1341  git branch -u features/rtg_rock_8_16_24_32_bit_modes
+ 1342  fir getch origin
+ 1343  git getch origin
+ 1344  git fetch origin
+ 1345  git branch
+ 1346  git branch -u features/rtg_rock_8_16_24_32_bit_modes
+ 1347  git push
+ 1348  git push --set-upstream origin features/rtg_rock_8_16_24_32_bit_modes
+ 1349  git branch -r
+ 1350  ls
+ 1351  git branch
+ 1352  killall -9 emulator
+ 1353  git branh
+ 1354  git branch
+ 1355  lsmod | grep pis
+ 1356  sudo modprobe pistorm
+ 1357  killall -9 emulator
+ 1358  vim default.cfg
+ 1359  killall -9 emulator
+ 1360  rg DBG8 rtg.log 
+ 1361  rg DBG32 rtg.log 
+ 1362  killall -9 emulator
+ 1363  ls ../old/
+ 1364  ls ../old/zz* 
+ 1365  ls ../old/Z3660_REFRENCE/z3660-drivers/rtg/
+ 1366  ls ../old/Z3660_REFRENCE/z3660-drivers/rtg/Monitors/
+ 1367  killall -9 emulator
+ 1368  rg -n "RTG/DBG\\]\\[P2D|RTG/RAYLIB\\]\\[DBG32" rtg.log
+ 1369  killall -9 emulator
+ 1370  >rtg.log 
+ 1371  rg -n "RTGCMD_|Pixel format switch|DBG32" rtg.log
+ 1372  killall -9 emulator
+ 1373  rg -n "RTGCMD_|Pixel format switch|DBG32" rtg.log
+ 1374  >rtg.log 
+ 1375  rg -n "RTGCMD_|Pixel format switch|DBG32" rtg.log
+ 1376  killall -9 emulator
+ 1377  >rtg.log 
+ 1378  rg -n "RTG/DBG\\]\\[CMD|RTG/DBG\\]\\[P2D|Pixel format switch|DBG32" rtg.log
+ 1379  >rtg.log 
+ 1380  killall -9 emulator
+ 1381  >rtg.log 
+ 1382  rg -n "Pixel format switch|DBG32" rtg.log
+ 1383  killall -9 emulator
+ 1384  >rtg; rg -n "CMD17->SETCLUT|DBG32|Pixel format switch" rtg.log
+ 1385  killall -9 emulator
+ 1386  >rtg.log
+ 1387  rg -n "Pixel format switch|DBG32" rtg.log
+ 1388  killall -9 emulator
+ 1389  rg -n "Pixel format switch|DBG32" rtg.log
+ 1390  >rtg.log
+ 1391  rg -n "Pixel format switch|DBG16|DBG32" rtg.log
+ 1392  >rtg.log
+ 1393  killall -9 emulator
+ 1394  >rtg.log
+ 1395  rg -n "MEM16|MEM32|DBG16|DBG32|Pixel format switch" rtg.log
+ 1396  killall -9 emulator
+ 1397  >rtg.log
+ 1398  TORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_MEMWRITE_DEBUG=1 PISTORM_RTG_32_SWIZZLE=bgra ./emulator --log rtg.log
+ 1399  rg -n "MEM32|DBG32|Pixel format switch" rtg.log
+ 1400  killall -9 emulator
+ 1401  >rtg.log
+ 1402  rg -n "MEM32|DBG32|Pixel format switch" rtg.log
+ 1403  killall -9 emulator
+ 1404  ls amiga.dev/Picasso96Develop/
+ 1405  ls ../old/zz9000-drivers/rtg/attic/
+ 1406  more ../old/zz9000-drivers/rtg/attic/mntgfx.c 
+ 1407  ls
+ 1408  ls ../VideoCore.card/src/
+ 1409  ls ../VideoCore.card/src/vpu/
+ 1410  ls ../VideoCore.card/src/emu68-vc4.h 
+ 1411  ls ../old/
+ 1412  ls ../old/amiga2000-gfxcard/
+ 1413  ls ../old/amiga2000-gfxcard/drivers/
+ 1414  cd src/platforms/amiga/rtg/Amiga/rtg_driver_amiga/
+ 1415  make clean; make ; make install
+ 1416  cd
+ 1417  cd pistorm64
+ 1418  killall -9 emulator
+ 1419  rg -n "Pixel format switch|RTG/RAYLIB\\]\\[DBG32|RTG/DBG\\]\\[CMD/sec|RTG/DBG\\]\\[MEM/sec" rtg.log
+ 1420  killall -9 emulator
+ 1421  >rtg.log
+ 1422  rg -n "Pixel format switch|RTG/RAYLIB\\]\\[DBG32|RTG/DBG\\]\\[CMD/sec|RTG/DBG\\]\\[MEM/sec" rtg.log
+ 1423  killall -9 emulator
+ 1424  rg -n "Pixel format switch|RTG/RAYLIB\\]\\[DBG32" rtg.log
+ 1425  killall -9 emulator
+ 1426  >rtg.log
+ 1427  rg -n "Pixel format switch|RTG/RAYLIB\\]\\[DBG32|RTG/DBG\\]\\[CMD/sec|RTG/DBG\\]\\[MEM/sec|RTG/DBG\\]\\[P2D" rtg.log
+ 1428  >rtg.log
+ 1429  killall -9 emulator
+ 1430  rg -n "RTG/DBG\\]\\[CMD/sec|Pixel format switch|RTG/RAYLIB\\]\\[DBG32" rtg.log
+ 1431  killall -9 emulator
+ 1432  cd src/platforms/amiga/rtg/Amiga/rtg_driver_amiga/
+ 1433  make clean; make;make install
+ 1434  killall -9 emulator
+ 1435  cd
+ 1436  cd pistorm64
+ 1437  vim default.cfg
+ 1438  killall -9 emulator
+ 1439  vim default.cfg
+ 1440  killall -9 emulator
+ 1441  vim default.cfg
+ 1442  killall -9 emulator
+ 1443  vim default.cfg
+ 1444  killall -9 emulator
+ 1445  vim default.cfg
+ 1446  killall -9 emulator
+ 1447  vim default.cfg
+ 1448  cd 
+ 1449  mount -o loop vfat.disk vfat
+ 1450  sudo mount -o loop vfat.disk vfat
+ 1451  sudo mkfs.vfat -F12 vfat.disk 
+ 1452  sudo mkfs.vfat -F16 vfat.disk 
+ 1453  sudo mount -o loop vfat.disk vfat
+ 1454  cp ts.avi vfat/
+ 1455  sudo cp ts.avi vfat/
+ 1456  sudo mount vfat
+ 1457  df
+ 1458  sudo umount vfat
+ 1459  cd pistorm64
+ 1460  vim default.cfg
+ 1461  killall -9 emulator
+ 1462  ls
+ 1463  ls | grep ts
+ 1464  cd
+ 1465  ls
+ 1466  l s-la
+ 1467  mkdir -p amiga_iso/vids
+ 1468  cp ts.avi amiga_iso/vids/TS.AVI
+ 1469  rm ts.avi 
+ 1470  genisoimage -o amiga_iso/tsvideo.iso   -V AMIVID   -J -r   amiga_iso/vids
+ 1471  sudo apt install isoimage
+ 1472  sudo apt install genisoimage
+ 1473  genisoimage -o amiga_iso/tsvideo.iso   -V AMIVID   -J -r   amiga_iso/vids
+ 1474  ls amiga_iso/
+ 1475  pwd
+ 1476  cd amiga_iso/
+ 1477  pwd
+ 1478  cd 
+ 1479  cd pistorm64
+ 1480  vim default.cfg
+ 1481  killall -9 emulator
+ 1482  vim makecd
+ 1483  chmod +x makecd 
+ 1484  cd
+ 1485  ls
+ 1486  ./pistorm64/makecd 
+ 1487  ls
+ 1488  scp ts_mjpeg_320x240.avi  amiga_iso/vids/TSMPEG.AVI
+ 1489  ./pistorm64/makecd 
+ 1490  rm   amiga_iso/vids/*
+ 1491  killall -9 emulator
+ 1492  ./pistorm64/makecd 
+ 1493  rm   amiga_iso/vids/*
+ 1494  killall -9 emulator
+ 1495  df
+ 1496  ls
+ 1497  rm vfat.disk 
+ 1498  rm Omega/ Emu68/ ooo/ kickend/  WorkBench_Classic-16GB.hdf.tar.gz  -rf
+ 1499  df
+ 1500  ls
+ 1501  ls /opt/
+ 1502  ls /opt/amiga/
+ 1503  ls /opt/amiga/NDK3.2R4.lha 
+ 1504  rm /opt/amiga/NDK3.2R4.lha 
+ 1505  df
+ 1506  cat pistorm64/default.cfg
+ 1507  lds
+ 1508  ls
+ 1509  ls | grep iso
+ 1510  history
+ 1511  cat ./pistorm64/makecd
+ 1512  ./pistorm64/makecd
+ 1513  s
+ 1514  ls ~/amiga_iso/
+ 1515  ls ~/amiga_iso/vids/
+ 1516  rm ~/amiga_iso/vids/*
+ 1517  killall -9 emulator
+ 1518  ./pistorm64/makecd
+ 1519  killall -9 emulator
+ 1520  rm ~/amiga_iso/vids/*
+ 1521  ./pistorm64/makecd
+ 1522  killall -9 emulator
+ 1523  ./pistorm64/makecd
+ 1524  killall -9 emulator
+ 1525  cd pistorm64
+ 1526  make full
+ 1527  MAKE -J4 EMULATOR
+ 1528  make -j4 emulator
+ 1529  rg rtg src/platforms/
+ 1530  make -j4 full
+ 1531  rg RTG_BASE
+ 1532  rg PIGFX_
+ 1533  make -j4 full
+ 1534  rg rtg
+ 1535  make -j4 full
+ 1536  make install
+ 1537  cd etc/systemd/system/
+ 1538  ls
+ 1539  mv kernelpistorm64.service  pistorm64.service
+ 1540  vim pistorm64.service 
+ 1541  make clean;make full
+ 1542  cd 
+ 1543  cd pistorm64
+ 1544  make clean;make full
+ 1545  ./emulator 
+ 1546  vim default.cfg
+ 1547  ./emulator 
+ 1548  vim default.cfg
+ 1549  ./emulator 
+ 1550  vim default.cfg
+ 1551  ./emulator 
+ 1552  vim default.cfg
+ 1553  ./emulator 
+ 1554  make full
+ 1555  cd src/platforms/amiga/pirtg64/
+ 1556  ls
+ 1557  git add --all
+ 1558  git commit -m'FAKENATIVEMODE=256COL on ECS ChipSet and Doom2 plays properly 60FPS+"
+ 1559  git commit -m'FAKENATIVEMODE=256COL on ECS ChipSet and Doom2 plays properly 60FPS+'
+ 1560  git push
+ 1561  ./emulator 
+ 1562  cd
+ 1563  cd pistorm64
+ 1564  cd
+ 1565  cd pistorm64
+ 1566  ./emulator 
+ 1567  vim default.cfg
+ 1568  make full
+ 1569  vim default.cfg
+ 1570  ./emulator 
+ 1571  rg rtg src/platforms/amiga/
+ 1572  rg rtg src/platforms/amiga/ | more
+ 1573  ./emulator 
+ 1574  make full
+ 1575  make full -J4
+ 1576  make full -j4
+ 1577  rg PIRTG64_RTG_SIZE src/platforms/amiga/pirtg64/
+ 1578  rg RTG_SIZE src/platforms/amiga/pirtg64/
+ 1579  rg RTG_ src/platforms/amiga/pirtg64/
+ 1580  rg \ RTG_ src/platforms/amiga/pirtg64/
+ 1581  make full -j4
+ 1582  rg PIRTG64_UPPER src/platforms/amiga/
+ 1583  rg PIRTG64_UPPER src/
+ 1584  make full -j4
+ 1585  git add --all
+ 1586  git commit -m'revert PIGFX_ changes'
+ 1587  git push
+ 1588  ./emulator 
+ 1589  vim default.cfg
+ 1590  ./emulator 
+ 1591  make -j4 amiga-pirtg64
+ 1592  make cleam
+ 1593  make clean
+ 1594  make -j4 amiga-pirtg64
+ 1595  make -j4 full
+ 1596  ./emulator 
+ 1597  ./emulator  --config min.cfg 
+ 1598  vim min.cfg 
+ 1599  ./emulator  --config min.cfg 
+ 1600  ls src/musashi/
+ 1601  ls Hardware/
+ 1602  ls Hardware/mc68xxx/
+ 1603  rm  Hardware/mc68xxx/MC68xxx.txt
+ 1604  killall -9 emulator
+ 1605  vim default.cfg
+ 1606  killall -9 emulator
+ 1607  vim default.cfg
+ 1608  killall -9 emulator
+ 1609  git branch
+ 1610  git merge features/rtg_rock_8_16_24_32_bit_modes
+ 1611  vim min.cfg 
+ 1612  killall -9 emulator
+ 1613  cp min.cfg default.cfg
+ 1614  vim .gitignore 
+ 1615  killall -9 emulator
+ 1616  cat default.cfg
+ 1617  vim  default.cfg
+ 1618  killall -9 emulator
+ 1619  vim default.cfg
+ 1620  killall -9 emulator
+ 1621  ls
+ 1622  cat default.cfg
+ 1623  git add default
+ 1624  git add default.cfg
+ 1625  ls -la | grep .cfg
+ 1626  cat default.cfg.full
+ 1627  killall -9 emulator
+ 1628  rm default.cfg
+ 1629  cp default.cfg.full default.cfg
+ 1630  more default.cfg
+ 1631  cp min.cfg default.cfg
+ 1632  vim default.cfg
+ 1633  killall -9 emulator
+ 1634  vim default.cfg
+ 1635  killall -9 emulator
+ 1636  vim default.cfg
+ 1637  killall -9 emulator
+ 1638  vim default.cfg
+ 1639  killall -9 emulator
+ 1640  ls /opt/pistorm64/pirtg64/
+ 1641  ls /opt/pistorm64/src/
+ 1642  ls /opt/pistorm64/src/platforms/
+ 1643  ls /opt/pistorm64/src/platforms/amiga/
+ 1644  ls /opt/pistorm64/src/platforms/amiga/pirtg64/
+ 1645  ls /opt/pistorm64/src/platforms/amiga/pirtg64/shaders/
+ 1646  ls src/platforms/amiga/pirtg64/
+ 1647  ls src/platforms/amiga/pirtg64/shaders/
+ 1648  ls src/platforms/amiga/pirtg64/shaders/ -la
+ 1649  chmod 755 src/platforms/amiga/pirtg64/shaders/ 
+ 1650  cgmod 775  src/platforms/amiga/pirtg64/shaders/*
+ 1651  chmod  775  src/platforms/amiga/pirtg64/shaders/*
+ 1652  chmod 755 src/platforms/amiga/pirtg64/shaders/*
+ 1653  killall -9 emulator
+ 1654  vim default.cfg
+ 1655  killall -9 emulator
+ 1656  cd
+ 1657  killall -9 emulator
+ 1658  cd pistorm64
+ 1659  vim default.cfg
+ 1660  killall -9 emulator
+ 1661  cat default.cfg
+ 1662  cat Makefile| grep berr
+ 1663  killall -9 emulator
+ 1664  vim default.cfg
+ 1665  killall -9 emulator
+ 1666  vim default.cfg
+ 1667  killall -9 emulator
+ 1668  ls -lah emulator 
+ 1669  vim default.cfg
+ 1670  killall -9 emulator
+ 1671  ls src/uae/
+ 1672  ls src/uae/include/
+ 1673  ls src/uae/uae_emulator.
+ 1674  ls src/uae/jit/
+ 1675  ls
+ 1676  ls src/uae/machdep/
+ 1677  ls
+ 1678  du -h  src/uae
+ 1679  ls src/uae/ -la
+ 1680  ls src/uae/ -lah
+ 1681  ls src/uae -lah
+ 1682  du -h  src/uae
+ 1683  du -h  src/uae/gen
+ 1684  du -h  src/uae/include/
+ 1685  du -h  src/uae/jit/
+ 1686  cd ..
+ 1687  ls
+ 1688  find . -name Emu68
+ 1689  git clone https://github.com/michalsc/Emu68.git
+ 1690  cd Emu68/
+ 1691  git submodule update --init --recursive
+ 1692  cd ..
+ 1693  du -h Emu68/
+ 1694  cd pistorm64
+ 1695  git branch
+ 1696  fir add --all
+ 1697  git add --all
+ 1698  git commit -m'060 test with jit fail pause'
+ 1699  git push
+ 1700  git checkout main 
+ 1701  git checkout -b feature/cpu_slot_fastram 
+ 1702  git push
+ 1703  git push --set-upstream origin feature/cpu_slot_fastram
+ 1704  ls -la default.cfg
+ 1705  rm default.cfg
+ 1706  cp min.cfg  default.cfg.
+ 1707  cp min.cfg  default.cfg
+ 1708  rm default.cfg.
+ 1709  vim default.cfg
+ 1710  make full
+ 1711  make full -j4
+ 1712  killall -9 emulator
+ 1713  vim default.cfg
+ 1714  git add --all
+ 1715  git commit -m'we lost speed'
+ 1716  git push
+ 1717  vim default.cfg
+ 1718  rg FC docs/wiki/
+ 1719  rg cpld docs/wiki/
+ 1720  vim default.cfg
+ 1721  killall -9 emulator
+ 1722  cat min.cfg 
+ 1723  git add --all
+ 1724  git commit -m' go slow'
+ 1725  git push
+ 1726  git checkout main
+ 1727  git pull
+ 1728  make full -j4
+ 1729  killall -9 emulator
+ 1730  git branch
+ 1731  git checkout features/rtg_rock_8_16_24_32_bit_modes
+ 1732  git branch
+ 1733  make full -j4
+ 1734  vim min.cfg 
+ 1735  rg cpld docs/wiki/
+ 1736  vim min.cfg 
+ 1737  git branch
+ 1738  killall -9 emulator
+ 1739  vim min.cfg 
+ 1740  killall -9 emulator
+ 1741  git branch
+ 1742  killall -9 emulator
+ 1743  make full -j4
+ 1744  cd ../pistorm64-rtg-recovery
+ 1745  make -j4 full
+ 1746  lsmod | grep pis
+ 1747  sudo modprobe pistorm
+ 1748  lsmod | grep pis
+ 1749  ./emulator  --config min.cfg 
+ 1750  cd
+ 1751  cd pistorm64-rtg-recovery/
+ 1752  make full -j4
+ 1753  PISTORM_USE_DIRECT_OPS=1 PISTORM_ENABLE_BATCH=1 ./emulator 
+ 1754  killall -9 emulator
+ 1755  PISTORM_RTG_CLUT_CPU=1 PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 nice -20 ./emulator -j --config min.cfg --log rtg.log
+ 1756  sudo modprobe pistorm
+ 1757  rg -n "ps_protocol|queue disabled|Inappropriate ioctl" rtg.log
+ 1758  cd pistorm64
+ 1759  make -j4 emulator;  ./emulator  --config min.cfg
+ 1760  git add --all
+ 1761  git commit -m'almost there with RTG , need to fix bitplane image size and 256 colour in fakenativemode'
+ 1762  git push
+ 1763  git branch
+ 1764  make full -j4;./emulator --config min.cfg
+ 1765  make emulator -j4;./emulator --config min.cfg
+ 1766  make emulator -j4;./emulator --config min.cfg --log image.log 
+ 1767  cat image.log 
+ 1768  grep "RTGCMD_BLITPATTERN" image.log 
+ 1769  make emulator -j4;./emulator --config min.cfg --log image.log 
+ 1770  make full -j4
+ 1771  git add --all
+ 1772  git commit -m'rtg and fakenativemode almost rworking nicely, , however can totally rip our iRTG and all that goes with it and reduce rtg.c by around 50% code size!.. umm'
+ 1773  git push
+ 1774  git branchj
+ 1775  git branch
+ 1776  git checkout feature/strip_rtg_unused_code
+ 1777  git checkout -b feature/strip_rtg_unused_code
+ 1778  git push
+ 1779  git push --set-upstream origin feature/strip_rtg_unused_code
+ 1780  make clean; make full -j4
+ 1781  make emulator -j4
+ 1782  ./emulator  --config min.cfg 
+ 1783  make emulator -j4
+ 1784  make full -j4
+ 1785  make emulator -j4
+ 1786  ./emulator  --config min.cfg 
+ 1787  make emulator -j4
+ 1788  ./emulator  --config min.cfg 
+ 1789  make emulator -j4
+ 1790  ./emulator  --config min.cfg 
+ 1791  make emulator -j4
+ 1792  ./emulator  --config min.cfg 
+ 1793  make emulator -j4
+ 1794  ./emulator  --config min.cfg 
+ 1795  make emulator -j4
+ 1796  ./emulator  --config min.cfg 
+ 1797  make emulator -j4
+ 1798  ./emulator  --config min.cfg 
+ 1799  make emulator -j4
+ 1800  ./emulator  --config min.cfg 
+ 1801  make emulator -j4
+ 1802  ./emulator  --config min.cfg 
+ 1803  make emulator -j4
+ 1804  ./emulator  --config min.cfg 
+ 1805  make emulator -j4
+ 1806  ./emulator  --config min.cfg 
+ 1807  make emulator -j4
+ 1808  ./emulator  --config min.cfg 
+ 1809  make emulator -j4
+ 1810  ./emulator  --config min.cfg 
+ 1811  make emulator -j4
+ 1812  ./emulator  --config min.cfg 
+ 1813  make emulator -j4
+ 1814  ./emulator  --config min.cfg 
+ 1815  make emulator -j4
+ 1816  ./emulator  --config min.cfg 
+ 1817  make emulator -j4
+ 1818  ./emulator  --config min.cfg 
+ 1819  make emulator -j4
+ 1820  ./emulator  --config min.cfg 
+ 1821  make emulator -j4
+ 1822  ./emulator  --config min.cfg 
+ 1823  make emulator -j4
+ 1824  ./emulator  --config min.cfg 
+ 1825  vim min.cfg 
+ 1826  cat default.cfg| grep cgip
+ 1827  cat default.cfg| grep chip
+ 1828  vim min.cfg 
+ 1829  ./emulator  --config min.cfg 
+ 1830  vim min.cfg 
+ 1831  make emulator -j4
+ 1832  ./emulator  --config min.cfg 
+ 1833  make emulator -j4
+ 1834  ./emulator  --config min.cfg 
+ 1835  ./emulator  --config min.cfg  --log rtg.log 
+ 1836  ./emulator  --config min.cfg  --log rtg.log  --log-level debug
+ 1837  ./emulator  --config min.cfg  
+ 1838  make emulator -j4
+ 1839  ./emulator  --config min.cfg  
+ 1840  vim min.cfg 
+ 1841  ./emulator  --config min.cfg  
+ 1842  vim min.cfg 
+ 1843  ./emulator  --config min.cfg  
+ 1844  vim min.cfg 
+ 1845  ./emulator  --config min.cfg  
+ 1846  vim min.cfg 
+ 1847  ./emulator  --config min.cfg  
+ 1848  vim min.cfg 
+ 1849  ./emulator  --config min.cfg  
+ 1850  vim min.cfg 
+ 1851  ./emulator  --config min.cfg  
+ 1852  vim min.cfg 
+ 1853  ./emulator  --config min.cfg  
+ 1854  vim min.cfg 
+ 1855  ./emulator  --config min.cfg  
+ 1856  vim min.cfg 
+ 1857  ./emulator  --config min.cfg  
+ 1858  make emulator -j4
+ 1859  ./emulator  --config min.cfg  
+ 1860  vim min.cfg 
+ 1861  ./emulator  --config min.cfg  
+ 1862  make emulator -j4
+ 1863  PISTORM_RTG_VSYNC=0 ./emulator  --config min.cfg  
+ 1864  make -j4 emulator ;PISTORM_RTG_VSYNC=0 ./emulator  --config min.cfg  
+ 1865  make -j4 emulator ;PISTORM_DRM_SWAP_INTERVAL=0 ./emulator  --config min.cfg  
+ 1866  PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 ./emulator --config min.log --log rtg.log --log-level debug
+ 1867  PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 ./emulator --config min.log --log rtg1.log
+ 1868  PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 ./emulator --config min.log 
+ 1869  PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 ./emulator --config min.cfg 
+ 1870  make -j4 emulator; PISTORM_DRM_PERF=1 PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 ./emulator --config min.cfg 
+ 1871  make -j4 emulator; PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 ./emulator
+ 1872  make -j4 full; PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 ./emulator
+ 1873  vim default.cfg
+ 1874  PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 ./emulator
+ 1875  PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 nice -20 ./emulator
+ 1876  make -j4 emulator; PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 nice -20 ./emulator
+ 1877  PISTORM_RTG_CLUT_CPU=1 PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 nice -20 ./emulator
+ 1878  make emulator -j4; PISTORM_RTG_CLUT_CPU=1 PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 nice -20 ./emulator
+ 1879  make emulator -j4;PISTORM_RTG_VIDEO_DEBUG=1  PISTORM_RTG_CLUT_CPU=1 PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 nice -20 ./emulator
+ 1880  clear
+ 1881  PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_CLUT_CPU=1 PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 nice -20 ./emulator
+ 1882  PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_CLUT_CPU=1 PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 nice -20 ./emulator --log rtg.log 
+ 1883  make emulator -j4; PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_CLUT_CPU=1 PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 nice -20 ./emulator --log rtg.log 
+ 1884  PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_32_SWIZZLE=none ./emulator
+ 1885  PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_32_SWIZZLE=bgra ./emulator
+ 1886  PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_32_SWIZZLE=argb ./emulator
+ 1887  PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_32_SWIZZLE=abgr ./emulator
+ 1888  PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_32_SWIZZLE=argb ./emulator
+ 1889  PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_32_SWIZZLE=bgra ./emulator
+ 1890  PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_32_SWIZZLE=none ./emulator
+ 1891  make emulator -j4 ; 
+ 1892  PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_CLUT_CPU=1 ./emulator --log rtg.log
+ 1893  make emulator -j4; PISTORM_RTG_VIDEO_DEBUG=1  ./emulator --log rtg.log
+ 1894  make emulator -j4; PISTORM_RTG_VIDEO_DEBUG=1  ./emulator --log rtg.logok, in rtg.c I have re
+ 1895  make emulator -j4; PISTORM_RTG_VIDEO_DEBUG=1  ./emulator --log rtg.log
+ 1896  vim default.cfg
+ 1897  make emulator -j4; PISTORM_RTG_VIDEO_DEBUG=1  ./emulator --log rtg.log
+ 1898  make emulator -j4; PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_32_SWIZZLE=rgbx ./emulator
+ 1899  make emulator -j4; PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_32_SWIZZLE=rgbx ./emulator --log rtg.log
+ 1900  make emulator -j4;PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_MEMWRITE_DEBUG=1 PISTORM_RTG_32_SWIZZLE=rgbx ./emulator --log rtg.log
+ 1901  make emulator -j4;PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_MEMWRITE_DEBUG=1 PISTORM_RTG_32_SWIZZLE=bgra ./emulator --log rtg.log
+ 1902  rg -n "MEM32|DBG32|Pixel format switch" rtg.log
+ 1903  make -j4 emulator 
+ 1904  ./emulator --log rtg.log
+ 1905  PISTORM_RTG_CMD_DEBUG=1 PISTORM_RTG_MEMWRITE_DEBUG=1 ./emulator --log rtg.log
+ 1906  make -j4 emulator 
+ 1907  ./emulator --log rtg.log
+ 1908  make -j4 emulator
+ 1909  PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_CMD_DEBUG=1 PISTORM_RTG_MEMWRITE_DEBUG=1
+ 1910  PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_CMD_DEBUG=1 PISTORM_RTG_MEMWRITE_DEBUG=1 ./emulator --log rtg.log
+ 1911  make -j4 emulator
+ 1912  PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_CMD_DEBUG=1 PISTORM_RTG_MEMWRITE_DEBUG=1 ./emulator --log rtg.log
+ 1913  make -j4 emulator
+ 1914  PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_CMD_DEBUG=1 PISTORM_RTG_MEMWRITE_DEBUG=1 ./emulator --log rtg.log
+ 1915  make emulator -j4; PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_CMD_DEBUG=1 PISTORM_RTG_MEMWRITE_DEBUG=1 ./emulator --log rtg.log
+ 1916  make emulator -j4; PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_CMD_DEBUG=1 PISTORM_RTG_MEMWRITE_DEBUG=1 ./emulator --log rtg.log --config min.cfg
+ 1917  pkill -f "/opt/pistorm64/a314/bsdsocket.py"
+ 1918  make emulator -j4; PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_CMD_DEBUG=1 PISTORM_RTG_MEMWRITE_DEBUG=1 ./emulator --log rtg.log
+ 1919  make emulator -j4; PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_CMD_DEBUG=1 PISTORM_RTG_MEMWRITE_DEBUG=1 ./emulator --log rtg.log 
+ 1920  ls
+ 1921  ls | grep iso
+ 1922  make emulator -j4; PISTORM_RTG_VIDEO_DEBUG=1 PISTORM_RTG_CMD_DEBUG=1 PISTORM_RTG_MEMWRITE_DEBUG=1 ./emulator --log rtg.log 
+ 1923  make emulator -j4;  ./emulator -
+ 1924  vim default.cfg
+ 1925  make emulator -j4;  ./emulator -
+ 1926  cd src/platforms/amiga/pirtg64/
+ 1927  cd Amiga/rtg_driver_amiga/
+ 1928  make clean; make
+ 1929  ls
+ 1930  rm pigfx.card 
+ 1931  rm pigfx-2.c.new-broken-driver-code.c 
+ 1932  ls
+ 1933  rm boardinfo.h.orig 
+ 1934  ls
+ 1935  make
+ 1936  killall -9 emulator
+ 1937  ls ~/pistorm64/src/musashi/
+ 1938  cd
+ 1939  cd pistorm64
+ 1940  git branch
+ 1941  git checkout -b feature/illegal_instruction_opcde_4e7a
+ 1942  git push
+ 1943  git push --set-upstream origin feature/illegal_instruction_opcde_4e7a
+ 1944  codex
+ 1945  codex --help
+ 1946  codex --dangerously-bypass-approvals-and-sandbox resume 019c84cd-fb92-7c91-9cd3-01abd2248384
+ 1947  codex resume
+ 1948  codex --help
+ 1949  codex --dangerously-bypass-approvals-and-sandbox resume 019c8074-165d-73f1-b14c-79f0d836d491
+ 1950  reboot
+ 1951  sudo reboot
+ 1952  cd pistorm64
+ 1953  cat run060 
+ 1954  >68060.log; ./emulator --config default.cfg --log 68060.log --log-level debug
+ 1955  >68060.log; PISTORM_060_PCR=0x04300000 ./emulator --config default.cfg --log 68060.log --log-level debug
+ 1956  >68060.log; PISTORM_060_PCR=0x04000000 ./emulator --config default.cfg --log 68060.log --log-level debug
+ 1957  >68060.log; ./emulator --config default.cfg --log 68060.log --log-level debug
+ 1958  >68060.log;PISTORM_ATTN_TRACE=1 ./emulator --config default.cfg --log 68060.log --log-level debug
+ 1959  >68060.log;PISTORM_EXECBASE_TRACE=1  ./emulator --config default.cfg --log 68060.log --log-level debug
+ 1960  >68060.log;PISTORM_EXECBASE_TRACE=1  timeout 30 ./emulator --config default.cfg --log 68060.log --log-level debug
+ 1961  >68060.log;PISTORM_EXECBASE_TRACE=1  ./emulator --config default.cfg --log 68060.log --log-level debug
+ 1962  >68060.log;  ./emulator --config default.cfg --log 68060.log --log-level debug
+ 1963  >68060.log;PISTORM_060_ATTN_PROFILE=1  ./emulator --config default.cfg --log 68060.log --log-level debug
+ 1964  >68060.log;PISTORM_ATTN_READ_TRACE=1  ./emulator --config default.cfg --log 68060.log --log-level debug
+ 1965  >68060.log;  ./emulator --config default.cfg --log 68060.log --log-level debug
+ 1966  >68060.log;PISTORM_060_STRICT_PROBES=1  ./emulator --config default.cfg --log 68060.log --log-level debug
+ 1967  >68060.log;  ./emulator --config default.cfg --log 68060.log --log-level debug
+ 1968  >68060.log;  ./emulator --jit --config default.cfg --log 68060.log --log-level debug
+ 1969  clear; >68060.log;  ./emulator --jit --config default.cfg --log 68060.log --log-level debug
+ 1970  clear;  ./emulator  --config default.cfg --log 68060.log --log-level debug
+ 1971  ./emulator 
+ 1972  ./emulator --config min.cfg 
+ 1973  history | grep emul
+ 1974  ./emulator --config min.cfg 
+ 1975  killall -9 emulator
+ 1976  git log
+ 1977  git stash
+ 1978  make clean
+ 1979  make full -j4 
+ 1980  vim default.cfg
+ 1981  vim min.cfg 
+ 1982  ./emulator 
+ 1983  vim min.cfg 
+ 1984  ls -lah emulator 
+ 1985  PISTORM_RTG_CLUT_CPU=1 PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 nice -20 ./emulator -j --config default.cfg --log rtg.log
+ 1986  git branch
+ 1987  git checkout features/rtg_rock_8_16_24_32_bit_modes
+ 1988  git stash
+ 1989  git checkout features/rtg_rock_8_16_24_32_bit_modes
+ 1990  git pull
+ 1991  make full -j4
+ 1992  PISTORM_RTG_CLUT_CPU=1 PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 nice -20 ./emulator -j --config default.cfg --log rtg.log
+ 1993  PISTORM_RTG_CLUT_CPU=1 PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 nice -20 ./emulator -j --config min.cfg --log rtg.log
+ 1994  ls -la emulator 
+ 1995  ls -hla emulator 
+ 1996  sudo dmesg
+ 1997  rg -n "ps_protocol|queue disabled|Inappropriate ioctl" rtg.log
+ 1998  PISTORM_RTG_CLUT_CPU=1 PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 nice -20 ./emulator --log rtg.log
+ 1999  PISTORM_ENABLE_QUEUE=1 PISTORM_RTG_CLUT_CPU=1 PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 nice -20 ./emulator --log rtg.log
+ 2000  PISTORM_ENABLE_QUEUE=1 PISTORM_RTG_CLUT_CPU=1 PISTORM_RTG_VSYNC=0 PISTORM_DRM_SWAP_INTERVAL=0 PISTORM_RTG_TARGET_FPS=0 PISTORM_RTG_CORE=1 PISTORM_RTG_RT_PRIO=60 PISTORM_DRM_PERF=1 nice -20 ./emulator --config min.cfg --log rtg.log
+ 2001  cd pistorm64
+ 2002  ls
+ 2003  git branch
+ 2004  git checkout feature/strip_rtg_unused_code
+ 2005  git stash
+ 2006  git checkout feature/strip_rtg_unused_code
+ 2007  make full -j4
+ 2008  ./emulator 
+ 2009  sudo modprobe pistorm
+ 2010  ./emulator 
+ 2011  git branch
+ 2012  git checkout features/rtg_rock_8_16_24_32_bit_modes
+ 2013  git stash
+ 2014  git checkout features/rtg_rock_8_16_24_32_bit_modes
+ 2015  git pull
+ 2016  make full -j4
+ 2017  ./emulator 
+ 2018  git log
+ 2019  history | more
+ 2020  git branch
+ 2021  git checkout feature/emu68-compat
+ 2022  vim .gitignore 
+ 2023  git stash
+ 2024  git checkout feature/emu68-compat
+ 2025  history --help
+ 2026  history -ps
+ 2027  history 
+ 2028  history  >history.txt
