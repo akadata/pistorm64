@@ -121,6 +121,16 @@ enum rtg_scaling_commands {
   PIGFX_SCALE_NUM,
 };
 
+/* Backward compatibility aliases for older RTG naming used in host code. */
+#define RTG_SCALE_NONE PIGFX_SCALE_NONE
+#define RTG_SCALE_INTEGER_MAX PIGFX_SCALE_INTEGER_MAX
+#define RTG_SCALE_FULL_ASPECT PIGFX_SCALE_FULL_ASPECT
+#define RTG_SCALE_FULL_43 PIGFX_SCALE_FULL_43
+#define RTG_SCALE_FULL_169 PIGFX_SCALE_FULL_169
+#define RTG_SCALE_FULL PIGFX_SCALE_FULL
+#define RTG_SCALE_CUSTOM PIGFX_SCALE_CUSTOM
+#define RTG_SCALE_CUSTOM_RECT PIGFX_SCALE_CUSTOM_RECT
+
 enum rtg_scale_filter_commands {
   PIGFX_FILTER_POINT,  // Nearest neighbor scaling, sharp image, may cause uneven pixels
   PIGFX_FILTER_SMOOTH, // Linear/bilinear texture scaling, blurry, may improve visibility or
