@@ -151,16 +151,16 @@ static void rtg_apply_thread_tuning(void) {
 static const char* rtg_resolve_shader_path(const char* filename, char* buf, size_t buf_len) {
     const char* root = getenv("PISTORM_ROOT");
     if (root && *root) {
-        snprintf(buf, buf_len, "%s/rtg/shaders/%s", root, filename);
+        snprintf(buf, buf_len, "%s/RTG/shaders/%s", root, filename);
         if (access(buf, R_OK) == 0) {
             return buf;
         }
-        snprintf(buf, buf_len, "%s/src/platforms/amiga/rtg/shaders/%s", root, filename);
+        snprintf(buf, buf_len, "%s/src/platforms/amiga/RTG/shaders/%s", root, filename);
         if (access(buf, R_OK) == 0) {
             return buf;
         }
     }
-    snprintf(buf, buf_len, "src/platforms/amiga/rtg/shaders/%s", filename);
+    snprintf(buf, buf_len, "src/platforms/amiga/RTG/shaders/%s", filename);
     if (access(buf, R_OK) == 0) {
         return buf;
     }
@@ -270,7 +270,7 @@ static Rectangle srcrect;
 static Rectangle dstscale;
 
 static Vector2 origin;
-static uint8_t scale_mode = PIRTG64_SCALE_FULL;
+static uint8_t scale_mode = RTG_SCALE_FULL;
 static uint8_t filter_mode = 0;
 
 struct rtg_shared_data rtg_share_data;
@@ -441,7 +441,7 @@ static void rtg_autodetect_screen_size(void) {
   }
 }
 
-uint32_t rtg_to_raylib[RTGFMT_NUM] = {
+uint32_t rtg_to_raylib[RTG_FMT_NUM] = {
     PIXELFORMAT_UNCOMPRESSED_GRAYSCALE, // 4BIT_PLANAR,
     PIXELFORMAT_UNCOMPRESSED_GRAYSCALE, // 8BIT_CLUT,
     PIXELFORMAT_UNCOMPRESSED_R5G6B5,    // RGB565_BE,
@@ -468,13 +468,13 @@ uint32_t rtg_to_raylib[RTGFMT_NUM] = {
 
 static inline int rtg_format_is_yuv(uint16_t format) {
   switch (format) {
-  case RTGFMT_YUV422_CGX:
-  case RTGFMT_YUV411:
-  case RTGFMT_YUV411_PC:
-  case RTGFMT_YUV422:
-  case RTGFMT_YUV422_PC:
-  case RTGFMT_YUV422_PA:
-  case RTGFMT_YUV422_PAPC:
+  case RTG_FMT_YUV422_CGX:
+  case RTG_FMT_YUV411:
+  case RTG_FMT_YUV411_PC:
+  case RTG_FMT_YUV422:
+  case RTG_FMT_YUV422_PC:
+  case RTG_FMT_YUV422_PA:
+  case RTG_FMT_YUV422_PAPC:
     return 1;
   default:
     return 0;
@@ -499,7 +499,7 @@ void rtg_scale_output(uint16_t width, uint16_t height) {
   srcrect.width = src_w;
   srcrect.height = src_h;
 
-  if(scale_mode != PIRTG64_SCALE_CUSTOM && scale_mode != PIRTG64_SCALE_CUSTOM_RECT) {
+  if(scale_mode != RTG_SCALE_CUSTOM && scale_mode != RTG_SCALE_CUSTOM_RECT) {
     dstscale.x = dstscale.y = 0;
     dstscale.width = src_w;
     dstscale.height = src_h;
@@ -518,7 +518,7 @@ void rtg_scale_output(uint16_t width, uint16_t height) {
     float dst_h = dstscale.height;
 
     switch (scale_mode) {
-    case PIRTG64_SCALE_INTEGER_MAX: {
+    case RTG_SCALE_INTEGER_MAX: {
       float scale = floorf(fminf(screen_w / src_w, screen_h / src_h));
       if(scale < 1.0f) {
         scale = 1.0f;
@@ -527,13 +527,13 @@ void rtg_scale_output(uint16_t width, uint16_t height) {
       dst_h = src_h * scale;
       break;
     }
-    case PIRTG64_SCALE_FULL_ASPECT: {
+    case RTG_SCALE_FULL_ASPECT: {
       float scale = fminf(screen_w / src_w, screen_h / src_h);
       dst_w = src_w * scale;
       dst_h = src_h * scale;
       break;
     }
-    case PIRTG64_SCALE_FULL_43: {
+    case RTG_SCALE_FULL_43: {
       const float aspect = 4.0f / 3.0f;
       dst_w = screen_w;
       dst_h = screen_w / aspect;
@@ -543,7 +543,7 @@ void rtg_scale_output(uint16_t width, uint16_t height) {
       }
       break;
     }
-    case PIRTG64_SCALE_FULL_169: {
+    case RTG_SCALE_FULL_169: {
       const float aspect = 16.0f / 9.0f;
       dst_w = screen_w;
       dst_h = screen_w / aspect;
@@ -553,11 +553,11 @@ void rtg_scale_output(uint16_t width, uint16_t height) {
       }
       break;
     }
-    case PIRTG64_SCALE_FULL:
+    case RTG_SCALE_FULL:
       dst_w = screen_w;
       dst_h = screen_h;
       break;
-    case PIRTG64_SCALE_NONE:
+    case RTG_SCALE_NONE:
       if (screen_w > src_w || screen_h > src_h) {
         float scale = fminf(screen_w / src_w, screen_h / src_h);
         dst_w = src_w * scale;
@@ -567,8 +567,8 @@ void rtg_scale_output(uint16_t width, uint16_t height) {
         dst_h = src_h;
       }
       break;
-    case PIRTG64_SCALE_CUSTOM:
-    case PIRTG64_SCALE_CUSTOM_RECT:
+    case RTG_SCALE_CUSTOM:
+    case RTG_SCALE_CUSTOM_RECT:
     default:
       dst_w = dstscale.width;
       dst_h = dstscale.height;
@@ -795,7 +795,7 @@ reinit_raylib:;
   // Mode registers can transiently be 0 during RTG startup/mode switches.
   // Wait for a valid mode instead of thrashing reinit/logging.
   while (!shutdown) {
-    if (rtg_on && width > 0 && height > 0 && format < RTGFMT_NUM && rtg_pixel_size[format] > 0) {
+    if (rtg_on && width > 0 && height > 0 && format < RTG_FMT_NUM && rtg_pixel_size[format] > 0) {
       break;
     }
     width = rtg_display_width;
@@ -811,7 +811,7 @@ reinit_raylib:;
   LOG_INFO("Creating %dx%d raylib window...\n", width, height);
 
   LOG_DEBUG("Setting up raylib framebuffer image.\n");
-  if(format >= RTGFMT_NUM) {
+  if(format >= RTG_FMT_NUM) {
     LOG_ERROR("[RTG/RAYLIB] Invalid RTG format: %u\n", format);
     reinit = 1;
     goto shutdown_raylib;
@@ -845,7 +845,7 @@ reinit_raylib:;
   int pitch_ok = (pitch >= row_bytes);
   int addr_ok = pitch_ok && (addr < rtg_mem_size) && (addr + needed <= rtg_mem_size);
 
-  if ((format == RTGFMT_8BIT_CLUT && clut_cpu_mode) || rtg_format_is_yuv(format)) {
+  if ((format == RTG_FMT_8BIT_CLUT && clut_cpu_mode) || rtg_format_is_yuv(format)) {
     raylib_fb.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
   } else {
     raylib_fb.format = (int)rtg_to_raylib[format];
@@ -885,9 +885,9 @@ reinit_raylib:;
     }
     memset(yuv_buf, 0, yuv_bytes);
     raylib_fb.data = yuv_buf;
-  } else if(format == RTGFMT_RGB565_BE || format == RTGFMT_RGB555_BE ||
-            format == RTGFMT_RGB555_LE || format == RTGFMT_BGR565_LE ||
-            format == RTGFMT_BGR555_LE) {
+  } else if(format == RTG_FMT_RGB565_BE || format == RTG_FMT_RGB555_BE ||
+            format == RTG_FMT_RGB555_LE || format == RTG_FMT_BGR565_LE ||
+            format == RTG_FMT_BGR555_LE) {
     if((pitch % 2) != 0) {
       LOG_DEBUG("[RTG/RAYLIB] 16-bit pitch not aligned: pitch=%u\n", pitch);
       reinit = 1;
@@ -911,23 +911,23 @@ reinit_raylib:;
         uint16_t raw = 0;
         uint16_t rgb565 = 0;
         switch (format) {
-        case RTGFMT_RGB565_BE:
+        case RTG_FMT_RGB565_BE:
           raw = load_u16_be(src_ptr);
           rgb565 = raw;
           break;
-        case RTGFMT_RGB555_BE:
+        case RTG_FMT_RGB555_BE:
           raw = load_u16_be(src_ptr);
           rgb565 = rtg_rgb555_to_rgb565(raw);
           break;
-        case RTGFMT_RGB555_LE:
+        case RTG_FMT_RGB555_LE:
           raw = load_u16_le(src_ptr);
           rgb565 = rtg_rgb555_to_rgb565(raw);
           break;
-        case RTGFMT_BGR565_LE:
+        case RTG_FMT_BGR565_LE:
           raw = load_u16_le(src_ptr);
           rgb565 = rtg_bgr565_to_rgb565(raw);
           break;
-        case RTGFMT_BGR555_LE:
+        case RTG_FMT_BGR555_LE:
           raw = load_u16_le(src_ptr);
           rgb565 = rtg_bgr555_to_rgb565(raw);
           break;
@@ -940,7 +940,7 @@ reinit_raylib:;
       }
     }
     raylib_fb.data = indexed_buf;
-  } else if(format == RTGFMT_8BIT_CLUT && clut_cpu_mode) {
+  } else if(format == RTG_FMT_8BIT_CLUT && clut_cpu_mode) {
     size_t clut_bytes = tight_size * 4;
     if(clut_buf_size < clut_bytes) {
       void* resized = realloc(clut_buf, clut_bytes);
@@ -1003,7 +1003,7 @@ reinit_raylib:;
       uint16_t current_pitch = *data->pitch;
       uint32_t current_addr = *data->addr;
 
-      if(current_format >= RTGFMT_NUM) {
+      if(current_format >= RTG_FMT_NUM) {
         LOG_ERROR("[RTG/RAYLIB] Invalid RTG format during frame update: %u\n", current_format);
         reinit = 1;
         goto shutdown_raylib;
@@ -1065,29 +1065,29 @@ reinit_raylib:;
       updating_screen = 1;
       int draw_swizzle_mode = 0; // 0=none, 1=bgra, 2=argb, 3=abgr, 4=rgbx
       switch (format) {
-      case RTGFMT_8BIT_CLUT:
+      case RTG_FMT_8BIT_CLUT:
         if(!clut_cpu_mode) {
           BeginShaderMode(clut_shader);
           SetShaderValueTexture(clut_shader, clut_loc, raylib_clut_texture);
         }
         break;
-      case RTGFMT_BGR24:
+      case RTG_FMT_BGR24:
         draw_swizzle_mode = 1;
         break;
-      case RTGFMT_RGB32_ARGB:
+      case RTG_FMT_RGB32_ARGB:
         draw_swizzle_mode = 2;
         break;
-      case RTGFMT_RGB32_ABGR:
+      case RTG_FMT_RGB32_ABGR:
         draw_swizzle_mode = 3;
         break;
-      case RTGFMT_RGB32_BGRA:
+      case RTG_FMT_RGB32_BGRA:
         draw_swizzle_mode = 1;
         break;
       }
-      if ((format == RTGFMT_RGB32_ARGB || format == RTGFMT_RGB32_ABGR || format == RTGFMT_RGB32_BGRA) &&
+      if ((format == RTG_FMT_RGB32_ARGB || format == RTG_FMT_RGB32_ABGR || format == RTG_FMT_RGB32_BGRA) &&
           swizzle_override_mode >= 0) {
         draw_swizzle_mode = swizzle_override_mode;
-      } else if (adaptive_swizzle_enabled && format == RTGFMT_RGB32_BGRA && adaptive_swizzle_mode != 0) {
+      } else if (adaptive_swizzle_enabled && format == RTG_FMT_RGB32_BGRA && adaptive_swizzle_mode != 0) {
         draw_swizzle_mode = adaptive_swizzle_mode;
       }
       switch (draw_swizzle_mode) {
@@ -1110,7 +1110,7 @@ reinit_raylib:;
       DrawTexturePro(raylib_texture, srcrect, dstscale, origin, 0.0f, RAYWHITE);
 
       switch (format) {
-      case RTGFMT_8BIT_CLUT:
+      case RTG_FMT_8BIT_CLUT:
         if(!clut_cpu_mode) {
           EndShaderMode();
         }
@@ -1128,7 +1128,7 @@ reinit_raylib:;
         float cursor_off_x = dstscale.x;
         float cursor_off_y = dstscale.y;
 
-        if(scale_mode == PIRTG64_SCALE_CUSTOM || scale_mode == PIRTG64_SCALE_CUSTOM_RECT) {
+        if(scale_mode == RTG_SCALE_CUSTOM || scale_mode == RTG_SCALE_CUSTOM_RECT) {
           cursor_off_x = 0.0f;
           cursor_off_y = 0.0f;
         }
@@ -1142,7 +1142,7 @@ reinit_raylib:;
       }
 
       if(debug_palette) {
-        if(current_format == RTGFMT_8BIT_CLUT) {
+        if(current_format == RTG_FMT_8BIT_CLUT) {
           Rectangle clut_srcrect = {0, 0, 256, 1};
           Rectangle clut_dstrect = {0, 0, 1024, 8};
           DrawTexturePro(raylib_clut_texture, clut_srcrect, clut_dstrect, origin, 0.0f, RAYWHITE);
@@ -1174,7 +1174,7 @@ reinit_raylib:;
         LOG_DEBUG("[RTG/RAYLIB] Framebuffer OOB: addr=0x%08X needed=%zu limit=%zu\n", current_addr,
                  frame_needed, rtg_mem_size);
       } else if(video_debug_mode && (frame_no % 120u) == 0u &&
-                current_format == RTGFMT_RGB565_LE && current_pitch >= (width * 2u)) {
+                current_format == RTG_FMT_RGB565_LE && current_pitch >= (width * 2u)) {
         const uint8_t* src = data->memory + addr_offset;
         size_t center_off = ((size_t)(height / 2) * (size_t)current_pitch) + ((size_t)(width / 2) * 2u);
         if (center_off + 2u > frame_needed) {
@@ -1232,11 +1232,11 @@ reinit_raylib:;
         }
         if(yuv_buf) {
           switch (current_format) {
-          case RTGFMT_YUV422_CGX:
-          case RTGFMT_YUV422:
-          case RTGFMT_YUV422_PC:
-          case RTGFMT_YUV422_PA:
-          case RTGFMT_YUV422_PAPC:
+          case RTG_FMT_YUV422_CGX:
+          case RTG_FMT_YUV422:
+          case RTG_FMT_YUV422_PC:
+          case RTG_FMT_YUV422_PA:
+          case RTG_FMT_YUV422_PAPC:
             for (uint16_t y = 0; y < height; y++) {
               const uint8_t* src = data->memory + addr_offset + (size_t)current_pitch * y;
               uint32_t* dst = yuv_buf + (size_t)width * y;
@@ -1251,19 +1251,19 @@ reinit_raylib:;
                 uint8_t u0 = 128;
                 uint8_t v0 = 128;
                 switch (current_format) {
-                case RTGFMT_YUV422_CGX: // Y0 V0 Y1 U0
+                case RTG_FMT_YUV422_CGX: // Y0 V0 Y1 U0
                   y0 = b0; v0 = b1; y1 = b2; u0 = b3;
                   break;
-                case RTGFMT_YUV422: // Y1 U0 Y0 V0
+                case RTG_FMT_YUV422: // Y1 U0 Y0 V0
                   y1 = b0; u0 = b1; y0 = b2; v0 = b3;
                   break;
-                case RTGFMT_YUV422_PC: // V0 Y0 U0 Y1
+                case RTG_FMT_YUV422_PC: // V0 Y0 U0 Y1
                   v0 = b0; y0 = b1; u0 = b2; y1 = b3;
                   break;
-                case RTGFMT_YUV422_PA: // Y0 Y1 V0 U0
+                case RTG_FMT_YUV422_PA: // Y0 Y1 V0 U0
                   y0 = b0; y1 = b1; v0 = b2; u0 = b3;
                   break;
-                case RTGFMT_YUV422_PAPC: // U0 V0 Y1 Y0
+                case RTG_FMT_YUV422_PAPC: // U0 V0 Y1 Y0
                   u0 = b0; v0 = b1; y1 = b2; y0 = b3;
                   break;
                 default:
@@ -1280,15 +1280,15 @@ reinit_raylib:;
               }
             }
             break;
-          case RTGFMT_YUV411:
-          case RTGFMT_YUV411_PC:
+          case RTG_FMT_YUV411:
+          case RTG_FMT_YUV411_PC:
             for (uint16_t y = 0; y < height; y++) {
               const uint8_t* src = data->memory + addr_offset + (size_t)current_pitch * y;
               uint32_t* dst = yuv_buf + (size_t)width * y;
               uint16_t x = 0;
               for (; x + 3 < width; x += 4) {
                 uint32_t pack = load_u32_be(src);
-                if(current_format == RTGFMT_YUV411_PC) {
+                if(current_format == RTG_FMT_YUV411_PC) {
                   pack = __builtin_bswap32(pack);
                 }
                 uint8_t u6 = (uint8_t)((pack >> 26) & 0x3F);
@@ -1341,9 +1341,9 @@ reinit_raylib:;
                      current_format, width, height, current_pitch, sample_buf);
           }
         }
-      } else if(current_format == RTGFMT_RGB565_BE || current_format == RTGFMT_RGB555_BE ||
-                current_format == RTGFMT_RGB555_LE || current_format == RTGFMT_BGR565_LE ||
-                current_format == RTGFMT_BGR555_LE) {
+      } else if(current_format == RTG_FMT_RGB565_BE || current_format == RTG_FMT_RGB555_BE ||
+                current_format == RTG_FMT_RGB555_LE || current_format == RTG_FMT_BGR565_LE ||
+                current_format == RTG_FMT_BGR555_LE) {
         if((current_pitch % 2) != 0) {
           LOG_DEBUG("[RTG/RAYLIB] 16-bit pitch not aligned: pitch=%u\n", current_pitch);
         } else {
@@ -1365,23 +1365,23 @@ reinit_raylib:;
                 uint16_t raw = 0;
                 uint16_t rgb565 = 0;
                 switch (current_format) {
-                case RTGFMT_RGB565_BE:
+                case RTG_FMT_RGB565_BE:
                   raw = load_u16_be(src_ptr);
                   rgb565 = raw;
                   break;
-                case RTGFMT_RGB555_BE:
+                case RTG_FMT_RGB555_BE:
                   raw = load_u16_be(src_ptr);
                   rgb565 = rtg_rgb555_to_rgb565(raw);
                   break;
-                case RTGFMT_RGB555_LE:
+                case RTG_FMT_RGB555_LE:
                   raw = load_u16_le(src_ptr);
                   rgb565 = rtg_rgb555_to_rgb565(raw);
                   break;
-                case RTGFMT_BGR565_LE:
+                case RTG_FMT_BGR565_LE:
                   raw = load_u16_le(src_ptr);
                   rgb565 = rtg_bgr565_to_rgb565(raw);
                   break;
-                case RTGFMT_BGR555_LE:
+                case RTG_FMT_BGR555_LE:
                   raw = load_u16_le(src_ptr);
                   rgb565 = rtg_bgr555_to_rgb565(raw);
                   break;
@@ -1396,7 +1396,7 @@ reinit_raylib:;
             UpdateTexture(raylib_texture, indexed_buf);
           }
         }
-      } else if(current_format == RTGFMT_8BIT_CLUT && clut_cpu_mode) {
+      } else if(current_format == RTG_FMT_8BIT_CLUT && clut_cpu_mode) {
         if(clut_buf_size < tight_size * 4) {
           void* resized = realloc(clut_buf, tight_size * 4);
           if(!resized) {
@@ -1457,8 +1457,8 @@ reinit_raylib:;
                      frame_no, used_count, min_idx, max_idx, gray_palette_entries, sample);
           }
         }
-      } else if(current_format == RTGFMT_RGB32_ARGB || current_format == RTGFMT_RGB32_ABGR ||
-                current_format == RTGFMT_RGB32_RGBA || current_format == RTGFMT_RGB32_BGRA) {
+      } else if(current_format == RTG_FMT_RGB32_ARGB || current_format == RTG_FMT_RGB32_ABGR ||
+                current_format == RTG_FMT_RGB32_RGBA || current_format == RTG_FMT_RGB32_BGRA) {
         if (video_debug_mode && (frame_no % 120u) == 0u) {
           const uint8_t* src = data->memory + addr_offset;
           size_t center_off = ((size_t)(height / 2) * (size_t)current_pitch) + ((size_t)(width / 2) * 4u);
@@ -1487,7 +1487,7 @@ reinit_raylib:;
               samples++;
             }
           }
-          if (adaptive_swizzle_enabled && swizzle_override_mode < 0 && current_format == RTGFMT_RGB32_BGRA) {
+          if (adaptive_swizzle_enabled && swizzle_override_mode < 0 && current_format == RTG_FMT_RGB32_BGRA) {
             // If color variation is overwhelmingly present in bytes 1..3, treat stream as ARGB-like.
             int prev = adaptive_swizzle_mode;
             if (chroma_argb > (chroma_bgra * 4u + 16u)) {
@@ -1671,7 +1671,7 @@ void rtg_set_clut_entry(uint8_t index, uint32_t xrgb) {
   dst[3] = 0xFF;
 
   static unsigned int clut_debug_count = 0;
-  if (rtg_display_format == RTGFMT_8BIT_CLUT && clut_debug_count < 8) {
+  if (rtg_display_format == RTG_FMT_8BIT_CLUT && clut_debug_count < 8) {
     LOG_INFO("[RTG/DBG] CLUT[%u] = %02X%02X%02X\n", (unsigned int)index,
              (unsigned int)dst[0], (unsigned int)dst[1], (unsigned int)dst[2]);
     clut_debug_count++;
@@ -1837,17 +1837,17 @@ void rtg_palette_debug(uint8_t enable) {
 
 void rtg_set_scale_mode(uint16_t _scale_mode) {
   switch (_scale_mode) {
-  case PIRTG64_SCALE_INTEGER_MAX:
-  case PIRTG64_SCALE_FULL_ASPECT:
-  case PIRTG64_SCALE_FULL_43:
-  case PIRTG64_SCALE_FULL_169:
-  case PIRTG64_SCALE_FULL:
-  case PIRTG64_SCALE_NONE:
+  case RTG_SCALE_INTEGER_MAX:
+  case RTG_SCALE_FULL_ASPECT:
+  case RTG_SCALE_FULL_43:
+  case RTG_SCALE_FULL_169:
+  case RTG_SCALE_FULL:
+  case RTG_SCALE_NONE:
     scale_mode = (uint8_t)_scale_mode;
     rtg_scale_output(rtg_display_width, rtg_display_height);
     break;
-  case PIRTG64_SCALE_CUSTOM:
-  case PIRTG64_SCALE_CUSTOM_RECT:
+  case RTG_SCALE_CUSTOM:
+  case RTG_SCALE_CUSTOM_RECT:
     LOG_DEBUG("[!!!RTG] Tried to set RTG scale mode to custom or custom rect using the wrong "
              "function. Ignored.\n");
     break;
@@ -1869,11 +1869,11 @@ void rtg_set_scale_rect(uint16_t _scale_mode, int16_t x1, int16_t y1, int16_t x2
   dstscale.y = (float)y1;
 
   switch (scale_mode) {
-  case PIRTG64_SCALE_CUSTOM_RECT:
+  case RTG_SCALE_CUSTOM_RECT:
     dstscale.width = (float)x2;
     dstscale.height = (float)y2;
     break;
-  case PIRTG64_SCALE_CUSTOM:
+  case RTG_SCALE_CUSTOM:
     dstscale.width = (float)x2 - (float)x1;
     dstscale.height = (float)y2 - (float)y1;
     break;

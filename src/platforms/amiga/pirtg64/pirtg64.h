@@ -8,8 +8,8 @@
 // Developed by AKADATA, with help and support from Codex.
 
 
-#define PIRTG64_BASE 0x70000000
-#define PIRTG64_REG_SIZE 0x00010000
+#define RTG_BASE 0x70000000
+#define RTG_REG_SIZE 0x00010000
 #ifndef RTG_GFX_MEM
 #define RTG_GFX_MEM 128u
 #endif
@@ -17,10 +17,10 @@
 #define RTG_MEM_MB RTG_GFX_MEM
 #endif
 
-#define PIRTG64_SIZE ((RTG_GFX_MEM) * 0x00100000u)
-#define PIRTG64_SCRATCH_SIZE 0x00800000
-#define PIRTG64_SCRATCH_AREA 0x72010000
-#define PIRTG64_UPPER 0x72810000
+#define RTG_SIZE ((RTG_GFX_MEM) * 0x00100000u)
+#define RTG_SCRATCH_SIZE 0x00800000
+#define RTG_SCRATCH_AREA 0x72010000
+#define RTG_UPPER 0x72810000
 
 #define CARD_OFFSET 0
 
@@ -45,32 +45,32 @@ static inline uint32_t rtg_load_pixel(
   uint16_t format
   ) {
   switch (format) {
-  case RTGFMT_8BIT_CLUT: {
+  case RTG_FMT_8BIT_CLUT: {
     return *dest;
   }
-  case RTGFMT_RGB565_LE:
-  case RTGFMT_RGB565_BE:
-  case RTGFMT_BGR565_LE:
-  case RTGFMT_RGB555_LE:
-  case RTGFMT_RGB555_BE:
-  case RTGFMT_BGR555_LE: {
+  case RTG_FMT_RGB565_LE:
+  case RTG_FMT_RGB565_BE:
+  case RTG_FMT_BGR565_LE:
+  case RTG_FMT_RGB555_LE:
+  case RTG_FMT_RGB555_BE:
+  case RTG_FMT_BGR555_LE: {
     
   uint16_t tmp;
     memcpy(&tmp, dest, sizeof tmp);
     return tmp;
   }
-  case RTGFMT_RGB32_ABGR:
-  case RTGFMT_RGB32_ARGB:
-  case RTGFMT_RGB32_BGRA:
-  case RTGFMT_RGB32_RGBA: {
+  case RTG_FMT_RGB32_ABGR:
+  case RTG_FMT_RGB32_ARGB:
+  case RTG_FMT_RGB32_BGRA:
+  case RTG_FMT_RGB32_RGBA: {
     uint32_t tmp;
     memcpy(&tmp, dest, sizeof tmp);
     return tmp;
   }
-  case RTGFMT_RGB24: {
+  case RTG_FMT_RGB24: {
     return ((uint32_t)dest[0] << 16) | ((uint32_t)dest[1] << 8) | (uint32_t)dest[2];
   }
-  case RTGFMT_BGR24: {
+  case RTG_FMT_BGR24: {
     return ((uint32_t)dest[2] << 16) | ((uint32_t)dest[1] << 8) | (uint32_t)dest[0];
   }
   default: {
@@ -85,37 +85,37 @@ static inline void rtg_store_pixel(
   uint32_t value
   ) {
   switch (format) {
-  case RTGFMT_8BIT_CLUT: {
+  case RTG_FMT_8BIT_CLUT: {
     uint8_t tmp = (uint8_t)value;
     memcpy(dest, &tmp, sizeof tmp);
     break;
   }
-  case RTGFMT_RGB565_LE:
-  case RTGFMT_RGB565_BE:
-  case RTGFMT_BGR565_LE:
-  case RTGFMT_RGB555_LE:
-  case RTGFMT_RGB555_BE:
-  case RTGFMT_BGR555_LE: {
+  case RTG_FMT_RGB565_LE:
+  case RTG_FMT_RGB565_BE:
+  case RTG_FMT_BGR565_LE:
+  case RTG_FMT_RGB555_LE:
+  case RTG_FMT_RGB555_BE:
+  case RTG_FMT_BGR555_LE: {
     uint16_t tmp = (uint16_t)value;
     memcpy(dest, &tmp, sizeof tmp
       );
     break;
   }
-  case RTGFMT_RGB32_ABGR:
-  case RTGFMT_RGB32_ARGB:
-  case RTGFMT_RGB32_BGRA:
-  case RTGFMT_RGB32_RGBA: {
+  case RTG_FMT_RGB32_ABGR:
+  case RTG_FMT_RGB32_ARGB:
+  case RTG_FMT_RGB32_BGRA:
+  case RTG_FMT_RGB32_RGBA: {
     uint32_t tmp = value;
     memcpy(dest, &tmp, sizeof tmp);
     break;
   }
-  case RTGFMT_RGB24: {
+  case RTG_FMT_RGB24: {
     dest[0] = (uint8_t)((value >> 16) & 0xFF);
     dest[1] = (uint8_t)((value >> 8) & 0xFF);
     dest[2] = (uint8_t)(value & 0xFF);
     break;
   }
-  case RTGFMT_BGR24: {
+  case RTG_FMT_BGR24: {
     dest[0] = (uint8_t)(value & 0xFF);
     dest[1] = (uint8_t)((value >> 8) & 0xFF);
     dest[2] = (uint8_t)((value >> 16) & 0xFF);
@@ -135,13 +135,13 @@ static inline void rtg_store_pixel_mask(
   uint32_t value,                                        
   uint32_t mask
   ) {
-  if (format == RTGFMT_8BIT_CLUT) {
+  if (format == RTG_FMT_8BIT_CLUT) {
     uint8_t current = *dest;
     uint8_t tmp = (uint8_t)value ^ (uint8_t)(current & ~mask);
     memcpy(dest, &tmp, sizeof tmp);
     return;
   }
-  if (format == RTGFMT_RGB24 || format == RTGFMT_BGR24) {
+  if (format == RTG_FMT_RGB24 || format == RTG_FMT_BGR24) {
     uint32_t current = rtg_load_pixel(dest, format);
     uint32_t merged = (value & mask) | (current & ~mask);
     rtg_store_pixel(dest, format, merged);
@@ -156,7 +156,7 @@ static inline void rtg_invert_pixel(
   uint32_t mask
   ) {
   switch (format) {
-  case RTGFMT_8BIT_CLUT: {
+  case RTG_FMT_8BIT_CLUT: {
     uint8_t tmp = *dest ^ (uint8_t)mask;
     memcpy(dest, &tmp, sizeof tmp);
     break;

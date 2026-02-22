@@ -2085,7 +2085,7 @@ static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t*
         *res = handle_pinet_read(addr, type);
         return 1;
       }
-      if (addr >= PIRTG64_BASE && addr < PIRTG64_UPPER) {
+      if (addr >= RTG_BASE && addr < RTG_UPPER) {
         *res = rtg_read((addr & 0x0FFFFFFF), type);
         return 1;
       }
@@ -2318,7 +2318,7 @@ static inline int32_t platform_write_check(uint8_t type, uint32_t addr, uint32_t
         handle_pinet_write(addr, val, type);
         return 1;
       }
-      if (addr >= PIRTG64_BASE && addr < PIRTG64_UPPER) {
+      if (addr >= RTG_BASE && addr < RTG_UPPER) {
         rtg_write((addr & 0x0FFFFFFF), val, type);
         return 1;
       }

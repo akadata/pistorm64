@@ -125,13 +125,14 @@ Example: `setvar piscsi64_1 /opt/Amiga/hdf/workbench.hdf`
 The `piscsi64_1` through `piscsi64_15` variables mount images for PiSCSI64 targets.  
 `piscsi64_0` is reserved for controller identity and is not used as a disk target.
 
-# rtg
+# pirtg64
 
-Example: `setvar rtg`  
-Enables the PiGFX RTG (ReTargetable Graphics) emulation, giving your Amiga a reasonably powerful Picasso96/CyberGraphics (CGX through Picasso96/P96 compatibility layer only, it is not possible to create a native CGX driver) graphics card that can be used for software and games that support RTG functionality.  
+Example: `setvar pirtg64`  
+Enables the PiRTG64 (ReTargetable Graphics) emulation, giving your Amiga a reasonably powerful Picasso96/CyberGraphics (CGX through Picasso96/P96 compatibility layer only, it is not possible to create a native CGX driver) graphics card that can be used for software and games that support PiRTG64 functionality.  
 Combined with the PiStorm Interaction Device, this also offers some additional acceleration that can be used to speed up large screen buffer blits considerably.  
-More detailed RTG information can be found in the `platforms/amiga/rtg` readme file.  
-**Note:** The PiGFX RTG **requires** 32-bit CPU emulation to work properly. It will not function with a 68000, 68010 or 68EC020 CPU selected in the config file. On the other hand, neither will Picasso96, so that's probably okay.
+More detailed PiRTG64 information can be found in the `platforms/amiga/pirtg64` readme file.
+
+**Note:** The PiRTG64 **requires** 64-bit CPU emulation to work properly. It will not function with less than 68030 CPU unless recompiled.
 
 # pi-ahi
 

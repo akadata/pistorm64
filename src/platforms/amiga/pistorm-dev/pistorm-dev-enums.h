@@ -14,7 +14,7 @@ enum pistorm_dev_cmds {
   PI_CMD_PISCSI_CTRL = 0x04,  // [RW] Write: Control a PiSCSI device. The command written here uses
                               //      values From various data registers around $2000.
                               //      Read: Returns whether PiSCSI is enabled or not.
-  PI_CMD_RTGSTATUS = 0x06, // [RW] Read: Check RTG status Write: Set RTG status (enabled/disabled)
+  PI_CMD_RTG_STATUS = 0x06, // [RW] Read: Check RTG status Write: Set RTG status (enabled/disabled)
   PI_CMD_NETSTATUS = 0x08, // [RW] Read: Check ETH status Write: Set ETH status (enabled/disabled)
   PI_CMD_KICKROM = 0x0A,   // [W] Map a different Kickstart ROM to the standard address using
                            //     the string at PI_STR1, if the file exists. Requires some config
@@ -108,26 +108,26 @@ enum pistorm_dev_cmds {
 };
 
 enum rtg_scaling_commands {
-  PIRTG64_SCALE_NONE,        // No scaling, display at 1:1 size even if it doesn't fit on screen
-  PIRTG64_SCALE_INTEGER_MAX, // Scale to max integer multiple that fits on screen
-  PIRTG64_SCALE_FULL_ASPECT, // Scale to full width and/or height of screen, preserve source aspect
+  RTG_SCALE_NONE,        // No scaling, display at 1:1 size even if it doesn't fit on screen
+  RTG_SCALE_INTEGER_MAX, // Scale to max integer multiple that fits on screen
+  RTG_SCALE_FULL_ASPECT, // Scale to full width and/or height of screen, preserve source aspect
                            // ratio
-  PIRTG64_SCALE_FULL_43,     // Scale to full width and/or height of screen at 4:3 aspect ratio
-  PIRTG64_SCALE_FULL_169,    // Scale to full width and/or height of screen at 16:9 aspect ratio
-  PIRTG64_SCALE_FULL,        // Scale to full width and height of screen, ignoring source aspect ratio
-  PIRTG64_SCALE_CUSTOM, // Scale to custom position and size specified in PI_WORD1 through PI_WORD4
-  PIRTG64_SCALE_CUSTOM_RECT, // Scale to custom rectangle coordinates specified in PI_WORD1 through
+  RTG_SCALE_FULL_43,     // Scale to full width and/or height of screen at 4:3 aspect ratio
+  RTG_SCALE_FULL_169,    // Scale to full width and/or height of screen at 16:9 aspect ratio
+  RTG_SCALE_FULL,        // Scale to full width and height of screen, ignoring source aspect ratio
+  RTG_SCALE_CUSTOM, // Scale to custom position and size specified in PI_WORD1 through PI_WORD4
+  RTG_SCALE_CUSTOM_RECT, // Scale to custom rectangle coordinates specified in PI_WORD1 through
                            // PI_WORD4
-  PIRTG64_SCALE_NUM,
+  RTG_SCALE_NUM,
 };
 
 enum rtg_scale_filter_commands {
-  PIRTG64_FILTER_POINT,  // Nearest neighbor scaling, sharp image, may cause uneven pixels
-  PIRTG64_FILTER_SMOOTH, // Linear/bilinear texture scaling, blurry, may improve visibility or
+  RTG_FILTER_POINT,  // Nearest neighbor scaling, sharp image, may cause uneven pixels
+  RTG_FILTER_SMOOTH, // Linear/bilinear texture scaling, blurry, may improve visibility or
                        // perceived "squareness" of pixels
-  PIRTG64_FILTER_SHADER, // Load and use a pixel shader specified in PI_STR1 for scaling RTG output
+  RTG_FILTER_SHADER, // Load and use a pixel shader specified in PI_STR1 for scaling RTG output
                        // [NYI]
-  PIRTG64_FILTER_NUM,
+  RTG_FILTER_NUM,
 };
 
 enum pistorm_piscsi_commands {

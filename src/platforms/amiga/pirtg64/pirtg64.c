@@ -30,7 +30,7 @@
 static zorro_device_t z3_rtg_device = {
     .name         = "pirtg64-rtg",
     .bus          = ZORRO_BUS_Z3,
-    .size         = PIRTG64_RTG_SIZE,          // whatever the spec wants
+    .size         = RTG_SIZE,          // whatever the spec wants
     .manufacturer = PISTORM_MANUF_ID,
     .product      = PISTORM_PROD_PI_RTG,     // add to the enum
     .flags        = 0,
@@ -103,7 +103,7 @@ static uint32_t rtg_memwrite16_gray = 0;
 static uint64_t rtg_memwrite_total_bytes = 0;
 static uint64_t rtg_memwrite_last_report_ns = 0;
 static int rtg_cmd_debug = -1;
-static uint32_t rtg_cmd_counts[RTGCMD_DEBUGME + 1];
+static uint32_t rtg_cmd_counts[RTG_CMD_DEBUGME + 1];
 static uint64_t rtg_cmd_last_report_ns = 0;
 static uint64_t rtg_cmd_p2c_pixels = 0;
 static uint64_t rtg_cmd_p2d_pixels = 0;
@@ -145,7 +145,7 @@ static void rtg_cmd_debug_note(uint32_t cmd) {
   if (!rtg_cmd_debug_enabled()) {
     return;
   }
-  if (cmd <= RTGCMD_DEBUGME) {
+  if (cmd <= RTG_CMD_DEBUGME) {
     rtg_cmd_counts[cmd]++;
   }
   uint64_t now = rtg_now_ns();
@@ -157,12 +157,12 @@ static void rtg_cmd_debug_note(uint32_t cmd) {
     return;
   }
   LOG_INFO("[RTG/DBG][CMD/sec] setgc=%u setpan=%u setclut=%u fill=%u blit=%u blitnm=%u tmpl=%u patt=%u p2c=%u p2d=%u draw=%u p2c_px=%" PRIu64 " p2d_px=%" PRIu64 " p2c_max=%ux%u p2d_max=%ux%u\n",
-           rtg_cmd_counts[RTGCMD_SETGC], rtg_cmd_counts[RTGCMD_SETPAN],
-           rtg_cmd_counts[RTGCMD_SETCLUT], rtg_cmd_counts[RTGCMD_FILLRECT],
-           rtg_cmd_counts[RTGCMD_BLITRECT], rtg_cmd_counts[RTGCMD_BLITRECT_NOMASK_COMPLETE],
-           rtg_cmd_counts[RTGCMD_BLITTEMPLATE], rtg_cmd_counts[RTGCMD_BLITPATTERN],
-           rtg_cmd_counts[RTGCMD_P2C], rtg_cmd_counts[RTGCMD_P2D],
-           rtg_cmd_counts[RTGCMD_DRAWLINE], rtg_cmd_p2c_pixels, rtg_cmd_p2d_pixels,
+           rtg_cmd_counts[RTG_CMD_SETGC], rtg_cmd_counts[RTG_CMD_SETPAN],
+           rtg_cmd_counts[RTG_CMD_SETCLUT], rtg_cmd_counts[RTG_CMD_FILLRECT],
+           rtg_cmd_counts[RTG_CMD_BLITRECT], rtg_cmd_counts[RTG_CMD_BLITRECT_NOMASK_COMPLETE],
+           rtg_cmd_counts[RTG_CMD_BLITTEMPLATE], rtg_cmd_counts[RTG_CMD_BLITPATTERN],
+           rtg_cmd_counts[RTG_CMD_P2C], rtg_cmd_counts[RTG_CMD_P2D],
+           rtg_cmd_counts[RTG_CMD_DRAWLINE], rtg_cmd_p2c_pixels, rtg_cmd_p2d_pixels,
            rtg_cmd_p2c_max_w, rtg_cmd_p2c_max_h, rtg_cmd_p2d_max_w, rtg_cmd_p2d_max_h);
   memset(rtg_cmd_counts, 0, sizeof(rtg_cmd_counts));
   rtg_cmd_p2c_pixels = 0;
@@ -252,7 +252,7 @@ extern uint8_t rtg_output_in_vblank;
 #define DEBUG(...)
 #endif
 
-static const char* rtg_format_names[RTGFMT_NUM] = {
+static const char* rtg_format_names[RTG_FMT_NUM] = {
     "4BPP PLANAR",        "8BPP CLUT",          "16BPP RGB (565 BE)", "16BPP RGB (565 LE)",
     "16BPP BGR (565 LE)", "24BPP RGB",          "24BPP BGR",          "32BPP RGB (ARGB)",
     "32BPP RGB (ABGR)",   "32BPP RGB (RGBA)",   "32BPP RGB (BGRA)",   "15BPP RGB (555 BE)",
@@ -292,8 +292,8 @@ int init_rtg_data(struct emulator_config* cfg_) {
     LOG_INFO("[RTG] Bound existing rtg_mem map[%d] to allocated RTG buffer (%u MB).\n",
              map_index, size / SIZE_MEGA);
   } else {
-    m68k_add_ram_range(PIRTG64_BASE + PIRTG64_REG_SIZE, PIRTG64_UPPER, rtg_mem);
-    add_mapping(cfg_, MAPTYPE_RAM_NOALLOC, PIRTG64_BASE + PIRTG64_REG_SIZE, rtg_mem_size,
+    m68k_add_ram_range(RTG_BASE + RTG_REG_SIZE, RTG_UPPER, rtg_mem);
+    add_mapping(cfg_, MAPTYPE_RAM_NOALLOC, RTG_BASE + RTG_REG_SIZE, rtg_mem_size,
                 (unsigned int)-1, (char*)rtg_mem, "rtg_mem", 0);
   }
   return 1;
@@ -313,7 +313,7 @@ void shutdown_rtg(void) {
 }
 
 unsigned int rtg_get_fb(void) {
-  return PIRTG64_BASE + PIRTG64_REG_SIZE + framebuffer_addr_adj;
+  return RTG_BASE + RTG_REG_SIZE + framebuffer_addr_adj;
 }
 
 uint8_t wait_vblank = 0;
@@ -323,8 +323,8 @@ extern uint32_t cur_rtg_frame;
 unsigned int rtg_read(uint32_t address, uint8_t mode) {
    //printf("%s read from RTG: %.8X\n", op_type_names[mode], address);
 
-  if (address >= PIRTG64_REG_SIZE) {
-    const unsigned int offset = address - PIRTG64_REG_SIZE;
+  if (address >= RTG_REG_SIZE) {
+    const unsigned int offset = address - RTG_REG_SIZE;
     if (rtg_mem && offset < rtg_mem_size) {
       switch (mode) {
       case OP_TYPE_BYTE:
@@ -490,11 +490,11 @@ static inline void rtg_write_reg_u32(uint32_t address, uint32_t value) {
   switch (address) {
   case RTG_ADDR1:
     *reg_addr1 = value;
-    rtg_address_adj[0] = value - (PIRTG64_BASE + PIRTG64_REG_SIZE);
+    rtg_address_adj[0] = value - (RTG_BASE + RTG_REG_SIZE);
     break;
   case RTG_ADDR2:
     *reg_addr2 = value;
-    rtg_address_adj[1] = value - (PIRTG64_BASE + PIRTG64_REG_SIZE);
+    rtg_address_adj[1] = value - (RTG_BASE + RTG_REG_SIZE);
     break;
   case RTG_ADDR3:
     *reg_addr3 = value;
@@ -518,8 +518,8 @@ static inline void rtg_write_reg_u32(uint32_t address, uint32_t value) {
 
 void rtg_write(uint32_t address, uint32_t value, uint8_t mode) {
   // printf("%s write to RTG: %.8X (%.8X)\n", op_type_names[mode], address, value);
-  if (address >= PIRTG64_REG_SIZE) {
-    const unsigned int offset = address - PIRTG64_REG_SIZE;
+  if (address >= RTG_REG_SIZE) {
+    const unsigned int offset = address - RTG_REG_SIZE;
     if (rtg_mem && offset < rtg_mem_size) {
       switch (mode) {
       case OP_TYPE_BYTE:
@@ -529,7 +529,7 @@ void rtg_write(uint32_t address, uint32_t value, uint8_t mode) {
       case OP_TYPE_WORD:
         write_be16(&rtg_mem[offset], (uint16_t)value);
         rtg_memwrite_debug_note(2);
-        if (rtg_memwrite_debug_enabled() && rtg_display_format == RTGFMT_RGB565_LE) {
+        if (rtg_memwrite_debug_enabled() && rtg_display_format == RTG_FMT_RGB565_LE) {
           uint16_t px = (uint16_t)value;
           uint8_t r5 = (uint8_t)((px >> 11) & 0x1F);
           uint8_t g6 = (uint8_t)((px >> 5) & 0x3F);
@@ -544,7 +544,7 @@ void rtg_write(uint32_t address, uint32_t value, uint8_t mode) {
       case OP_TYPE_LONGWORD:
         write_be32(&rtg_mem[offset], (uint32_t)value);
         rtg_memwrite_debug_note(4);
-        if (rtg_memwrite_debug_enabled() && rtg_display_format == RTGFMT_RGB32_BGRA) {
+        if (rtg_memwrite_debug_enabled() && rtg_display_format == RTG_FMT_RGB32_BGRA) {
           uint8_t b1 = (uint8_t)((value >> 16) & 0xFF);
           uint8_t b2 = (uint8_t)((value >> 8) & 0xFF);
           uint8_t b3 = (uint8_t)(value & 0xFF);
@@ -707,7 +707,7 @@ static void handle_rtg_command(uint32_t cmd) {
   const uint8_t sprite_h = u2_byte;                  // SETSPRITEIMAGE
 
   switch (cmd) {
-  case RTGCMD_SETGC:
+  case RTG_CMD_SETGC:
     gdebug("SetGC\n");
     if (rtg_display_format != rtg_format) {
       LOG_INFO("Pixel format switch from: %s (%d) to %s (%d)\n",
@@ -727,40 +727,40 @@ static void handle_rtg_command(uint32_t cmd) {
       rtg_total_rows = total_rows;
     }
     if (realtime_graphics_debug) {
-      LOG_DEBUG("Set RTG mode:\n");
+      LOG_DEBUG("Set PIRTG mode:\n");
       LOG_DEBUG("%dx%d pixels\n", rtg_display_width, rtg_display_height);
     }
     break;
-  case RTGCMD_SETPAN:
+  case RTG_CMD_SETPAN:
     // printf("Command: SetPan.\n");
     rtg_offset_x = pan_offset_x;
     rtg_offset_y = pan_offset_y;
     rtg_pitch = (uint16_t)(pan_width * rtg_pixel_size[rtg_display_format]);
-    framebuffer_addr = pan_framebuffer - (PIRTG64_BASE + PIRTG64_REG_SIZE);
+    framebuffer_addr = pan_framebuffer - (RTG_BASE + RTG_REG_SIZE);
     framebuffer_addr_adj = framebuffer_addr + (rtg_offset_x * rtg_pixel_size[rtg_display_format]) + (rtg_offset_y * rtg_pitch);
 
     // printf("PAN:\nPitch: %d\n", rtg_pitch);
     // printf("Pixel format: %s (%d)\n", rtg_format_names[rtg_format], rtg_format);
     // printf("Display pixel format: %s (%d)\n", rtg_format_names[rtg_display_format], rtg_display_format);
     break;
-  case RTGCMD_SETCLUT:
+  case RTG_CMD_SETCLUT:
     // IMPORTANT: reg_rgb1 is the correct palette payload for this driver path.
     // A previous attempt to source RGB from reg_u2/reg_u3/reg_u4 caused severe CLUT corruption
     // (black/green screen, 2-color icons). Treat any change here as high-risk and re-test
     // Workbench + 8-bit video playback before merging.
     rtg_set_clut_entry(clut_index, clut_color);
     break;
-  case RTGCMD_SETDISPLAY:
+  case RTG_CMD_SETDISPLAY:
     gdebug("SetDisplay\n");
     if (realtime_graphics_debug) {
-      LOG_DEBUG("RTG SetDisplay %s\n", (u2_byte) ? "enabled" : "disabled");
+      LOG_DEBUG("PIRTG SetDisplay %s\n", (u2_byte) ? "enabled" : "disabled");
     }
     break;
-  case RTGCMD_ENABLE:
-  case RTGCMD_SETSWITCH:
+  case RTG_CMD_ENABLE:
+  case RTG_CMD_SETSWITCH:
     gdebug("SetSwitch\n");
     if (realtime_graphics_debug) {
-      LOG_DEBUG("RTG SetSwitch %s\n", ((switch_flags) & 0x01) ? "enabled" : "disabled");
+      LOG_DEBUG("PIRTG SetSwitch %s\n", ((switch_flags) & 0x01) ? "enabled" : "disabled");
       LOG_DEBUG("LAL: %.4X\n", switch_flags);
     }
     display_enabled = ((switch_flags) & 0x01);
@@ -773,8 +773,8 @@ static void handle_rtg_command(uint32_t cmd) {
       }
     }
     break;
-  case RTGCMD_FILLRECT:
-    if (fill_mask == 0xFF || rtg_format != RTGFMT_8BIT_CLUT) { // done messes with workbench width, height 
+  case RTG_CMD_FILLRECT:
+    if (fill_mask == 0xFF || rtg_format != RTG_FMT_8BIT_CLUT) { // done messes with workbench width, height 
       rtg_fillrect_solid(fill_dst_x, fill_dst_y, fill_width, fill_height, fill_color, fill_pitch, rtg_format);
       gdebug("FillRect Solid\n");
     } else {
@@ -783,13 +783,13 @@ static void handle_rtg_command(uint32_t cmd) {
       gdebug("FillRect Masked\n");
     }
     break;
-  case RTGCMD_INVERTRECT:
+  case RTG_CMD_INVERTRECT:
     rtg_invertrect(fill_dst_x, fill_dst_y, fill_width, fill_height, fill_pitch, rtg_format,
                    fill_mask);
     gdebug("InvertRect\n");
     break;
-  case RTGCMD_BLITRECT:
-    if (blit_mask == 0xFF || rtg_format != RTGFMT_8BIT_CLUT) {
+  case RTG_CMD_BLITRECT:
+    if (blit_mask == 0xFF || rtg_format != RTG_FMT_8BIT_CLUT) {
       rtg_blitrect_solid(blit_src_x, blit_src_y, blit_dst_x, blit_dst_y, blit_width, blit_height,
                          blit_pitch, rtg_format);
       gdebug("BlitRect Solid\n");
@@ -799,27 +799,27 @@ static void handle_rtg_command(uint32_t cmd) {
       gdebug("BlitRect Masked\n");
     }
     break;
-  case RTGCMD_BLITRECT_NOMASK_COMPLETE:
+  case RTG_CMD_BLITRECT_NOMASK_COMPLETE:
     rtg_blitrect_nomask_complete(blit_src_x, blit_src_y, blit_dst_x, blit_dst_y, blit_width,
                                  blit_height, blit_src_pitch, blit_dst_pitch, blit_src_addr,
                                  blit_dst_addr, rtg_format, blit_minterm);
     gdebug("BlitRectNoMaskComplete\n");
     break;
-  case RTGCMD_BLITPATTERN:
+  case RTG_CMD_BLITPATTERN:
     rtg_blitpattern(pattern_dst_x, pattern_dst_y, pattern_width, pattern_height, pattern_src_addr,
                     pattern_fg_color, pattern_bg_color, pattern_dst_pitch, rtg_format,
                     pattern_offset_x, pattern_offset_y, pattern_mask, pattern_draw_mode,
                     pattern_loop_rows);
     gdebug("BlitPattern\n");
     return;
-  case RTGCMD_BLITTEMPLATE: /// text etc
+  case RTG_CMD_BLITTEMPLATE: /// text etc
     rtg_blittemplate(template_dst_x, template_dst_y, template_width, template_height,
                      template_src_addr, template_fg_color, template_bg_color, template_dst_pitch,
                      template_src_pitch, rtg_format, template_offset_x, template_mask,
                      template_draw_mode);
     gdebug("BlitTemplate\n");
     break;
-  case RTGCMD_DRAWLINE:
+  case RTG_CMD_DRAWLINE:
     if (line_mask == 0xFF && line_pattern == 0xFFFF) {// tried! fail here
       rtg_drawline_solid(line_start_x, line_start_y, line_end_x, line_end_y, line_length,
                          line_fg_color, line_pitch, rtg_format);
@@ -830,39 +830,39 @@ static void handle_rtg_command(uint32_t cmd) {
     }
     gdebug("DrawLine\n");
     break;
-  case RTGCMD_P2C: // fake native mode horizontal correction.
+  case RTG_CMD_P2C: // fake native mode horizontal correction.
       rtg_cmd_debug_note_p2_dims(0, p2_width, p2_height);
       rtg_p2c(p2_src_x, p2_src_y, p2_dst_x, p2_dst_y, p2_width, p2_height, p2_draw_mode,
               p2_planes, p2_mask, p2_layer_mask, p2_src_pitch, (uint8_t*)p2_bitmap);
     gdebug("Planar2Chunky\n");
     break;
-  case RTGCMD_P2D:// PiGFX mode horizontal correction.
+  case RTG_CMD_P2D:// PiGFX mode horizontal correction.
     rtg_cmd_debug_note_p2_dims(1, p2_width, p2_height);
     rtg_p2d(p2_src_x, p2_src_y, p2_dst_x, p2_dst_y, p2_width, p2_height, p2_draw_mode,
             p2_planes, p2_mask, p2_layer_mask, p2_src_pitch, (uint8_t*)p2_bitmap);
     gdebug("Planar2Direct\n");
     break;
-  case RTGCMD_SETSPRITE:
+  case RTG_CMD_SETSPRITE:
     rtg_enable_mouse_cursor(sprite_enable);
     gdebug("SetSprite\n");
     break;
-  case RTGCMD_SETSPRITECOLOR:
+  case RTG_CMD_SETSPRITECOLOR:
     rtg_set_cursor_clut_entry(sprite_r, sprite_g, sprite_b, sprite_idx);
     gdebug("SetSpriteColor\n");
     break;
-  case RTGCMD_SETSPRITEPOS:
+  case RTG_CMD_SETSPRITEPOS:
     rtg_set_mouse_cursor_pos(sprite_x, sprite_y);
     gdebug("SetSpritePos\n");
     break;
-  case RTGCMD_SETSPRITEIMAGE:
+  case RTG_CMD_SETSPRITEIMAGE:
     rtg_set_mouse_cursor_image((uint8_t*)sprite_image, sprite_w, sprite_h);
     gdebug("SetSpriteImage\n");
     break;
-  case RTGCMD_DEBUGME:
-    LOG_DEBUG("[RTG] DebugMe!\n");
+  case RTG_CMD_DEBUGME:
+    LOG_DEBUG("[PIRTG] DebugMe!\n");
     break;
   default:
-    LOG_DEBUG("[!!!RTG] Unknown/unhandled RTG command %d ($%.4X)\n", cmd, cmd);
+    LOG_DEBUG("[!!!PIRTG] Unknown/unhandled PIRTG command %d ($%.4X)\n", cmd, cmd);
     break;
   }
 }

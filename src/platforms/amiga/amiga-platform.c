@@ -129,7 +129,7 @@ uint8_t a314_initialized = 0;
 extern uint32_t piscsi_base;
 extern uint32_t piscsi64_base;
 extern uint32_t pistorm_dev_base;
-extern uint8_t rtg_dpms;
+//extern uint8_t rtg_dpms;
 
 extern void stop_cpu_emulation(uint8_t disasm_cur);
 
@@ -501,7 +501,9 @@ void adjust_ranges_amiga(struct emulator_config* cfg) {
     );
   }
 
-  if (rtg_enabled)    CUSTOM_RANGE_STEP("rtg",   PIRTG64_BASE, PIRTG64_UPPER);
+  if (rtg_enabled)  {
+    CUSTOM_RANGE_STEP("rtg",   RTG_BASE, RTG_UPPER);
+  }
   if (piscsi_enabled) {
     uint32_t pbase = piscsi_base ? piscsi_base : PISCSI_OFFSET;
     CUSTOM_RANGE_STEP("piscsi", pbase, pbase + PISCSI_REGSIZE);
@@ -509,8 +511,12 @@ void adjust_ranges_amiga(struct emulator_config* cfg) {
   if (piscsi64_enabled && piscsi64_base) {
     CUSTOM_RANGE_STEP("piscsi64", piscsi64_base, piscsi64_base + PISCSI64_REGSIZE);
   }
-  if (pinet_enabled)  CUSTOM_RANGE_STEP("pinet", PINET_OFFSET, PINET_UPPER);
-  if (pi_ahi_enabled) CUSTOM_RANGE_STEP("ahi",   PI_AHI_OFFSET, PI_AHI_UPPER);
+  if (pinet_enabled) {
+   CUSTOM_RANGE_STEP("pinet", PINET_OFFSET, PINET_UPPER);
+  }
+  if (pi_ahi_enabled) {
+    CUSTOM_RANGE_STEP("ahi",   PI_AHI_OFFSET, PI_AHI_UPPER);
+  }
 
   if (zorro_get_device_count() > 0) {
     CUSTOM_RANGE_STEP("zorro", z2_cfg_base, z2_cfg_base + cfg_win_size);
@@ -536,7 +542,7 @@ void adjust_ranges_amiga(struct emulator_config* cfg) {
 
 int setup_platform_amiga(struct emulator_config* cfg) {
   LOG_INFO("[AMIGA] Performing setup for Amiga platform.\n");
-  {
+  //{
     const amiga_zorro_layout_t* zlayout = amiga_get_zorro_layout();
     if (zlayout) {
       LOG_INFO("[AMIGA][ZORRO] Z2 config=$%.8X size=$%.8X Z2 mem=$%.8X-$%.8X\n",
@@ -545,7 +551,7 @@ int setup_platform_amiga(struct emulator_config* cfg) {
       LOG_INFO("[AMIGA][ZORRO] Z3 config=$%.8X size=$%.8X Z3 mem=$%.8X-$%.8X\n",
                zlayout->z3_config_base, zlayout->config_window_size,
                zlayout->z3_mem_base, zlayout->z3_mem_base + zlayout->z3_mem_size - 1u);
-    }
+ //   }
   }
 
   /* --------------------------------------------------------------------
@@ -827,31 +833,31 @@ void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val)
     LOG_INFO("[AMIGA] CDTV mode enabled.\n");
     cdtv_mode = 1;
   }
-  if (CHKVAR("rtg") && !rtg_enabled) {
-    if (init_rtg_data(cfg)) {
-      LOG_INFO("[AMIGA] RTG Enabled.\n");
-      rtg_enabled = 1;
-      adjust_ranges_amiga(cfg);
+  if (CHKVAR("pirtg64") && !rtg_enabled) {
+      if (init_rtg_data(cfg)) {
+        LOG_INFO("[AMIGA] PiRTG64 Enabled.\n");
+        rtg_enabled = 1;
+        adjust_ranges_amiga(cfg);
     } else {
-      LOG_WARN("[AMIGA] Failed to enable RTG.\n");
+      LOG_WARN("[AMIGA] Failed to enable PiRTG64.\n");
     }
   }
-  if (CHKVAR("rtg-dpms")) {
+ /* if (CHKVAR("rtg-dpms")) {
     rtg_dpms = 1;
     LOG_INFO("[AMIGA] DPMS enabled for RTG.\n");
-  }
+  } */
   if (CHKVAR("rtg-width")) {
     if (val && strlen(val) != 0) {
       uint32_t rtg_width = get_int(val);
       rtg_set_screen_width(rtg_width);
-      LOG_INFO("[AMIGA] RTG screen width set to %d.\n", rtg_width);
+      LOG_INFO("[AMIGA] PiRTG64 screen width set to %d.\n", rtg_width);
     }
   }
   if (CHKVAR("rtg-height")) {
     if (val && strlen(val) != 0) {
       uint32_t rtg_height = get_int(val);
       rtg_set_screen_height(rtg_height);
-      LOG_INFO("[AMIGA] RTG screen height set to %d.\n", rtg_height);
+      LOG_INFO("[AMIGA] PiRTG64 screen height set to %d.\n", rtg_height);
     }
   }
   if CHKVAR ("kick13") {

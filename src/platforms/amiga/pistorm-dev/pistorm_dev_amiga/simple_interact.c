@@ -91,7 +91,7 @@ int __stdargs main(int argc, char* argv[]) {
     printf("PiStorm ----------------------------\n");
     printf("Hardware revision: %d.%d\n", (pi_get_hw_rev() >> 8), (pi_get_hw_rev() & 0xFF));
     printf("Software revision: %d.%d\n", (pi_get_sw_rev() >> 8), (pi_get_sw_rev() & 0xFF));
-    printf("RTG: %s - %s\n", (pi_get_rtg_status() & 0x01) ? "Enabled" : "Disabled",
+    printf("PIRTG64: %s - %s\n", (pi_get_rtg_status() & 0x01) ? "Enabled" : "Disabled",
            (pi_get_rtg_status() & 0x02) ? "In use" : "Not in use");
     printf("NET: %s\n", pi_get_net_status() ? "Enabled" : "Disabled");
     printf("PiSCSI: %s\n", pi_get_piscsi_status() ? "Enabled" : "Disabled");
@@ -146,14 +146,14 @@ int __stdargs main(int argc, char* argv[]) {
   }
   case PI_CMD_RTG_SCALE_FILTER: {
     if (argc < 3) {
-      printf("Failed to set RTG scale filter: No scale filter specified.\n");
+      printf("Failed to set PIRTG64 scale filter: No scale filter specified.\n");
       break;
     }
     unsigned short scale_filter = get_scale_filter(argv[2]);
     if (scale_filter != PIRTG64_FILTER_NUM) {
       pi_set_rtg_scale_filter(scale_filter);
     } else {
-      printf("Failed to set RTG scale filter: Unknown scale filter %s.\n", argv[2]);
+      printf("Failed to set PIRTG64 scale filter: Unknown scale filter %s.\n", argv[2]);
     }
 
     break;
@@ -161,7 +161,7 @@ int __stdargs main(int argc, char* argv[]) {
   case PI_CMD_RTG_SCALING:
     if (scale_rect != 0) {
       if (argc < 6) {
-        printf("Missing command line arguments for RTG scale rect. Example:\n");
+        printf("Missing command line arguments for PIRTG64 scale rect. Example:\n");
         if (scale_rect == 1) {
           printf("%s --rtg-rect 16 16 640 480\n", argv[0]);
           printf("Arguments being a rect: [X] [Y] [Width] [Height]\n");
@@ -183,14 +183,14 @@ int __stdargs main(int argc, char* argv[]) {
       }
     } else {
       if (argc < 3) {
-        printf("Failed to set RTG scale mode: No scale mode type specified.\n");
+        printf("Failed to set PIRTG64 scale mode: No scale mode type specified.\n");
         break;
       }
       unsigned short scale_mode = get_scale_mode(argv[2]);
       if (scale_mode != PIRTG64_SCALE_NUM) {
         pi_set_rtg_scale_mode(scale_mode);
       } else {
-        printf("Failed to set RTG scale mode: Unknown RTG scale mode %s.\n", argv[2]);
+        printf("Failed to set PIRTG64 scale mode: Unknown PIRTG64 scale mode %s.\n", argv[2]);
         printf("Valid options are 4:3, 16:9, 1:1, full, aspect and integer\n");
       }
     }

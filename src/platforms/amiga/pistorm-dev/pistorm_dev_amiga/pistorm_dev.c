@@ -296,7 +296,7 @@ unsigned short pi_handle_config(unsigned char cmd, char* str) {
 
 // Simple feature status write functions
 void pi_enable_rtg(unsigned short val) {
-  WRITESHORT(PI_CMD_RTGSTATUS, val);
+  WRITESHORT(PI_CMD_RTG_STATUS, val);
 }
 void pi_enable_net(unsigned short val) {
   WRITESHORT(PI_CMD_NETSTATUS, val);
@@ -321,7 +321,7 @@ unsigned short pi_get_rtg_scale_filter(void) {
 }
 
 // Generic feature status setting function.
-// Example: pi_set_feature_status(PI_CMD_RTGSTATUS, 1) to enable RTG
+// Example: pi_set_feature_status(PI_CMD_RTG_STATUS, 1) to enable RTG
 //          pi_set_feature_status(PI_CMD_PISCSI_CTRL, PISCSI_CTRL_ENABLE) to enable PiSCSI
 void pi_set_feature_status(unsigned short cmd, unsigned char value) {
   WRITESHORT(cmd, value);
@@ -348,7 +348,7 @@ unsigned short pi_get_sw_rev(void) {
   return short_val;
 }
 unsigned short pi_get_rtg_status(void) {
-  READSHORT(PI_CMD_RTGSTATUS, short_val);
+  READSHORT(PI_CMD_RTG_STATUS, short_val);
   return short_val;
 }
 unsigned short pi_get_net_status(void) {

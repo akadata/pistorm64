@@ -32,7 +32,7 @@ map type=register address=0xDC0000 size=0x10000
 setvar enable_rtc_emulation 1
 
 # Uncomment to enable PiRTG
-setvar rtg
+setvar pirtg64
 setvar rtg_mem 64
 setvar rtg-width 0
 setvar rtg-height 0
