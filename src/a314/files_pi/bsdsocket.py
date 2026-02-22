@@ -329,8 +329,13 @@ class LibInstance:
 
     def read_str(self, address: int) -> str:
         length = self.copy_str_to_bounce(self.bb_address, address)
+        if length <= 0:
+            return ''
         data = self.read_bounce(self.bb_address, length)
-        return data.decode('latin-1')
+        nul = data.find(b'\x00')
+        if nul != -1:
+            data = data[:nul]
+        return data.decode('latin-1', errors='ignore')
 
     def read_tag_list(self, address: int) -> List[Tuple[int, int]]:
         length = self.copy_tag_list_to_bounce(self.bb_address, address)
@@ -814,8 +819,20 @@ class LibInstance:
 
     def handle_gethostbyname_op(self, name: int):
         logger.debug('handle_gethostbyname_op(name=%s)', name)
-        data = self.read_str(name)
-        host_addr = socket.gethostbyname(data)
+        data = self.read_str(name).strip()
+        if not data:
+            logger.warning('gethostbyname called with empty hostname (ptr=%s)', name)
+            self.service.send_op_res(self.stream_id, 0, 0)
+            return
+
+        try:
+            host_addr = socket.gethostbyname(data)
+        except socket.gaierror as e:
+            # Do not crash the lib thread on DNS failures; return NULL hostent.
+            logger.warning('gethostbyname failed for %r: %s', data, e)
+            self.service.send_op_res(self.stream_id, 0, 0)
+            return
+
         logger.debug('host_addr=%s', host_addr)
 
         result = 0

@@ -1,0 +1,1 @@
+savedcmd_z3bus.ko := ld -r -EL  -maarch64elf -z noexecstack --no-warn-rwx-segments --build-id=sha1  -T /usr/src/rpi-linux-6.18.6-v8+/scripts/module.lds -o z3bus.ko z3bus.o z3bus.mod.o .module-common.o
