@@ -26,6 +26,9 @@ NDKs:
 2) Add `/opt/amiga/bin` to `PATH`.
 3) Install NDK headers/libs under `/opt/amiga/include` and `/opt/amiga/lib`.
 
+Detailed end-to-end compiler setup (including `vc`/VBCC):
+- `Setup_Amiga_Compiler.md`
+
 ## Amiga.dev (Picasso96 / SDK components)
 
 If you maintain an `amiga.dev` tree (e.g. Picasso96Develop), install it alongside the toolchain and reference it in builds that require RTG dev headers.

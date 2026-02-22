@@ -91,7 +91,7 @@ int __stdargs main(int argc, char* argv[]) {
     printf("PiStorm ----------------------------\n");
     printf("Hardware revision: %d.%d\n", (pi_get_hw_rev() >> 8), (pi_get_hw_rev() & 0xFF));
     printf("Software revision: %d.%d\n", (pi_get_sw_rev() >> 8), (pi_get_sw_rev() & 0xFF));
-    printf("PIRTG64: %s - %s\n", (pi_get_rtg_status() & 0x01) ? "Enabled" : "Disabled",
+    printf("RTG: %s - %s\n", (pi_get_rtg_status() & 0x01) ? "Enabled" : "Disabled",
            (pi_get_rtg_status() & 0x02) ? "In use" : "Not in use");
     printf("NET: %s\n", pi_get_net_status() ? "Enabled" : "Disabled");
     printf("PiSCSI: %s\n", pi_get_piscsi_status() ? "Enabled" : "Disabled");
@@ -146,14 +146,14 @@ int __stdargs main(int argc, char* argv[]) {
   }
   case PI_CMD_RTG_SCALE_FILTER: {
     if (argc < 3) {
-      printf("Failed to set PIRTG64 scale filter: No scale filter specified.\n");
+      printf("Failed to set RTG scale filter: No scale filter specified.\n");
       break;
     }
     unsigned short scale_filter = get_scale_filter(argv[2]);
-    if (scale_filter != PIRTG64_FILTER_NUM) {
+    if (scale_filter != PIGFX_FILTER_NUM) {
       pi_set_rtg_scale_filter(scale_filter);
     } else {
-      printf("Failed to set PIRTG64 scale filter: Unknown scale filter %s.\n", argv[2]);
+      printf("Failed to set RTG scale filter: Unknown scale filter %s.\n", argv[2]);
     }
 
     break;
@@ -161,7 +161,7 @@ int __stdargs main(int argc, char* argv[]) {
   case PI_CMD_RTG_SCALING:
     if (scale_rect != 0) {
       if (argc < 6) {
-        printf("Missing command line arguments for PIRTG64 scale rect. Example:\n");
+        printf("Missing command line arguments for RTG scale rect. Example:\n");
         if (scale_rect == 1) {
           printf("%s --rtg-rect 16 16 640 480\n", argv[0]);
           printf("Arguments being a rect: [X] [Y] [Width] [Height]\n");
@@ -177,20 +177,20 @@ int __stdargs main(int argc, char* argv[]) {
         y1 = atoi(argv[3]);
         x2 = atoi(argv[4]);
         y2 = atoi(argv[5]);
-        pi_set_rtg_scale_rect(scale_rect == 1 ? PIRTG64_SCALE_CUSTOM_RECT : PIRTG64_SCALE_CUSTOM, x1,
+        pi_set_rtg_scale_rect(scale_rect == 1 ? PIGFX_SCALE_CUSTOM_RECT : PIGFX_SCALE_CUSTOM, x1,
                               y1, x2, y2);
         break;
       }
     } else {
       if (argc < 3) {
-        printf("Failed to set PIRTG64 scale mode: No scale mode type specified.\n");
+        printf("Failed to set RTG scale mode: No scale mode type specified.\n");
         break;
       }
       unsigned short scale_mode = get_scale_mode(argv[2]);
-      if (scale_mode != PIRTG64_SCALE_NUM) {
+      if (scale_mode != PIGFX_SCALE_NUM) {
         pi_set_rtg_scale_mode(scale_mode);
       } else {
-        printf("Failed to set PIRTG64 scale mode: Unknown PIRTG64 scale mode %s.\n", argv[2]);
+        printf("Failed to set RTG scale mode: Unknown RTG scale mode %s.\n", argv[2]);
         printf("Valid options are 4:3, 16:9, 1:1, full, aspect and integer\n");
       }
     }
@@ -264,38 +264,38 @@ int get_command(char* cmd) {
 
 unsigned short get_scale_mode(char* mode) {
   if (strcmp(mode, "4:3") == 0)
-    return PIRTG64_SCALE_FULL_43;
+    return PIGFX_SCALE_FULL_43;
   if (strcmp(mode, "16:9") == 0)
-    return PIRTG64_SCALE_FULL_169;
+    return PIGFX_SCALE_FULL_169;
   if (strcmp(mode, "1:1") == 0)
-    return PIRTG64_SCALE_NONE;
+    return PIGFX_SCALE_NONE;
   if (strcmp(mode, "full") == 0)
-    return PIRTG64_SCALE_FULL;
+    return PIGFX_SCALE_FULL;
   if (strcmp(mode, "aspect") == 0)
-    return PIRTG64_SCALE_FULL_ASPECT;
+    return PIGFX_SCALE_FULL_ASPECT;
   if (strcmp(mode, "integer") == 0)
-    return PIRTG64_SCALE_INTEGER_MAX;
+    return PIGFX_SCALE_INTEGER_MAX;
 
-  return PIRTG64_SCALE_NUM;
+  return PIGFX_SCALE_NUM;
 }
 
 unsigned short get_scale_filter(char* mode) {
   if (strcmp(mode, "sharp") == 0)
-    return PIRTG64_FILTER_POINT;
+    return PIGFX_FILTER_POINT;
   if (strcmp(mode, "point") == 0)
-    return PIRTG64_FILTER_POINT;
+    return PIGFX_FILTER_POINT;
   if (strcmp(mode, "smooth") == 0)
-    return PIRTG64_FILTER_SMOOTH;
+    return PIGFX_FILTER_SMOOTH;
   if (strcmp(mode, "blurry") == 0)
-    return PIRTG64_FILTER_SMOOTH;
+    return PIGFX_FILTER_SMOOTH;
   if (strcmp(mode, "bilinear") == 0)
-    return PIRTG64_FILTER_SMOOTH;
+    return PIGFX_FILTER_SMOOTH;
   if (strcmp(mode, "linear") == 0)
-    return PIRTG64_FILTER_SMOOTH;
+    return PIGFX_FILTER_SMOOTH;
   if (strcmp(mode, "shader") == 0)
-    return PIRTG64_FILTER_SHADER;
+    return PIGFX_FILTER_SHADER;
 
-  return PIRTG64_FILTER_NUM;
+  return PIGFX_FILTER_NUM;
 }
 
 void print_usage(char* exe) {

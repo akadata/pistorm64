@@ -36,6 +36,7 @@ Feature how-tos:
 
 Development:
 - Dev-Environment.md
+- Setup_Amiga_Compiler.md
 - Tools.md
 - UAE-JIT-Status.md (experimental UAE JIT backend status)
 - Janus-Bus-Engine.md

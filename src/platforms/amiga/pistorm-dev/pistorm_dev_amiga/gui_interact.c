@@ -4,11 +4,10 @@
 #include <proto/dos.h>
 #include <intuition/intuition.h>
 #include <proto/exec.h>
-#include <proto/dos.h>
 #include <workbench/startup.h>
 #include <clib/expansion_protos.h>
 #include <libraries/reqtools.h>
-#include <clib/reqtools_protos.h>
+#include "reqtools/proto/reqtools.h"
 
 #include "pistorm_dev.h"
 #include "../pistorm-dev-enums.h"
@@ -19,7 +18,7 @@
 extern unsigned int pistorm_base_addr;
 struct ReqToolsBase* ReqToolsBase;
 
-#define VERSION "v0.4.1"
+#define VERSION "v0.4.0"
 
 #define button1w 54
 #define button1h 11
@@ -394,7 +393,7 @@ struct Gadget ConfigFile = {&ConfigCommit,
 
 #define RTGSTATUS_TXT_SIZE 64
 
-UBYTE RTGStatus_buf[RTGSTATUS_TXT_SIZE] = "PIRTG64 status";
+UBYTE RTGStatus_buf[RTGSTATUS_TXT_SIZE] = "RTG status";
 
 struct IntuiText RTGStatus_text = {1, 0, JAM2, 1, 1, &font, (UBYTE*)RTGStatus_buf, NULL};
 
@@ -418,7 +417,7 @@ struct Gadget RTGStatus = {&ConfigFile,
 
 #define RTGENABLE_TXT_SIZE 64
 
-UBYTE RTG_buf[64] = "PIRTG64 Enable";
+UBYTE RTG_buf[64] = "RTG Enable";
 
 struct IntuiText RTG_text = {1, 0, JAM2, 8, 2, &font, (UBYTE*)RTG_buf, NULL};
 
@@ -516,39 +515,39 @@ static void WriteGadgetText(const char* text, UBYTE* buffer, struct Window* wind
 static void updateRTG(struct Window* window) {
   unsigned short rtg = pi_get_rtg_status();
   if (rtg & 0x01) {
-    WriteGadgetText("Disable PIRTG64", RTG_buf, window, &RTGButton, RTGENABLE_TXT_SIZE);
+    WriteGadgetText("Disable RTG", RTG_buf, window, &RTGButton, RTGENABLE_TXT_SIZE);
     if (rtg & 0x02) {
-      WriteGadgetText("PIRTG64 in use", RTGStatus_buf, window, &RTGStatus, RTGSTATUS_TXT_SIZE);
+      WriteGadgetText("RTG in use", RTGStatus_buf, window, &RTGStatus, RTGSTATUS_TXT_SIZE);
     } else {
-      WriteGadgetText("PIRTG64 not in use", RTGStatus_buf, window, &RTGStatus, RTGSTATUS_TXT_SIZE);
+      WriteGadgetText("RTG not in use", RTGStatus_buf, window, &RTGStatus, RTGSTATUS_TXT_SIZE);
     }
   } else {
-    WriteGadgetText("Enable PIRTG64", RTG_buf, window, &RTGButton, RTGENABLE_TXT_SIZE);
-    WriteGadgetText("PIRTG64 disabled", RTGStatus_buf, window, &RTGStatus, RTGSTATUS_TXT_SIZE);
+    WriteGadgetText("Enable RTG", RTG_buf, window, &RTGButton, RTGENABLE_TXT_SIZE);
+    WriteGadgetText("RTG disabled", RTGStatus_buf, window, &RTGStatus, RTGSTATUS_TXT_SIZE);
   }
   unsigned short filter = pi_get_rtg_scale_mode();
   switch (filter) {
-  case RTG_SCALE_NONE:
+  case PIGFX_SCALE_NONE:
     WriteGadgetText("None", RTG_scale_buf, window, &RTGScaleButton, RTGENABLE_TXT_SIZE);
     break;
-  case RTG_SCALE_INTEGER_MAX:
+  case PIGFX_SCALE_INTEGER_MAX:
     WriteGadgetText("Max integer", RTG_scale_buf, window, &RTGScaleButton, RTGENABLE_TXT_SIZE);
     break;
-  case RTG_SCALE_FULL_ASPECT:
+  case PIGFX_SCALE_FULL_ASPECT:
     WriteGadgetText("Full aspect", RTG_scale_buf, window, &RTGScaleButton, RTGENABLE_TXT_SIZE);
     break;
-  case RTG_SCALE_FULL_43:
+  case PIGFX_SCALE_FULL_43:
     WriteGadgetText("Full 4:3", RTG_scale_buf, window, &RTGScaleButton, RTGENABLE_TXT_SIZE);
     break;
-  case RTG_SCALE_FULL_169:
+  case PIGFX_SCALE_FULL_169:
     WriteGadgetText("Full 16:9", RTG_scale_buf, window, &RTGScaleButton, RTGENABLE_TXT_SIZE);
     break;
-  case RTG_SCALE_FULL:
+  case PIGFX_SCALE_FULL:
     WriteGadgetText("Full", RTG_scale_buf, window, &RTGScaleButton, RTGENABLE_TXT_SIZE);
     break;
-  case RTG_SCALE_CUSTOM:
-  case RTG_SCALE_CUSTOM_RECT:
-  case RTG_SCALE_NUM:
+  case PIGFX_SCALE_CUSTOM:
+  case PIGFX_SCALE_CUSTOM_RECT:
+  case PIGFX_SCALE_NUM:
   default:
     WriteGadgetText("Custom", RTG_scale_buf, window, &RTGScaleButton, RTGENABLE_TXT_SIZE);
     break;
@@ -556,16 +555,16 @@ static void updateRTG(struct Window* window) {
 
   unsigned short scale = pi_get_rtg_scale_filter();
   switch (scale) {
-  case RTG_FILTER_POINT:
+  case PIGFX_FILTER_POINT:
     WriteGadgetText("Point", RTG_filter_buf, window, &RTGFilterButton, RTGENABLE_TXT_SIZE);
     break;
-  case RTG_FILTER_SMOOTH:
+  case PIGFX_FILTER_SMOOTH:
     WriteGadgetText("Smooth", RTG_filter_buf, window, &RTGFilterButton, RTGENABLE_TXT_SIZE);
     break;
-  case RTG_FILTER_SHADER:
+  case PIGFX_FILTER_SHADER:
     WriteGadgetText("Shader", RTG_filter_buf, window, &RTGFilterButton, RTGENABLE_TXT_SIZE);
     break;
-  case RTG_FILTER_NUM:
+  case PIGFX_FILTER_NUM:
   default:
     WriteGadgetText("Custom", RTG_filter_buf, window, &RTGFilterButton, RTGENABLE_TXT_SIZE);
     break;
@@ -811,27 +810,27 @@ int main() {
         case GADRTGSCALEBUTTON: {
           unsigned short scale = pi_get_rtg_scale_mode();
           switch (scale) {
-          case RTG_SCALE_NONE:
-            pi_set_rtg_scale_mode(RTG_SCALE_INTEGER_MAX);
+          case PIGFX_SCALE_NONE:
+            pi_set_rtg_scale_mode(PIGFX_SCALE_INTEGER_MAX);
             break;
-          case RTG_SCALE_INTEGER_MAX:
-            pi_set_rtg_scale_mode(RTG_SCALE_FULL_ASPECT);
+          case PIGFX_SCALE_INTEGER_MAX:
+            pi_set_rtg_scale_mode(PIGFX_SCALE_FULL_ASPECT);
             break;
-          case RTG_SCALE_FULL_ASPECT:
-            pi_set_rtg_scale_mode(RTG_SCALE_FULL_43);
+          case PIGFX_SCALE_FULL_ASPECT:
+            pi_set_rtg_scale_mode(PIGFX_SCALE_FULL_43);
             break;
-          case RTG_SCALE_FULL_43:
-            pi_set_rtg_scale_mode(RTG_SCALE_FULL_169);
+          case PIGFX_SCALE_FULL_43:
+            pi_set_rtg_scale_mode(PIGFX_SCALE_FULL_169);
             break;
-          case RTG_SCALE_FULL_169:
-            pi_set_rtg_scale_mode(RTG_SCALE_FULL);
+          case PIGFX_SCALE_FULL_169:
+            pi_set_rtg_scale_mode(PIGFX_SCALE_FULL);
             break;
-          case RTG_SCALE_FULL:
-          case RTG_SCALE_CUSTOM:
-          case RTG_SCALE_CUSTOM_RECT:
-          case RTG_SCALE_NUM:
+          case PIGFX_SCALE_FULL:
+          case PIGFX_SCALE_CUSTOM:
+          case PIGFX_SCALE_CUSTOM_RECT:
+          case PIGFX_SCALE_NUM:
           default:
-            pi_set_rtg_scale_mode(RTG_SCALE_NONE);
+            pi_set_rtg_scale_mode(PIGFX_SCALE_NONE);
             break;
           }
           updateRTG(myWindow);
@@ -839,14 +838,14 @@ int main() {
         case GADRTGFILTERBUTTON: {
           unsigned short filter = pi_get_rtg_scale_filter();
           switch (filter) {
-          case RTG_FILTER_POINT:
-            pi_set_rtg_scale_filter(RTG_FILTER_SMOOTH);
+          case PIGFX_FILTER_POINT:
+            pi_set_rtg_scale_filter(PIGFX_FILTER_SMOOTH);
             break;
-          case RTG_FILTER_SMOOTH:
-          case RTG_FILTER_SHADER:
-          case RTG_FILTER_NUM:
+          case PIGFX_FILTER_SMOOTH:
+          case PIGFX_FILTER_SHADER:
+          case PIGFX_FILTER_NUM:
           default:
-            pi_set_rtg_scale_filter(RTG_FILTER_POINT);
+            pi_set_rtg_scale_filter(PIGFX_FILTER_POINT);
             break;
           }
           updateRTG(myWindow);

@@ -151,16 +151,16 @@ static void rtg_apply_thread_tuning(void) {
 static const char* rtg_resolve_shader_path(const char* filename, char* buf, size_t buf_len) {
     const char* root = getenv("PISTORM_ROOT");
     if (root && *root) {
-        snprintf(buf, buf_len, "%s/RTG/shaders/%s", root, filename);
+        snprintf(buf, buf_len, "%s/pirtg/shaders/%s", root, filename);
         if (access(buf, R_OK) == 0) {
             return buf;
         }
-        snprintf(buf, buf_len, "%s/src/platforms/amiga/RTG/shaders/%s", root, filename);
+        snprintf(buf, buf_len, "%s/src/platforms/amiga/pirtg64/shaders/%s", root, filename);
         if (access(buf, R_OK) == 0) {
             return buf;
         }
     }
-    snprintf(buf, buf_len, "src/platforms/amiga/RTG/shaders/%s", filename);
+    snprintf(buf, buf_len, "src/platforms/amiga/pirtg64/shaders/%s", filename);
     if (access(buf, R_OK) == 0) {
         return buf;
     }
