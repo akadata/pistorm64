@@ -9,7 +9,7 @@
 #include "platforms/amiga/Gayle.h"
 #include "platforms/amiga/amiga-registers.h"
 #include "platforms/amiga/amiga-interrupts.h"
-#include "platforms/amiga/rtg/rtg.h"
+#include "platforms/amiga/pirtg64/pirtg64.h"
 #include "platforms/amiga/hunk-reloc.h"
 #include "platforms/amiga/piscsi/piscsi.h"
 #include "platforms/amiga/piscsi/piscsi-enums.h"
@@ -2085,7 +2085,7 @@ static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t*
         *res = handle_pinet_read(addr, type);
         return 1;
       }
-      if (addr >= PIGFX_RTG_BASE && addr < PIGFX_UPPER) {
+      if (addr >= PIRTG64_BASE && addr < PIRTG64_UPPER) {
         *res = rtg_read((addr & 0x0FFFFFFF), type);
         return 1;
       }
@@ -2318,7 +2318,7 @@ static inline int32_t platform_write_check(uint8_t type, uint32_t addr, uint32_t
         handle_pinet_write(addr, val, type);
         return 1;
       }
-      if (addr >= PIGFX_RTG_BASE && addr < PIGFX_UPPER) {
+      if (addr >= PIRTG64_BASE && addr < PIRTG64_UPPER) {
         rtg_write((addr & 0x0FFFFFFF), val, type);
         return 1;
       }

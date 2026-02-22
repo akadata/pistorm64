@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: MIT
 
-// PiStorm RTG driver, VBCC edition.
+// PiStorm PiRTG64 driver, VBCC edition.
 // Based in part on the ZZ9000 RTG driver.
+// PiRTG64 Picasso96 RTG card – build script
+// Copyright (c) 2026 AKADATA Limited
+// Licensed under the MIT License – see LICENSE for details.
+// Developed by AKADATA, with help and support from Codex.
 
 #include <proto/exec.h>
 #include <proto/expansion.h>
@@ -327,9 +331,15 @@ void SetSpriteColor (
 #define DEVICE_VERSION 43
 #define DEVICE_REVISION 20
 #define DEVICE_PRIORITY 0
-#define DEVICE_ID_STRING "PiGFX " XSTR(DEVICE_VERSION) "." XSTR(DEVICE_REVISION) " " DEVICE_DATE
-#define DEVICE_NAME "pigfx.card"
+#define DEVICE_ID_STRING "PiRTG64 " XSTR(DEVICE_VERSION) "." XSTR(DEVICE_REVISION) " " DEVICE_DATE
+#define DEVICE_NAME "pigrtg64.card"
 #define DEVICE_DATE "(21 Feb 2026)"
+
+/*
+ * Keep advertised RGB formats conservative and aligned with what the backend
+ * is known to handle reliably end-to-end.
+ */
+static const ULONG kPigfxSupportedFormats = RGBFF_NONE | RGBFF_CLUT | RGBFF_R5G6B5 | RGBFF_R5G5B5 | RGBFF_R8G8B8A8 | RGBFF_B8G8R8A8;
 
 
 int __attribute__((no_reorder)) _start() {
@@ -376,7 +386,7 @@ __saveds struct GFXBase* InitLib(
 // 100000000
 
 static struct GFXBase *_gfxbase;
-const char *gfxname = "PiStorm RTG";
+const char *gfxname = "PiStorm PiRTG64";
 char dummies[128];
 
 __saveds struct GFXBase* __attribute__((used)) InitLib(
@@ -482,13 +492,13 @@ int __attribute__((used)) InitCard(
 
     b->CardBase = (struct CardBase *)_gfxbase;
     b->ExecBase = SysBase;
-    b->BoardName = "PiStorm RTG";
+    b->BoardName = "PiStorm PiRTG64";
     b->BoardType = 14;
     b->PaletteChipType = PCT_S3ViRGE;
     b->GraphicsControllerType = GCT_S3ViRGE;
 
     b->Flags |= BIF_GRANTDIRECTACCESS | BIF_HARDWARESPRITE | BIF_FLICKERFIXER;// | BIF_BLITTER;
-    b->RGBFormats = RGBFF_HICOLOR | RGBFF_TRUECOLOR | RGBFF_TRUEALPHA | RGBFF_CLUT | RGBFF_NONE;
+    b->RGBFormats = (UWORD)kPigfxSupportedFormats;
     b->SoftSpriteFlags = 0;
     b->BitsPerCannon = 8;
 
@@ -639,6 +649,10 @@ void SetColorArray (
     if (!b->CLUT) {
         return;
     }
+    if (b->RGBFormat != RGBFB_CLUT) {
+        // Direct-color modes should not consume CLUT updates.
+        return;
+    }
     
     int j = start + num;
     
@@ -719,7 +733,25 @@ APTR CalculateMemory (
 ULONG GetCompatibleFormats (
     __REGA0(struct BoardInfo *b), 
     __REGD7(RGBFTYPE format)) {
-    return 0xFFFFFFFF;
+    (void)b;
+    switch (format) {
+    case RGBFB_CLUT:
+        return (RGBFF_NONE | RGBFF_CLUT);
+
+    case RGBFB_R5G6B5PC: case RGBFB_R5G5B5PC:
+    case RGBFB_R5G6B5:   case RGBFB_R5G5B5:
+    case RGBFB_B5G6R5PC: case RGBFB_B5G5R5PC:
+        return (RGBFF_NONE | RGBFF_R5G6B5 | RGBFF_R5G5B5);
+
+    case RGBFB_B8G8R8A8:
+    case RGBFB_R8G8B8A8:
+    case RGBFB_A8B8G8R8:
+    case RGBFB_A8R8G8B8:
+        return (RGBFF_NONE | RGBFF_B8G8R8A8 | RGBFF_R8G8B8A8);
+
+    default:
+        return kPigfxSupportedFormats;
+    }
 }
 
 //static int display_enabled = 0;

@@ -23,7 +23,7 @@ These are always serviced locally when enabled:
 
 | Range | Path | Notes |
 | --- | --- | --- |
-| `0x70000000..0x72810000` | Pi-side | RTG window (`PIGFX_RTG_BASE`..`PIGFX_UPPER`) |
+| `0x70000000..0x72810000` | Pi-side | RTG window (`PIRTG64_BASE`..`PIRTG64_UPPER`) |
 | `0x80000000..0x80010000` | Pi-side | PiSCSI regs (`PISCSI_OFFSET`..`PISCSI_UPPER`) |
 | `0x80010000..0x80020000` | Pi-side | Pi-Net regs (`PINET_OFFSET`..`PINET_UPPER`) |
 | `0x88000000..0x8A000000` | Pi-side | Pi-AHI (`PI_AHI_OFFSET`..`PI_AHI_UPPER`) |

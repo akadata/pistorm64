@@ -103,22 +103,22 @@ enum pistorm_dev_cmds {
 };
 
 enum rtg_scaling_commands {
-    PIGFX_SCALE_NONE,           // No scaling, display at 1:1 size even if it doesn't fit on screen
-    PIGFX_SCALE_INTEGER_MAX,    // Scale to max integer multiple that fits on screen
-    PIGFX_SCALE_FULL_ASPECT,    // Scale to full width and/or height of screen, preserve source aspect ratio
-    PIGFX_SCALE_FULL_43,        // Scale to full width and/or height of screen at 4:3 aspect ratio
-    PIGFX_SCALE_FULL_169,       // Scale to full width and/or height of screen at 16:9 aspect ratio
-    PIGFX_SCALE_FULL,           // Scale to full width and height of screen, ignoring source aspect ratio
-    PIGFX_SCALE_CUSTOM,         // Scale to custom position and size specified in PI_WORD1 through PI_WORD4
-    PIGFX_SCALE_CUSTOM_RECT,    // Scale to custom rectangle coordinates specified in PI_WORD1 through PI_WORD4
-    PIGFX_SCALE_NUM,
+    PIRTG64_SCALE_NONE,           // No scaling, display at 1:1 size even if it doesn't fit on screen
+    PIRTG64_SCALE_INTEGER_MAX,    // Scale to max integer multiple that fits on screen
+    PIRTG64_SCALE_FULL_ASPECT,    // Scale to full width and/or height of screen, preserve source aspect ratio
+    PIRTG64_SCALE_FULL_43,        // Scale to full width and/or height of screen at 4:3 aspect ratio
+    PIRTG64_SCALE_FULL_169,       // Scale to full width and/or height of screen at 16:9 aspect ratio
+    PIRTG64_SCALE_FULL,           // Scale to full width and height of screen, ignoring source aspect ratio
+    PIRTG64_SCALE_CUSTOM,         // Scale to custom position and size specified in PI_WORD1 through PI_WORD4
+    PIRTG64_SCALE_CUSTOM_RECT,    // Scale to custom rectangle coordinates specified in PI_WORD1 through PI_WORD4
+    PIRTG64_SCALE_NUM,
 };
 
 enum rtg_scale_filter_commands {
-    PIGFX_FILTER_POINT,     // Nearest neighbor scaling, sharp image, may cause uneven pixels
-    PIGFX_FILTER_SMOOTH,    // Linear/bilinear texture scaling, blurry, may improve visibility or perceived "squareness" of pixels
-    PIGFX_FILTER_SHADER,    // Load and use a pixel shader specified in PI_STR1 for scaling RTG output [NYI]
-    PIGFX_FILTER_NUM,
+    PIRTG64_FILTER_POINT,     // Nearest neighbor scaling, sharp image, may cause uneven pixels
+    PIRTG64_FILTER_SMOOTH,    // Linear/bilinear texture scaling, blurry, may improve visibility or perceived "squareness" of pixels
+    PIRTG64_FILTER_SHADER,    // Load and use a pixel shader specified in PI_STR1 for scaling RTG output [NYI]
+    PIRTG64_FILTER_NUM,
 };
 
 enum pistorm_piscsi_commands {

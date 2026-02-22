@@ -81,6 +81,14 @@ enum rtg_formats {
   RTGFMT_NUM,
 };
 
+// Readability aliases for 24/32-bit mode work.
+#define RTGFMT_RGB888     RTGFMT_RGB24
+#define RTGFMT_BGR888     RTGFMT_BGR24
+#define RTGFMT_ARGB8888   RTGFMT_RGB32_ARGB
+#define RTGFMT_ABGR8888   RTGFMT_RGB32_ABGR
+#define RTGFMT_RGBA8888   RTGFMT_RGB32_RGBA
+#define RTGFMT_BGRA8888   RTGFMT_RGB32_BGRA
+
 enum gfx_minterm_modes {
   MINTERM_FALSE,
   MINTERM_NOR,

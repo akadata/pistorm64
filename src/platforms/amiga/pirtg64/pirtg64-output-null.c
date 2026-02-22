@@ -1,8 +1,16 @@
 // SPDX-License-Identifier: MIT
-// Minimal RTG stub to allow builds without raylib/SDL backends.
+// PiStorm PiRTG64 driver, VBCC edition.
+// Based in part on the ZZ9000 RTG driver.
+// PiRTG64 Picasso96 RTG card – build script
+//
+// Copyright (c) 2026 AKADATA Limited
+// Licensed under the MIT License – see LICENSE for details.
+// Developed by AKADATA, with help and support from Codex.
+// PiRTG64 stub to allow builds without raylib/SDL backends.
+
 
 #include <stdint.h>
-#include "rtg.h"
+#include "pirtg64.h"
 
 uint8_t busy = 0;
 uint8_t rtg_on = 0;

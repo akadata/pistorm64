@@ -1,7 +1,15 @@
 // SPDX-License-Identifier: MIT
+// PiStorm PiRTG64 driver, VBCC edition.
+// Based in part on the ZZ9000 RTG driver.
+// PiRTG64 Picasso96 RTG card – build script
+//
+// Copyright (c) 2026 AKADATA Limited
+// Licensed under the MIT License – see LICENSE for details.
+// Developed by AKADATA, with help and support from Codex.
 
-#define PIGFX_RTG_BASE 0x70000000
-#define PIGFX_REG_SIZE 0x00010000
+
+#define PIRTG64_BASE 0x70000000
+#define PIRTG64_REG_SIZE 0x00010000
 #ifndef RTG_GFX_MEM
 #define RTG_GFX_MEM 128u
 #endif
@@ -9,10 +17,10 @@
 #define RTG_MEM_MB RTG_GFX_MEM
 #endif
 
-#define PIGFX_RTG_SIZE ((RTG_GFX_MEM) * 0x00100000u)
-#define PIGFX_SCRATCH_SIZE 0x00800000
-#define PIGFX_SCRATCH_AREA 0x72010000
-#define PIGFX_UPPER 0x72810000
+#define PIRTG64_SIZE ((RTG_GFX_MEM) * 0x00100000u)
+#define PIRTG64_SCRATCH_SIZE 0x00800000
+#define PIRTG64_SCRATCH_AREA 0x72010000
+#define PIRTG64_UPPER 0x72810000
 
 #define CARD_OFFSET 0
 
@@ -59,6 +67,12 @@ static inline uint32_t rtg_load_pixel(
     memcpy(&tmp, dest, sizeof tmp);
     return tmp;
   }
+  case RTGFMT_RGB24: {
+    return ((uint32_t)dest[0] << 16) | ((uint32_t)dest[1] << 8) | (uint32_t)dest[2];
+  }
+  case RTGFMT_BGR24: {
+    return ((uint32_t)dest[2] << 16) | ((uint32_t)dest[1] << 8) | (uint32_t)dest[0];
+  }
   default: {
     return *dest;
   }
@@ -95,6 +109,18 @@ static inline void rtg_store_pixel(
     memcpy(dest, &tmp, sizeof tmp);
     break;
   }
+  case RTGFMT_RGB24: {
+    dest[0] = (uint8_t)((value >> 16) & 0xFF);
+    dest[1] = (uint8_t)((value >> 8) & 0xFF);
+    dest[2] = (uint8_t)(value & 0xFF);
+    break;
+  }
+  case RTGFMT_BGR24: {
+    dest[0] = (uint8_t)(value & 0xFF);
+    dest[1] = (uint8_t)((value >> 8) & 0xFF);
+    dest[2] = (uint8_t)((value >> 16) & 0xFF);
+    break;
+  }
   default: {
     uint8_t tmp = (uint8_t)value;
     memcpy(dest, &tmp, sizeof tmp);
@@ -113,6 +139,12 @@ static inline void rtg_store_pixel_mask(
     uint8_t current = *dest;
     uint8_t tmp = (uint8_t)value ^ (uint8_t)(current & ~mask);
     memcpy(dest, &tmp, sizeof tmp);
+    return;
+  }
+  if (format == RTGFMT_RGB24 || format == RTGFMT_BGR24) {
+    uint32_t current = rtg_load_pixel(dest, format);
+    uint32_t merged = (value & mask) | (current & ~mask);
+    rtg_store_pixel(dest, format, merged);
     return;
   }
   rtg_store_pixel(dest, format, value);

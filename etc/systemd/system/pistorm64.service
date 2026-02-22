@@ -1,5 +1,5 @@
 [Unit]
-Description=PiStorm emulator
+Description=PiStorm64 emulator
 StartLimitIntervalSec=0
 
 [Service]
@@ -23,7 +23,7 @@ Environment=A314_FS_CONF=/opt/pistorm64/a314/a314fs.conf
 Environment=RAYLIB_DRM_DEVICE=/dev/dri/card0
 Environment=RAYLIB_DRM_CONNECTOR=HDMI-A-1
 
-Nice=-10
+Nice=-16
 IOSchedulingClass=1
 IOSchedulingPriority=2
 CPUAffinity=1-3

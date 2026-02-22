@@ -1,11 +1,18 @@
 // SPDX-License-Identifier: MIT
+// PiStorm PiRTG64 driver, VBCC edition.
+// Based in part on the ZZ9000 RTG driver.
+// PiRTG64 Picasso96 RTG card – build script
+//
+// Copyright (c) 2026 AKADATA Limited
+// Licensed under the MIT License – see LICENSE for details.
+// Developed by AKADATA, with help and support from Codex.
+// PiRTG64 stub to allow builds without raylib/SDL backends.
 
-//#define _GNU_SOURCE
 
 #include "config_file/config_file.h"
 #include "platforms/amiga/pistorm-dev/pistorm-dev-enums.h"
 #include "emulator.h"
-#include "rtg.h"
+#include "pirtg64.h"
 #include "log.h"
 
 #include "raylib.h"
@@ -97,32 +104,47 @@ static inline uint64_t rtg_now_ns(void) {
 
 static void rtg_apply_thread_tuning(void) {
   const char* core_env = getenv("PISTORM_RTG_CORE");
+  int core = -1;
   if(core_env && *core_env) {
-    int core = atoi(core_env);
-    if(core >= 0) {
-      cpu_set_t cpuset;
-      CPU_ZERO(&cpuset);
-      CPU_SET(core, &cpuset);
-      if(pthread_setaffinity_np(pthread_self(), sizeof(cpuset), &cpuset) == 0) {
+    core = atoi(core_env);
+  } else {
+    core = 1;
+    LOG_INFO("[RTG/RAYLIB] Defaulting PISTORM_RTG_CORE to %d.\n", core);
+  }
+  if(core >= 0) {
+    cpu_set_t cpuset;
+    CPU_ZERO(&cpuset);
+    CPU_SET(core, &cpuset);
+    if(pthread_setaffinity_np(pthread_self(), sizeof(cpuset), &cpuset) == 0) {
+      if(core_env && *core_env) {
         LOG_INFO("[RTG/RAYLIB] Thread pinned to core %d via PISTORM_RTG_CORE.\n", core);
       } else {
-        LOG_DEBUG("[RTG/RAYLIB] Failed to pin thread to core %d (errno=%d).\n", core, errno);
+        LOG_INFO("[RTG/RAYLIB] Thread pinned to core %d (default).\n", core);
       }
+    } else {
+      LOG_DEBUG("[RTG/RAYLIB] Failed to pin thread to core %d (errno=%d).\n", core, errno);
     }
   }
 
   const char* prio_env = getenv("PISTORM_RTG_RT_PRIO");
+  int prio = 60;
   if(prio_env && *prio_env) {
-    int prio = atoi(prio_env);
-    if(prio < 1) prio = 1;
-    if(prio > 99) prio = 99;
-    struct sched_param sp = {0};
-    sp.sched_priority = prio;
-    if(pthread_setschedparam(pthread_self(), SCHED_RR, &sp) == 0) {
+    prio = atoi(prio_env);
+  } else {
+    LOG_INFO("[RTG/RAYLIB] Defaulting PISTORM_RTG_RT_PRIO to %d.\n", prio);
+  }
+  if(prio < 1) prio = 1;
+  if(prio > 99) prio = 99;
+  struct sched_param sp = {0};
+  sp.sched_priority = prio;
+  if(pthread_setschedparam(pthread_self(), SCHED_RR, &sp) == 0) {
+    if(prio_env && *prio_env) {
       LOG_INFO("[RTG/RAYLIB] Thread set to SCHED_RR prio %d via PISTORM_RTG_RT_PRIO.\n", prio);
     } else {
-      LOG_DEBUG("[RTG/RAYLIB] Failed to set SCHED_RR prio %d (errno=%d).\n", prio, errno);
+      LOG_INFO("[RTG/RAYLIB] Thread set to SCHED_RR prio %d (default).\n", prio);
     }
+  } else {
+    LOG_DEBUG("[RTG/RAYLIB] Failed to set SCHED_RR prio %d (errno=%d).\n", prio, errno);
   }
 }
 
@@ -188,8 +210,12 @@ static uint8_t updating_screen      = 0;
 static uint8_t debug_palette        = 0;
 static uint8_t show_fps             = 1;
 static uint8_t palette_updated      = 0;
-static int clut_cpu_mode            = 0; // was -1
+static int clut_cpu_mode            = 1;
 static uint8_t yuv_log_once         = 0;
+static int video_debug_mode          = 0;
+static int swizzle_override_mode     = -1;
+static int adaptive_swizzle_mode     = 0; // 0=off/default, 1=bgra, 2=argb
+static int adaptive_swizzle_enabled  = 0;
 
 static uint16_t mouse_cursor_w      = 16;
 static uint16_t mouse_cursor_h      = 16;
@@ -244,7 +270,7 @@ static Rectangle srcrect;
 static Rectangle dstscale;
 
 static Vector2 origin;
-static uint8_t scale_mode = PIGFX_SCALE_FULL;
+static uint8_t scale_mode = PIRTG64_SCALE_FULL;
 static uint8_t filter_mode = 0;
 
 struct rtg_shared_data rtg_share_data;
@@ -473,7 +499,7 @@ void rtg_scale_output(uint16_t width, uint16_t height) {
   srcrect.width = src_w;
   srcrect.height = src_h;
 
-  if(scale_mode != PIGFX_SCALE_CUSTOM && scale_mode != PIGFX_SCALE_CUSTOM_RECT) {
+  if(scale_mode != PIRTG64_SCALE_CUSTOM && scale_mode != PIRTG64_SCALE_CUSTOM_RECT) {
     dstscale.x = dstscale.y = 0;
     dstscale.width = src_w;
     dstscale.height = src_h;
@@ -492,7 +518,7 @@ void rtg_scale_output(uint16_t width, uint16_t height) {
     float dst_h = dstscale.height;
 
     switch (scale_mode) {
-    case PIGFX_SCALE_INTEGER_MAX: {
+    case PIRTG64_SCALE_INTEGER_MAX: {
       float scale = floorf(fminf(screen_w / src_w, screen_h / src_h));
       if(scale < 1.0f) {
         scale = 1.0f;
@@ -501,13 +527,13 @@ void rtg_scale_output(uint16_t width, uint16_t height) {
       dst_h = src_h * scale;
       break;
     }
-    case PIGFX_SCALE_FULL_ASPECT: {
+    case PIRTG64_SCALE_FULL_ASPECT: {
       float scale = fminf(screen_w / src_w, screen_h / src_h);
       dst_w = src_w * scale;
       dst_h = src_h * scale;
       break;
     }
-    case PIGFX_SCALE_FULL_43: {
+    case PIRTG64_SCALE_FULL_43: {
       const float aspect = 4.0f / 3.0f;
       dst_w = screen_w;
       dst_h = screen_w / aspect;
@@ -517,7 +543,7 @@ void rtg_scale_output(uint16_t width, uint16_t height) {
       }
       break;
     }
-    case PIGFX_SCALE_FULL_169: {
+    case PIRTG64_SCALE_FULL_169: {
       const float aspect = 16.0f / 9.0f;
       dst_w = screen_w;
       dst_h = screen_w / aspect;
@@ -527,16 +553,22 @@ void rtg_scale_output(uint16_t width, uint16_t height) {
       }
       break;
     }
-    case PIGFX_SCALE_FULL:
+    case PIRTG64_SCALE_FULL:
       dst_w = screen_w;
       dst_h = screen_h;
       break;
-    case PIGFX_SCALE_NONE:
-      dst_w = src_w;
-      dst_h = src_h;
+    case PIRTG64_SCALE_NONE:
+      if (screen_w > src_w || screen_h > src_h) {
+        float scale = fminf(screen_w / src_w, screen_h / src_h);
+        dst_w = src_w * scale;
+        dst_h = src_h * scale;
+      } else {
+        dst_w = src_w;
+        dst_h = src_h;
+      }
       break;
-    case PIGFX_SCALE_CUSTOM:
-    case PIGFX_SCALE_CUSTOM_RECT:
+    case PIRTG64_SCALE_CUSTOM:
+    case PIRTG64_SCALE_CUSTOM_RECT:
     default:
       dst_w = dstscale.width;
       dst_h = dstscale.height;
@@ -566,6 +598,10 @@ void* rtgThread(void* args) {
 
   LOG_INFO("[RTG] Thread running\n");
   rtg_apply_thread_tuning();
+  if (!getenv("PISTORM_DRM_SWAP_INTERVAL")) {
+    setenv("PISTORM_DRM_SWAP_INTERVAL", "0", 0);
+    LOG_INFO("[RTG/RAYLIB] Defaulting PISTORM_DRM_SWAP_INTERVAL to 0.\n");
+  }
 
   int reinit = 0;
   int old_filter_mode = -1;
@@ -574,7 +610,7 @@ void* rtgThread(void* args) {
 
   uint16_t* indexed_buf = NULL;
   size_t indexed_buf_size = 0;
-  uint32_t* clut_buf = NULL;
+  uint8_t* clut_buf = NULL;
   size_t clut_buf_size = 0;
   uint32_t* yuv_buf = NULL;
   size_t yuv_buf_size = 0;
@@ -612,10 +648,12 @@ void* rtgThread(void* args) {
   LOG_INFO("[RTG/RAYLIB] Output resolution: %dx%d\n", pi_screen_width, pi_screen_height);
 
   InitWindow(pi_screen_width, pi_screen_height, "Pistorm RTG");
-  int enable_vsync = 1;
+  int enable_vsync = 0;
   const char* vsync_env = getenv("PISTORM_RTG_VSYNC");
-  if(vsync_env && *vsync_env && atoi(vsync_env) == 0) {
-    enable_vsync = 0;
+  if(vsync_env && *vsync_env) {
+    enable_vsync = (atoi(vsync_env) != 0) ? 1 : 0;
+  } else {
+    LOG_INFO("[RTG/RAYLIB] Defaulting PISTORM_RTG_VSYNC to off.\n");
   }
   if(enable_vsync) {
     SetWindowState(FLAG_VSYNC_HINT);
@@ -639,6 +677,9 @@ void* rtgThread(void* args) {
     target_fps = atoi(fps_env);
     if(target_fps < 0) target_fps = 0;
     if(target_fps > 240) target_fps = 240;
+  } else {
+    target_fps = 0;
+    LOG_INFO("[RTG/RAYLIB] Defaulting PISTORM_RTG_TARGET_FPS to 0 (uncapped).\n");
   }
   SetTargetFPS(target_fps);
   int mon = GetCurrentMonitor();
@@ -647,11 +688,49 @@ void* rtgThread(void* args) {
            enable_vsync ? "on" : "off");
   LOG_INFO("[RTG/RAYLIB] Target FPS=%d (PISTORM_RTG_TARGET_FPS)\n", target_fps);
 
-  if (clut_cpu_mode < 0) {
+  {
     const char* env = getenv("PISTORM_RTG_CLUT_CPU");
-    clut_cpu_mode = (env && *env && atoi(env) != 0) ? 1 : 0;
-    if (clut_cpu_mode) {
-      LOG_INFO("[RTG/RAYLIB] CPU CLUT conversion enabled via PISTORM_RTG_CLUT_CPU.\n");
+    if (env && *env) {
+      clut_cpu_mode = (atoi(env) != 0) ? 1 : 0;
+      LOG_INFO("[RTG/RAYLIB] CPU CLUT conversion %s via PISTORM_RTG_CLUT_CPU=%s.\n",
+               clut_cpu_mode ? "enabled" : "disabled", env);
+    } else {
+      LOG_INFO("[RTG/RAYLIB] CPU CLUT conversion enabled by default.\n");
+    }
+  }
+  {
+    const char* env = getenv("PISTORM_RTG_VIDEO_DEBUG");
+    if (env && *env) {
+      video_debug_mode = (atoi(env) != 0) ? 1 : 0;
+    }
+    if (video_debug_mode) {
+      LOG_INFO("[RTG/RAYLIB] Video debug enabled via PISTORM_RTG_VIDEO_DEBUG=1.\n");
+    }
+  }
+  {
+    const char* env = getenv("PISTORM_RTG_32_SWIZZLE");
+    if (env && *env) {
+      if (strcmp(env, "none") == 0) {
+        swizzle_override_mode = 0;
+      } else if (strcmp(env, "bgra") == 0) {
+        swizzle_override_mode = 1;
+      } else if (strcmp(env, "argb") == 0) {
+        swizzle_override_mode = 2;
+      } else if (strcmp(env, "abgr") == 0) {
+        swizzle_override_mode = 3;
+      } else if (strcmp(env, "rgbx") == 0) {
+        swizzle_override_mode = 4;
+      } else {
+        swizzle_override_mode = -1;
+      }
+      LOG_INFO("[RTG/RAYLIB] 32-bit swizzle override=%s (PISTORM_RTG_32_SWIZZLE).\n", env);
+    }
+  }
+  {
+    const char* env = getenv("PISTORM_RTG_32_ADAPTIVE");
+    adaptive_swizzle_enabled = (env && *env && atoi(env) != 0) ? 1 : 0;
+    if (adaptive_swizzle_enabled) {
+      LOG_INFO("[RTG/RAYLIB] Adaptive 32-bit swizzle enabled via PISTORM_RTG_32_ADAPTIVE=1.\n");
     }
   }
 
@@ -668,6 +747,9 @@ void* rtgThread(void* args) {
                                                                         shader_path,
                                                                         sizeof(shader_path)));
   Shader abgr_swizzle_shader = LoadShader(NULL, rtg_resolve_shader_path("abgrswizzle.shader",
+                                                                        shader_path,
+                                                                        sizeof(shader_path)));
+  Shader rgbx_swizzle_shader = LoadShader(NULL, rtg_resolve_shader_path("rgbxswizzle.shader",
                                                                         shader_path,
                                                                         sizeof(shader_path)));
   int clut_loc = GetShaderLocation(clut_shader, "texture1");
@@ -859,7 +941,7 @@ reinit_raylib:;
     }
     raylib_fb.data = indexed_buf;
   } else if(format == RTGFMT_8BIT_CLUT && clut_cpu_mode) {
-    size_t clut_bytes = tight_size * sizeof(uint32_t);
+    size_t clut_bytes = tight_size * 4;
     if(clut_buf_size < clut_bytes) {
       void* resized = realloc(clut_buf, clut_bytes);
       if(!resized) {
@@ -981,7 +1063,7 @@ reinit_raylib:;
       ClearBackground(black);
       rtg_output_in_vblank = 0;
       updating_screen = 1;
-
+      int draw_swizzle_mode = 0; // 0=none, 1=bgra, 2=argb, 3=abgr, 4=rgbx
       switch (format) {
       case RTGFMT_8BIT_CLUT:
         if(!clut_cpu_mode) {
@@ -990,14 +1072,38 @@ reinit_raylib:;
         }
         break;
       case RTGFMT_BGR24:
-      case RTGFMT_RGB32_BGRA:
-        BeginShaderMode(bgra_swizzle_shader);
+        draw_swizzle_mode = 1;
         break;
       case RTGFMT_RGB32_ARGB:
-        BeginShaderMode(argb_swizzle_shader);
+        draw_swizzle_mode = 2;
         break;
       case RTGFMT_RGB32_ABGR:
+        draw_swizzle_mode = 3;
+        break;
+      case RTGFMT_RGB32_BGRA:
+        draw_swizzle_mode = 1;
+        break;
+      }
+      if ((format == RTGFMT_RGB32_ARGB || format == RTGFMT_RGB32_ABGR || format == RTGFMT_RGB32_BGRA) &&
+          swizzle_override_mode >= 0) {
+        draw_swizzle_mode = swizzle_override_mode;
+      } else if (adaptive_swizzle_enabled && format == RTGFMT_RGB32_BGRA && adaptive_swizzle_mode != 0) {
+        draw_swizzle_mode = adaptive_swizzle_mode;
+      }
+      switch (draw_swizzle_mode) {
+      case 1:
+        BeginShaderMode(bgra_swizzle_shader);
+        break;
+      case 2:
+        BeginShaderMode(argb_swizzle_shader);
+        break;
+      case 3:
         BeginShaderMode(abgr_swizzle_shader);
+        break;
+      case 4:
+        BeginShaderMode(rgbx_swizzle_shader);
+        break;
+      default:
         break;
       }
 
@@ -1009,11 +1115,10 @@ reinit_raylib:;
           EndShaderMode();
         }
         break;
-      case RTGFMT_BGR24:
-      case RTGFMT_RGB32_BGRA:
-      case RTGFMT_RGB32_ARGB:
-      case RTGFMT_RGB32_ABGR:
-        EndShaderMode();
+      default:
+        if (draw_swizzle_mode != 0) {
+          EndShaderMode();
+        }
         break;
       }
 
@@ -1023,7 +1128,7 @@ reinit_raylib:;
         float cursor_off_x = dstscale.x;
         float cursor_off_y = dstscale.y;
 
-        if(scale_mode == PIGFX_SCALE_CUSTOM || scale_mode == PIGFX_SCALE_CUSTOM_RECT) {
+        if(scale_mode == PIRTG64_SCALE_CUSTOM || scale_mode == PIRTG64_SCALE_CUSTOM_RECT) {
           cursor_off_x = 0.0f;
           cursor_off_y = 0.0f;
         }
@@ -1068,6 +1173,52 @@ reinit_raylib:;
       } else if(frame_addr_offset >= rtg_mem_size || frame_needed > rtg_mem_size - frame_addr_offset) {
         LOG_DEBUG("[RTG/RAYLIB] Framebuffer OOB: addr=0x%08X needed=%zu limit=%zu\n", current_addr,
                  frame_needed, rtg_mem_size);
+      } else if(video_debug_mode && (frame_no % 120u) == 0u &&
+                current_format == RTGFMT_RGB565_LE && current_pitch >= (width * 2u)) {
+        const uint8_t* src = data->memory + addr_offset;
+        size_t center_off = ((size_t)(height / 2) * (size_t)current_pitch) + ((size_t)(width / 2) * 2u);
+        if (center_off + 2u > frame_needed) {
+          center_off = 0;
+        }
+        uint16_t tl = load_u16_le(src);
+        uint16_t center = load_u16_le(src + center_off);
+        unsigned int samples = 0;
+        unsigned int chroma565 = 0;
+        uint16_t step_y = (height > 96) ? 16 : 4;
+        uint16_t step_x = (width > 96) ? 16 : 4;
+        for (uint16_t sy = 0; sy < height; sy += step_y) {
+          const uint8_t* row = src + ((size_t)sy * (size_t)current_pitch);
+          for (uint16_t sx = 0; sx < width; sx += step_x) {
+            uint16_t px = load_u16_le(row + ((size_t)sx * 2u));
+            uint8_t r5 = (uint8_t)((px >> 11) & 0x1F);
+            uint8_t g6 = (uint8_t)((px >> 5) & 0x3F);
+            uint8_t b5 = (uint8_t)(px & 0x1F);
+            uint8_t g5 = (uint8_t)((g6 + 1u) >> 1);
+            if (!(r5 == b5 && g5 == r5)) {
+              chroma565++;
+            }
+            samples++;
+          }
+        }
+        LOG_INFO("[RTG/RAYLIB][DBG16] frame=%u fmt=%u pitch=%u tl=%04X c=%04X chroma(samples=%u rgb565=%u)\n",
+                 frame_no, current_format, current_pitch, tl, center, samples, chroma565);
+        if(current_pitch != row_bytes) {
+          if(tight_buf_size < tight_size) {
+            void* resized = realloc(tight_buf, tight_size);
+            if(!resized) {
+              LOG_ERROR("[RTG/RAYLIB] Failed to allocate tight buffer (%zu bytes)\n", tight_size);
+            } else {
+              tight_buf = resized;
+              tight_buf_size = tight_size;
+            }
+          }
+          if(tight_buf) {
+            rtg_copy_tight_rows(tight_buf, data->memory + addr_offset, row_bytes, current_pitch, height);
+            UpdateTexture(raylib_texture, tight_buf);
+          }
+        } else {
+          UpdateTexture(raylib_texture, data->memory + addr_offset);
+        }
       } else if(rtg_format_is_yuv(current_format)) {
         size_t yuv_bytes = (size_t)width * height * sizeof(uint32_t);
         if(yuv_buf_size < yuv_bytes) {
@@ -1246,25 +1397,131 @@ reinit_raylib:;
           }
         }
       } else if(current_format == RTGFMT_8BIT_CLUT && clut_cpu_mode) {
-        if(clut_buf_size < tight_size * sizeof(uint32_t)) {
-          void* resized = realloc(clut_buf, tight_size * sizeof(uint32_t));
+        if(clut_buf_size < tight_size * 4) {
+          void* resized = realloc(clut_buf, tight_size * 4);
           if(!resized) {
             LOG_ERROR("[RTG/RAYLIB] Failed to allocate CLUT buffer (%zu bytes)\n",
-                      tight_size * sizeof(uint32_t));
+                      tight_size * 4);
           } else {
             clut_buf = resized;
-            clut_buf_size = tight_size * sizeof(uint32_t);
+            clut_buf_size = tight_size * 4;
           }
         }
         if(clut_buf) {
+          uint8_t used_index[256] = {0};
+          unsigned int used_count = 0;
+          uint8_t min_idx = 255;
+          uint8_t max_idx = 0;
           for (uint16_t y = 0; y < height; y++) {
             const uint8_t* src = data->memory + addr_offset + (size_t)current_pitch * y;
-            uint32_t* dst = clut_buf + (size_t)width * y;
+            uint8_t* dst = clut_buf + ((size_t)width * y * 4);
             for (uint16_t x = 0; x < width; x++) {
-              dst[x] = palette[src[x]];
+              uint8_t idx = src[x];
+              if (!used_index[idx]) {
+                used_index[idx] = 1;
+                used_count++;
+                if (idx < min_idx) min_idx = idx;
+                if (idx > max_idx) max_idx = idx;
+              }
+              const uint8_t* color = (const uint8_t*)&palette[idx];
+              dst[(size_t)x * 4 + 0] = color[0];
+              dst[(size_t)x * 4 + 1] = color[1];
+              dst[(size_t)x * 4 + 2] = color[2];
+              dst[(size_t)x * 4 + 3] = color[3];
             }
           }
           UpdateTexture(raylib_texture, clut_buf);
+          if (video_debug_mode && (frame_no % 120u) == 0u) {
+            unsigned int gray_palette_entries = 0;
+            unsigned int sampled_entries = 0;
+            char sample[160] = {0};
+            size_t sample_pos = 0;
+            for (unsigned int i = 0; i < 256; i++) {
+              if (!used_index[i]) {
+                continue;
+              }
+              const uint8_t* c = (const uint8_t*)&palette[i];
+              if (c[0] == c[1] && c[1] == c[2]) {
+                gray_palette_entries++;
+              }
+              if (sampled_entries < 6 && sample_pos + 24 < sizeof(sample)) {
+                int n = snprintf(sample + sample_pos, sizeof(sample) - sample_pos, "%u:%02X%02X%02X ",
+                                 i, c[0], c[1], c[2]);
+                if (n > 0) {
+                  sample_pos += (size_t)n;
+                }
+              }
+              sampled_entries++;
+            }
+            LOG_INFO("[RTG/RAYLIB][DBG8] frame=%u used_idx=%u idx_range=%u-%u gray_used=%u sample={%s}\n",
+                     frame_no, used_count, min_idx, max_idx, gray_palette_entries, sample);
+          }
+        }
+      } else if(current_format == RTGFMT_RGB32_ARGB || current_format == RTGFMT_RGB32_ABGR ||
+                current_format == RTGFMT_RGB32_RGBA || current_format == RTGFMT_RGB32_BGRA) {
+        if (video_debug_mode && (frame_no % 120u) == 0u) {
+          const uint8_t* src = data->memory + addr_offset;
+          size_t center_off = ((size_t)(height / 2) * (size_t)current_pitch) + ((size_t)(width / 2) * 4u);
+          if (center_off + 8 > frame_needed) {
+            center_off = 0;
+          }
+          const uint8_t* center = src + center_off;
+          unsigned int samples = 0;
+          unsigned int chroma_bgra = 0; // B,G,R,A
+          unsigned int chroma_argb = 0; // A,R,G,B
+          unsigned int chroma_abgr = 0; // A,B,G,R
+          unsigned int chroma_rgba = 0; // R,G,B,A
+          unsigned int alpha_zero = 0;
+          uint16_t step_y = (height > 96) ? 16 : 4;
+          uint16_t step_x = (width > 96) ? 16 : 4;
+          for (uint16_t sy = 0; sy < height; sy += step_y) {
+            const uint8_t* row = src + ((size_t)sy * (size_t)current_pitch);
+            for (uint16_t sx = 0; sx < width; sx += step_x) {
+              const uint8_t* p = row + ((size_t)sx * 4u);
+              uint8_t b0 = p[0], b1 = p[1], b2 = p[2], b3 = p[3];
+              if (!(b0 == b1 && b1 == b2)) chroma_bgra++;
+              if (!(b1 == b2 && b2 == b3)) chroma_argb++;
+              if (!(b3 == b2 && b2 == b1)) chroma_abgr++;
+              if (!(b0 == b1 && b1 == b2)) chroma_rgba++;
+              if (b3 == 0) alpha_zero++;
+              samples++;
+            }
+          }
+          if (adaptive_swizzle_enabled && swizzle_override_mode < 0 && current_format == RTGFMT_RGB32_BGRA) {
+            // If color variation is overwhelmingly present in bytes 1..3, treat stream as ARGB-like.
+            int prev = adaptive_swizzle_mode;
+            if (chroma_argb > (chroma_bgra * 4u + 16u)) {
+              adaptive_swizzle_mode = 2;
+            } else {
+              adaptive_swizzle_mode = 1;
+            }
+            if (prev != adaptive_swizzle_mode) {
+              LOG_INFO("[RTG/RAYLIB] Adaptive 32-bit swizzle -> %s (bgra=%u argb=%u)\n",
+                       adaptive_swizzle_mode == 2 ? "argb" : "bgra", chroma_bgra, chroma_argb);
+            }
+          }
+          LOG_INFO("[RTG/RAYLIB][DBG32] frame=%u fmt=%u swz=%d pitch=%u tl=%02X%02X%02X%02X c=%02X%02X%02X%02X chroma(samples=%u bgra=%u argb=%u abgr=%u rgba=%u alpha0=%u)\n",
+                   frame_no, current_format, draw_swizzle_mode, current_pitch,
+                   src[0], src[1], src[2], src[3],
+                   center[0], center[1], center[2], center[3],
+                   samples, chroma_bgra, chroma_argb, chroma_abgr, chroma_rgba, alpha_zero);
+        }
+        if(current_pitch != row_bytes) {
+          if(tight_buf_size < tight_size) {
+            void* resized = realloc(tight_buf, tight_size);
+            if(!resized) {
+              LOG_ERROR("[RTG/RAYLIB] Failed to allocate tight buffer (%zu bytes)\n", tight_size);
+            } else {
+              tight_buf = resized;
+              tight_buf_size = tight_size;
+            }
+          }
+          if(tight_buf) {
+            rtg_copy_tight_rows(tight_buf, data->memory + addr_offset, row_bytes, current_pitch, height);
+            UpdateTexture(raylib_texture, tight_buf);
+          }
+        } else {
+          UpdateTexture(raylib_texture, data->memory + addr_offset);
         }
       } else if(current_pitch != row_bytes) {
         if(tight_buf_size < tight_size) {
@@ -1371,6 +1628,7 @@ shutdown_raylib:;
   UnloadShader(bgra_swizzle_shader);
   UnloadShader(argb_swizzle_shader);
   UnloadShader(abgr_swizzle_shader);
+  UnloadShader(rgbx_swizzle_shader);
 
   CloseWindow();
 
@@ -1396,13 +1654,20 @@ void rtg_set_screen_height(uint32_t height) {
 }
 
 void rtg_set_clut_entry(uint8_t index, uint32_t xrgb) {
-  // palette[index] = xrgb;
-  unsigned char* src = (unsigned char*)&xrgb;
+  uint32_t rgb24 = xrgb & 0x00FFFFFFu;
+  // Some callers provide RGB as 0xRRGGBB00 instead of 0x00RRGGBB.
+  if ((xrgb & 0xFF000000u) != 0 && (xrgb & 0x000000FFu) == 0) {
+    rgb24 = (xrgb >> 8) & 0x00FFFFFFu;
+  }
+  uint8_t red = (uint8_t)((rgb24 >> 16) & 0xFFu);
+  uint8_t green = (uint8_t)((rgb24 >> 8) & 0xFFu);
+  uint8_t blue = (uint8_t)(rgb24 & 0xFFu);
   unsigned char* dst = (unsigned char*)&palette[index];
+
   palette_updated = 1;
-  dst[0] = src[2];
-  dst[1] = src[1];
-  dst[2] = src[0];
+  dst[0] = red;
+  dst[1] = green;
+  dst[2] = blue;
   dst[3] = 0xFF;
 
   static unsigned int clut_debug_count = 0;
@@ -1572,17 +1837,17 @@ void rtg_palette_debug(uint8_t enable) {
 
 void rtg_set_scale_mode(uint16_t _scale_mode) {
   switch (_scale_mode) {
-  case PIGFX_SCALE_INTEGER_MAX:
-  case PIGFX_SCALE_FULL_ASPECT:
-  case PIGFX_SCALE_FULL_43:
-  case PIGFX_SCALE_FULL_169:
-  case PIGFX_SCALE_FULL:
-  case PIGFX_SCALE_NONE:
+  case PIRTG64_SCALE_INTEGER_MAX:
+  case PIRTG64_SCALE_FULL_ASPECT:
+  case PIRTG64_SCALE_FULL_43:
+  case PIRTG64_SCALE_FULL_169:
+  case PIRTG64_SCALE_FULL:
+  case PIRTG64_SCALE_NONE:
     scale_mode = (uint8_t)_scale_mode;
     rtg_scale_output(rtg_display_width, rtg_display_height);
     break;
-  case PIGFX_SCALE_CUSTOM:
-  case PIGFX_SCALE_CUSTOM_RECT:
+  case PIRTG64_SCALE_CUSTOM:
+  case PIRTG64_SCALE_CUSTOM_RECT:
     LOG_DEBUG("[!!!RTG] Tried to set RTG scale mode to custom or custom rect using the wrong "
              "function. Ignored.\n");
     break;
@@ -1604,11 +1869,11 @@ void rtg_set_scale_rect(uint16_t _scale_mode, int16_t x1, int16_t y1, int16_t x2
   dstscale.y = (float)y1;
 
   switch (scale_mode) {
-  case PIGFX_SCALE_CUSTOM_RECT:
+  case PIRTG64_SCALE_CUSTOM_RECT:
     dstscale.width = (float)x2;
     dstscale.height = (float)y2;
     break;
-  case PIGFX_SCALE_CUSTOM:
+  case PIRTG64_SCALE_CUSTOM:
     dstscale.width = (float)x2 - (float)x1;
     dstscale.height = (float)y2 - (float)y1;
     break;

@@ -11,9 +11,10 @@
 #include "pistorm-dev-enums.h"
 #include "platforms/platforms.h"
 #include "gpio/ps_protocol.h"
-#include "platforms/amiga/rtg/rtg.h"
+#include "platforms/amiga/pirtg64/pirtg64.h"
 #include "platforms/amiga/piscsi/piscsi.h"
 #include "platforms/amiga/net/pi-net.h"
+#include "platforms/amiga/net64/net64_device.h"
 #include "janus/janus-ipc.h"
 #include "log.h"
 
@@ -783,7 +784,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     break;
   case PI_CMD_RTG_SCALING:
     DEBUG("[PISTORM-DEV] Write to RTG_SCALING: %d\n", val);
-    if(val == PIGFX_SCALE_CUSTOM || val == PIGFX_SCALE_CUSTOM_RECT) {
+    if(val == PIRTG64_SCALE_CUSTOM || val == PIRTG64_SCALE_CUSTOM_RECT) {
       rtg_set_scale_rect((uint16_t)val, (int16_t)pi_word[0], (int16_t)pi_word[1], (int16_t)pi_word[2],
                          (int16_t)pi_word[3]);
     } else {

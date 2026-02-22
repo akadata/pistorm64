@@ -1,4 +1,11 @@
 // SPDX-License-Identifier: MIT
+// PiStorm PiRTG64 driver, VBCC edition.
+// Based in part on the ZZ9000 RTG driver.
+// PiRTG64 Picasso96 RTG card – build script
+//
+// Copyright (c) 2026 AKADATA Limited
+// Licensed under the MIT License – see LICENSE for details.
+// Developed by AKADATA, with help and support from Codex.
 
 #include <stdio.h>
 #include <stdint.h>
@@ -11,8 +18,8 @@
 #include "gpio/ps_protocol.h"
 #endif
 #include <endian.h>
-#include "platforms/amiga/rtg/irtg_structs.h"
-#include "rtg.h"
+#include "platforms/amiga/pirtg64/irtg_structs.h"
+#include "pirtg64.h"
 #include "log.h"
 
 
@@ -180,6 +187,14 @@ void rtg_fillrect_solid(uint16_t dst_x, uint16_t dst_y, uint16_t width, uint16_t
     }
     break;
   }
+  case RTGFMT_RGB24:
+  case RTGFMT_BGR24: {
+    for (int xs = 0; xs < width; xs++) {
+      size_t offset = (size_t)xs * rtg_pixel_size[pixel_format];
+      rtg_store_pixel(&dptr[offset], pixel_format, color);
+    }
+    break;
+  }
   }
   for (int ys = 1; ys < height; ys++) {
     dptr += dst_pitch;
@@ -236,7 +251,7 @@ void rtg_invertrect(uint16_t dst_x, uint16_t dst_y, uint16_t width, uint16_t hei
         break;
       }
       case RTGFMT_RGB32_ABGR:
-    case RTGFMT_RGB32_ARGB:
+      case RTGFMT_RGB32_ARGB:
     case RTGFMT_RGB32_BGRA:
     case RTGFMT_RGB32_RGBA: {
         for (int xs = 0; xs < width; xs++) {
@@ -245,6 +260,16 @@ void rtg_invertrect(uint16_t dst_x, uint16_t dst_y, uint16_t width, uint16_t hei
           val = ~val;
           store_u32_be(&dptr[offset], val);
         }
+      break;
+    }
+    case RTGFMT_RGB24:
+    case RTGFMT_BGR24: {
+      for (int xs = 0; xs < width; xs++) {
+        size_t offset = (size_t)xs * rtg_pixel_size[pixel_format];
+        uint32_t val = rtg_load_pixel(&dptr[offset], pixel_format);
+        val = ~val;
+        rtg_store_pixel(&dptr[offset], pixel_format, val);
+      }
       break;
     }
     }
@@ -318,6 +343,15 @@ void rtg_blitrect(uint16_t src_x, uint16_t src_y, uint16_t dst_x, uint16_t dst_y
                 SET_RTG_PIXEL_MASK(&dptr[dst_offset], pixel_val, pixel_format);
               }
               break;
+            case RTGFMT_RGB24:
+            case RTGFMT_BGR24:
+              {
+                size_t src_offset = rtg_index_offset(xs, bpp);
+                size_t dst_offset = rtg_index_offset(xs, bpp);
+                uint32_t pixel_val = rtg_load_pixel(&sptr[src_offset], pixel_format);
+                SET_RTG_PIXEL_MASK(&dptr[dst_offset], pixel_val, pixel_format);
+              }
+              break;
             }
           }
         } else {
@@ -344,6 +378,15 @@ void rtg_blitrect(uint16_t src_x, uint16_t src_y, uint16_t dst_x, uint16_t dst_y
                 size_t src_offset = rtg_index_offset(xs, sizeof(uint32_t));
                 size_t dst_offset = rtg_index_offset(xs, bpp);
                 uint32_t pixel_val = load_u32_be(&sptr[src_offset]);
+                SET_RTG_PIXEL_MASK(&dptr[dst_offset], pixel_val, pixel_format);
+              }
+              break;
+            case RTGFMT_RGB24:
+            case RTGFMT_BGR24:
+              {
+                size_t src_offset = rtg_index_offset(xs, bpp);
+                size_t dst_offset = rtg_index_offset(xs, bpp);
+                uint32_t pixel_val = rtg_load_pixel(&sptr[src_offset], pixel_format);
                 SET_RTG_PIXEL_MASK(&dptr[dst_offset], pixel_val, pixel_format);
               }
               break;
@@ -399,8 +442,8 @@ void rtg_blitrect_nomask_complete(uint16_t src_x, uint16_t src_y, uint16_t dst_x
   }
   uint8_t* sptr = NULL;
   uint8_t* dptr = NULL;
-  uint32_t src_base = src_addr - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
-  uint32_t dst_base = dst_addr - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
+  uint32_t src_base = src_addr - (PIRTG64_BASE + PIRTG64_REG_SIZE);
+  uint32_t dst_base = dst_addr - (PIRTG64_BASE + PIRTG64_REG_SIZE);
   if (!rtg_get_ptr_checked(src_base, src_x, src_y, width, height, src_pitch, format, "blitrect_nomask_src",
                            &sptr)) {
     return;
@@ -442,6 +485,11 @@ void rtg_blitrect_nomask_complete(uint16_t src_x, uint16_t src_y, uint16_t dst_x
   case RTGFMT_RGB32_BGRA:
   case RTGFMT_RGB32_RGBA:
     mask = 0xFFFFFFFF;
+    break;
+  case RTGFMT_RGB24:
+  case RTGFMT_BGR24:
+    mask = 0x00FFFFFF;
+    break;
   default:
     break;
   }
@@ -492,6 +540,16 @@ void rtg_blitrect_nomask_complete(uint16_t src_x, uint16_t src_y, uint16_t dst_x
               HANDLE_MINTERM_PIXEL(src_val, dst_val, format);
             }
             break;
+          case RTGFMT_RGB24:
+          case RTGFMT_BGR24:
+            {
+              size_t src_offset = rtg_index_offset(xs, rtg_pixel_size[format]);
+              size_t dst_offset = rtg_index_offset(xs, rtg_pixel_size[format]);
+              uint32_t src_val = rtg_load_pixel(&sptr[src_offset], format);
+              uint32_t dst_val = rtg_load_pixel(&dptr[dst_offset], format);
+              HANDLE_MINTERM_PIXEL(src_val, dst_val, format);
+            }
+            break;
           }
         }
       } else {
@@ -523,6 +581,16 @@ void rtg_blitrect_nomask_complete(uint16_t src_x, uint16_t src_y, uint16_t dst_x
               size_t dst_offset = rtg_index_offset(xs, sizeof(uint32_t));
               uint32_t src_val = load_u32_be(&sptr[src_offset]);
               uint32_t dst_val = load_u32_be(&dptr[dst_offset]);
+              HANDLE_MINTERM_PIXEL(src_val, dst_val, format);
+            }
+            break;
+          case RTGFMT_RGB24:
+          case RTGFMT_BGR24:
+            {
+              size_t src_offset = rtg_index_offset(xs, rtg_pixel_size[format]);
+              size_t dst_offset = rtg_index_offset(xs, rtg_pixel_size[format]);
+              uint32_t src_val = rtg_load_pixel(&sptr[src_offset], format);
+              uint32_t dst_val = rtg_load_pixel(&dptr[dst_offset], format);
               HANDLE_MINTERM_PIXEL(src_val, dst_val, format);
             }
             break;
@@ -1386,6 +1454,9 @@ void rtg_p2d(int16_t src_x, int16_t src_y, int16_t dst_x, int16_t dst_y, int16_t
 
       if (mask == 0xFF && (draw_mode == MINTERM_SRC || draw_mode == MINTERM_NOTSRC)) {
         switch (rtg_format) {
+        case RTGFMT_8BIT_CLUT:
+          dptr[(size_t)x] = u8_fg;
+          break;
         case RTGFMT_RGB565_LE:
         case RTGFMT_RGB565_BE:
         case RTGFMT_BGR565_LE:
@@ -1402,6 +1473,10 @@ void rtg_p2d(int16_t src_x, int16_t src_y, int16_t dst_x, int16_t dst_y, int16_t
         case RTGFMT_RGB32_BGRA:
         case RTGFMT_RGB32_RGBA:
           store_u32_be(&dptr[(size_t)x * sizeof(uint32_t)], fg_color);
+          break;
+        case RTGFMT_RGB24:
+        case RTGFMT_BGR24:
+          rtg_store_pixel(&dptr[(size_t)x * rtg_pixel_size[rtg_format]], rtg_format, fg_color);
           break;
         }
         goto skip;

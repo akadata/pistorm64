@@ -26,7 +26,7 @@
 #include "pistorm-dev/pistorm-dev.h"
 #include "platforms/platforms.h"
 #include "platforms/shared/rtc.h"
-#include "rtg/rtg.h"
+#include "pirtg64/pirtg64.h"
 #include "amiga-platform.h"
 #include "a314/a314.h"
 #include "emulator_fc.h"
@@ -501,7 +501,7 @@ void adjust_ranges_amiga(struct emulator_config* cfg) {
     );
   }
 
-  if (rtg_enabled)    CUSTOM_RANGE_STEP("rtg",   PIGFX_RTG_BASE, PIGFX_UPPER);
+  if (rtg_enabled)    CUSTOM_RANGE_STEP("rtg",   PIRTG64_BASE, PIRTG64_UPPER);
   if (piscsi_enabled) {
     uint32_t pbase = piscsi_base ? piscsi_base : PISCSI_OFFSET;
     CUSTOM_RANGE_STEP("piscsi", pbase, pbase + PISCSI_REGSIZE);

@@ -19,7 +19,7 @@
 extern unsigned int pistorm_base_addr;
 struct ReqToolsBase* ReqToolsBase;
 
-#define VERSION "v0.4.0"
+#define VERSION "v0.4.1"
 
 #define button1w 54
 #define button1h 11
@@ -528,27 +528,27 @@ static void updateRTG(struct Window* window) {
   }
   unsigned short filter = pi_get_rtg_scale_mode();
   switch (filter) {
-  case PIGFX_SCALE_NONE:
+  case PIRTG64_SCALE_NONE:
     WriteGadgetText("None", RTG_scale_buf, window, &RTGScaleButton, RTGENABLE_TXT_SIZE);
     break;
-  case PIGFX_SCALE_INTEGER_MAX:
+  case PIRTG64_SCALE_INTEGER_MAX:
     WriteGadgetText("Max integer", RTG_scale_buf, window, &RTGScaleButton, RTGENABLE_TXT_SIZE);
     break;
-  case PIGFX_SCALE_FULL_ASPECT:
+  case PIRTG64_SCALE_FULL_ASPECT:
     WriteGadgetText("Full aspect", RTG_scale_buf, window, &RTGScaleButton, RTGENABLE_TXT_SIZE);
     break;
-  case PIGFX_SCALE_FULL_43:
+  case PIRTG64_SCALE_FULL_43:
     WriteGadgetText("Full 4:3", RTG_scale_buf, window, &RTGScaleButton, RTGENABLE_TXT_SIZE);
     break;
-  case PIGFX_SCALE_FULL_169:
+  case PIRTG64_SCALE_FULL_169:
     WriteGadgetText("Full 16:9", RTG_scale_buf, window, &RTGScaleButton, RTGENABLE_TXT_SIZE);
     break;
-  case PIGFX_SCALE_FULL:
+  case PIRTG64_SCALE_FULL:
     WriteGadgetText("Full", RTG_scale_buf, window, &RTGScaleButton, RTGENABLE_TXT_SIZE);
     break;
-  case PIGFX_SCALE_CUSTOM:
-  case PIGFX_SCALE_CUSTOM_RECT:
-  case PIGFX_SCALE_NUM:
+  case PIRTG64_SCALE_CUSTOM:
+  case PIRTG64_SCALE_CUSTOM_RECT:
+  case PIRTG64_SCALE_NUM:
   default:
     WriteGadgetText("Custom", RTG_scale_buf, window, &RTGScaleButton, RTGENABLE_TXT_SIZE);
     break;
@@ -556,16 +556,16 @@ static void updateRTG(struct Window* window) {
 
   unsigned short scale = pi_get_rtg_scale_filter();
   switch (scale) {
-  case PIGFX_FILTER_POINT:
+  case PIRTG64_FILTER_POINT:
     WriteGadgetText("Point", RTG_filter_buf, window, &RTGFilterButton, RTGENABLE_TXT_SIZE);
     break;
-  case PIGFX_FILTER_SMOOTH:
+  case PIRTG64_FILTER_SMOOTH:
     WriteGadgetText("Smooth", RTG_filter_buf, window, &RTGFilterButton, RTGENABLE_TXT_SIZE);
     break;
-  case PIGFX_FILTER_SHADER:
+  case PIRTG64_FILTER_SHADER:
     WriteGadgetText("Shader", RTG_filter_buf, window, &RTGFilterButton, RTGENABLE_TXT_SIZE);
     break;
-  case PIGFX_FILTER_NUM:
+  case PIRTG64_FILTER_NUM:
   default:
     WriteGadgetText("Custom", RTG_filter_buf, window, &RTGFilterButton, RTGENABLE_TXT_SIZE);
     break;
@@ -811,27 +811,27 @@ int main() {
         case GADRTGSCALEBUTTON: {
           unsigned short scale = pi_get_rtg_scale_mode();
           switch (scale) {
-          case PIGFX_SCALE_NONE:
-            pi_set_rtg_scale_mode(PIGFX_SCALE_INTEGER_MAX);
+          case PIRTG64_SCALE_NONE:
+            pi_set_rtg_scale_mode(PIRTG64_SCALE_INTEGER_MAX);
             break;
-          case PIGFX_SCALE_INTEGER_MAX:
-            pi_set_rtg_scale_mode(PIGFX_SCALE_FULL_ASPECT);
+          case PIRTG64_SCALE_INTEGER_MAX:
+            pi_set_rtg_scale_mode(PIRTG64_SCALE_FULL_ASPECT);
             break;
-          case PIGFX_SCALE_FULL_ASPECT:
-            pi_set_rtg_scale_mode(PIGFX_SCALE_FULL_43);
+          case PIRTG64_SCALE_FULL_ASPECT:
+            pi_set_rtg_scale_mode(PIRTG64_SCALE_FULL_43);
             break;
-          case PIGFX_SCALE_FULL_43:
-            pi_set_rtg_scale_mode(PIGFX_SCALE_FULL_169);
+          case PIRTG64_SCALE_FULL_43:
+            pi_set_rtg_scale_mode(PIRTG64_SCALE_FULL_169);
             break;
-          case PIGFX_SCALE_FULL_169:
-            pi_set_rtg_scale_mode(PIGFX_SCALE_FULL);
+          case PIRTG64_SCALE_FULL_169:
+            pi_set_rtg_scale_mode(PIRTG64_SCALE_FULL);
             break;
-          case PIGFX_SCALE_FULL:
-          case PIGFX_SCALE_CUSTOM:
-          case PIGFX_SCALE_CUSTOM_RECT:
-          case PIGFX_SCALE_NUM:
+          case PIRTG64_SCALE_FULL:
+          case PIRTG64_SCALE_CUSTOM:
+          case PIRTG64_SCALE_CUSTOM_RECT:
+          case PIRTG64_SCALE_NUM:
           default:
-            pi_set_rtg_scale_mode(PIGFX_SCALE_NONE);
+            pi_set_rtg_scale_mode(PIRTG64_SCALE_NONE);
             break;
           }
           updateRTG(myWindow);
@@ -839,14 +839,14 @@ int main() {
         case GADRTGFILTERBUTTON: {
           unsigned short filter = pi_get_rtg_scale_filter();
           switch (filter) {
-          case PIGFX_FILTER_POINT:
-            pi_set_rtg_scale_filter(PIGFX_FILTER_SMOOTH);
+          case PIRTG64_FILTER_POINT:
+            pi_set_rtg_scale_filter(PIRTG64_FILTER_SMOOTH);
             break;
-          case PIGFX_FILTER_SMOOTH:
-          case PIGFX_FILTER_SHADER:
-          case PIGFX_FILTER_NUM:
+          case PIRTG64_FILTER_SMOOTH:
+          case PIRTG64_FILTER_SHADER:
+          case PIRTG64_FILTER_NUM:
           default:
-            pi_set_rtg_scale_filter(PIGFX_FILTER_POINT);
+            pi_set_rtg_scale_filter(PIRTG64_FILTER_POINT);
             break;
           }
           updateRTG(myWindow);

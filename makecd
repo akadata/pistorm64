@@ -1,0 +1,4 @@
+mkisofs -o ~/amiga_iso/tsvideo.iso \
+  -V AMIVID \
+  -J -r \
+  ~/amiga_iso/vids

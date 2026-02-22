@@ -229,9 +229,9 @@ MAINFILES += src/platforms/amiga/hunk-reloc.c
 MAINFILES += src/platforms/amiga/fsid.c
 MAINFILES += src/platforms/amiga/cdtv-dmac.c
 
-MAINFILES += src/platforms/amiga/rtg/rtg.c
-MAINFILES += src/platforms/amiga/rtg/rtg-output-raylib.c
-MAINFILES += src/platforms/amiga/rtg/rtg-gfx.c
+MAINFILES += src/platforms/amiga/pirtg64/pirtg64.c
+MAINFILES += src/platforms/amiga/pirtg64/pirtg64-output-raylib.c
+MAINFILES += src/platforms/amiga/pirtg64/pirtg64-gfx.c
 
 MAINFILES += src/platforms/amiga/piscsi/piscsi.c
 MAINFILES += src/platforms/amiga/piscsi64/piscsi64.c
@@ -249,8 +249,8 @@ MAINFILES += src/selftest.c
 
 
 ifeq ($(USE_RAYLIB),0)
-MAINFILES := $(filter-out src/platforms/amiga/rtg/rtg-output-raylib.c,$(MAINFILES))
-MAINFILES += src/platforms/amiga/rtg/rtg-output-null.c
+MAINFILES := $(filter-out src/platforms/amiga/pirtg64/pirtg64-output-raylib.c,$(MAINFILES))
+MAINFILES += src/platforms/amiga/pirtg64/pirtg64-output-null.c
 endif
 
 ifeq ($(USE_ALSA),0)
@@ -502,7 +502,7 @@ HELP_TARGETS = \
 	"make amiga-net64"                "Build Amiga net64 driver (.device)" \
 	"make amiga-piscsi"               "Build Amiga PiSCSI driver + bootrom" \
 	"make amiga-piscsi64"             "Build Amiga PiSCSI64 Z3 driver + bootrom" \
-	"make amiga-rtg"                  "Build Amiga RTG driver (.card)" \
+	"make amiga-pirtg64"                  "Build Amiga PiRTG64 driver (.card)" \
 	"make amiga-ahi"                  "Build Amiga AHI driver (.audio)" \
 	"make amiga-pissa"                "Build Amiga PISSA crypto tools" \
 	"make amiga-pissl"                "Build Amiga PISSL TLS tools" \
@@ -679,8 +679,8 @@ install: all amiga-piscsi amiga-piscsi64
 #	@if [ -d $(INSTALL_DIR)/data/a314-shared ] && [ "$$(ls -A $(INSTALL_DIR)/data/a314-shared 2>/dev/null)" ]; then \
 #		echo "Warning: $(INSTALL_DIR)/data/a314-shared is not empty; Python code must not be installed there."; \
 #	fi
-	$(INSTALL) -d $(INSTALL_DIR)/rtg
-	$(INSTALL) -m 644 src/platforms/amiga/rtg/*.shader $(INSTALL_DIR)/rtg/
+	$(INSTALL) -d $(INSTALL_DIR)/src/platforms/amiga/pirtg64/shaders
+	$(INSTALL) -m 644 src/platforms/amiga/pirtg64/shaders/*.shader $(INSTALL_DIR)/src/platforms/amiga/pirtg64/shaders/
 	[ -f pistorm.LICENSE ] && $(INSTALL) -m 644 pistorm.LICENSE $(INSTALL_DIR)/
 		if [ -f $(UDEV_RULES) ]; then \
 			$(INSTALL) -d /etc/udev/rules.d; \
@@ -832,8 +832,8 @@ amiga-piscsi:
 amiga-piscsi64:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi64/device_driver_amiga
 
-amiga-rtg:
-	$(AMIGA_SUBMAKE) -C src/platforms/amiga/rtg/rtg_driver_amiga
+amiga-pirtg64:
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/pirtg64/Amiga/rtg_driver_amiga
 
 amiga-ahi:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/ahi/ahi_driver_amiga
@@ -844,14 +844,14 @@ amiga-pissa:
 amiga-pissl:
 	$(AMIGA_SUBMAKE) -C amiga/pissl
 
-amiga-all: amiga-net amiga-net64 amiga-piscsi amiga-piscsi64 amiga-rtg amiga-pissa amiga-pissl
+amiga-all: amiga-net amiga-net64 amiga-piscsi amiga-piscsi64 amiga-pirtg64 amiga-pissa amiga-pissl
 
 amiga-clean:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/net/net_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/net64/net_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi/device_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi64/device_driver_amiga clean
-	$(AMIGA_SUBMAKE) -C src/platforms/amiga/rtg/rtg_driver_amiga clean
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/pirtg64/Amiga/rtg_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/ahi/ahi_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C amiga/pissa clean
 	$(AMIGA_SUBMAKE) -C amiga/pissl clean
@@ -870,7 +870,7 @@ else
 	$(MAKE) 
 endif
 	$(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD)
-	$(MAKE) amiga-piscsi amiga-piscsi64
+	$(MAKE) amiga-piscsi amiga-piscsi64  amiga-pirtg64
 	$(MAKE) kernel_module
 	sudo $(MAKE) kernel_install
 	sudo $(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD) INSTALL_BOOT_FIRMWARE=$(INSTALL_BOOT_FIRMWARE) BOOT_FIRMWARE_DIR="$(BOOT_FIRMWARE_DIR)" install
@@ -881,14 +881,14 @@ endif
 	sudo cp -f $(MODPROBE_CONF) /etc/modprobe.d/pistorm.conf
 	sudo cp -f etc/security/limits.d/pistorm-rt.conf /etc/security/limits.d/pistorm-rt.conf
 	sudo cp -f etc/udev/99-pistorm.rules /etc/udev/rules.d/99-pistorm.rules
-	sudo cp -f etc/systemd/system/kernelpistorm64.service /etc/systemd/system/kernelpistorm64.service
+	sudo cp -f etc/systemd/system/pistorm64.service /etc/systemd/system/pistorm64.service
 	# Reload systemd configurations
 	sudo systemctl daemon-reload
 	sudo udevadm control --reload-rules && sudo udevadm trigger --subsystem-match=misc --attr-match=dev=10:262 && sudo udevadm trigger --subsystem-match=block
 	# Apply sysctl settings (continue even if hugepages not supported)
 	sudo sysctl -p /etc/sysctl.d/10-hugepages.conf || echo "Note: Some hugepage settings may not be supported on this system"
 	# Enable and start the emulator service
-	# sudo systemctl enable kernelpistorm64.service
+	# sudo systemctl enable pistorm64.service
 	echo "Loading Kernel PiStorm64"
 #	sudo modprobe pistorm run_batch_enable=1 berr_reset_input=1 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV) 2>/dev/null || true
 	sudo modprobe pistorm $(PISTORM_KMOD_PARAMS) 2>/dev/null || true
@@ -899,4 +899,4 @@ help:
 
 -include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d tools/piscsi64_remote/piscsi64_remote_server.d tools/piscsi64_remote/piscsi64_remote_client.d $(UAE_OBJS:%.o=%.d)
 
-.PHONY: all clean buptest pistorm_truth_test install install-boot-firmware uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-net64 amiga-piscsi amiga-piscsi64 amiga-rtg amiga-ahi amiga-all amiga-clean
+.PHONY: all clean buptest pistorm_truth_test install install-boot-firmware uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-net64 amiga-piscsi amiga-piscsi64 amiga-pirtg64 amiga-ahi amiga-all amiga-clean

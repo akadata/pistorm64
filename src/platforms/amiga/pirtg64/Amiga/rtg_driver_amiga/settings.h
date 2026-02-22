@@ -1,3 +1,10 @@
+// PiStorm PiRTG64 driver, VBCC edition.
+// Based in part on the ZZ9000 RTG driver.
+// PiRTG64 Picasso96 RTG card – build script
+// Copyright (c) 2026 AKADATA Limited
+// Licensed under the MIT License – see LICENSE for details.
+// Developed by AKADATA, with help and support from Codex.
+
 #ifndef settings_H
 #define settings_H
 
