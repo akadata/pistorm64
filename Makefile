@@ -57,7 +57,7 @@ USE_PMMU   ?= 1
 # Optional: build UAE/JIT objects (AArch64 JIT backend from Amiberry).
 # This does not replace Musashi in the main emulator yet; it builds a standalone
 # libuae.a for bring-up and integration work.
-USE_UAE_JIT ?= 0
+USE_UAE_JIT ?= 1
 
 # Force FPU on EC/020/EC040/LC040 for 68881/68882 emulation (optional).
 USE_EC_FPU ?= 0

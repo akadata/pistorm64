@@ -137,6 +137,11 @@ static const char* fc_mode_name(enum fc_mode mode) {
 
 extern unsigned int cpu_type;
 
+static int mmu_direct_pool_allowed = 0;
+static int mmu_direct_pool_checked = 0;
+static int mmu_direct_pool_warned = 0;
+static int attnflags_sync_done = 0;
+
 static int cpu_type_at_least_68020(unsigned int type) {
   switch (type) {
   case M68K_CPU_TYPE_68EC020:
@@ -146,6 +151,7 @@ static int cpu_type_at_least_68020(unsigned int type) {
   case M68K_CPU_TYPE_68EC040:
   case M68K_CPU_TYPE_68LC040:
   case M68K_CPU_TYPE_68040:
+  case M68K_CPU_TYPE_68060:
   case M68K_CPU_TYPE_SCC68070:
     return 1;
   default:
@@ -164,9 +170,105 @@ static const char* cpu_type_name(unsigned int type) {
   case M68K_CPU_TYPE_68EC040: return "68EC040";
   case M68K_CPU_TYPE_68LC040: return "68LC040";
   case M68K_CPU_TYPE_68040: return "68040";
+  case M68K_CPU_TYPE_68060: return "68060";
   case M68K_CPU_TYPE_SCC68070: return "SCC68070";
   default: return "unknown";
   }
+}
+
+static int map_type_is_host_backed_memory(unsigned int map_type) {
+  return map_type == MAPTYPE_RAM ||
+         map_type == MAPTYPE_RAM_NOALLOC ||
+         map_type == MAPTYPE_RAM_WTC ||
+         map_type == MAPTYPE_ROM;
+}
+
+static int map_id_is_mmu_direct_pool_candidate(const char* map_id) {
+  if (!map_id || !*map_id) {
+    return 0;
+  }
+  return strcasecmp(map_id, "cpu_slot_fastram") == 0 ||
+         strcasecmp(map_id, "cpu_slot_ram") == 0 ||
+         strcasecmp(map_id, "z2_autoconf_fast") == 0 ||
+         strcasecmp(map_id, "z3_autoconf_fast") == 0 ||
+         strcasecmp(map_id, "rtg_mem") == 0;
+}
+
+static int map_host_span_is_low4g(const uint8_t* base, size_t size) {
+  if (!base || size == 0) {
+    return 0;
+  }
+  uintptr_t start = (uintptr_t)base;
+  uintptr_t end = start + (uintptr_t)(size - 1u);
+  if (end < start) {
+    return 0;
+  }
+#if UINTPTR_MAX > 0xFFFFFFFFu
+  return end <= 0xFFFFFFFFu;
+#else
+  return 1;
+#endif
+}
+
+static void compute_mmu_direct_pool_allowed(struct emulator_config* cfg_) {
+  mmu_direct_pool_checked = 1;
+  mmu_direct_pool_warned = 0;
+  mmu_direct_pool_allowed = 0;
+
+  if (!cfg_) {
+    LOG_WARN("[CPU][MMU] No config available; PMMU remains disabled.\n");
+    return;
+  }
+
+  int candidate_count = 0;
+  int failed = 0;
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    unsigned int map_type = cfg_->map_type[i];
+    if (!map_type_is_host_backed_memory(map_type)) {
+      continue;
+    }
+    if (!cfg_->map_data[i]) {
+      continue;
+    }
+    if (!map_id_is_mmu_direct_pool_candidate(cfg_->map_id[i])) {
+      continue;
+    }
+
+    size_t span = (size_t)cfg_->map_size[i];
+    if (map_type == MAPTYPE_ROM && cfg_->rom_size[i] > cfg_->map_size[i]) {
+      span = (size_t)cfg_->rom_size[i];
+    }
+    if (span == 0) {
+      LOG_WARN("[CPU][MMU] Direct pool candidate map[%d] id=%s has zero size; ignoring.\n",
+               i, cfg_->map_id[i] ? cfg_->map_id[i] : "(null)");
+      continue;
+    }
+
+    candidate_count++;
+    if (!map_host_span_is_low4g(cfg_->map_data[i], span)) {
+      uintptr_t host = (uintptr_t)cfg_->map_data[i];
+      LOG_ERROR("[CPU][MMU] map[%d] id=%s host=%p span=$%zX not fully in low 4GB; PMMU gate closed.\n",
+                i, cfg_->map_id[i] ? cfg_->map_id[i] : "(null)", (void*)host, span);
+      failed = 1;
+      continue;
+    }
+
+    LOG_INFO("[CPU][MMU] Direct pool map[%d] id=%s amiga=$%.8X-$%.8X host=%p span=$%zX\n",
+             i, cfg_->map_id[i] ? cfg_->map_id[i] : "(null)",
+             (uint32_t)cfg_->map_offset[i], (uint32_t)cfg_->map_high[i],
+             (void*)cfg_->map_data[i], span);
+  }
+
+  if (candidate_count == 0) {
+    LOG_WARN("[CPU][MMU] No dedicated direct-memory pool maps found (cpu_slot_fastram/cpu_slot_ram/z2_autoconf_fast/z3_autoconf_fast/rtg_mem); PMMU remains disabled.\n");
+    return;
+  }
+  if (failed) {
+    return;
+  }
+
+  mmu_direct_pool_allowed = 1;
+  LOG_INFO("[CPU][MMU] Direct-memory pool is valid in low 4GB; PMMU enable requests allowed.\n");
 }
 
 static void enforce_kickstart_cpu_compat(struct emulator_config* cfg_) {
@@ -257,6 +359,8 @@ static int uae_cpu_model_from_musashi(unsigned int type) {
   case M68K_CPU_TYPE_68LC040:
   case M68K_CPU_TYPE_68040:
     return 68040;
+  case M68K_CPU_TYPE_68060:
+    return 68060;
   default:
     return 68030;
   }
@@ -404,7 +508,7 @@ static void dump_cpu_state(const char *reason, int opcode) {
     }
   }
 
-  m68k_disassemble(disasm_buf, pc, cpu_type);
+  m68k_disassemble(disasm_buf, ppc, cpu_type);
   LOG_ERROR("[CPU] %s\n", disasm_buf);
   LOG_ERROR("REGA: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",
             m68k_get_reg(NULL, M68K_REG_A0), m68k_get_reg(NULL, M68K_REG_A1),
@@ -454,7 +558,515 @@ static void instr_hook_callback(unsigned int pc) {
   last_pc_seen = pc;
 }
 
+static int read_guest_word_debug(uint32_t addr, uint16_t *out_word) {
+  if (!out_word) {
+    return 0;
+  }
+
+  if (cfg) {
+    mem_map_entry_info_t map_info;
+    if (memmap_lookup(cfg, addr, &map_info) >= 0 && map_info.host_ptr && map_info.host_span >= 2) {
+      uint32_t off = addr - map_info.amiga_base;
+      if (off + 1 < map_info.host_span) {
+        uint16_t raw = ps_load_u16((unsigned char *)map_info.host_ptr + off);
+        *out_word = (uint16_t)be16toh(raw);
+        return 1;
+      }
+    }
+  }
+
+  if ((addr & 0xFF000000u) == 0) {
+    *out_word = (uint16_t)ps_read_16(addr);
+    return 1;
+  }
+  return 0;
+}
+
+static inline uint32_t get_da_reg(uint8_t reg) {
+  if (reg < 8) {
+    return m68k_get_reg(NULL, (m68k_register_t)(M68K_REG_D0 + reg));
+  }
+  return m68k_get_reg(NULL, (m68k_register_t)(M68K_REG_A0 + (reg - 8)));
+}
+
+static inline void set_da_reg(uint8_t reg, uint32_t value) {
+  if (reg < 8) {
+    m68k_set_reg(NULL, (m68k_register_t)(M68K_REG_D0 + reg), value);
+    return;
+  }
+  m68k_set_reg(NULL, (m68k_register_t)(M68K_REG_A0 + (reg - 8)), value);
+}
+
+static uint16_t attnflags_for_cpu(uint16_t attn_in) {
+  const uint16_t cpu_mask = (uint16_t)((1u << 0) | (1u << 1) | (1u << 2) | (1u << 3) |
+                                       (1u << 4) | (1u << 5) | (1u << 6) | (1u << 7));
+  uint16_t attn = (uint16_t)(attn_in & (uint16_t)~cpu_mask);
+
+  switch (cpu_type) {
+  case M68K_CPU_TYPE_68010:
+    attn |= (uint16_t)(1u << 0);
+    break;
+  case M68K_CPU_TYPE_68EC020:
+  case M68K_CPU_TYPE_68020:
+    attn |= (uint16_t)((1u << 0) | (1u << 1));
+    break;
+  case M68K_CPU_TYPE_68EC030:
+  case M68K_CPU_TYPE_68030:
+    attn |= (uint16_t)((1u << 0) | (1u << 1) | (1u << 2));
+    break;
+  case M68K_CPU_TYPE_68EC040:
+  case M68K_CPU_TYPE_68LC040:
+  case M68K_CPU_TYPE_68040:
+    attn |= (uint16_t)((1u << 0) | (1u << 1) | (1u << 2) | (1u << 3) | (1u << 6));
+    break;
+  case M68K_CPU_TYPE_68060:
+    if (getenv("PISTORM_060_ATTN_PROFILE") && atoi(getenv("PISTORM_060_ATTN_PROFILE")) == 1) {
+      /* Strict 060 profile: clear 68040/FPU40 lineage bits. */
+      attn |= (uint16_t)((1u << 0) | (1u << 1) | (1u << 2) | (1u << 7));
+    } else {
+      /* Compatibility profile: keep 68040 lineage + 060 private bit, but do
+       * not force AFB_FPU40 which can bias tools toward 68040 classification. */
+      attn |= (uint16_t)((1u << 0) | (1u << 1) | (1u << 2) | (1u << 3) | (1u << 7));
+    }
+    break;
+  default:
+    break;
+  }
+
+  return attn;
+}
+
+static int attn_runtime_intercept = -1;
+static int attn_trace_reads = -1;
+static int execbase_trace_reads = -1;
+static int attn_read_trace_only = -1;
+static uint32_t attn_addr_cached[4] = {0, 0, 0, 0};
+static uint8_t attn_cache_valid = 0;
+static uint32_t attn_execbase_cached = 0;
+static uint32_t attn_trace_budget = 64;
+static uint32_t execbase_trace_budget = 128;
+static uint32_t attn_read_trace_budget = 128;
+static inline int attn_runtime_intercept_enabled(void) {
+  if (attn_runtime_intercept == -1) {
+    const char* env = getenv("PISTORM_ATTN_RUNTIME_INTERCEPT");
+    /* Runtime interception is opt-in; some ExecBase layouts/toolchains reuse
+     * nearby fields and forced read substitution can disturb boot. */
+    attn_runtime_intercept = (env && *env && atoi(env) != 0) ? 1 : 0;
+  }
+  return attn_runtime_intercept;
+}
+
+static inline int attn_trace_enabled(void) {
+  if (attn_trace_reads == -1) {
+    const char* env = getenv("PISTORM_ATTN_TRACE");
+    attn_trace_reads = (env && *env && atoi(env) != 0) ? 1 : 0;
+  }
+  return attn_trace_reads;
+}
+
+static inline int execbase_trace_enabled(void) {
+  if (execbase_trace_reads == -1) {
+    const char* env = getenv("PISTORM_EXECBASE_TRACE");
+    execbase_trace_reads = (env && *env && atoi(env) != 0) ? 1 : 0;
+  }
+  return execbase_trace_reads;
+}
+
+static inline int attn_read_trace_enabled(void) {
+  if (attn_read_trace_only == -1) {
+    const char* env = getenv("PISTORM_ATTN_READ_TRACE");
+    attn_read_trace_only = (env && *env && atoi(env) != 0) ? 1 : 0;
+  }
+  return attn_read_trace_only;
+}
+
+static int sync_amiga_exec_attnflags_once(void) {
+  if (!cfg || cfg->platform->id != PLATFORM_AMIGA) {
+    return 0;
+  }
+  if (attnflags_sync_done) {
+    return 1;
+  }
+
+  const uint32_t execbase_ptr_addr = 0x00000004u;
+  /* Use a single, stable AttnFlags slot.
+   * Probing multiple offsets risks corrupting unrelated ExecBase fields. */
+  const uint32_t attnflags_offset = 296u; /* 0x128 */
+  uint32_t execbase = (uint32_t)ps_read_32(execbase_ptr_addr);
+  if (execbase == 0 || (execbase & 1u)) {
+    return 0;
+  }
+  mem_map_entry_info_t exec_map;
+  if (memmap_lookup(cfg, execbase, &exec_map) < 0) {
+    return 0;
+  }
+  if (!(exec_map.map_type == MAPTYPE_RAM ||
+        exec_map.map_type == MAPTYPE_RAM_NOALLOC ||
+        exec_map.map_type == MAPTYPE_RAM_WTC)) {
+    return 0;
+  }
+  attn_cache_valid = 0;
+  attn_execbase_cached = execbase;
+
+  int touched = 0;
+  uint32_t attn_addr = execbase + attnflags_offset;
+  uint16_t cur = (uint16_t)ps_read_16(attn_addr);
+  uint16_t fixed = attnflags_for_cpu(cur);
+  LOG_INFO("[CPU][ATTN] sync cpu=%u execbase=$%.8X off=$%.3X addr=$%.8X raw=$%.4X fixed=$%.4X\n",
+           cpu_type, execbase, attnflags_offset, attn_addr, cur, fixed);
+  if (fixed != cur) {
+    ps_write_16(attn_addr, fixed);
+    touched = 1;
+  }
+  attn_addr_cached[0] = attn_addr;
+  attn_addr_cached[1] = 0;
+  attn_addr_cached[2] = 0;
+  attn_addr_cached[3] = 0;
+  attn_cache_valid = 1;
+  attnflags_sync_done = 1;
+  LOG_INFO("[CPU][ATTN] sync complete cpu=%u execbase=$%.8X touched=%d\n", cpu_type, execbase, touched);
+  return 1;
+}
+
+static inline void refresh_attn_cache_if_execbase_changed(void) {
+  if (!cfg || cfg->platform->id != PLATFORM_AMIGA) {
+    return;
+  }
+
+  uint32_t execbase = (uint32_t)ps_read_32(0x00000004u);
+  if (execbase == 0 || (execbase & 1u)) {
+    return;
+  }
+
+  if (attn_cache_valid && attn_execbase_cached == execbase) {
+    return;
+  }
+  if (attnflags_sync_done && attn_execbase_cached == execbase) {
+    return;
+  }
+
+  attnflags_sync_done = 0;
+  attn_cache_valid = 0;
+  attn_execbase_cached = 0;
+  attn_addr_cached[0] = 0;
+  attn_addr_cached[1] = 0;
+  attn_addr_cached[2] = 0;
+  attn_addr_cached[3] = 0;
+  (void)sync_amiga_exec_attnflags_once();
+}
+
+/* Stage-1 68060 control registers reachable via MOVEC.
+ * Full 68060 CPU/MMU/FPU modeling will replace these placeholders. */
+/* PCR bits31..16 identification for MC68060 per user manual Figure 3-5: 0x0430. */
+#define CPU060_PCR_ID_MC68060   0x04300000u
+/* PCR writable bits on 68060: EDEBUG(7), DFP(1), ESS(0). */
+#define CPU060_PCR_WRITABLE_MASK 0x00000083u
+/* BUSCR currently modeled as low nibble L/SL/LE/SLE only. */
+#define CPU060_BUSCR_MASK        0x0000000Fu
+static uint8_t movec060_recover_log_budget = 4;
+static int cpu060_pcr_env_inited = 0;
+static uint32_t cpu060_pcr_reset_value = CPU060_PCR_ID_MC68060;
+
+static void cpu060_init_pcr_reset_value_once(void) {
+  if (cpu060_pcr_env_inited) {
+    return;
+  }
+  cpu060_pcr_env_inited = 1;
+  const char* env = getenv("PISTORM_060_PCR");
+  if (env && *env) {
+    char* endp = NULL;
+    unsigned long v = strtoul(env, &endp, 0);
+    if (endp && *endp == '\0') {
+      cpu060_pcr_reset_value = (uint32_t)v;
+      LOG_INFO("[CPU][060] PCR reset value overridden via PISTORM_060_PCR=$%.8X\n",
+               cpu060_pcr_reset_value);
+    } else {
+      LOG_WARN("[CPU][060] Invalid PISTORM_060_PCR value '%s'; using default $%.8X\n",
+               env, CPU060_PCR_ID_MC68060);
+    }
+  }
+}
+
+static int try_handle_illegal_movec(int opcode) {
+  if (opcode != 0x4E7A && opcode != 0x4E7B) {
+    return 0;
+  }
+
+  /* MOVEC is privileged and requires 68010+. */
+  if (cpu_type < M68K_CPU_TYPE_68010) {
+    return 0;
+  }
+  if ((m68k_get_reg(NULL, M68K_REG_SR) & 0x2000u) == 0) {
+    return 0;
+  }
+
+  uint32_t pc = m68k_get_reg(NULL, M68K_REG_PC);
+  uint32_t ppc = m68k_get_reg(NULL, M68K_REG_PPC);
+  uint32_t ext_addr = (pc - ppc) >= 4u ? ppc + 2u : pc;
+  uint16_t ext = 0;
+  if (!read_guest_word_debug(ext_addr, &ext)) {
+    LOG_ERROR("[CPU][MOVEC] Unable to fetch extension word at $%.8X (PC=$%.8X PPC=$%.8X)\n",
+              ext_addr, pc, ppc);
+    return 0;
+  }
+
+  uint8_t reg = (uint8_t)((ext >> 12) & 0x0F);
+  uint16_t creg = (uint16_t)(ext & 0x0FFF);
+  int is_cr_to_rn = (opcode == 0x4E7A);
+  uint32_t val = 0;
+  int supported = 1;
+
+  if (!is_cr_to_rn) {
+    val = get_da_reg(reg);
+  }
+
+  switch (creg) {
+  case 0x000: /* SFC */
+    if (is_cr_to_rn) {
+      val = m68k_get_reg(NULL, M68K_REG_SFC) & 7u;
+    } else {
+      m68k_set_reg(NULL, M68K_REG_SFC, val & 7u);
+    }
+    break;
+  case 0x001: /* DFC */
+    if (is_cr_to_rn) {
+      val = m68k_get_reg(NULL, M68K_REG_DFC) & 7u;
+    } else {
+      m68k_set_reg(NULL, M68K_REG_DFC, val & 7u);
+    }
+    break;
+  case 0x002: /* CACR */
+    if (cpu_type < M68K_CPU_TYPE_68EC020) {
+      supported = 0;
+      break;
+    }
+    if (is_cr_to_rn) {
+      val = m68k_get_reg(NULL, M68K_REG_CACR);
+    } else {
+      if (cpu_type >= M68K_CPU_TYPE_68EC040) {
+        m68k_set_reg(NULL, M68K_REG_CACR, val & 0xFFFFFFFEu);
+      } else if (cpu_type >= M68K_CPU_TYPE_68030) {
+        m68k_set_reg(NULL, M68K_REG_CACR, val & 0xFF1Fu);
+      } else {
+        m68k_set_reg(NULL, M68K_REG_CACR, val & 0x000Fu);
+      }
+    }
+    break;
+  case 0x003: /* TC / TCR */
+    if (cpu_type < M68K_CPU_TYPE_68EC040) {
+      supported = 0;
+      break;
+    }
+    if (is_cr_to_rn) {
+      val = m68ki_cpu.mmu_tc;
+    } else {
+      if (!mmu_direct_pool_checked && cfg) {
+        compute_mmu_direct_pool_allowed(cfg);
+      }
+      uint32_t next_tc = val;
+      if ((next_tc & 0x8000u) && !mmu_direct_pool_allowed) {
+        next_tc &= ~0x8000u;
+        m68ki_cpu.pmmu_enabled = 0;
+        if (!mmu_direct_pool_warned) {
+          LOG_WARN("[CPU][MMU] PMMU enable requested via MOVEC TC, but direct-memory pool gate is closed (checked=%d); forcing TC.E=0.\n",
+                   mmu_direct_pool_checked);
+          mmu_direct_pool_warned = 1;
+        }
+      } else {
+        m68ki_cpu.pmmu_enabled = (next_tc & 0x8000u) ? 1 : 0;
+      }
+      m68ki_cpu.mmu_tc = next_tc;
+    }
+    break;
+  case 0x004: /* ITT0 */
+    if (cpu_type < M68K_CPU_TYPE_68EC040) {
+      supported = 0;
+      break;
+    }
+    if (is_cr_to_rn) {
+      val = m68ki_cpu.mmu_itt0;
+    } else {
+      m68ki_cpu.mmu_itt0 = val;
+    }
+    break;
+  case 0x005: /* ITT1 */
+    if (cpu_type < M68K_CPU_TYPE_68EC040) {
+      supported = 0;
+      break;
+    }
+    if (is_cr_to_rn) {
+      val = m68ki_cpu.mmu_itt1;
+    } else {
+      m68ki_cpu.mmu_itt1 = val;
+    }
+    break;
+  case 0x006: /* DTT0 */
+    if (cpu_type < M68K_CPU_TYPE_68EC040) {
+      supported = 0;
+      break;
+    }
+    if (is_cr_to_rn) {
+      val = m68ki_cpu.mmu_dtt0;
+    } else {
+      m68ki_cpu.mmu_dtt0 = val;
+    }
+    break;
+  case 0x007: /* DTT1 */
+    if (cpu_type < M68K_CPU_TYPE_68EC040) {
+      supported = 0;
+      break;
+    }
+    if (is_cr_to_rn) {
+      val = m68ki_cpu.mmu_dtt1;
+    } else {
+      m68ki_cpu.mmu_dtt1 = val;
+    }
+    break;
+  case 0x800: /* USP */
+    if (is_cr_to_rn) {
+      val = m68k_get_reg(NULL, M68K_REG_USP);
+    } else {
+      m68k_set_reg(NULL, M68K_REG_USP, val);
+    }
+    break;
+  case 0x801: /* VBR */
+    if (is_cr_to_rn) {
+      val = m68k_get_reg(NULL, M68K_REG_VBR);
+    } else {
+      m68k_set_reg(NULL, M68K_REG_VBR, val);
+    }
+    break;
+  case 0x802: /* CAAR */
+    if (cpu_type < M68K_CPU_TYPE_68EC020) {
+      supported = 0;
+      break;
+    }
+    if (is_cr_to_rn) {
+      val = m68k_get_reg(NULL, M68K_REG_CAAR);
+    } else {
+      m68k_set_reg(NULL, M68K_REG_CAAR, val);
+    }
+    break;
+  case 0x803: /* MSP */
+    if (cpu_type < M68K_CPU_TYPE_68EC020) {
+      supported = 0;
+      break;
+    }
+    if (is_cr_to_rn) {
+      val = m68k_get_reg(NULL, M68K_REG_MSP);
+    } else {
+      m68k_set_reg(NULL, M68K_REG_MSP, val);
+    }
+    break;
+  case 0x804: /* ISP */
+    if (cpu_type < M68K_CPU_TYPE_68EC020) {
+      supported = 0;
+      break;
+    }
+    if (is_cr_to_rn) {
+      val = m68k_get_reg(NULL, M68K_REG_ISP);
+    } else {
+      m68k_set_reg(NULL, M68K_REG_ISP, val);
+    }
+    break;
+  case 0x805: /* MMUSR */
+    if (cpu_type == M68K_CPU_TYPE_68060) {
+      /* 68060 does not implement MOVEC of MMUSR. */
+      supported = 0;
+      break;
+    }
+    if (cpu_type < M68K_CPU_TYPE_68EC040) {
+      supported = 0;
+      break;
+    }
+    if (is_cr_to_rn) {
+      val = m68ki_cpu.mmu_sr_040;
+    } else {
+      m68ki_cpu.mmu_sr_040 = val;
+    }
+    break;
+  case 0x806: /* URP */
+    if (cpu_type < M68K_CPU_TYPE_68EC040) {
+      supported = 0;
+      break;
+    }
+    if (is_cr_to_rn) {
+      val = m68ki_cpu.mmu_urp_aptr;
+    } else {
+      m68ki_cpu.mmu_urp_aptr = val;
+    }
+    break;
+  case 0x807: /* SRP */
+    if (cpu_type < M68K_CPU_TYPE_68EC040) {
+      supported = 0;
+      break;
+    }
+    if (is_cr_to_rn) {
+      val = m68ki_cpu.mmu_srp_aptr;
+    } else {
+      m68ki_cpu.mmu_srp_aptr = val;
+    }
+    break;
+  case 0x808: /* PCR (68060) */
+    if (cpu_type != M68K_CPU_TYPE_68060) {
+      supported = 0;
+      break;
+    }
+    if (is_cr_to_rn) {
+      val = m68ki_cpu.cpu060_pcr;
+    } else {
+      /* ID/revision and reserved bits are read-only/ignored on write. */
+      m68ki_cpu.cpu060_pcr =
+          (m68ki_cpu.cpu060_pcr & ~CPU060_PCR_WRITABLE_MASK) | (val & CPU060_PCR_WRITABLE_MASK);
+    }
+    break;
+  case 0x809: /* BUSCR (68060) */
+    if (cpu_type != M68K_CPU_TYPE_68060) {
+      supported = 0;
+      break;
+    }
+    if (is_cr_to_rn) {
+      val = m68ki_cpu.cpu060_buscr;
+    } else {
+      m68ki_cpu.cpu060_buscr = val & CPU060_BUSCR_MASK;
+    }
+    break;
+  default:
+    supported = 0;
+    break;
+  }
+
+  if (!supported) {
+    LOG_ERROR("[CPU][MOVEC] Unsupported control register $%03X opcode=$%.4X ext=$%.4X PC=$%.8X PPC=$%.8X cpu=%u\n",
+              creg, opcode & 0xFFFF, ext, pc, ppc, cpu_type);
+    return 0;
+  }
+
+  if (is_cr_to_rn) {
+    set_da_reg(reg, val);
+  }
+
+  /* If MOVEC came through illegal path before consuming extension, skip it now. */
+  if ((m68k_get_reg(NULL, M68K_REG_PC) - ppc) < 4u) {
+    m68k_set_reg(NULL, M68K_REG_PC, ppc + 4u);
+  }
+
+  if ((creg == 0x808u || creg == 0x809u) && movec060_recover_log_budget > 0) {
+    LOG_INFO("[CPU][MOVEC] Recovered 68060 MOVEC opcode=$%.4X ext=$%.4X reg=%u creg=$%03X val=$%.8X dir=%s pc=$%.8X\n",
+             opcode & 0xFFFF, ext, reg, creg, val, is_cr_to_rn ? "cr->rn" : "rn->cr",
+             m68k_get_reg(NULL, M68K_REG_PC));
+    movec060_recover_log_budget--;
+  } else if (creg != 0x808u && creg != 0x809u) {
+    LOG_WARN("[CPU][MOVEC] Recovered illegal MOVEC opcode=$%.4X ext=$%.4X reg=%u creg=$%03X\n",
+             opcode & 0xFFFF, ext, reg, creg);
+  }
+  return 1;
+}
+
 static int illg_instr_callback(int opcode) {
+  if (try_handle_illegal_movec(opcode)) {
+    return 1;
+  }
   dump_cpu_state("Illegal instruction", opcode);
   return 0; // let Musashi raise the exception normally
 }
@@ -987,6 +1599,9 @@ cpu_loop:
     goto stop_cpu_emulation;
   }
 #endif
+  if (!attnflags_sync_done && cpu_type >= M68K_CPU_TYPE_68010) {
+    sync_amiga_exec_attnflags_once();
+  }
   if (realtime_disassembly && (do_disasm || cpu_emulation_running)) {
     m68k_disassemble(disasm_buf, m68k_get_reg(NULL, M68K_REG_PC), cpu_type);
     printf("REGA: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",
@@ -1004,6 +1619,14 @@ cpu_loop:
     if (do_disasm) {
       do_disasm--;
     }
+    if (state->pmmu_enabled && !mmu_direct_pool_allowed) {
+      state->pmmu_enabled = 0;
+      state->mmu_tc &= ~0x8000u;
+      if (!mmu_direct_pool_warned) {
+        LOG_WARN("[CPU][MMU] PMMU was active while direct-memory pool gate is closed; forcing PMMU off.\n");
+        mmu_direct_pool_warned = 1;
+      }
+    }
     cpu_backend_execute(state, 1);
     // Check for end_signal immediately after CPU execution to be more responsive
     if (end_signal) {
@@ -1012,6 +1635,14 @@ cpu_loop:
   } else {
     if (cpu_emulation_running) {
       unsigned int slice = loop_cycles > loop_cycles_cap ? loop_cycles_cap : loop_cycles;
+      if (state->pmmu_enabled && !mmu_direct_pool_allowed) {
+        state->pmmu_enabled = 0;
+        state->mmu_tc &= ~0x8000u;
+        if (!mmu_direct_pool_warned) {
+          LOG_WARN("[CPU][MMU] PMMU was active while direct-memory pool gate is closed; forcing PMMU off.\n");
+          mmu_direct_pool_warned = 1;
+        }
+      }
       if (irq) {
         cpu_backend_execute(state, 5);
       } else {
@@ -1545,6 +2176,7 @@ switch_config:
     }
     cfg->platform->platform_initial_setup(cfg);
     enforce_kickstart_cpu_compat(cfg);
+    compute_mmu_direct_pool_allowed(cfg);
   }
 
   if (fc_get_mode() != FC_MODE_OFF) {
@@ -1648,16 +2280,24 @@ switch_config:
 #ifdef USE_UAE_JIT
   if (enable_jit_backend) {
     int rc = uae_pistorm_init(uae_cpu_model_from_musashi(cpu_type), 1, enable_fpu_jit_backend ? 1 : 0);
+    uint32_t rv_sp = 0;
+    uint32_t rv_pc = 0;
+    int rv_ovl = -1;
+    int rv_err = uae_pistorm_get_last_init_error();
+    uae_pistorm_get_last_reset_vectors(&rv_sp, &rv_pc, &rv_ovl);
     if (rc == 0) {
-      use_uae_jit = 1;
-      enable_jit_backend = 1;
-      LOG_INFO("[CPU] UAE JIT backend enabled\n");
+      if (rv_pc == 0 || (rv_pc & 1u) != 0 || rv_sp == 0) {
+        use_uae_jit = 0;
+        enable_jit_backend = 0;
+        LOG_ERROR("[CPU] UAE JIT init produced invalid reset vectors, falling back to Musashi\n");
+        LOG_ERROR("[CPU] UAE JIT init detail: err=%d reset_sp=$%.8X reset_pc=$%.8X ovl=%d\n",
+                  rv_err, rv_sp, rv_pc, rv_ovl);
+      } else {
+        use_uae_jit = 1;
+        enable_jit_backend = 1;
+        LOG_INFO("[CPU] UAE JIT backend enabled\n");
+      }
     } else {
-      uint32_t rv_sp = 0;
-      uint32_t rv_pc = 0;
-      int rv_ovl = -1;
-      int rv_err = uae_pistorm_get_last_init_error();
-      uae_pistorm_get_last_reset_vectors(&rv_sp, &rv_pc, &rv_ovl);
       use_uae_jit = 0;
       enable_jit_backend = 0;
       LOG_ERROR("[CPU] UAE JIT init failed (rc=%d), falling back to Musashi\n", rc);
@@ -1677,6 +2317,7 @@ switch_config:
     m68k_init();
     printf("Setting CPU type to %d.\n", cpu_type);
     m68k_set_cpu_type(&m68ki_cpu, cpu_type);
+    sync_amiga_exec_attnflags_once();
     m68k_set_instr_hook_callback(&m68ki_cpu, instr_hook_callback);
     m68k_set_fc_callback(&m68ki_cpu, fc_callback_wrapper);  // Use wrapper to call cpu_set_fc
     m68k_set_illg_instr_callback(&m68ki_cpu, illg_instr_callback);
@@ -1848,6 +2489,19 @@ void cpu_pulse_reset(void) {
   m68ki_cpu_core* state = &m68ki_cpu;
   ps_pulse_reset();
 
+  cpu060_init_pcr_reset_value_once();
+  m68ki_cpu.cpu060_pcr = cpu060_pcr_reset_value;
+  m68ki_cpu.cpu060_buscr = 0;
+  movec060_recover_log_budget = 4;
+
+  attnflags_sync_done = 0;
+  attn_cache_valid = 0;
+  attn_execbase_cached = 0;
+  attn_addr_cached[0] = 0;
+  attn_addr_cached[1] = 0;
+  attn_addr_cached[2] = 0;
+  attn_addr_cached[3] = 0;
+
   ovl = 1;
   m68ki_cpu.ovl = 1;
   for (int i = 0; i < 8; i++) {
@@ -1934,6 +2588,122 @@ static inline void ps_write(uint8_t type, uint32_t addr, uint32_t val) {
 static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t* res) {
   switch (cfg->platform->id) {
   case PLATFORM_AMIGA:
+    if (execbase_trace_enabled() && execbase_trace_budget) {
+      uint32_t execbase = (uint32_t)ps_read_32(0x00000004u);
+      if ((execbase & 1u) == 0 && execbase != 0) {
+        uint32_t read_lo = addr;
+        if (type == OP_TYPE_WORD) {
+          read_lo = addr + 1u;
+        } else if (type == OP_TYPE_LONGWORD) {
+          read_lo = addr + 3u;
+        }
+        uint32_t win_lo = execbase;
+        uint32_t win_hi = execbase + 0x300u;
+        if (addr <= win_hi && read_lo >= win_lo) {
+          uint32_t v = ps_read(type, addr);
+          LOG_INFO("[CPU][EXECBASE][TRACE] type=%u addr=$%.8X off=$%.3X val=$%.8X execbase=$%.8X\n",
+                   type, addr, addr - execbase, v, execbase);
+          execbase_trace_budget--;
+        }
+      }
+    }
+
+    if (cpu_type >= M68K_CPU_TYPE_68010 && attn_runtime_intercept_enabled()) {
+      refresh_attn_cache_if_execbase_changed();
+      if (attn_cache_valid) {
+        uint32_t read_hi = addr;
+        uint32_t read_lo = addr;
+        if (type == OP_TYPE_WORD) {
+          read_lo = addr + 1u;
+        } else if (type == OP_TYPE_LONGWORD) {
+          read_lo = addr + 3u;
+        }
+
+        for (unsigned i = 0; i < 4u; i++) {
+          uint32_t attn_addr = attn_addr_cached[i];
+          if (!attn_addr) {
+            continue;
+          }
+          if (read_hi <= attn_addr + 1u && read_lo >= attn_addr) {
+            uint16_t attn = (uint16_t)ps_read_16(attn_addr);
+            attn = attnflags_for_cpu(attn);
+
+            if (type == OP_TYPE_BYTE) {
+              if (addr == attn_addr) {
+                *res = (uint32_t)((attn >> 8) & 0xFFu);
+              } else {
+                *res = (uint32_t)(attn & 0xFFu);
+              }
+              if (attn_trace_enabled() && attn_trace_budget) {
+                LOG_INFO("[CPU][ATTN][TRACE] read8 addr=$%.8X attn_addr=$%.8X val=$%.2X\n",
+                         addr, attn_addr, (unsigned int)(*res & 0xFFu));
+                attn_trace_budget--;
+              }
+              return 1;
+            }
+            if (type == OP_TYPE_WORD) {
+              *res = (uint32_t)attn;
+              if (attn_trace_enabled() && attn_trace_budget) {
+                LOG_INFO("[CPU][ATTN][TRACE] read16 addr=$%.8X attn_addr=$%.8X val=$%.4X\n",
+                         addr, attn_addr, (unsigned int)(*res & 0xFFFFu));
+                attn_trace_budget--;
+              }
+              return 1;
+            }
+            if (type == OP_TYPE_LONGWORD) {
+              if (addr == attn_addr) {
+                uint16_t next = (uint16_t)ps_read_16(attn_addr + 2u);
+                *res = ((uint32_t)attn << 16) | (uint32_t)next;
+                if (attn_trace_enabled() && attn_trace_budget) {
+                  LOG_INFO("[CPU][ATTN][TRACE] read32-hi addr=$%.8X attn_addr=$%.8X val=$%.8X\n",
+                           addr, attn_addr, *res);
+                  attn_trace_budget--;
+                }
+                return 1;
+              }
+              if (addr + 2u == attn_addr) {
+                uint16_t prev = (uint16_t)ps_read_16(addr);
+                *res = ((uint32_t)prev << 16) | (uint32_t)attn;
+                if (attn_trace_enabled() && attn_trace_budget) {
+                  LOG_INFO("[CPU][ATTN][TRACE] read32-lo addr=$%.8X attn_addr=$%.8X val=$%.8X\n",
+                           addr, attn_addr, *res);
+                  attn_trace_budget--;
+                }
+                return 1;
+              }
+            }
+          }
+        }
+      }
+    }
+    if (cpu_type >= M68K_CPU_TYPE_68010 && attn_read_trace_enabled() && attn_read_trace_budget) {
+      if (!attn_cache_valid) {
+        refresh_attn_cache_if_execbase_changed();
+      }
+      if (attn_cache_valid) {
+        uint32_t read_hi = addr;
+        uint32_t read_lo = addr;
+        if (type == OP_TYPE_WORD) {
+          read_lo = addr + 1u;
+        } else if (type == OP_TYPE_LONGWORD) {
+          read_lo = addr + 3u;
+        }
+        for (unsigned i = 0; i < 4u; i++) {
+          uint32_t attn_addr = attn_addr_cached[i];
+          if (!attn_addr) {
+            continue;
+          }
+          if (read_hi <= attn_addr + 1u && read_lo >= attn_addr) {
+            uint32_t v = ps_read(type, addr);
+            LOG_INFO("[CPU][ATTN][READTRACE] type=%u addr=$%.8X val=$%.8X attn_addr=$%.8X\n",
+                     type, addr, v, attn_addr);
+            attn_read_trace_budget--;
+            break;
+          }
+        }
+      }
+    }
+
     switch (addr) {
     case INTREQR:
       return amiga_handle_intrqr_read(res);

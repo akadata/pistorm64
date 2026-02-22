@@ -108,7 +108,8 @@ enum {
 	M68K_CPU_TYPE_68EC040,
 	M68K_CPU_TYPE_68LC040,
 	M68K_CPU_TYPE_68040,
-	M68K_CPU_TYPE_SCC68070
+	M68K_CPU_TYPE_SCC68070,
+	M68K_CPU_TYPE_68060
 };
 
 /* Registers used by m68k_get_reg() and m68k_set_reg() */
@@ -329,10 +330,7 @@ void m68k_set_instr_hook_callback(struct m68ki_cpu_core *state, void  (*callback
 /* ====================== FUNCTIONS TO ACCESS THE CPU ===================== */
 /* ======================================================================== */
 
-/* Use this function to set the CPU type you want to emulate.
- * Currently supported types are: M68K_CPU_TYPE_68000, M68K_CPU_TYPE_68010,
- * M68K_CPU_TYPE_EC020, and M68K_CPU_TYPE_68020.
- */
+/* Use this function to set the CPU type you want to emulate. */
 void m68k_set_cpu_type(struct m68ki_cpu_core *state, unsigned int cpu_type);
 
 /* Do whatever initialisations the core requires.  Should be called

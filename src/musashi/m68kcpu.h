@@ -1025,6 +1025,10 @@ typedef struct
 typedef struct __attribute__((aligned(16))) m68ki_cpu_core
 {
 	uint cpu_type;     /* CPU Type: 68000, 68008, 68010, 68EC020, 68020, 68EC030, 68030, 68EC040, or 68040 */
+	uint api_cpu_type; /* Requested external CPU type (can differ from internal execution core) */
+	uint cpu060_mode;  /* 1 when API CPU is 68060 while execution core is still 040-class */
+	uint cpu060_pcr;   /* 68060 Processor Configuration Register (MOVEC 0x808) */
+	uint cpu060_buscr; /* 68060 Bus Control Register (MOVEC 0x809) */
 	uint dar[16];      /* Data and Address Registers */
 	uint dar_save[16];  /* Saved Data and Address Registers (pushed onto the
 						   stack when a bus error occurs)*/

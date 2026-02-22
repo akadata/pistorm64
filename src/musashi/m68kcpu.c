@@ -46,9 +46,11 @@ extern void m68ki_build_opcode_table(void);
 
 #include "m68kops.h"
 #include "m68kcpu.h"
+#include <stdlib.h>
 
 #include "m68kfpu.c"
 #include "m68kmmu.h" // uses some functions from m68kfpu.c which are static !
+#define M68K_060_PCR_ID 0x04300000u
 #ifdef M68K_ENHANCE
 #include "m68k_enhanced.h"
 #endif 
@@ -632,6 +634,9 @@ unsigned int m68k_get_reg(void* context, m68k_register_t regnum) {
 		case M68K_REG_IR:	
 			return cpu->ir;
 		case M68K_REG_CPU_TYPE:
+			if (cpu->api_cpu_type) {
+				return cpu->api_cpu_type;
+			}
 			switch(cpu->cpu_type) {
 				case CPU_TYPE_000:
 					return (unsigned int)M68K_CPU_TYPE_68000;
@@ -813,6 +818,10 @@ void m68k_set_instr_hook_callback(m68ki_cpu_core *state, void  (*callback)(unsig
 
 /* Set the CPU type. */
 void m68k_set_cpu_type(struct m68ki_cpu_core *state, unsigned int cpu_type) {
+	state->api_cpu_type = cpu_type;
+	state->cpu060_mode = 0;
+	state->cpu060_pcr = 0;
+	state->cpu060_buscr = 0;
 	switch(cpu_type) {
 		case M68K_CPU_TYPE_68000:
 			CPU_TYPE         = CPU_TYPE_000;
@@ -945,6 +954,30 @@ void m68k_set_cpu_type(struct m68ki_cpu_core *state, unsigned int cpu_type) {
 			HAS_PMMU         = 1;
 			HAS_FPU          = 1;
 			return;
+		case M68K_CPU_TYPE_68060:
+			/* Stage-2 68060 plumbing: keep external CPU identity 68060 while using
+			 * 040-class execution tables until native 060 ops are implemented. */
+			CPU_TYPE         = CPU_TYPE_040;
+			CPU_ADDRESS_MASK = 0xffffffff;
+			CPU_SR_MASK      = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+			CYC_INSTRUCTION  = m68ki_cycles[4];
+			CYC_EXCEPTION    = m68ki_exception_cycle_table[4];
+			CYC_BCC_NOTAKE_B = -2;
+			CYC_BCC_NOTAKE_W = 0;
+			CYC_DBCC_F_NOEXP = 0;
+			CYC_DBCC_F_EXP   = 4;
+			CYC_SCC_R_TRUE   = 0;
+			CYC_MOVEM_W      = 2;
+			CYC_MOVEM_L      = 2;
+			CYC_SHIFT        = 0;
+			CYC_RESET        = 518;
+			HAS_PMMU         = 1;
+			HAS_FPU          = 1;
+			state->cpu060_mode = 1;
+			state->cpu060_pcr = M68K_060_PCR_ID;
+			state->cpu060_buscr = 0;
+			printf("[MUSASHI] CPU type 68060 requested; using temporary 68040 execution core.\n");
+			return;
 		case M68K_CPU_TYPE_68EC040: // Just a 68040 without pmmu apparently...
 			CPU_TYPE         = CPU_TYPE_EC040;
 			CPU_ADDRESS_MASK = 0xffffffff;
@@ -986,6 +1019,34 @@ void m68k_set_cpu_type(struct m68ki_cpu_core *state, unsigned int cpu_type) {
 
 uint m68k_get_address_mask(m68ki_cpu_core *state) {
 	return state->address_mask;
+}
+
+static inline int m68k_is_060_unimplemented_opcode(uint16_t ir) {
+	/* MC68060 does not implement several 68020/030/040-era integer ops in hardware.
+	 * Start with the high-signal probes used by CPU ID tools:
+	 * - Bitfield family BFxxx (E8C0-EFFF opcode space)
+	 * - CAS2
+	 * - RTM
+	 */
+	if ((ir & 0xF8C0u) == 0xE8C0u) { /* BFxxx */
+		return 1;
+	}
+	if (ir == 0x0CFCu || ir == 0x0EFCu) { /* CAS2.W / CAS2.L */
+		return 1;
+	}
+	if ((ir & 0xFFF0u) == 0x06C0u) { /* RTM Dn/An */
+		return 1;
+	}
+	return 0;
+}
+
+static inline int m68k_060_probe_traps_enabled(void) {
+	static int enabled = -1;
+	if (enabled == -1) {
+		const char *env = getenv("PISTORM_060_STRICT_PROBES");
+		enabled = (env && *env && atoi(env) != 0) ? 1 : 0;
+	}
+	return enabled;
 }
 
 /* Execute some instructions until we use up num_cycles clock cycles */
@@ -1041,7 +1102,13 @@ int m68k_execute(m68ki_cpu_core *state, int num_cycles) {
 
 			/* Read an instruction and call its handler */
 			REG_IR = m68ki_read_imm_16(state);
-			m68ki_instruction_jump_table[REG_IR](state);
+			if (state->api_cpu_type == M68K_CPU_TYPE_68060 &&
+			    m68k_060_probe_traps_enabled() &&
+			    m68k_is_060_unimplemented_opcode((uint16_t)REG_IR)) {
+				m68ki_exception_illegal(state);
+			} else {
+				m68ki_instruction_jump_table[REG_IR](state);
+			}
 			USE_CYCLES(CYC_INSTRUCTION[REG_IR]);
 
 			/* Trace m68k_exception, if necessary */
@@ -1184,6 +1251,11 @@ void m68k_pulse_reset(m68ki_cpu_core *state) {
 	state->mmu_tc = 0;
 	state->mmu_tt0 = 0;
 	state->mmu_tt1 = 0;
+	if (state->api_cpu_type == M68K_CPU_TYPE_68060) {
+		/* BUSCR reset value is 0. Keep PCR ID/revision, clear writable control bits. */
+		state->cpu060_buscr = 0;
+		state->cpu060_pcr &= 0xFFFF0000u;
+	}
 
 	/* Clear all stop levels and eat up all remaining cycles */
 	CPU_STOPPED = 0;

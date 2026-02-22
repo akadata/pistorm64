@@ -1,0 +1,1 @@
+>68060.log; ./emulator --config default.cfg --log 68060.log --log-level debug 

@@ -3755,6 +3755,7 @@ unsigned int m68k_disassemble(char* str_buff, unsigned int pc, unsigned int cpu_
 		case M68K_CPU_TYPE_68040:
 		case M68K_CPU_TYPE_68EC040:
 		case M68K_CPU_TYPE_68LC040:
+		case M68K_CPU_TYPE_68060:
 			g_cpu_type = TYPE_68040;
 			g_address_mask = 0xffffffff;
 			break;
@@ -3966,6 +3967,7 @@ unsigned int m68k_is_valid_instruction(unsigned int instruction, unsigned int cp
 		case M68K_CPU_TYPE_68040:
 		case M68K_CPU_TYPE_68EC040:
 		case M68K_CPU_TYPE_68LC040:
+		case M68K_CPU_TYPE_68060:
 			if(g_instruction_table[instruction] == d68020_cpbcc_16)
 				return 0;
 			if(g_instruction_table[instruction] == d68020_cpbcc_32)

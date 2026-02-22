@@ -17,8 +17,8 @@ regtool
 !etc/modules-load.d/*.conf
 
 # Generated files
-m68kops.c
-m68kops.h
+#m68kops.c
+#m68kops.h
 
 # IDE and editor files
 *.swp
@@ -28,10 +28,8 @@ m68kops.h
 .idea/
 qwen.resume
 *.log
-*.rom 
 *.jdf
 *.dd
-*.pdf
 *.pvs
 *.sr
 codex.resume

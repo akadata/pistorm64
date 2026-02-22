@@ -4801,7 +4801,11 @@ static int get_reset_jmp_pc_bias(void)
       return override_bias;
    }
    int bias = -2;
-   if (currprefs.cpu_model >= 68040) {
+   if (currprefs.cpu_model == 68060) {
+      /* 68060 reset/jmp trampoline handling is more stable with UAE's
+       * historical addr-2 behavior; bias 0 can loop at Kick reset stubs. */
+      bias = -2;
+   } else if (currprefs.cpu_model >= 68040) {
       bias = 0;
    } else if (currprefs.cpu_model <= 68010) {
       bias = -2;
@@ -4864,19 +4868,37 @@ bool cpureset (void)
       write_log (_T("CPU reset PC=%x\n"), pc - 2);
 
       ins = get_word (pc);
-      if ((ins & ~7) == 0x4ed0) {
-         int reg = ins & 7;
-         uae_u32 addr = m68k_areg (regs, reg);
-         if (addr < 0x80000)
-            addr += 0xf80000;
-         // Match upstream UAE reset trampoline behavior (addr - 2).
-         int bias = get_reset_jmp_pc_bias();
-         uae_u32 jmp_pc = addr + bias;
-         custom_reset_cpu_trace(false, false, "cpureset:reset_jmp", jmp_pc);
-         // Keep ROM visible while jumping into Kickstart reset trampoline.
-         ovl = 1;
-         write_log (_T("reset/jmp (ax) combination at %08x emulated raw=%x bias=%d -> %x\n"),
-            pc, addr, bias, jmp_pc);
+	      if ((ins & ~7) == 0x4ed0) {
+	         int reg = ins & 7;
+	         uae_u32 addr = m68k_areg (regs, reg);
+	         if (addr < 0x80000)
+	            addr += 0xf80000;
+	         // Match upstream UAE reset trampoline behavior (addr - 2).
+	         int bias = get_reset_jmp_pc_bias();
+	         uae_u32 jmp_pc = addr + bias;
+	         static uaecptr last_reset_jmp_site = 0;
+	         static uae_u32 last_reset_jmp_raw = 0;
+	         if (last_reset_jmp_site == pc && last_reset_jmp_raw == addr) {
+	            reset_loop_counter++;
+	         } else {
+	            reset_loop_counter = 1;
+	            last_reset_jmp_site = pc;
+	            last_reset_jmp_raw = addr;
+	         }
+	         if (reset_loop_counter > 8) {
+	            write_log(_T("reset/jmp loop detected at %08x raw=%x bias=%d, breaking to ksboot=%x\n"),
+	               pc, addr, bias, ksboot);
+	            custom_reset_cpu_trace(false, false, "cpureset:reset_jmp_loopbreak", ksboot);
+	            ovl = 1;
+	            m68k_setpc_normal(ksboot);
+	            reset_loop_counter = 0;
+	            return false;
+	         }
+	         custom_reset_cpu_trace(false, false, "cpureset:reset_jmp", jmp_pc);
+	         // Keep ROM visible while jumping into Kickstart reset trampoline.
+	         ovl = 1;
+	         write_log (_T("reset/jmp (ax) combination at %08x emulated raw=%x bias=%d -> %x\n"),
+	            pc, addr, bias, jmp_pc);
          m68k_setpc_normal (jmp_pc);
 //         reset_loop_counter++;
 //         if(reset_loop_counter>=5)
@@ -4886,9 +4908,10 @@ bool cpureset (void)
 //         }
          return false;
       }
-      custom_reset_cpu_trace(false, false, "cpureset:valid_mem", ksboot);
-      ovl = 1;
-      m68k_setpc_normal (ksboot);
+	      custom_reset_cpu_trace(false, false, "cpureset:valid_mem", ksboot);
+	      reset_loop_counter = 0;
+	      ovl = 1;
+	      m68k_setpc_normal (ksboot);
       // did memory disappear under us?
 //      if (ab == &get_mem_bank (pc))
 //         return false;
@@ -4900,9 +4923,10 @@ bool cpureset (void)
    // (which is probably what program wanted anyway)
 //   write_log (_T("CPU Reset PC=%x (%s), invalid memory -> %x.\n"), pc, ab->name, ksboot + 2);
 
-   write_log (_T("CPU Reset PC=%x, invalid memory -> %x.\n"), pc, ksboot + 2);
-   custom_reset_cpu_trace(false, false, "cpureset:invalid_mem", ksboot);
-   m68k_setpc_normal (ksboot);
+	   write_log (_T("CPU Reset PC=%x, invalid memory -> %x.\n"), pc, ksboot + 2);
+	   custom_reset_cpu_trace(false, false, "cpureset:invalid_mem", ksboot);
+	   reset_loop_counter = 0;
+	   m68k_setpc_normal (ksboot);
    return false;
 }
 

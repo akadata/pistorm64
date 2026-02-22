@@ -14,7 +14,7 @@
 #include "rominfo.h"
 #include "gpio/ps_protocol.h"
 
-#define M68K_CPU_TYPES M68K_CPU_TYPE_SCC68070
+#define M68K_CPU_TYPES M68K_CPU_TYPE_68060
 #define PI_AFFINITY_ENV "PISTORM_AFFINITY"
 #define PI_RT_ENV "PISTORM_RT"
 
@@ -33,6 +33,7 @@ const char* cpu_types[M68K_CPU_TYPES] = {
     "68LC040", 
     "68040", 
     "SCC68070",
+    "68060",
 };
 
 const char* map_type_names[MAPTYPE_NUM] = {
@@ -255,13 +256,9 @@ unsigned int get_m68k_cpu_type(const char* name) {
     name = "68EC030";
   else if (strcasecmp(name, "680ec40") == 0)
     name = "68EC040";
-  else if (strcasecmp(name, "68060") == 0 || strcasecmp(name, "68EC060") == 0 ||
-           strcasecmp(name, "68LC060") == 0) {
-    // Current core set tops out at 68040 tables; keep user intent ("high-end CPU")
-    // without silently dropping all the way to 68000.
-    printf("[CFG] CPU type %s requested; mapping to 68040 (68060 tables not present).\n", name);
-    name = "68040";
-  }
+  else if (strcasecmp(name, "680ec60") == 0 || strcasecmp(name, "68EC060") == 0 ||
+           strcasecmp(name, "68LC060") == 0)
+    name = "68060";
 
   for (int i = 0; i < M68K_CPU_TYPES; i++) {
     if (strcasecmp(name, cpu_types[i]) == 0) {

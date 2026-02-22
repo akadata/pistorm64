@@ -45,7 +45,7 @@ extern int load_fs(struct piscsi64_fs *fs, char *dosID);
 extern struct emulator_config *cfg;
 
 // Debug output is controlled at runtime via --log-level debug.
-#define PISCSI64_DEBUG
+//#define PISCSI64_DEBUG
 
 static const char *op_type_names[4] = {
     "BYTE",

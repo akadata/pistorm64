@@ -25,7 +25,7 @@ Here's a list of config file commands that can be used with any platform:
 
 SYNTAX: `cpu CPU_TYPE`  
 Example: `cpu 68020`  
-This command takes a single argument, which is the CPU type to emulate. Valid CPU types are `68000`, `68010`, `68EC020`, `68020`, `68EC030`, `68030`, `68EC040`, `68LC040`, `68040` and `SCC68070`.
+This command takes a single argument, which is the CPU type to emulate. Valid CPU types are `68000`, `68010`, `68EC020`, `68020`, `68EC030`, `68030`, `68EC040`, `68LC040`, `68040`, `68060` and `SCC68070`.
 
 # map
 

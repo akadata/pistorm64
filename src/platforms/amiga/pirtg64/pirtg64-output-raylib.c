@@ -149,20 +149,45 @@ static void rtg_apply_thread_tuning(void) {
 }
 
 static const char* rtg_resolve_shader_path(const char* filename, char* buf, size_t buf_len) {
+    static int logged_once = 0;
     const char* root = getenv("PISTORM_ROOT");
     if (root && *root) {
-        snprintf(buf, buf_len, "%s/RTG/shaders/%s", root, filename);
-        if (access(buf, R_OK) == 0) {
-            return buf;
+        const char* root_candidates[] = {
+            "%s/src/platforms/amiga/pirtg64/shaders/%s",
+            "%s/src/platforms/amiga/RTG/shaders/%s",
+            "%s/RTG/shaders/%s",
+        };
+        for (size_t i = 0; i < sizeof(root_candidates) / sizeof(root_candidates[0]); i++) {
+            snprintf(buf, buf_len, root_candidates[i], root, filename);
+            if (access(buf, R_OK) == 0) {
+                if (!logged_once) {
+                    LOG_INFO("[RTG/RAYLIB] Shader root resolved via PISTORM_ROOT: %s\n", buf);
+                    logged_once = 1;
+                }
+                return buf;
+            }
         }
-        snprintf(buf, buf_len, "%s/src/platforms/amiga/RTG/shaders/%s", root, filename);
+    }
+    const char* fallback_candidates[] = {
+        "src/platforms/amiga/pirtg64/shaders/%s",
+        "src/platforms/amiga/RTG/shaders/%s",
+        "/opt/pistorm64/src/platforms/amiga/pirtg64/shaders/%s",
+        "/opt/pistorm64/src/platforms/amiga/RTG/shaders/%s",
+    };
+    for (size_t i = 0; i < sizeof(fallback_candidates) / sizeof(fallback_candidates[0]); i++) {
+        snprintf(buf, buf_len, fallback_candidates[i], filename);
         if (access(buf, R_OK) == 0) {
+            if (!logged_once) {
+                LOG_INFO("[RTG/RAYLIB] Shader path resolved: %s\n", buf);
+                logged_once = 1;
+            }
             return buf;
         }
     }
-    snprintf(buf, buf_len, "src/platforms/amiga/RTG/shaders/%s", filename);
-    if (access(buf, R_OK) == 0) {
-        return buf;
+    if (!logged_once) {
+        LOG_WARN("[RTG/RAYLIB] Shader file '%s' not found in known paths; relying on current working directory.\n",
+                 filename);
+        logged_once = 1;
     }
     return filename;
 }
