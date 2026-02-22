@@ -209,9 +209,9 @@ MAINFILES += src/platforms/amiga/Gayle.c
 MAINFILES += src/platforms/amiga/hunk-reloc.c
 MAINFILES += src/platforms/amiga/cdtv-dmac.c
 
-MAINFILES += src/platforms/amiga/rtg/rtg.c
-MAINFILES += src/platforms/amiga/rtg/rtg-output-raylib.c
-MAINFILES += src/platforms/amiga/rtg/rtg-gfx.c
+MAINFILES += src/platforms/amiga/pirtg64/pirtg64.c
+MAINFILES += src/platforms/amiga/pirtg64/pirtg64-output-raylib.c
+MAINFILES += src/platforms/amiga/pirtg64/pirtg64-gfx.c
 
 MAINFILES += src/platforms/amiga/piscsi/piscsi.c
 MAINFILES += src/platforms/amiga/net/pi-net.c
@@ -224,8 +224,8 @@ MAINFILES += src/selftest.c
 
 
 ifeq ($(USE_RAYLIB),0)
-MAINFILES := $(filter-out src/platforms/amiga/rtg/rtg-output-raylib.c,$(MAINFILES))
-MAINFILES += src/platforms/amiga/rtg/rtg-output-null.c
+MAINFILES := $(filter-out src/platforms/amiga/pirtg64/pirtg64-output-raylib.c,$(MAINFILES))
+MAINFILES += src/platforms/amiga/pirtg64/pirtg64-output-null.c
 endif
 
 ifeq ($(USE_ALSA),0)
@@ -549,7 +549,7 @@ install: all
 #		echo "Warning: $(INSTALL_DIR)/data/a314-shared is not empty; Python code must not be installed there."; \
 #	fi
 	$(INSTALL) -d $(INSTALL_DIR)/rtg
-	$(INSTALL) -m 644 src/platforms/amiga/rtg/*.shader $(INSTALL_DIR)/rtg/
+	$(INSTALL) -m 644 src/platforms/amiga/pirtg64/shaders/*.shader $(INSTALL_DIR)/rtg/
 	[ -f pistorm.LICENSE ] && $(INSTALL) -m 644 pistorm.LICENSE $(INSTALL_DIR)/
 	if [ -f $(UDEV_RULES) ]; then \
 		$(INSTALL) -d /etc/udev/rules.d; \
@@ -615,7 +615,7 @@ amiga-piscsi:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi/device_driver_amiga
 
 amiga-rtg:
-	$(AMIGA_SUBMAKE) -C src/platforms/amiga/rtg/rtg_driver_amiga
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/pirtg64/Amiga/rtg_driver_amiga
 
 amiga-ahi:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/ahi/ahi_driver_amiga
@@ -631,7 +631,7 @@ amiga-all: amiga-net amiga-piscsi amiga-rtg amiga-pissa amiga-pissl
 amiga-clean:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/net/net_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi/device_driver_amiga clean
-	$(AMIGA_SUBMAKE) -C src/platforms/amiga/rtg/rtg_driver_amiga clean
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/pirtg64/Amiga/rtg_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/ahi/ahi_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C amiga/pissa clean
 	$(AMIGA_SUBMAKE) -C amiga/pissl clean

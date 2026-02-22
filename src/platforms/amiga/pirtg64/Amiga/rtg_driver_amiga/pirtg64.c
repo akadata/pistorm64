@@ -332,14 +332,14 @@ void SetSpriteColor (
 #define DEVICE_REVISION 20
 #define DEVICE_PRIORITY 0
 #define DEVICE_ID_STRING "PiRTG64 " XSTR(DEVICE_VERSION) "." XSTR(DEVICE_REVISION) " " DEVICE_DATE
-#define DEVICE_NAME "pigrtg64.card"
+#define DEVICE_NAME "pirtg64.card"
 #define DEVICE_DATE "(21 Feb 2026)"
 
 /*
  * Keep advertised RGB formats conservative and aligned with what the backend
  * is known to handle reliably end-to-end.
  */
-static const ULONG kPigfxSupportedFormats = RGBFF_NONE | RGBFF_CLUT | RGBFF_R5G6B5 | RGBFF_R5G5B5 | RGBFF_R8G8B8A8 | RGBFF_B8G8R8A8;
+static const ULONG kPirtg64SupportedFormats = RGBFF_NONE | RGBFF_CLUT | RGBFF_R5G6B5 | RGBFF_R5G5B5 | RGBFF_R8G8B8A8 | RGBFF_B8G8R8A8;
 
 
 int __attribute__((no_reorder)) _start() {
@@ -498,7 +498,7 @@ int __attribute__((used)) InitCard(
     b->GraphicsControllerType = GCT_S3ViRGE;
 
     b->Flags |= BIF_GRANTDIRECTACCESS | BIF_HARDWARESPRITE | BIF_FLICKERFIXER;// | BIF_BLITTER;
-    b->RGBFormats = (UWORD)kPigfxSupportedFormats;
+    b->RGBFormats = (UWORD)kPirtg64SupportedFormats;
     b->SoftSpriteFlags = 0;
     b->BitsPerCannon = 8;
 
@@ -594,7 +594,7 @@ void SetGC (
     WRITESHORT(RTG_X1, mode_info->Width);
     WRITESHORT(RTG_Y1, mode_info->Height);
     WRITESHORT(RTG_FORMAT, rgbf_to_rtg[b->RGBFormat]);
-    WRITESHORT(RTG_COMMAND, RTGCMD_SETGC);
+    WRITESHORT(RTG_COMMAND, RTG_CMD_SETGC);
 }
 
 int setswitch = -1;
@@ -608,7 +608,7 @@ UWORD SetSwitch (
     
     WRITEBYTE(RTG_U81, setswitch);
     WRITESHORT(RTG_X1, setswitch);
-    WRITESHORT(RTG_COMMAND, RTGCMD_SETSWITCH);
+    WRITESHORT(RTG_COMMAND, RTG_CMD_SETSWITCH);
 
     return 1 - enabled;
 }
@@ -635,9 +635,9 @@ void SetPanning (
     WRITESHORT(RTG_FORMAT, rgbf_to_rtg[format]);
     WRITESHORT(RTG_X2, b->XOffset);
     WRITESHORT(RTG_Y2, b->YOffset);
-    WRITESHORT(RTG_COMMAND, RTGCMD_SETPAN);
+    WRITESHORT(RTG_COMMAND, RTG_CMD_SETPAN);
 #else
-    IWRITECMD(RTGCMD_SETPAN);
+    IWRITECMD(RTG_CMD_SETPAN);
 #endif
 }
 
@@ -663,7 +663,7 @@ void SetColorArray (
         unsigned long xrgb = 0 | (b->CLUT[i].Red << 16) | (b->CLUT[i].Green << 8) | (b->CLUT[i].Blue);
         WRITEBYTE(RTG_U81, (unsigned char)i);
         WRITELONG(RTG_RGB1, xrgb);
-        WRITESHORT(RTG_COMMAND, RTGCMD_SETCLUT);
+        WRITESHORT(RTG_COMMAND, RTG_CMD_SETCLUT);
     }
 }
 
@@ -750,7 +750,7 @@ ULONG GetCompatibleFormats (
         return (RGBFF_NONE | RGBFF_B8G8R8A8 | RGBFF_R8G8B8A8);
 
     default:
-        return kPigfxSupportedFormats;
+        return kPirtg64SupportedFormats;
     }
 }
 
@@ -761,7 +761,7 @@ UWORD SetDisplay (
     ) {
     // Enables or disables the display.
     WRITEBYTE(RTG_U82, (unsigned char)enabled);
-    WRITESHORT(RTG_COMMAND, RTGCMD_SETDISPLAY);
+    WRITESHORT(RTG_COMMAND, RTG_CMD_SETDISPLAY);
 
     return 1;
 }
@@ -863,9 +863,9 @@ void FillRect (
     WRITELONG(RTG_RGB1, color);
     WRITESHORT(RTG_X3, r->BytesPerRow);
     WRITEBYTE(RTG_U81, mask);
-    WRITESHORT(RTG_COMMAND, RTGCMD_FILLRECT);
+    WRITESHORT(RTG_COMMAND, RTG_CMD_FILLRECT);
 #else
-    IWRITECMD(RTGCMD_FILLRECT);
+    IWRITECMD(RTG_CMD_FILLRECT);
 #endif
 }
 
@@ -893,9 +893,9 @@ void InvertRect (
     WRITESHORT(RTG_Y2, h);
     WRITESHORT(RTG_X3, r->BytesPerRow);
     WRITEBYTE(RTG_U81, mask);
-    WRITESHORT(RTG_COMMAND, RTGCMD_INVERTRECT);
+    WRITESHORT(RTG_COMMAND, RTG_CMD_INVERTRECT);
 #else
-    IWRITECMD(RTGCMD_INVERTRECT);
+    IWRITECMD(RTG_CMD_INVERTRECT);
 #endif
 }
 
@@ -927,9 +927,9 @@ void BlitRect (
     WRITESHORT(RTG_Y3, h);
     WRITESHORT(RTG_X4, r->BytesPerRow);
     WRITEBYTE(RTG_U81, mask);
-    WRITESHORT(RTG_COMMAND, RTGCMD_BLITRECT);
+    WRITESHORT(RTG_COMMAND, RTG_CMD_BLITRECT);
 #else
-    IWRITECMD(RTGCMD_BLITRECT);
+    IWRITECMD(RTG_CMD_BLITRECT);
 #endif
 }
 
@@ -962,9 +962,9 @@ void BlitRectNoMaskComplete (
     WRITESHORT(RTG_X4, rs->BytesPerRow);
     WRITESHORT(RTG_X5, rt->BytesPerRow);
     WRITEBYTE(RTG_U81, minterm);
-    WRITESHORT(RTG_COMMAND, RTGCMD_BLITRECT_NOMASK_COMPLETE);
+    WRITESHORT(RTG_COMMAND, RTG_CMD_BLITRECT_NOMASK_COMPLETE);
 #else
-    IWRITECMD(RTGCMD_BLITRECT_NOMASK_COMPLETE);
+    IWRITECMD(RTG_CMD_BLITRECT_NOMASK_COMPLETE);
 #endif
 }
 
@@ -1014,9 +1014,9 @@ void BlitTemplate (
 
     WRITEBYTE(RTG_U81, mask);
     WRITEBYTE(RTG_U82, t->DrawMode);
-    WRITESHORT(RTG_COMMAND, RTGCMD_BLITTEMPLATE);
+    WRITESHORT(RTG_COMMAND, RTG_CMD_BLITTEMPLATE);
 #else
-    IWRITECMD(RTGCMD_BLITTEMPLATE);
+    IWRITECMD(RTG_CMD_BLITTEMPLATE);
 #endif
 }
 
@@ -1068,9 +1068,9 @@ void BlitPattern (
     WRITEBYTE(RTG_U82, p->DrawMode);
     WRITEBYTE(RTG_U83, (1 << p->Size)
     );
-    WRITESHORT(RTG_COMMAND, RTGCMD_BLITPATTERN);
+    WRITESHORT(RTG_COMMAND, RTG_CMD_BLITPATTERN);
 #else
-    IWRITECMD(RTGCMD_BLITPATTERN);
+    IWRITECMD(RTG_CMD_BLITPATTERN);
 #endif
 }
 
@@ -1106,9 +1106,9 @@ void DrawLine (
     WRITEBYTE(RTG_U81, mask);
     WRITEBYTE(RTG_U82, l->DrawMode);
     WRITEBYTE(RTG_U83, l->pad);
-    WRITESHORT(RTG_COMMAND, RTGCMD_DRAWLINE);
+    WRITESHORT(RTG_COMMAND, RTG_CMD_DRAWLINE);
 #else
-    IWRITECMD(RTGCMD_DRAWLINE);
+    IWRITECMD(RTG_CMD_DRAWLINE);
 #endif
 }
 
@@ -1182,9 +1182,9 @@ void BlitPlanar2Chunky (
     );
     WRITEBYTE(RTG_U83, bm->Depth);
 
-    WRITESHORT(RTG_COMMAND, RTGCMD_P2C);
+    WRITESHORT(RTG_COMMAND, RTG_CMD_P2C);
 //#else
-//    IWRITECMD(RTGCMD_P2C);
+//    IWRITECMD(RTG_CMD_P2C);
 //#endif
 }
 
@@ -1262,7 +1262,7 @@ void BlitPlanar2Direct (
     );
     WRITEBYTE(RTG_U83, bm->Depth);
 
-    WRITESHORT(RTG_COMMAND, RTGCMD_P2D);
+    WRITESHORT(RTG_COMMAND, RTG_CMD_P2D);
 }
 
 void SetSprite (
@@ -1270,7 +1270,7 @@ void SetSprite (
     __REGD0(BOOL enable), 
     __REGD7(RGBFTYPE format)) {
     WRITESHORT(RTG_U1, enable);
-    WRITESHORT(RTG_COMMAND, RTGCMD_SETSPRITE);
+    WRITESHORT(RTG_COMMAND, RTG_CMD_SETSPRITE);
 }
 
 void SetSpritePosition (
@@ -1281,7 +1281,7 @@ void SetSpritePosition (
     WRITESHORT(RTG_X1, x);
     WRITESHORT(RTG_Y1, y);
 
-    WRITESHORT(RTG_COMMAND, RTGCMD_SETSPRITEPOS);
+    WRITESHORT(RTG_COMMAND, RTG_CMD_SETSPRITEPOS);
 }
 
 void SetSpriteImage (
@@ -1303,7 +1303,7 @@ void SetSpriteImage (
 
     WRITELONG(RTG_ADDR2, CARD_SCRATCH);
 
-    WRITESHORT(RTG_COMMAND, RTGCMD_SETSPRITEIMAGE);
+    WRITESHORT(RTG_COMMAND, RTG_CMD_SETSPRITEIMAGE);
 }
 
 void SetSpriteColor (
@@ -1318,7 +1318,7 @@ void SetSpriteColor (
     WRITEBYTE(RTG_U83, B);
     WRITEBYTE(RTG_U84, idx);
 
-    WRITESHORT(RTG_COMMAND, RTGCMD_SETSPRITECOLOR);
+    WRITESHORT(RTG_COMMAND, RTG_CMD_SETSPRITECOLOR);
 }
 
 static uint32_t device_vectors[] = {

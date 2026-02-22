@@ -836,7 +836,7 @@ static void handle_rtg_command(uint32_t cmd) {
               p2_planes, p2_mask, p2_layer_mask, p2_src_pitch, (uint8_t*)p2_bitmap);
     gdebug("Planar2Chunky\n");
     break;
-  case RTG_CMD_P2D:// PiGFX mode horizontal correction.
+  case RTG_CMD_P2D:// PiRTG64 mode horizontal correction.
     rtg_cmd_debug_note_p2_dims(1, p2_width, p2_height);
     rtg_p2d(p2_src_x, p2_src_y, p2_dst_x, p2_dst_y, p2_width, p2_height, p2_draw_mode,
             p2_planes, p2_mask, p2_layer_mask, p2_src_pitch, (uint8_t*)p2_bitmap);

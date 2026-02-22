@@ -54,7 +54,7 @@ $(TARGET): $(SRC)
 	PATH="$(AMIGA_PATH)" $(M68K_GCC) $(CFLAGS) -o $@ $< $(LDFLAGS)
 
 clean:
-	rm -f pirtg64.card
+	rm -f pirtg64.card pigfx020.card pigfx020i.card
 
 install:
 	sudo cp pirtg64.card /opt/pistorm64/data/a314-shared/pirtg64.card

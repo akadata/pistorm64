@@ -833,7 +833,7 @@ void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val)
     LOG_INFO("[AMIGA] CDTV mode enabled.\n");
     cdtv_mode = 1;
   }
-  if (CHKVAR("pirtg64") && !rtg_enabled) {
+  if ((CHKVAR("pirtg64") || CHKVAR("rtg")) && !rtg_enabled) {
       if (init_rtg_data(cfg)) {
         LOG_INFO("[AMIGA] PiRTG64 Enabled.\n");
         rtg_enabled = 1;

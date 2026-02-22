@@ -1,8 +1,8 @@
-PiGFX RTG Installer
+PiRTG64 RTG Installer
 ===================
 
 Unfortunately, there are some Picasso96 settings files required to use 
-PiGFX RTG on PiStorm that are not able to be freely distributed.
+PiRTG64 RTG on PiStorm that are not able to be freely distributed.
 
 This installer will patch and copy some files from the original install 
 folder to create the required monitor file and settings files. This will 
@@ -19,7 +19,7 @@ This installer requires you to already have installed Picasso96 on
 your PiStorm machine. 
 
 During the Picasso96 installation you can choose any graphics board 
-(or select none at all) as this will be ignored and new files for PiGFX
+(or select none at all) as this will be ignored and new files for PiRTG64
 will be created.
 
 The installer will also require access to the original installation 
@@ -50,7 +50,7 @@ Installation
 
 Simply run the installer and it will walk you through the process.
 
-Any old versions of the PiGFX files will be removed during the install
+Any old versions of the PiRTG64 files will be removed during the install
 and new ones created by patching some of the original install files.
 
 During the install, you will be asked to locate the original 

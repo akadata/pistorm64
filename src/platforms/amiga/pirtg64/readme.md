@@ -1,6 +1,6 @@
 # PiRTG64 / PiStorm RTG driver for Amiga
 
-PiRTG64 is the evolved RTG path for PiStorm-based Amiga systems. It replaces the original "PiGFX" driver with a modern, raylib‑based renderer, higher and more stable frame rates, and cleaner integration with Picasso96 (P96).
+PiRTG64 is the evolved RTG path for PiStorm-based Amiga systems. It replaces the original "PiRTG64" driver with a modern, raylib‑based renderer, higher and more stable frame rates, and cleaner integration with Picasso96 (P96).
 
 PiRTG64 has been validated on Raspberry Pi 4 and is designed for 64‑bit Linux userspace. The goal is to provide a solid, maintained RTG backend that can drive high‑resolution Workbench screens, games and applications, and "fake native" 8‑bit modes on ECS/OCS machines.
 
@@ -36,7 +36,7 @@ PiRTG64 has two main halves:
 
 1. **Amiga‑side Picasso96 card driver**
 
-   * `pirtg64.card` (replacing the old `pigfx020.card`)
+   * `pirtg64.card` (replacing the old `pirtg64.card`)
    * Registers a Picasso96 board ("PiStorm PiRTG64") and exposes a curated set of pixel formats:
 
      * 8‑bit CLUT (indexed)
