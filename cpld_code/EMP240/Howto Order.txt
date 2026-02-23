@@ -1,0 +1,7 @@
+* Upload the PistormRevB_PCB_FAB.zip 
+* PCB is 4 Layers 1.6mm , pick Surface and Color (Currently only Green can be used with PCBA)
+* Select PCBA , and select the Top Side of the Board for Assembly, press next
+
+Upload the BOM and CPL Files on the next page
+
+
