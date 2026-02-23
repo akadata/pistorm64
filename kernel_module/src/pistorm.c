@@ -407,8 +407,8 @@ static int ps_read_status(struct pistorm_dev *ps, u16 *out) {
 	ps_set_bus_dir(ps, false);
 	ps_write_set(REG_STATUS << PIN_A0);
 	ps_write_set(BIT(PIN_RD));
-	ps_write_set(BIT(PIN_RD));
-	ps_write_set(BIT(PIN_RD));
+	//ps_write_set(BIT(PIN_RD));
+	//ps_write_set(BIT(PIN_RD));
 	ps_write_set(BIT(PIN_RD));
 
 	value = ps_readl(GPIO_GPLEV0);
