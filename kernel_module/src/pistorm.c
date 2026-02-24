@@ -507,7 +507,7 @@ static int ps_read_status(struct pistorm_dev *ps, u16 *out)
 	ps_write_set(BIT(PIN_RD));
 	//ps_write_set(BIT(PIN_RD));
 	//ps_write_set(BIT(PIN_RD));
-	ps_write_set(BIT(PIN_RD));
+	//ps_write_set(BIT(PIN_RD));
 
 	value = ps_readl(GPIO_GPLEV0);
 	ps_clear_lines();
@@ -952,7 +952,7 @@ module_exit(pistorm_exit);
 MODULE_AUTHOR("AKADATA LIMITED (PiStorm64)");
 MODULE_DESCRIPTION("PiStorm64 kernel backend: GPIO + GPCLK bus engine for PiStorm CPLD");
 MODULE_LICENSE("GPL");
-MODULE_VERSION("0.1.0");
+MODULE_VERSION("0.1.3");
 
 MODULE_INFO(project, "PiStorm64");
 MODULE_INFO(firmware, "N/A");

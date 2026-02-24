@@ -1,5 +1,5 @@
 Flow report for pistorm_fc
-Tue Feb 24 00:48:42 2026
+Tue Feb 24 03:12:50 2026
 Quartus Prime Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
 
 
@@ -41,7 +41,7 @@ on the Quartus Prime software download page.
 +-------------------------------------------------------------------------+
 ; Flow Summary                                                            ;
 +-----------------------+-------------------------------------------------+
-; Flow Status           ; Successful - Tue Feb 24 00:48:41 2026           ;
+; Flow Status           ; Successful - Tue Feb 24 03:12:49 2026           ;
 ; Quartus Prime Version ; 25.1std.0 Build 1129 10/21/2025 SC Lite Edition ;
 ; Revision Name         ; pistorm_fc                                      ;
 ; Top-level Entity Name ; pistorm                                         ;
@@ -60,7 +60,7 @@ on the Quartus Prime software download page.
 +-------------------+---------------------+
 ; Option            ; Setting             ;
 +-------------------+---------------------+
-; Start date & time ; 02/24/2026 00:48:35 ;
+; Start date & time ; 02/24/2026 03:12:44 ;
 ; Main task         ; Compilation         ;
 ; Revision Name     ; pistorm_fc          ;
 +-------------------+---------------------+
@@ -71,7 +71,7 @@ on the Quartus Prime software download page.
 +---------------------------------------+--------------------------------+---------------+-------------+------------+
 ; Assignment Name                       ; Value                          ; Default Value ; Entity Name ; Section Id ;
 +---------------------------------------+--------------------------------+---------------+-------------+------------+
-; COMPILER_SIGNATURE_ID                 ; 48599035290328.177189411519962 ; --            ; --          ; --         ;
+; COMPILER_SIGNATURE_ID                 ; 48599035290328.177190276453111 ; --            ; --          ; --         ;
 ; MAX_CORE_JUNCTION_TEMP                ; 85                             ; --            ; --          ; --         ;
 ; MIN_CORE_JUNCTION_TEMP                ; 0                              ; --            ; --          ; --         ;
 ; NUM_PARALLEL_PROCESSORS               ; All                            ; --            ; --          ; --         ;
@@ -88,11 +88,11 @@ on the Quartus Prime software download page.
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 ; Module Name          ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
-; Analysis & Synthesis ; 00:00:04     ; 1.0                     ; 328 MB              ; 00:00:15                           ;
-; Fitter               ; 00:00:01     ; 1.0                     ; 1650 MB             ; 00:00:01                           ;
+; Analysis & Synthesis ; 00:00:03     ; 1.0                     ; 328 MB              ; 00:00:15                           ;
+; Fitter               ; 00:00:00     ; 1.1                     ; 1665 MB             ; 00:00:01                           ;
 ; Assembler            ; 00:00:00     ; 1.0                     ; 322 MB              ; 00:00:00                           ;
 ; Timing Analyzer      ; 00:00:00     ; 1.0                     ; 336 MB              ; 00:00:00                           ;
-; Total                ; 00:00:05     ; --                      ; --                  ; 00:00:16                           ;
+; Total                ; 00:00:03     ; --                      ; --                  ; 00:00:16                           ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 
 

@@ -1,5 +1,5 @@
 Fitter report for pistorm_fc
-Tue Feb 24 00:48:40 2026
+Tue Feb 24 03:12:48 2026
 Quartus Prime Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
 
 
@@ -56,7 +56,7 @@ on the Quartus Prime software download page.
 +-------------------------------------------------------------------------+
 ; Fitter Summary                                                          ;
 +-----------------------+-------------------------------------------------+
-; Fitter Status         ; Successful - Tue Feb 24 00:48:40 2026           ;
+; Fitter Status         ; Successful - Tue Feb 24 03:12:48 2026           ;
 ; Quartus Prime Version ; 25.1std.0 Build 1129 10/21/2025 SC Lite Edition ;
 ; Revision Name         ; pistorm_fc                                      ;
 ; Top-level Entity Name ; pistorm                                         ;
@@ -688,9 +688,9 @@ Info (170194): Fitter routing operations ending: elapsed time is 00:00:00
 Info (11888): Total time spent on timing analysis during the Fitter is 0.05 seconds.
 Info (11218): Fitter post-fit operations ending: elapsed time is 00:00:00
 Info: Quartus Prime Fitter was successful. 0 errors, 1 warning
-    Info: Peak virtual memory: 1650 megabytes
-    Info: Processing ended: Tue Feb 24 00:48:40 2026
-    Info: Elapsed time: 00:00:01
+    Info: Peak virtual memory: 1665 megabytes
+    Info: Processing ended: Tue Feb 24 03:12:48 2026
+    Info: Elapsed time: 00:00:00
     Info: Total CPU time (on all processors): 00:00:01
 
 
