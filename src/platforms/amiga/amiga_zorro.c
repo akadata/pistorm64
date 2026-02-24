@@ -47,6 +47,14 @@ int zorro_register_device(zorro_device_t *dev) {
     return -1;
   }
 
+  for (uint8_t i = 0; i < zorro_device_count; i++) {
+    if (zorro_devices[i] == dev) {
+      LOG_INFO("[ZORRO] Device %s already registered in slot=%u, skipping duplicate registration.\n",
+               dev->name ? dev->name : "unnamed", i);
+      return (int)i;
+    }
+  }
+
   const uint8_t slot = zorro_device_count;
 
   dev->slot = slot;

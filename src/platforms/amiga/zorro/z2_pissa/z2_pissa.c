@@ -239,18 +239,27 @@ static void z2_pissa_write32(zorro_device_t *dev, uint32_t offset, uint32_t valu
 
 static void z2_pissa_write16(zorro_device_t *dev, uint32_t offset, uint16_t value) {
   uint32_t base = offset & ~0x3u;
-  uint32_t val32 = (uint32_t)value;
+  uint32_t cur = z2_pissa_read32(dev, base);
+  uint32_t val32;
+
   if ((offset & 0x2u) == 0) {
-    val32 <<= 16;
+    /* High halfword */
+    val32 = (cur & 0x0000FFFFu) | ((uint32_t)value << 16);
+  } else {
+    /* Low halfword */
+    val32 = (cur & 0xFFFF0000u) | (uint32_t)value;
   }
+
   z2_pissa_write32(dev, base, val32);
 }
 
 static void z2_pissa_write8(zorro_device_t *dev, uint32_t offset, uint8_t value) {
   uint32_t base = offset & ~0x3u;
-  uint32_t val32 = (uint32_t)value;
+  uint32_t cur = z2_pissa_read32(dev, base);
+  uint32_t val32 = cur;
   uint32_t shift = (3u - (offset & 0x3u)) * 8u;
-  val32 <<= shift;
+  val32 &= ~(0xFFu << shift);
+  val32 |= ((uint32_t)value << shift);
   z2_pissa_write32(dev, base, val32);
 }
 

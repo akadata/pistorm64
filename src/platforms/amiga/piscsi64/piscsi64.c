@@ -3215,9 +3215,17 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
                             PUTNODELONG(i);
                             PUTNODELONG(0);
                             uint32_t nodesize = (be32toh(piscsi64_devs[i].pb[j]->pb_Environment[0]) + 1) * 4;
-                            if (nodesize < sizeof(struct pihd_dosnode_data)) {
+                            /*
+                             * The first 4 longs (name_ptr/dev_name_ptr/unit/flags) are written
+                             * separately above via PUTNODELONG, then pb_Environment[] is copied.
+                             * So the minimum valid env payload here is 68 bytes, not sizeof(struct
+                             * pihd_dosnode_data) (84 bytes).
+                             */
+                            const uint32_t min_env_nodesize =
+                                (uint32_t)(sizeof(struct pihd_dosnode_data) - (4u * sizeof(uint32_t)));
+                            if (nodesize < min_env_nodesize) {
                                 LOG_ERROR("[PISCSI64] Partition node write refused: invalid env nodesize=%u (<%u)\n",
-                                          (unsigned int)nodesize, (unsigned int)sizeof(struct pihd_dosnode_data));
+                                          (unsigned int)nodesize, (unsigned int)min_env_nodesize);
                                 goto skip_disk;
                             }
                             if (p_offs > map_size || nodesize > (map_size - p_offs)) {
