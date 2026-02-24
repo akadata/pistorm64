@@ -742,6 +742,22 @@ static int parse_bool_flag(const char *val, int default_on) {
   return -1;
 }
 
+static int write_kernel_param_value(const char *name, const char *value) {
+  char path[PATH_MAX];
+  FILE *f;
+  if (!name || !value) {
+    return -1;
+  }
+  snprintf(path, sizeof(path), "/sys/module/pistorm/parameters/%s", name);
+  f = fopen(path, "w");
+  if (!f) {
+    return -1;
+  }
+  fputs(value, f);
+  fclose(f);
+  return 0;
+}
+
 void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val) {
   if (!var) {
     return;
@@ -1055,6 +1071,27 @@ void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val)
     } else {
       LOG_WARN("[FC] Unknown enable_fc value '%s' (use off|stub|cpld)\n", val);
       fc_set_mode(FC_MODE_OFF);
+    }
+  }
+
+  if CHKVAR ("enable_bus_arb") {
+    int enabled = parse_bool_flag(val, 1);
+    if (enabled >= 0) {
+      const char *param_val = enabled ? "1\n" : "0\n";
+      if (write_kernel_param_value("bus_arb_release", param_val) == 0) {
+        uint16_t status_now = STATUS_BIT_RESET;
+        if (enabled) {
+          status_now |= STATUS_BIT_BUS_ARB;
+        }
+        ps_write_status_reg(status_now);
+        LOG_INFO("[AMIGA] Bus arbitration release %s (bus_arb_release=%d).\n",
+                 enabled ? "enabled" : "disabled", enabled);
+      } else {
+        LOG_WARN("[AMIGA] Failed to set bus_arb_release kernel parameter.\n");
+      }
+    } else {
+      LOG_WARN("[AMIGA] Unknown enable_bus_arb value '%s' (use on|off|1|0)\n",
+               val ? val : "(null)");
     }
   }
 

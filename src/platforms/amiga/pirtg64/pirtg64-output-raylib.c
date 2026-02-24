@@ -1588,7 +1588,7 @@ reinit_raylib:;
       double end_ms = (double)perf_end_ns / frames / 1e6;
       double update_ms = (double)perf_update_ns / frames / 1e6;
       double frame_ms = (double)perf_total_ns / frames / 1e6;
-      LOG_INFO("[RTG/RAYLIB][PERF] %.1f fps avg_ms frame=%.2f draw=%.2f render=%.2f end=%.2f post=%.2f fmt=%u %ux%u pitch=%u\n",
+      LOG_DEBUG("[RTG/RAYLIB][PERF] %.1f fps avg_ms frame=%.2f draw=%.2f render=%.2f end=%.2f post=%.2f fmt=%u %ux%u pitch=%u\n",
                fps, frame_ms, draw_ms, render_ms, end_ms, update_ms, format, width, height, pitch);
       perf_report_ns = frame_end_ns;
       perf_frames = 0;

@@ -33,6 +33,11 @@
 #define REG_ADDR_HI  2
 #define REG_STATUS   3
 
+/* STATUS register bits shared by CPLD/userspace/kmod. */
+#define STATUS_BIT_INIT     0x0001u
+#define STATUS_BIT_RESET    0x0002u
+#define STATUS_BIT_BUS_ARB  0x0004u
+
 /* Core bus access API (implemented by ps_protocol_kmod.c) */
 
 uint8_t  ps_read_8 (uint32_t address);

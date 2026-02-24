@@ -3,11 +3,11 @@ Timing Analyzer Summary
 ------------------------------------------------------------
 
 Type  : Slow Model Setup 'PI_CLK'
-Slack : -1.826
-TNS   : -19.653
+Slack : -2.256
+TNS   : -37.904
 
 Type  : Slow Model Hold 'PI_CLK'
-Slack : 1.405
+Slack : 1.078
 TNS   : 0.000
 
 Type  : Slow Model Minimum Pulse Width 'PI_CLK'
@@ -27,11 +27,11 @@ Slack : 278.711
 TNS   : 0.000
 
 Type  : Fast Model Setup 'PI_CLK'
-Slack : 2.788
+Slack : 2.646
 TNS   : 0.000
 
 Type  : Fast Model Hold 'PI_CLK'
-Slack : 0.284
+Slack : 0.280
 TNS   : 0.000
 
 Type  : Fast Model Minimum Pulse Width 'PI_CLK'

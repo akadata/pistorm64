@@ -69,6 +69,7 @@
 
 #define STATUS_BIT_INIT 1
 #define STATUS_BIT_RESET 2
+#define STATUS_BIT_BUS_ARB 4
 
 #define PISTORM_MAX_BATCH_OPS 1024
 
@@ -107,6 +108,10 @@ MODULE_PARM_DESC(berr_reset_input, "Treat GPIO5 (RESET/BERR) as input to sample 
 static bool run_batch_enable;
 module_param(run_batch_enable, bool, 0644);
 MODULE_PARM_DESC(run_batch_enable, "Enable PISTORM_IOC_RUN_BATCH v2 batch interface");
+
+static bool bus_arb_release;
+module_param(bus_arb_release, bool, 0644);
+MODULE_PARM_DESC(bus_arb_release, "Enable CPLD bus release/arbitration mode (BR/BG handling)");
 
 static inline u32 ps_readl(u32 off) 
 {
@@ -482,6 +487,11 @@ static int ps_read8(struct pistorm_dev *ps, u32 addr, u8 *out)
 
 static int ps_write_status(struct pistorm_dev *ps, u16 value) 
 {
+	if (bus_arb_release) {
+		value |= STATUS_BIT_BUS_ARB;
+	} else {
+		value &= ~STATUS_BIT_BUS_ARB;
+	}
 	ps_set_bus_dir(ps, true);
 	ps_write_payload((value & 0xffff) << 8, REG_STATUS);
 	ps_set_bus_dir(ps, false);
