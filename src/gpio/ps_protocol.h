@@ -37,6 +37,13 @@
 #define STATUS_BIT_INIT     0x0001u
 #define STATUS_BIT_RESET    0x0002u
 #define STATUS_BIT_BUS_ARB  0x0004u
+#define STATUS_BIT_ARB_EN   0x0100u
+#define STATUS_BIT_BGACK    0x0200u
+#define STATUS_BIT_BG       0x0400u
+#define STATUS_BIT_BR       0x0800u
+#define STATUS_BIT_ARB_REL  0x1000u
+#define STATUS_MASK_IPL     0xE000u
+#define STATUS_SHIFT_IPL    13u
 
 /* Core bus access API (implemented by ps_protocol_kmod.c) */
 

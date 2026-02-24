@@ -52,6 +52,8 @@ PI_CLK => ipl_2[2].CLK
 PI_CLK => ipl_1[0].CLK
 PI_CLK => ipl_1[1].CLK
 PI_CLK => ipl_1[2].CLK
+PI_CLK => bgack_sync[0].CLK
+PI_CLK => bgack_sync[1].CLK
 PI_CLK => br_sync[0].CLK
 PI_CLK => br_sync[1].CLK
 PI_CLK => c7m_sync[0].CLK
@@ -137,6 +139,7 @@ M68K_RESET_n <> M68K_RESET_n
 M68K_HALT_n <> M68K_HALT_n
 M68K_BR_n => br_sync[0].DATAIN
 M68K_BG_n <= bg_n.DB_MAX_OUTPUT_PORT_TYPE
+M68K_BGACK_n => bgack_sync[0].DATAIN
 M68K_BGACK_n => M68K_FC.IN1
 M68K_C1 => comb.IN0
 M68K_C3 => comb.IN1

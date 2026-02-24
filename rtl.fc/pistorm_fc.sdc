@@ -39,7 +39,10 @@ set_time_format -unit ns -decimal_places 3
 # Create Clock
 #**************************************************************
 
-create_clock -name {PI_CLK} -period 5.000 [get_ports {PI_CLK}]
+# PI_CLK must match the fastest GPCLK mode you intend to run in hardware.
+# Current default test mode: src=5 (648 MHz parent), div=5 => 129.6 MHz.
+# Period = 1000 / 129.6 = 7.716 ns.
+create_clock -name {PI_CLK} -period 7.716 [get_ports {PI_CLK}]
 
 # These are *observed* clocks/phase references from the Amiga side.
 # They are not phase-related to PI_CLK.

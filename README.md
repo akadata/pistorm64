@@ -60,7 +60,18 @@ This repository does **not** ship Amiga ROM images or Amiga Workbench system ima
 Use:
 
 ```sh
-sudo modprobe pistorm gpclk_src=5 gpclk_div=6
+sudo modprobe pistorm gpclk_src=5 gpclk_div=4 run_batch_enable=1 berr_reset_input=1 bus_arb_release=1
 ```
 
 Changing `gpclk_src` from `5` is not recommended for normal users.
+
+To run emulator without `sudo`, install the udev rule and add your user to the
+`pistorm` group:
+
+```sh
+sudo groupadd -f pistorm
+sudo usermod -aG pistorm "$USER"
+sudo cp -f etc/udev/99-pistorm.rules /etc/udev/rules.d/99-pistorm.rules
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```

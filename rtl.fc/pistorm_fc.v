@@ -81,6 +81,10 @@ module pistorm(
   reg [1:0] rd_sync;
   reg [1:0] wr_sync;
   reg [1:0] br_sync;
+  reg [1:0] bgack_sync;
+  reg bus_relinquished = 1'b0;
+  wire br_req = !br_sync[1];
+  wire bgack_req = !bgack_sync[1];
 
   always @(posedge c200m) begin
     rd_sync <= {rd_sync[0], PI_RD};
@@ -95,7 +99,7 @@ module pistorm(
 
   always @(posedge c200m) begin
     if (rd_rising && PI_A == REG_STATUS) begin
-      data_out <= {ipl, 13'd0};
+      data_out <= {ipl, bus_relinquished, br_req, !bg_n, bgack_req, bus_arb_enable, 8'd0};
     end
   end
 
@@ -117,6 +121,7 @@ module pistorm(
     status <= 16'h0002;
     pi_berr <= 1'b1;
     br_sync <= 2'b11;
+    bgack_sync <= 2'b11;
   end
 
   always @(*) begin
@@ -149,12 +154,11 @@ module pistorm(
   end
 
   reg a0;
-  wire br_req = !br_sync[1];
-  reg bus_relinquished = 1'b0;
 
   always @(posedge c200m) begin
     c7m_sync <= {c7m_sync[1:0], (CLK_SEL?M68K_CLK:c1c3_clk)};
     br_sync <= {br_sync[0], M68K_BR_n};
+    bgack_sync <= {bgack_sync[0], M68K_BGACK_n};
   end
 
   wire c7m_rising = !c7m_sync[2] && c7m_sync[1];
@@ -234,19 +238,20 @@ module pistorm(
 
     case (state)
       3'd0: begin // S0
-        if (bus_arb_enable && br_req) begin
+        if (bus_arb_enable && br_req && bgack_req) begin
           bus_relinquished <= 1'b1;
           op_req <= 1'b0;
           state <= 3'd0;
         end else begin
-          bus_relinquished <= 1'b0;
+          if (!br_req)
+            bus_relinquished <= 1'b0;
         M68K_RW <= 1'b1; // S7 -> S0
           state <= 2'd1;
         end
       end
 
       3'd1: begin // S1
-        if (bus_arb_enable && br_req) begin
+        if (bus_arb_enable && br_req && bgack_req) begin
           state <= 3'd0;
         end else if (op_req) begin
           if(c7m_rising) begin
