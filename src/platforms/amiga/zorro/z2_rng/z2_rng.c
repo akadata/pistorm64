@@ -98,8 +98,8 @@ static void z2_rng_reset(zorro_device_t *dev) {
 static uint8_t z2_rng_rom[] = {
     Z2_Z2,
     AC_MEM_SIZE_64KB,
+    0x2,
     0x1,
-    0x0,
     0x0,
     0x0,
     0x0,

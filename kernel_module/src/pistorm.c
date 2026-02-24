@@ -82,6 +82,11 @@ struct pistorm_dev {
 	u32 fsel_output[3];
 	bool data_out;
 	bool gpclk_ready;
+	struct pistorm_busop queue_ops[PISTORM_MAX_BATCH_OPS];
+	u32 queue_depth;
+	u64 queue_enqueued;
+	u64 queue_drained;
+	u32 queue_max_depth;
 };
 
 static struct pistorm_dev *ps_dev;
@@ -635,6 +640,31 @@ static int ps_handle_batch(struct pistorm_batch *batch)
 	return ret;
 }
 
+static int ps_queue_flush_locked(struct pistorm_dev *ps)
+{
+	int ret = 0;
+	u32 i;
+
+	for (i = 0; i < ps->queue_depth; i++) {
+		ret = ps_handle_busop(ps, &ps->queue_ops[i]);
+		if (ret) {
+			break;
+		}
+	}
+
+	ps->queue_drained += i;
+	ps->queue_depth = 0;
+	return ret;
+}
+
+static void ps_queue_reset_locked(struct pistorm_dev *ps)
+{
+	ps->queue_depth = 0;
+	ps->queue_enqueued = 0;
+	ps->queue_drained = 0;
+	ps->queue_max_depth = 0;
+}
+
 static int ps_handle_run_batch(struct pistorm_run_batch *batch) 
 {
 	struct pistorm_busop_v2 *ops;
@@ -720,6 +750,7 @@ static long ps_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	struct pistorm_busop busop;
 	struct pistorm_batch batch;
 	struct pistorm_run_batch run_batch;
+	struct pistorm_queue_stats qstats;
 	struct pistorm_pins pins;
 	int ret = 0;
 
@@ -731,12 +762,15 @@ static long ps_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 	switch (cmd) {
 	case PISTORM_IOC_SETUP:
+		ps_queue_reset_locked(ps_dev);
 		ret = ps_setup_protocol(ps_dev);
 		break;
 	case PISTORM_IOC_RESET_SM:
+		ps_queue_reset_locked(ps_dev);
 		ret = ps_reset_sm(ps_dev);
 		break;
 	case PISTORM_IOC_PULSE_RESET:
+		ps_queue_reset_locked(ps_dev);
 		ret = ps_pulse_reset(ps_dev);
 		break;
 	case PISTORM_IOC_GET_PINS:
@@ -768,6 +802,39 @@ static long ps_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		pr_debug("ps_ioctl: BATCH count=%u ptr=0x%llx\n",
 			 batch.ops_count, batch.ops_ptr);
 		ret = ps_handle_batch(&batch);
+		break;
+	case PISTORM_IOC_QUEUE_ENQUEUE:
+		if (copy_from_user(&busop, argp, sizeof(busop))) {
+			ret = -EFAULT;
+			break;
+		}
+		/* Queue is intended for write coalescing only. */
+		if (busop.is_read) {
+			ret = -EINVAL;
+			break;
+		}
+		if (ps_dev->queue_depth >= PISTORM_MAX_BATCH_OPS) {
+			ret = -ENOSPC;
+			break;
+		}
+		ps_dev->queue_ops[ps_dev->queue_depth++] = busop;
+		ps_dev->queue_enqueued++;
+		if (ps_dev->queue_depth > ps_dev->queue_max_depth) {
+			ps_dev->queue_max_depth = ps_dev->queue_depth;
+		}
+		break;
+	case PISTORM_IOC_QUEUE_FLUSH:
+		ret = ps_queue_flush_locked(ps_dev);
+		break;
+	case PISTORM_IOC_QUEUE_STATS:
+		qstats.enqueued = ps_dev->queue_enqueued;
+		qstats.drained = ps_dev->queue_drained;
+		qstats.max_depth = ps_dev->queue_max_depth;
+		qstats.current_depth = ps_dev->queue_depth;
+		qstats.reserved = 0;
+		if (copy_to_user(argp, &qstats, sizeof(qstats))) {
+			ret = -EFAULT;
+		}
 		break;
 	case PISTORM_IOC_RUN_BATCH:
 		if (!run_batch_enable) {

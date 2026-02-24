@@ -33,7 +33,7 @@ endif
 DEVICE_SRC ?= net64-amiga.c
 DEVICE_TARGET ?= net64-$(CPU).device
 DEVICE_CFLAGS ?= $(CPUFLAG) -O2 -Wall -Wextra -Wno-unused-parameter -fomit-frame-pointer -nostartfiles
-DEVICE_LDFLAGS ?= -lm -ldebug
+DEVICE_LDFLAGS ?= -lm #-ldebug
 
 TOOL_TARGET ?= net64info
 TOOL_SRC ?= net64info.c

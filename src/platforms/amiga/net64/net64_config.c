@@ -47,6 +47,58 @@ static int net64_parse_mac(const char *val, uint8_t out[6]) {
   return 1;
 }
 
+static int net64_parse_debug_flags(const char *val, uint32_t *out_flags) {
+  if (out_flags == NULL) {
+    return 0;
+  }
+  if (val == NULL || val[0] == '\0') {
+    *out_flags = NET64_DBG_TX | NET64_DBG_RX | NET64_DBG_CFG;
+    return 1;
+  }
+
+  if (strcasecmp(val, "off") == 0 || strcmp(val, "0") == 0 ||
+      strcasecmp(val, "false") == 0 || strcasecmp(val, "no") == 0) {
+    *out_flags = 0;
+    return 1;
+  }
+  if (strcasecmp(val, "on") == 0 || strcmp(val, "1") == 0 ||
+      strcasecmp(val, "true") == 0 || strcasecmp(val, "yes") == 0 ||
+      strcasecmp(val, "packets") == 0) {
+    *out_flags = NET64_DBG_TX | NET64_DBG_RX | NET64_DBG_CFG;
+    return 1;
+  }
+  if (strcasecmp(val, "all") == 0) {
+    *out_flags = NET64_DBG_ALL;
+    return 1;
+  }
+
+  char buf[128];
+  snprintf(buf, sizeof(buf), "%s", val);
+  uint32_t flags = 0;
+  char *save = NULL;
+  for (char *tok = strtok_r(buf, ",| ", &save); tok != NULL; tok = strtok_r(NULL, ",| ", &save)) {
+    if (strcasecmp(tok, "tx") == 0) {
+      flags |= NET64_DBG_TX;
+    } else if (strcasecmp(tok, "rx") == 0) {
+      flags |= NET64_DBG_RX;
+    } else if (strcasecmp(tok, "cfg") == 0) {
+      flags |= NET64_DBG_CFG;
+    } else if (strcasecmp(tok, "regs") == 0 || strcasecmp(tok, "reg") == 0) {
+      flags |= NET64_DBG_REGS;
+    } else if (strcasecmp(tok, "stats") == 0) {
+      flags |= NET64_DBG_STATS;
+    } else if (strcasecmp(tok, "packets") == 0) {
+      flags |= NET64_DBG_TX | NET64_DBG_RX;
+    } else if (strcasecmp(tok, "none") == 0 || strcasecmp(tok, "off") == 0) {
+      /* no-op */
+    } else {
+      return 0;
+    }
+  }
+  *out_flags = flags;
+  return 1;
+}
+
 static uint32_t net64_hash32(uint32_t hash, uint8_t c) {
   hash ^= c;
   hash *= 16777619u;
@@ -121,6 +173,7 @@ void net64_config_init_once(void) {
   g_cfg.queue_depth = 128;
   g_cfg.link_speed_mbps = 1000;
   g_cfg.full_duplex = 1;
+  g_cfg.debug_flags = 0;
   g_cfg_initialized = 1;
 
   LOG_INFO("[NET64] Defaults: tap=%s mac=%02X:%02X:%02X:%02X:%02X:%02X queue=%u promisc=%u\n",
@@ -214,6 +267,18 @@ int net64_config_setvar(const char *var, const char *val) {
       g_cfg.full_duplex = 0;
     }
     LOG_INFO("[NET64] Duplex set to %s\n", g_cfg.full_duplex ? "full" : "half");
+    return 1;
+  }
+
+  if (strcmp(var, "net64_debug") == 0) {
+    uint32_t flags = 0;
+    if (!net64_parse_debug_flags(val, &flags)) {
+      LOG_WARN("[NET64] Invalid net64_debug value '%s' (use off|on|all|tx,rx,cfg,regs,stats)\n",
+               val ? val : "(null)");
+      return 1;
+    }
+    g_cfg.debug_flags = flags;
+    LOG_INFO("[NET64] Debug flags set to 0x%X\n", (unsigned int)g_cfg.debug_flags);
     return 1;
   }
 

@@ -107,16 +107,45 @@ static int zorro_read_impl(zorro_device_t *dev, uint8_t type, uint32_t offset, u
       *val = dev->read8(dev, offset);
       return 1;
     }
+    if (dev->read16) {
+      uint32_t w = dev->read16(dev, offset & ~1u);
+      if (offset & 1u) {
+        *val = w & 0xFFu;
+      } else {
+        *val = (w >> 8) & 0xFFu;
+      }
+      return 1;
+    }
     break;
   case OP_TYPE_WORD:
     if (dev->read16) {
       *val = dev->read16(dev, offset);
       return 1;
     }
+    if (dev->read8) {
+      uint32_t hi = dev->read8(dev, offset);
+      uint32_t lo = dev->read8(dev, offset + 1u);
+      *val = ((hi & 0xFFu) << 8) | (lo & 0xFFu);
+      return 1;
+    }
     break;
   case OP_TYPE_LONGWORD:
     if (dev->read32) {
       *val = dev->read32(dev, offset);
+      return 1;
+    }
+    if (dev->read16) {
+      uint32_t hi = dev->read16(dev, offset);
+      uint32_t lo = dev->read16(dev, offset + 2u);
+      *val = ((hi & 0xFFFFu) << 16) | (lo & 0xFFFFu);
+      return 1;
+    }
+    if (dev->read8) {
+      uint32_t b0 = dev->read8(dev, offset);
+      uint32_t b1 = dev->read8(dev, offset + 1u);
+      uint32_t b2 = dev->read8(dev, offset + 2u);
+      uint32_t b3 = dev->read8(dev, offset + 3u);
+      *val = ((b0 & 0xFFu) << 24) | ((b1 & 0xFFu) << 16) | ((b2 & 0xFFu) << 8) | (b3 & 0xFFu);
       return 1;
     }
     break;
@@ -133,16 +162,47 @@ static int zorro_write_impl(zorro_device_t *dev, uint8_t type, uint32_t offset, 
       dev->write8(dev, offset, (uint8_t)val);
       return 1;
     }
+    if (dev->write16) {
+      uint32_t base = offset & ~1u;
+      uint16_t cur = 0;
+      if (dev->read16) {
+        cur = dev->read16(dev, base);
+      }
+      if (offset & 1u) {
+        cur = (uint16_t)((cur & 0xFF00u) | (val & 0xFFu));
+      } else {
+        cur = (uint16_t)((cur & 0x00FFu) | ((val & 0xFFu) << 8));
+      }
+      dev->write16(dev, base, cur);
+      return 1;
+    }
     break;
   case OP_TYPE_WORD:
     if (dev->write16) {
       dev->write16(dev, offset, (uint16_t)val);
       return 1;
     }
+    if (dev->write8) {
+      dev->write8(dev, offset, (uint8_t)((val >> 8) & 0xFFu));
+      dev->write8(dev, offset + 1u, (uint8_t)(val & 0xFFu));
+      return 1;
+    }
     break;
   case OP_TYPE_LONGWORD:
     if (dev->write32) {
       dev->write32(dev, offset, (uint32_t)val);
+      return 1;
+    }
+    if (dev->write16) {
+      dev->write16(dev, offset, (uint16_t)((val >> 16) & 0xFFFFu));
+      dev->write16(dev, offset + 2u, (uint16_t)(val & 0xFFFFu));
+      return 1;
+    }
+    if (dev->write8) {
+      dev->write8(dev, offset, (uint8_t)((val >> 24) & 0xFFu));
+      dev->write8(dev, offset + 1u, (uint8_t)((val >> 16) & 0xFFu));
+      dev->write8(dev, offset + 2u, (uint8_t)((val >> 8) & 0xFFu));
+      dev->write8(dev, offset + 3u, (uint8_t)(val & 0xFFu));
       return 1;
     }
     break;
@@ -158,6 +218,18 @@ int zorro_handle_read(uint32_t addr, uint8_t type, uint32_t *val) {
     return -1;
   }
   uint32_t offset = addr - dev->base;
+  if (dev->bus == ZORRO_BUS_Z2 && type == OP_TYPE_LONGWORD) {
+    uint32_t hi = 0;
+    uint32_t lo = 0;
+    if (zorro_read_impl(dev, OP_TYPE_WORD, offset, &hi) != 1) {
+      return -1;
+    }
+    if (zorro_read_impl(dev, OP_TYPE_WORD, offset + 2u, &lo) != 1) {
+      return -1;
+    }
+    *val = ((hi & 0xFFFFu) << 16) | (lo & 0xFFFFu);
+    return 1;
+  }
   return zorro_read_impl(dev, type, offset, val);
 }
 
@@ -167,5 +239,14 @@ int zorro_handle_write(uint32_t addr, uint8_t type, uint32_t val) {
     return -1;
   }
   uint32_t offset = addr - dev->base;
+  if (dev->bus == ZORRO_BUS_Z2 && type == OP_TYPE_LONGWORD) {
+    if (zorro_write_impl(dev, OP_TYPE_WORD, offset, (val >> 16) & 0xFFFFu) != 1) {
+      return -1;
+    }
+    if (zorro_write_impl(dev, OP_TYPE_WORD, offset + 2u, val & 0xFFFFu) != 1) {
+      return -1;
+    }
+    return 1;
+  }
   return zorro_write_impl(dev, type, offset, val);
 }

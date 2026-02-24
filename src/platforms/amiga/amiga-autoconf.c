@@ -232,7 +232,7 @@ static const autoconf_size_entry autoconf_sizes_ext[] = {
     { 128u,   AC_MEM_SIZE_EXT_128MB  },
     { 256u,   AC_MEM_SIZE_EXT_256MB  },
     { 512u,   AC_MEM_SIZE_EXT_512MB  },
-    { 1024u,  AC_MEM_SIZE_EXT_1024MB },
+    { 1024u,  AC_MEM_SIZE_EXT_1024MB }
 };
 
 static unsigned char lookup_autoconf_size(unsigned int size,

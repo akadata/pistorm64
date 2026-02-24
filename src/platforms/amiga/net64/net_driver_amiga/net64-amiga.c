@@ -33,6 +33,7 @@
 #define DEVICE_VERSION 0
 #define DEVICE_REVISION 1
 #define DEVICE_PRIORITY 0
+#define NET64_TRACKED_TYPES_MAX 32
 
 #define kprintf(...)
 
@@ -46,6 +47,7 @@ struct BufferManagement {
 
 typedef struct net64_unit {
   struct Unit unit;
+  struct List pending_onevent;
   ULONG board_base;
   UBYTE station_addr[6];
   ULONG online;
@@ -55,6 +57,9 @@ typedef struct net64_unit {
   ULONG rx_packets;
   ULONG tx_packets;
   ULONG rx_dropped;
+  ULONG event_flags;
+  ULONG tracked_count;
+  ULONG tracked_types[NET64_TRACKED_TYPES_MAX];
   UBYTE tx_bounce[NET64_RAW_MTU];
   UBYTE rx_bounce[NET64_RAW_MTU];
 } net64_unit_t;
@@ -73,6 +78,69 @@ static net64_base_t *g_base = NULL;
 #define READLONG(reg, out) out = *((volatile ULONG *)(g_base->unit.board_base + (reg)))
 #define READWORD(reg, out) out = *((volatile UWORD *)(g_base->unit.board_base + (reg)))
 #define READBYTE(reg, out) out = *((volatile UBYTE *)(g_base->unit.board_base + (reg)));
+
+static void complete_io(struct IOSana2Req *ios2) {
+  if (ios2->ios2_Req.io_Flags & SANA2IOF_QUICK) {
+    ios2->ios2_Req.io_Message.mn_Node.ln_Type = NT_REPLYMSG;
+  } else {
+    ReplyMsg(&ios2->ios2_Req.io_Message);
+  }
+}
+
+static void raise_events(ULONG bits) {
+  struct Node *node = NULL;
+  ULONG pending_mask = 0;
+
+  if (bits == 0) {
+    return;
+  }
+
+  g_base->unit.event_flags |= bits;
+
+  node = g_base->unit.pending_onevent.lh_Head;
+  while (node != NULL && node->ln_Succ != NULL) {
+    struct Node *next = node->ln_Succ;
+    struct IOSana2Req *req = (struct IOSana2Req *)node;
+    ULONG wanted = req->ios2_WireError & S2EVENT_ALL;
+    ULONG hit = g_base->unit.event_flags & wanted;
+    if (hit != 0) {
+      Remove(node);
+      req->ios2_Req.io_Error = S2ERR_NO_ERROR;
+      req->ios2_WireError = hit;
+      complete_io(req);
+    } else {
+      pending_mask |= wanted;
+    }
+    node = next;
+  }
+
+  g_base->unit.event_flags &= pending_mask;
+}
+
+static ULONG queue_onevent_request(struct IOSana2Req *ios2) {
+  ULONG wanted = ios2->ios2_WireError;
+  ULONG invalid = wanted & ~S2EVENT_ALL;
+  ULONG hit = 0;
+
+  if (wanted == 0 || invalid != 0) {
+    ios2->ios2_Req.io_Error = S2ERR_NOT_SUPPORTED;
+    ios2->ios2_WireError = S2WERR_BAD_EVENT;
+    return 0;
+  }
+
+  wanted &= S2EVENT_ALL;
+  hit = g_base->unit.event_flags & wanted;
+  if (hit != 0) {
+    ios2->ios2_Req.io_Error = S2ERR_NO_ERROR;
+    ios2->ios2_WireError = hit;
+    g_base->unit.event_flags &= ~hit;
+    return 0;
+  }
+
+  ios2->ios2_WireError = wanted;
+  AddTail(&g_base->unit.pending_onevent, &ios2->ios2_Req.io_Message.mn_Node);
+  return 1;
+}
 
 static ULONG find_net64_board_base(void) {
   ULONG board_addr = 0;
@@ -175,6 +243,43 @@ static void fill_global_stats(struct IOSana2Req *ios2) {
   stats->Overruns = g_base->unit.rx_dropped;
 }
 
+static ULONG is_tracked_type(ULONG ptype) {
+  ULONG i = 0;
+  for (i = 0; i < g_base->unit.tracked_count; i++) {
+    if (g_base->unit.tracked_types[i] == ptype) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+static ULONG add_tracked_type(ULONG ptype) {
+  if (is_tracked_type(ptype)) {
+    return S2WERR_ALREADY_TRACKED;
+  }
+  if (g_base->unit.tracked_count >= NET64_TRACKED_TYPES_MAX) {
+    return S2WERR_GENERIC_ERROR;
+  }
+  g_base->unit.tracked_types[g_base->unit.tracked_count++] = ptype;
+  return 0;
+}
+
+static ULONG remove_tracked_type(ULONG ptype) {
+  ULONG i = 0;
+  for (i = 0; i < g_base->unit.tracked_count; i++) {
+    if (g_base->unit.tracked_types[i] == ptype) {
+      ULONG j = i;
+      while (j + 1 < g_base->unit.tracked_count) {
+        g_base->unit.tracked_types[j] = g_base->unit.tracked_types[j + 1];
+        j++;
+      }
+      g_base->unit.tracked_count--;
+      return 0;
+    }
+  }
+  return S2WERR_NOT_TRACKED;
+}
+
 static ULONG net64_write_frame(struct IOSana2Req *ios2) {
   ULONG frame_len = 0;
   UBYTE *frame = g_base->unit.tx_bounce;
@@ -221,6 +326,7 @@ static ULONG net64_write_frame(struct IOSana2Req *ios2) {
   WRITELONG(NET64_REG_CMD, NET64_CMD_TX_KICK);
 
   g_base->unit.tx_packets++;
+  raise_events(S2EVENT_TX);
   return 0;
 }
 
@@ -280,6 +386,28 @@ static ULONG net64_read_frame(struct IOSana2Req *ios2) {
   }
 
   g_base->unit.rx_packets++;
+  raise_events(S2EVENT_RX);
+  return 0;
+}
+
+static ULONG net64_read_orphan_frame(struct IOSana2Req *ios2) {
+  ULONG tries = 8;
+  while (tries--) {
+    ULONG rc = net64_read_frame(ios2);
+    if (rc != 0) {
+      return rc;
+    }
+    if (ios2->ios2_DataLength == 0) {
+      return 0;
+    }
+    if (!is_tracked_type(ios2->ios2_PacketType)) {
+      return 0;
+    }
+  }
+
+  ios2->ios2_DataLength = 0;
+  ios2->ios2_Req.io_Error = S2ERR_NO_ERROR;
+  ios2->ios2_WireError = S2WERR_GENERIC_ERROR;
   return 0;
 }
 
@@ -313,7 +441,10 @@ static struct Library * __attribute__((used)) init_device(struct Device *dev asm
   }
 
   g_base->device = dev;
+  NewList(&g_base->unit.pending_onevent);
   g_base->unit.board_base = find_net64_board_base();
+  g_base->unit.event_flags = S2EVENT_CONFIGCHANGED;
+  g_base->unit.tracked_count = 0;
 
   read_station_address(g_base->unit.station_addr);
   WRITELONG(NET64_REG_CMD, NET64_CMD_RESET);
@@ -341,6 +472,7 @@ open_dev(struct Library *dev asm("a6"), struct IOSana2Req *ios2 asm("a1"), ULONG
 
   g_base->unit.promisc = (flags & SANA2OPF_PROM) ? 1u : 0u;
   apply_promisc(g_base->unit.promisc);
+  raise_events(S2EVENT_CONFIGCHANGED);
 }
 
 static UBYTE * __attribute__((used))
@@ -362,6 +494,7 @@ close_dev(struct Library *dev asm("a6"), struct IOSana2Req *ios2 asm("a1")) {
 static void __attribute__((used))
 begin_io(struct Library *dev asm("a6"), struct IOSana2Req *ios2 asm("a1")) {
   (void)dev;
+  ULONG reply_now = 1;
 
   ios2->ios2_Req.io_Error = S2ERR_NO_ERROR;
   ios2->ios2_WireError = S2WERR_GENERIC_ERROR;
@@ -387,7 +520,11 @@ begin_io(struct Library *dev asm("a6"), struct IOSana2Req *ios2 asm("a1")) {
     break;
 
   case CMD_WRITE:
+  case S2_MULTICAST:
     if (g_base->unit.online) {
+      if (ios2->ios2_Req.io_Command == S2_MULTICAST) {
+        ios2->ios2_Req.io_Flags |= SANA2IOF_MCAST;
+      }
       (void)net64_write_frame(ios2);
     } else {
       ios2->ios2_Req.io_Error = S2ERR_OUTOFSERVICE;
@@ -409,14 +546,27 @@ begin_io(struct Library *dev asm("a6"), struct IOSana2Req *ios2 asm("a1")) {
     g_base->unit.station_addr[0] = (g_base->unit.station_addr[0] & (UBYTE)~0x01u) | 0x02u;
     write_station_address(g_base->unit.station_addr);
     g_base->unit.configured = 1;
+    raise_events(S2EVENT_CONFIGCHANGED);
     break;
 
   case S2_ONLINE:
-    g_base->unit.online = 1;
+    if (g_base->unit.online) {
+      ios2->ios2_Req.io_Error = S2ERR_BAD_STATE;
+      ios2->ios2_WireError = S2WERR_UNIT_ONLINE;
+    } else {
+      g_base->unit.online = 1;
+      raise_events(S2EVENT_ONLINE);
+    }
     break;
 
   case S2_OFFLINE:
-    g_base->unit.online = 0;
+    if (!g_base->unit.online) {
+      ios2->ios2_Req.io_Error = S2ERR_BAD_STATE;
+      ios2->ios2_WireError = S2WERR_UNIT_OFFLINE;
+    } else {
+      g_base->unit.online = 0;
+      raise_events(S2EVENT_OFFLINE);
+    }
     break;
 
   case S2_GETGLOBALSTATS:
@@ -453,20 +603,81 @@ begin_io(struct Library *dev asm("a6"), struct IOSana2Req *ios2 asm("a1")) {
     }
     break;
 
-  case S2_CONNECT:
+  case S2_CONNECT: {
+    ULONG ev = S2EVENT_CONNECT;
+    if (g_base->unit.connected) {
+      ios2->ios2_Req.io_Error = S2ERR_BAD_STATE;
+      ios2->ios2_WireError = S2WERR_UNIT_CONNECTED;
+      break;
+    }
     g_base->unit.connected = 1;
-    g_base->unit.online = 1;
+    if (!g_base->unit.online) {
+      g_base->unit.online = 1;
+      ev |= S2EVENT_ONLINE;
+    }
+    raise_events(ev);
     break;
+  }
 
-  case S2_DISCONNECT:
+  case S2_DISCONNECT: {
+    ULONG ev = S2EVENT_DISCONNECT;
+    if (!g_base->unit.connected) {
+      ios2->ios2_Req.io_Error = S2ERR_BAD_STATE;
+      ios2->ios2_WireError = S2WERR_UNIT_DISCONNECTED;
+      break;
+    }
     g_base->unit.connected = 0;
-    g_base->unit.online = 0;
+    if (g_base->unit.online) {
+      g_base->unit.online = 0;
+      ev |= S2EVENT_OFFLINE;
+    }
+    raise_events(ev);
     break;
+  }
 
   case S2_ONEVENT:
-  case S2_TRACKTYPE:
-  case S2_UNTRACKTYPE:
+    reply_now = !queue_onevent_request(ios2);
+    break;
+
+  case S2_TRACKTYPE: {
+    ULONG w = add_tracked_type(ios2->ios2_PacketType);
+    if (w != 0) {
+      ios2->ios2_Req.io_Error = (w == S2WERR_ALREADY_TRACKED) ? S2ERR_BAD_STATE : S2ERR_NO_RESOURCES;
+      ios2->ios2_WireError = w;
+    }
+    break;
+  }
+
+  case S2_UNTRACKTYPE: {
+    ULONG w = remove_tracked_type(ios2->ios2_PacketType);
+    if (w != 0) {
+      ios2->ios2_Req.io_Error = S2ERR_BAD_STATE;
+      ios2->ios2_WireError = w;
+    }
+    break;
+  }
+
   case S2_READORPHAN:
+    if (g_base->unit.online) {
+      (void)net64_read_orphan_frame(ios2);
+    } else {
+      ios2->ios2_Req.io_Error = S2ERR_OUTOFSERVICE;
+      ios2->ios2_WireError = S2WERR_UNIT_OFFLINE;
+    }
+    break;
+
+  case S2_ADDMULTICASTADDRESS:
+  case S2_DELMULTICASTADDRESS:
+  case S2_GETSIGNALQUALITY:
+  case S2_GETNETWORKS:
+  case S2_SETOPTIONS:
+  case S2_SETKEY:
+  case S2_GETNETWORKINFO:
+  case S2_READMGMT:
+  case S2_WRITEMGMT:
+  case S2_SANA2HOOK:
+    ios2->ios2_Req.io_Error = S2ERR_NOT_SUPPORTED;
+    ios2->ios2_WireError = S2WERR_GENERIC_ERROR;
     break;
 
   default:
@@ -475,10 +686,8 @@ begin_io(struct Library *dev asm("a6"), struct IOSana2Req *ios2 asm("a1")) {
     break;
   }
 
-  if (ios2->ios2_Req.io_Flags & SANA2IOF_QUICK) {
-    ios2->ios2_Req.io_Message.mn_Node.ln_Type = NT_REPLYMSG;
-  } else {
-    ReplyMsg(&ios2->ios2_Req.io_Message);
+  if (reply_now) {
+    complete_io(ios2);
   }
 }
 

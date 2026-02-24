@@ -61,6 +61,7 @@
 int net64_init(void);
 void net64_shutdown(void);
 void net64_handle_reset(void);
+void net64_apply_runtime_config(void);
 
 uint32_t handle_net64_read(uint32_t addr, uint8_t type);
 void handle_net64_write(uint32_t addr, uint32_t value, uint8_t type);

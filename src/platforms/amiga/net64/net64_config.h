@@ -5,6 +5,15 @@
 #include <stdint.h>
 #include <net/if.h>
 
+enum {
+  NET64_DBG_TX    = 1u << 0,
+  NET64_DBG_RX    = 1u << 1,
+  NET64_DBG_REGS  = 1u << 2,
+  NET64_DBG_CFG   = 1u << 3,
+  NET64_DBG_STATS = 1u << 4,
+  NET64_DBG_ALL   = 0xFFFFFFFFu
+};
+
 typedef struct net64_config {
   char tap_ifname[IFNAMSIZ];
   uint8_t mac[6];
@@ -13,6 +22,7 @@ typedef struct net64_config {
   uint16_t queue_depth;
   uint32_t link_speed_mbps;
   uint8_t full_duplex;
+  uint32_t debug_flags;
 } net64_config_t;
 
 void net64_config_init_once(void);

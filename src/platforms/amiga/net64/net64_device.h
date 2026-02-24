@@ -29,6 +29,7 @@ int net64_device_link_up(void);
 void net64_device_get_mac(uint8_t out_mac[6]);
 void net64_device_set_mac(const uint8_t mac[6]);
 void net64_device_set_promisc(uint8_t enabled);
+void net64_device_set_debug_flags(uint32_t flags);
 
 void net64_device_get_stats(net64_stats_t *stats);
 

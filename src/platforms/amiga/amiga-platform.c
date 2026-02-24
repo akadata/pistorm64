@@ -177,19 +177,32 @@ static inline unsigned int autoconf_z2_read_width(struct emulator_config* cfg, u
 
 static inline void autoconf_z2_write_width(struct emulator_config* cfg, unsigned int offset,
                                            unsigned int value, unsigned char type) {
+  uint32_t pic_before = ac_z2_current_pic;
   if (type == OP_TYPE_BYTE) {
     autoconfig_write_memory_8(cfg, offset, value);
     return;
   }
   if (type == OP_TYPE_WORD) {
     autoconfig_write_memory_8(cfg, offset, (value >> 8) & 0xFF);
+    if (ac_z2_current_pic != pic_before) {
+      return;
+    }
     autoconfig_write_memory_8(cfg, offset + 2, value & 0xFF);
     return;
   }
   if (type == OP_TYPE_LONGWORD) {
     autoconfig_write_memory_8(cfg, offset, (value >> 24) & 0xFF);
+    if (ac_z2_current_pic != pic_before) {
+      return;
+    }
     autoconfig_write_memory_8(cfg, offset + 2, (value >> 16) & 0xFF);
+    if (ac_z2_current_pic != pic_before) {
+      return;
+    }
     autoconfig_write_memory_8(cfg, offset + 4, (value >> 8) & 0xFF);
+    if (ac_z2_current_pic != pic_before) {
+      return;
+    }
     autoconfig_write_memory_8(cfg, offset + 6, value & 0xFF);
   }
 }
@@ -221,6 +234,7 @@ static inline unsigned int autoconf_z3_read_width(struct emulator_config* cfg, u
 
 static inline void autoconf_z3_write_width(struct emulator_config* cfg, unsigned int offset,
                                            unsigned int value, unsigned char type) {
+  uint32_t pic_before = ac_z3_current_pic;
   if (type == OP_TYPE_BYTE) {
     autoconfig_write_memory_z3_8(cfg, offset, value);
     return;
@@ -231,6 +245,9 @@ static inline void autoconf_z3_write_width(struct emulator_config* cfg, unsigned
   }
   if (type == OP_TYPE_LONGWORD) {
     autoconfig_write_memory_z3_16(cfg, offset, (value >> 16) & 0xFFFF);
+    if (ac_z3_current_pic != pic_before) {
+      return;
+    }
     autoconfig_write_memory_z3_16(cfg, offset + 4, value & 0xFFFF);
   }
 }
@@ -908,6 +925,9 @@ void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val)
 
   if (CHKVAR("net64") || strncmp(var, "net64_", 6) == 0) {
     (void)net64_config_setvar(var, val);
+    if (net64_enabled && strncmp(var, "net64_", 6) == 0) {
+      net64_apply_runtime_config();
+    }
   }
 
   zorro_setvar(cfg, var, val);

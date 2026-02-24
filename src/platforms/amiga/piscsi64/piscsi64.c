@@ -3141,8 +3141,24 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
             if (driver_r != -1) {
                 uint32_t driver_base_addr = (uint32_t)(val - cfg->map_offset[driver_r]);
                 uint8_t *dst_data = cfg->map_data[driver_r];
+                uint32_t map_size = (uint32_t)(cfg->map_high[driver_r] - cfg->map_offset[driver_r]);
                 uint8_t cur_partition = 0;
-                memcpy(dst_data + driver_base_addr, piscsi64_rom_ptr + PISCSI64_DRIVER_OFFSET, 0x4000 - PISCSI64_DRIVER_OFFSET);
+                uint32_t driver_copy_len = (0x4000u - (uint32_t)PISCSI64_DRIVER_OFFSET);
+                if (!piscsi64_rom_ptr || (uint32_t)PISCSI64_DRIVER_OFFSET >= piscsi64_rom_size ||
+                    (uint32_t)PISCSI64_DRIVER_OFFSET + driver_copy_len > piscsi64_rom_size) {
+                    LOG_ERROR("[PISCSI64] Driver copy refused: ROM buffer invalid (rom_size=%u offs=0x%X len=0x%X)\n",
+                              (unsigned int)piscsi64_rom_size,
+                              (unsigned int)PISCSI64_DRIVER_OFFSET,
+                              (unsigned int)driver_copy_len);
+                    break;
+                }
+                if (driver_base_addr > map_size || driver_copy_len > (map_size - driver_base_addr)) {
+                    LOG_ERROR("[PISCSI64] Driver copy refused: destination overflow (map=%d base=0x%X size=0x%X copy=0x%X)\n",
+                              driver_r, (unsigned int)driver_base_addr, (unsigned int)map_size,
+                              (unsigned int)driver_copy_len);
+                    break;
+                }
+                memcpy(dst_data + driver_base_addr, piscsi64_rom_ptr + PISCSI64_DRIVER_OFFSET, driver_copy_len);
 
                 piscsi64_hinfo.base_offset = val;
 
@@ -3162,7 +3178,12 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
                 piscsi64_rom_cur_partition = 0;
 
                 uint32_t driver_data_addr = driver_base_addr + 0x3F00;
-                sprintf((char *)dst_data + driver_data_addr, "pi-scsi64.device");
+                if (driver_data_addr >= map_size || (map_size - driver_data_addr) < sizeof("pi-scsi64.device")) {
+                    LOG_ERROR("[PISCSI64] Driver metadata write refused: destination overflow (addr=0x%X map=0x%X)\n",
+                              (unsigned int)driver_data_addr, (unsigned int)map_size);
+                    break;
+                }
+                snprintf((char *)dst_data + driver_data_addr, sizeof("pi-scsi64.device"), "pi-scsi64.device");
                 uint32_t driver_addr2 = driver_base_addr + 0x4000;
                 for (int i = 0; i < PISCSI64_NUM_UNITS; i++) {
                     if (piscsi64_devs[i].fd == -1)
@@ -3172,14 +3193,38 @@ void handle_piscsi64_write(uint32_t addr, uint32_t val, uint8_t type) {
                         uint32_t p_offs = driver_addr2;
                         DEBUG("[PISCSI64] Adding %d partitions for unit %d\n", piscsi64_devs[i].num_partitions, i);
                         for (uint32_t j = 0; j < piscsi64_devs[i].num_partitions; j++) {
+                            if (cur_partition >= 128u) {
+                                LOG_WARN("[PISCSI64] Partition table full; truncating additional partitions.\n");
+                                goto skip_disk;
+                            }
                             DEBUG("Partition %d: %s\n", j, piscsi64_devs[i].pb[j]->pb_DriveName + 1);
-                            sprintf((char *)dst_data + p_offs, "%s", piscsi64_devs[i].pb[j]->pb_DriveName + 1);
+                            if (p_offs >= map_size || (map_size - p_offs) < 0x20u) {
+                                LOG_ERROR("[PISCSI64] Partition node write refused: name field overflow (map=%d offs=0x%X size=0x%X)\n",
+                                          driver_r, (unsigned int)p_offs, (unsigned int)map_size);
+                                goto skip_disk;
+                            }
+                            snprintf((char *)dst_data + p_offs, 0x20, "%s", piscsi64_devs[i].pb[j]->pb_DriveName + 1);
                             p_offs += 0x20;
+                            if (p_offs > map_size || (map_size - p_offs) < 16u) {
+                                LOG_ERROR("[PISCSI64] Partition node write refused: header overflow (map=%d offs=0x%X size=0x%X)\n",
+                                          driver_r, (unsigned int)p_offs, (unsigned int)map_size);
+                                goto skip_disk;
+                            }
                             PUTNODELONG(driver_addr2 + cfg->map_offset[driver_r]);
                             PUTNODELONG(driver_data_addr + cfg->map_offset[driver_r]);
                             PUTNODELONG(i);
                             PUTNODELONG(0);
                             uint32_t nodesize = (be32toh(piscsi64_devs[i].pb[j]->pb_Environment[0]) + 1) * 4;
+                            if (nodesize < sizeof(struct pihd_dosnode_data)) {
+                                LOG_ERROR("[PISCSI64] Partition node write refused: invalid env nodesize=%u (<%u)\n",
+                                          (unsigned int)nodesize, (unsigned int)sizeof(struct pihd_dosnode_data));
+                                goto skip_disk;
+                            }
+                            if (p_offs > map_size || nodesize > (map_size - p_offs)) {
+                                LOG_ERROR("[PISCSI64] Partition node write refused: env overflow (map=%d offs=0x%X nodesize=0x%X size=0x%X)\n",
+                                          driver_r, (unsigned int)p_offs, (unsigned int)nodesize, (unsigned int)map_size);
+                                goto skip_disk;
+                            }
                             memcpy(dst_data + p_offs, piscsi64_devs[i].pb[j]->pb_Environment, nodesize);
 
 #pragma GCC diagnostic push
@@ -3249,7 +3294,15 @@ skip_disk:;
             int32_t copy_r = get_mapped_item_by_address(cfg, piscsi64_u32[2]);
             if (copy_r != -1) {
                 uint32_t copy_base_addr = (uint32_t)(piscsi64_u32[2] - cfg->map_offset[copy_r]);
-                memcpy(cfg->map_data[copy_r] + copy_base_addr, piscsi64_filesystems[piscsi64_rom_cur_fs].binary_data, piscsi64_filesystems[piscsi64_rom_cur_fs].h_info.byte_size);
+                uint8_t *copy_dst = NULL;
+                uint32_t copy_avail = 0;
+                uint32_t copy_len = piscsi64_filesystems[piscsi64_rom_cur_fs].h_info.byte_size;
+                if (piscsi64_get_map_bounds(cfg, piscsi64_u32[2], copy_len, &copy_dst, &copy_avail) != 0) {
+                    LOG_ERROR("[PISCSI64] COPYFS refused: destination overflow addr=0x%08X len=%u (map=%d avail=%u)\n",
+                              piscsi64_u32[2], (unsigned int)copy_len, copy_r, (unsigned int)copy_avail);
+                    break;
+                }
+                memcpy(copy_dst, piscsi64_filesystems[piscsi64_rom_cur_fs].binary_data, copy_len);
                 piscsi64_filesystems[piscsi64_rom_cur_fs].h_info.base_offset = piscsi64_u32[2];
                 if (reloc_hunks(piscsi64_filesystems[piscsi64_rom_cur_fs].relocs, cfg->map_data[copy_r] + copy_base_addr,
                                 &piscsi64_filesystems[piscsi64_rom_cur_fs].h_info) != 0) {

@@ -34,6 +34,9 @@ typedef struct net64_state {
 
   uint8_t mac[6];
   uint8_t promisc;
+  uint32_t debug_flags;
+  uint8_t promisc_ctl_supported;
+  uint8_t promisc_warned;
 
   pthread_t rx_thread;
   int rx_thread_running;
@@ -44,6 +47,24 @@ typedef struct net64_state {
 } net64_state_t;
 
 static net64_state_t g_net64;
+
+static int net64_dbg_enabled(uint32_t flag) {
+  if (log_get_level() < LOG_LEVEL_DEBUG) {
+    return 0;
+  }
+  return (g_net64.debug_flags & flag) != 0u;
+}
+
+static void net64_log_frame(const char *tag, const uint8_t *frame, uint16_t len) {
+  if (frame == NULL || len < 14) {
+    return;
+  }
+  uint16_t ethertype = (uint16_t)(((uint16_t)frame[12] << 8) | frame[13]);
+  LOG_DEBUG("[NET64] %s len=%u eth=0x%04X dst=%02X:%02X:%02X:%02X:%02X:%02X src=%02X:%02X:%02X:%02X:%02X:%02X\n",
+            tag, (unsigned int)len, (unsigned int)ethertype,
+            frame[0], frame[1], frame[2], frame[3], frame[4], frame[5],
+            frame[6], frame[7], frame[8], frame[9], frame[10], frame[11]);
+}
 
 static void net64_rx_ring_clear_locked(net64_rx_ring_t *ring) {
   ring->head = 0;
@@ -153,6 +174,10 @@ static int net64_apply_promisc(const char *ifname, uint8_t enabled) {
   }
 
   if (ioctl(sock, SIOCSIFFLAGS, &ifr) != 0) {
+    if (errno == EPERM || errno == EACCES) {
+      close(sock);
+      return -2;
+    }
     close(sock);
     return -1;
   }
@@ -222,9 +247,15 @@ static void *net64_rx_thread_main(void *arg) {
     pthread_mutex_lock(&g_net64.lock);
     if (net64_rx_ring_push_locked(&g_net64.rx_ring, frame, len) != 0) {
       g_net64.stats.rx_dropped++;
+      if (net64_dbg_enabled(NET64_DBG_RX)) {
+        LOG_DEBUG("[NET64] RX drop len=%u (queue full)\n", (unsigned int)len);
+      }
     } else {
       g_net64.stats.rx_packets++;
       g_net64.stats.rx_bytes += len;
+      if (net64_dbg_enabled(NET64_DBG_RX)) {
+        net64_log_frame("RX<-TAP", frame, len);
+      }
     }
     pthread_mutex_unlock(&g_net64.lock);
   }
@@ -257,6 +288,7 @@ int net64_device_init(const net64_config_t *cfg) {
   if (cfg != NULL) {
     memcpy(g_net64.mac, cfg->mac, sizeof(g_net64.mac));
     g_net64.promisc = cfg->promisc;
+    g_net64.debug_flags = cfg->debug_flags;
   } else {
     g_net64.mac[0] = 0x02;
     g_net64.mac[1] = 0x50;
@@ -265,7 +297,10 @@ int net64_device_init(const net64_config_t *cfg) {
     g_net64.mac[4] = 0x00;
     g_net64.mac[5] = 0x64;
     g_net64.promisc = 0;
+    g_net64.debug_flags = 0;
   }
+  g_net64.promisc_ctl_supported = 1;
+  g_net64.promisc_warned = 0;
 
   g_net64.tap_fd = -1;
   g_net64.tap_live = 0;
@@ -275,7 +310,13 @@ int net64_device_init(const net64_config_t *cfg) {
   g_net64.tap_fd = net64_open_tap(tap_name, g_net64.tap_name);
   if (g_net64.tap_fd >= 0) {
     g_net64.tap_live = 1;
-    if (net64_apply_promisc(g_net64.tap_name, g_net64.promisc) != 0) {
+    int prc = net64_apply_promisc(g_net64.tap_name, g_net64.promisc);
+    if (prc == -2) {
+      g_net64.promisc_ctl_supported = 0;
+      g_net64.promisc_warned = 1;
+      LOG_WARN("[NET64] No permission to control promisc on %s; continuing without promisc ioctl.\n",
+               g_net64.tap_name);
+    } else if (prc != 0) {
       LOG_WARN("[NET64] Unable to set promisc=%u on %s (continuing).\n",
                (unsigned int)g_net64.promisc, g_net64.tap_name);
     }
@@ -351,6 +392,10 @@ int net64_device_send_frame(const uint8_t *frame, uint16_t len) {
     if (wr != (ssize_t)len) {
       rc = -1;
       g_net64.stats.tx_errors++;
+      if (net64_dbg_enabled(NET64_DBG_TX)) {
+        LOG_DEBUG("[NET64] TX write failed len=%u rc=%zd errno=%d\n",
+                  (unsigned int)len, wr, errno);
+      }
     }
   } else {
     if (net64_rx_ring_push_locked(&g_net64.rx_ring, frame, len) != 0) {
@@ -365,6 +410,9 @@ int net64_device_send_frame(const uint8_t *frame, uint16_t len) {
   if (rc == 0) {
     g_net64.stats.tx_packets++;
     g_net64.stats.tx_bytes += len;
+    if (net64_dbg_enabled(NET64_DBG_TX)) {
+      net64_log_frame("TX", frame, len);
+    }
   }
 
   pthread_mutex_unlock(&g_net64.lock);
@@ -381,6 +429,9 @@ int net64_device_recv_frame(uint8_t *dst, uint16_t dst_len, uint16_t *out_len) {
 
   pthread_mutex_lock(&g_net64.lock);
   int rc = net64_rx_ring_pop_locked(&g_net64.rx_ring, dst, dst_len, out_len);
+  if (rc == 0 && net64_dbg_enabled(NET64_DBG_RX) && out_len != NULL) {
+    net64_log_frame("RX->AMIGA", dst, *out_len);
+  }
   pthread_mutex_unlock(&g_net64.lock);
   return rc;
 }
@@ -441,10 +492,32 @@ void net64_device_set_promisc(uint8_t enabled) {
   pthread_mutex_unlock(&g_net64.lock);
 
   if (tap_live) {
-    if (net64_apply_promisc(ifname, g_net64.promisc) != 0) {
+    if (g_net64.promisc_ctl_supported == 0) {
+      return;
+    }
+    int prc = net64_apply_promisc(ifname, g_net64.promisc);
+    if (prc == -2) {
+      g_net64.promisc_ctl_supported = 0;
+      if (!g_net64.promisc_warned) {
+        LOG_WARN("[NET64] No permission to control promisc on %s; suppressing further promisc warnings.\n",
+                 ifname);
+        g_net64.promisc_warned = 1;
+      }
+    } else if (prc != 0) {
       LOG_WARN("[NET64] Failed to set promisc=%u on %s\n", (unsigned int)g_net64.promisc, ifname);
+    } else if (net64_dbg_enabled(NET64_DBG_CFG)) {
+      LOG_DEBUG("[NET64] promisc=%u applied to %s\n", (unsigned int)g_net64.promisc, ifname);
     }
   }
+}
+
+void net64_device_set_debug_flags(uint32_t flags) {
+  if (!g_net64.initialized) {
+    return;
+  }
+  pthread_mutex_lock(&g_net64.lock);
+  g_net64.debug_flags = flags;
+  pthread_mutex_unlock(&g_net64.lock);
 }
 
 void net64_device_get_stats(net64_stats_t *stats) {

@@ -33,6 +33,14 @@ typedef struct net64_regs {
 static net64_regs_t g_net64_regs;
 static uint8_t g_net64_initialized;
 
+static int net64_dbg_enabled(uint32_t flag) {
+  const net64_config_t *cfg64 = net64_config_get();
+  if (cfg64 == NULL || log_get_level() < LOG_LEVEL_DEBUG) {
+    return 0;
+  }
+  return (cfg64->debug_flags & flag) != 0u;
+}
+
 static uint32_t net64_type_width(uint8_t type) {
   if (type == OP_TYPE_BYTE) {
     return 1;
@@ -168,6 +176,9 @@ static void net64_command_reset(void) {
   net64_device_reset_queues();
   net64_update_mac_regs();
   net64_refresh_status();
+  if (net64_dbg_enabled(NET64_DBG_CFG)) {
+    LOG_DEBUG("[NET64] CMD_RESET complete\n");
+  }
 }
 
 static void net64_command_tx(void) {
@@ -180,6 +191,10 @@ static void net64_command_tx(void) {
 
   uint8_t frame[NET64_MAX_FRAME];
   net64_copy_from_amiga(g_net64_regs.tx_addr, frame, len);
+  if (net64_dbg_enabled(NET64_DBG_TX)) {
+    LOG_DEBUG("[NET64] CMD_TX_KICK addr=0x%08X len=%u\n",
+              (unsigned int)g_net64_regs.tx_addr, (unsigned int)len);
+  }
 
   if (net64_device_send_frame(frame, (uint16_t)len) == 0) {
     g_net64_regs.status |= NET64_STATUS_TX_OK;
@@ -214,6 +229,10 @@ static void net64_command_rx_pop(void) {
   }
 
   net64_copy_to_amiga(g_net64_regs.rx_addr, frame, copy_len);
+  if (net64_dbg_enabled(NET64_DBG_RX)) {
+    LOG_DEBUG("[NET64] CMD_RX_POP addr=0x%08X copy=%u frame=%u\n",
+              (unsigned int)g_net64_regs.rx_addr, (unsigned int)copy_len, (unsigned int)frame_len);
+  }
   g_net64_regs.rx_actual = frame_len;
   g_net64_regs.irq_status |= NET64_IRQ_RX_EVENT;
   net64_refresh_status();
@@ -222,6 +241,9 @@ static void net64_command_rx_pop(void) {
 static void net64_command_apply_cfg(void) {
   net64_apply_mac_regs();
   net64_device_set_promisc((g_net64_regs.features & NET64_FEATURE_PROMISC) ? 1u : 0u);
+  if (net64_dbg_enabled(NET64_DBG_CFG)) {
+    LOG_DEBUG("[NET64] CMD_APPLY_CFG features=0x%08X\n", (unsigned int)g_net64_regs.features);
+  }
 }
 
 static void net64_execute_command(uint32_t cmd) {
@@ -319,6 +341,10 @@ static uint32_t net64_read_register_u32(uint32_t offset) {
 }
 
 static void net64_write_register_u32(uint32_t offset, uint32_t value) {
+  if (net64_dbg_enabled(NET64_DBG_REGS)) {
+    LOG_DEBUG("[NET64] REG write off=0x%04X val=0x%08X\n",
+              (unsigned int)offset, (unsigned int)value);
+  }
   switch (offset) {
   case NET64_REG_CMD:
     net64_execute_command(value);
@@ -395,9 +421,19 @@ int net64_init(void) {
   g_net64_regs.features |= NET64_FEATURE_TAP_BACK;
   g_net64_regs.link = cfg64->link_speed_mbps;
   g_net64_regs.mtu = 1500;
+  net64_device_set_debug_flags(cfg64->debug_flags);
 
   net64_update_mac_regs();
   net64_refresh_status();
+  LOG_INFO("[NET64] Effective config: tap=%s mac=%02X:%02X:%02X:%02X:%02X:%02X promisc=%u queue=%u link=%uMbps duplex=%s dbg=0x%X\n",
+           cfg64->tap_ifname,
+           cfg64->mac[0], cfg64->mac[1], cfg64->mac[2],
+           cfg64->mac[3], cfg64->mac[4], cfg64->mac[5],
+           (unsigned int)cfg64->promisc,
+           (unsigned int)cfg64->queue_depth,
+           (unsigned int)cfg64->link_speed_mbps,
+           cfg64->full_duplex ? "full" : "half",
+           (unsigned int)cfg64->debug_flags);
 
   g_net64_initialized = 1;
   return 0;
@@ -418,6 +454,44 @@ void net64_handle_reset(void) {
     return;
   }
   net64_command_reset();
+}
+
+void net64_apply_runtime_config(void) {
+  if (!g_net64_initialized) {
+    return;
+  }
+
+  const net64_config_t *cfg64 = net64_config_get();
+  if (cfg64 == NULL) {
+    return;
+  }
+
+  net64_device_set_mac(cfg64->mac);
+  net64_device_set_promisc(cfg64->promisc ? 1u : 0u);
+  net64_device_set_debug_flags(cfg64->debug_flags);
+
+  if (cfg64->promisc) {
+    g_net64_regs.features |= NET64_FEATURE_PROMISC;
+  } else {
+    g_net64_regs.features &= ~NET64_FEATURE_PROMISC;
+  }
+  if (cfg64->full_duplex) {
+    g_net64_regs.features |= NET64_FEATURE_FULL_DUP;
+  } else {
+    g_net64_regs.features &= ~NET64_FEATURE_FULL_DUP;
+  }
+
+  g_net64_regs.link = cfg64->link_speed_mbps;
+  net64_update_mac_regs();
+  net64_refresh_status();
+
+  LOG_INFO("[NET64] Applied runtime config: mac=%02X:%02X:%02X:%02X:%02X:%02X promisc=%u link=%uMbps duplex=%s dbg=0x%X\n",
+           cfg64->mac[0], cfg64->mac[1], cfg64->mac[2],
+           cfg64->mac[3], cfg64->mac[4], cfg64->mac[5],
+           (unsigned int)cfg64->promisc,
+           (unsigned int)cfg64->link_speed_mbps,
+           cfg64->full_duplex ? "full" : "half",
+           (unsigned int)cfg64->debug_flags);
 }
 
 uint32_t handle_net64_read(uint32_t addr, uint8_t type) {

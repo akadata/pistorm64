@@ -1,4 +1,5 @@
 /*
+ * Copyright 2026 AKADATA - Andrew Smalley - Added FC/BERR and Bus release - DMA Enhancements
  * Copyright 2020 Claude Schwarz
  * Copyright 2020 Niklas Ekström - rewrite in Verilog
  * FC/BERR enhancements for PiStorm64 EPM240

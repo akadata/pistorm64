@@ -28,15 +28,25 @@ Register model:
 
 ## setvar options
 
-- `setvar net64`
-  - Enables net64 device registration.
-  - Optional value may be a TAP interface name.
 - `setvar net64_tap tap0`
 - `setvar net64_mac 02:50:12:34:56:78`
 - `setvar net64_promisc 0|1`
 - `setvar net64_queue_depth <8..1024>`
 - `setvar net64_link_mbps <10..100000>`
 - `setvar net64_duplex half|full`
+- `setvar net64_debug off|on|all|tx,rx,cfg,regs,stats`
+  - Debug logs are emitted only when emulator is started with `--log-level debug`.
+  - `on` enables packet+config diagnostics (`tx,rx,cfg`).
+- `setvar net64`
+  - Enables net64 device registration.
+  - Optional value may be a TAP interface name.
+
+Recommended order in config:
+1. Set `net64_*` values first.
+2. Put `setvar net64` last to start with final config in one pass.
+
+If `net64_*` values are changed after `setvar net64`, runtime config is now applied
+to the already-initialized backend (MAC/promisc/link/duplex).
 
 If no MAC override is provided, a locally administered unicast MAC is derived from host identity material.
 

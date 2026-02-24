@@ -880,7 +880,7 @@ endif
 	sudo cp -f $(MODPROBE_CONF) /etc/modprobe.d/pistorm.conf
 	sudo cp -f etc/security/limits.d/pistorm-rt.conf /etc/security/limits.d/pistorm-rt.conf
 	sudo cp -f etc/udev/99-pistorm.rules /etc/udev/rules.d/99-pistorm.rules
-	sudo cp -f etc/systemd/system/pistorm64.service /etc/systemd/system/pistorm64.service
+#	sudo cp -f etc/systemd/system/pistorm64.service /etc/systemd/system/pistorm64.service
 	# Reload systemd configurations
 	sudo systemctl daemon-reload
 	sudo udevadm control --reload-rules && sudo udevadm trigger --subsystem-match=misc --attr-match=dev=10:262 && sudo udevadm trigger --subsystem-match=block

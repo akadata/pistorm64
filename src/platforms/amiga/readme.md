@@ -109,6 +109,13 @@ Enables or disables promiscuous mode on the host TAP interface.
 Example: `setvar net64_queue_depth 256`  
 Sets host-side RX queue depth used by `net64`.
 
+# net64_debug
+
+Example: `setvar net64_debug on`  
+Enables additional `net64` diagnostics. Valid values: `off`, `on`, `all`, or a list such as
+`tx,rx,cfg,regs,stats`.  
+**Note:** Debug output is only emitted when running emulator with `--log-level debug`.
+
 # piscsi
 
 Example: `setvar piscsi`  
