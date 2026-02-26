@@ -454,7 +454,7 @@ ifneq ($(OPENSSL_LIBS),)
 BASE_LIBS += $(OPENSSL_LIBS)
 INCLUDES += $(OPENSSL_CFLAGS)
 endif
-RAYLIB_LIBS := $(RAYLIB_A) -lEGL -lGLESv2 -ldrm -lgbm  -lpthread -lvcos -lvchiq_arm -lbcm_host
+RAYLIB_LIBS := $(RAYLIB_A) -lEGL -lGLESv2 -ldrm -lgbm  -lpthread
 ifeq ($(USE_RAYLIB),0)
 RAYLIB_LIBS :=
 RAYLIB_INC    =
