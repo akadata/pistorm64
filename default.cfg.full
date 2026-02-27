@@ -2,16 +2,14 @@ cpu 68040
 platform amiga 500
 map type=rom address=0xF80000 size=0x80000 file=../Amiga/kick/Kickstart-v3.1-r40.068.rom ovl=0 id=kickstart autodump_mem
 map type=ram address=0x00100000 size=1M id=chipram_extra
-map type=ram address=0x90000000 size=64M id=z3_autoconf_fast
+map type=ram address=0x10000000 size=64M id=z3_autoconf_fast
 map type=ram address=0x00400000 size=4M   id=z2_autoconf_fast
 
 
 loopcycles 512
 setvar piscsi64
 setvar piscsi64_2 /opt/Amiga/hdf/KernelPiStormBench.hdf
-setvar piscsi64_1 ../Amiga/piscsi64_amiga8g.img
 setvar piscsi64_4 ./src/platforms/amiga/pistorm.hdf
-setvar piscsi64_3 cdrom:/home/smalley/amiga_iso/tsvideo.iso
 #setvar piscsi64_5 remote:dqt3t@172.16.0.2:4964/remote,mode=rw,blocksize=4096
 #setvar rtg64 yes
 
