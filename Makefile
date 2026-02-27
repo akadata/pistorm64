@@ -35,7 +35,6 @@
 # ARCH_FEATURES : optional AArch64 feature modifiers (e.g. +crc+simd+fp16+lse).
 # CPUFLAGS   : per-platform tuning defaults below; override if needed.
 # RAYLIB_*   : raylib include/lib paths; adjust for custom builds.
-# USE_VC     : legacy (no longer required for pistorm-dev).
 # USE_LTO    : set to 1 to enable link-time optimisation (-flto) on build and link.
 # USE_NO_PLT : set to 1 to pass -fno-plt for direct calls (glibc-specific; default off).
 # OMIT_FP    : set to 1 to omit frame pointers (-fomit-frame-pointer) for perf.
@@ -63,8 +62,7 @@ USE_UAE_JIT ?= 0
 USE_EC_FPU ?= 0
 
 ARCH_FEATURES ?=
-# Toggle Pi host (/opt/vc) support for dev tools.
-USE_VC     ?= 0
+
 # Perf toggles
 USE_LTO    ?= 0
 USE_NO_PLT ?= 1 
@@ -114,9 +112,9 @@ endif
 EMU_WARNINGS  ?= $(WARNINGS) $(EMU_WARNINGS_EXTRA)
 
 ifeq ($(findstring clang,$(CC)),)
-OPT_LEVEL_DEFAULT ?= -Os -ffast-math
+OPT_LEVEL_DEFAULT ?= -O3 -ffast-math
 else
-OPT_LEVEL_DEFAULT ?= -Os -ffast-math
+OPT_LEVEL_DEFAULT ?= -O3 -ffast-math
 endif
 
 OPT_LEVEL ?= $(OPT_LEVEL_DEFAULT)

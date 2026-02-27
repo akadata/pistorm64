@@ -2691,7 +2691,7 @@ static void print_about(const char* prog) {
   printf("- FC/BERR plumbing for CPLD-aware bus cycles and reset handling\n");
   printf("\n");
   printf("Runtime hints:\n");
-  printf("- Kernel module: gpclk_src/gpclk_div, berr_reset_input, run_batch_enable\n");
+  printf("- Kernel module: gpclk_src/gpclk_div, berr_reset_input, run_batch_enable, bus_arb_release\n");
   printf("- Userspace queue: PISTORM_ENABLE_QUEUE=1 (optional PISTORM_BATCH_BITS=2048)\n");
   printf("\n");
   printf("Project goals:\n");

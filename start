@@ -1,1 +1,1 @@
-./emulator --config min.cfg --log net64.log --lob-level debug
+PISTORM_BATCH_MAX=2048 PISTORM_ENABLE_BATCH=1 PISTORM_ENABLE_QUEUE=1 ./emulator --config min.cfg

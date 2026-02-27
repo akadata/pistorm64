@@ -73,10 +73,18 @@ module pistorm(
 
   end
 
-  assign M68K_BG_n = M68K_BR_n;
+  localparam STATUS_BIT_BUS_ARB = 16'h0004;
+
+  reg bg_n = 1'b1;
+  assign M68K_BG_n = bg_n;
 
   reg [1:0] rd_sync;
   reg [1:0] wr_sync;
+  reg [1:0] br_sync;
+  reg [1:0] bgack_sync;
+  reg bus_relinquished = 1'b0;
+  wire br_req = !br_sync[1];
+  wire bgack_req = !bgack_sync[1];
 
   always @(posedge c200m) begin
     rd_sync <= {rd_sync[0], PI_RD};
@@ -91,12 +99,13 @@ module pistorm(
 
   always @(posedge c200m) begin
     if (rd_rising && PI_A == REG_STATUS) begin
-      data_out <= {ipl, 13'd0};
+      data_out <= {ipl, bus_relinquished, br_req, !bg_n, bgack_req, bus_arb_enable, 8'd0};
     end
   end
 
   reg [15:0] status;
   wire reset_out = !status[1];
+  wire bus_arb_enable = status[2];
 
   assign M68K_RESET_n = reset_out ? 1'b0 : 1'bz;
   assign M68K_HALT_n = reset_out ? 1'b0 : 1'bz;
@@ -111,6 +120,8 @@ module pistorm(
   initial begin
     status <= 16'h0002;
     pi_berr <= 1'b1;
+    br_sync <= 2'b11;
+    bgack_sync <= 2'b11;
   end
 
   always @(*) begin
@@ -137,12 +148,17 @@ module pistorm(
 
     if (PI_RD && PI_A == REG_DATA)
       LTCH_D_RD_OE_n = 1'b0;
+
+    if (bus_relinquished)
+      LTCH_D_RD_OE_n = 1'b1;
   end
 
   reg a0;
 
   always @(posedge c200m) begin
     c7m_sync <= {c7m_sync[1:0], (CLK_SEL?M68K_CLK:c1c3_clk)};
+    br_sync <= {br_sync[0], M68K_BR_n};
+    bgack_sync <= {bgack_sync[0], M68K_BGACK_n};
   end
 
   wire c7m_rising = !c7m_sync[2] && c7m_sync[1];
@@ -202,18 +218,42 @@ module pistorm(
         end
         REG_STATUS: begin
           status <= PI_D;
+          if (!(PI_D & STATUS_BIT_BUS_ARB))
+            bus_relinquished <= 1'b0;
         end
       endcase
     end
 
+    if (!bus_arb_enable) begin
+      bg_n <= 1'b1;
+      bus_relinquished <= 1'b0;
+    end else begin
+      if (!br_req) begin
+        bg_n <= 1'b1;
+        bus_relinquished <= 1'b0;
+      end else begin
+        bg_n <= 1'b0;
+      end
+    end
+
     case (state)
       3'd0: begin // S0
+        if (bus_arb_enable && br_req && bgack_req) begin
+          bus_relinquished <= 1'b1;
+          op_req <= 1'b0;
+          state <= 3'd0;
+        end else begin
+          if (!br_req)
+            bus_relinquished <= 1'b0;
         M68K_RW <= 1'b1; // S7 -> S0
           state <= 2'd1;
+        end
       end
 
       3'd1: begin // S1
-        if (op_req) begin
+        if (bus_arb_enable && br_req && bgack_req) begin
+          state <= 3'd0;
+        end else if (op_req) begin
           if(c7m_rising) begin
             state <= 3'd2;
           end
@@ -284,9 +324,21 @@ module pistorm(
           state <= 3'd0;
       end
     endcase
+
+    if (bus_relinquished) begin
+      op_req <= 1'b0;
+      state <= 3'd0;
+      LTCH_D_WR_OE_n <= 1'b1;
+      LTCH_A_OE_n <= 1'b1;
+      M68K_AS_n <= 1'b1;
+      M68K_UDS_n <= 1'b1;
+      M68K_LDS_n <= 1'b1;
+      M68K_RW <= 1'b1;
+      M68K_VMA_n <= 1'b1;
+    end
   end
 
-  assign M68K_FC = M68K_BGACK_n ? op_fc : 3'bzzz;
+  assign M68K_FC = (bus_relinquished || !M68K_BGACK_n) ? 3'bzzz : op_fc;
   assign PI_RESET = (pi_berr == 1'b0) ? 1'b0 : (reset_out ? 1'b1 : M68K_RESET_n);
 
 endmodule

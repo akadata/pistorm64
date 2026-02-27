@@ -19,9 +19,6 @@
 #include "src/musashi/m68k.h"
 #include "log.h"
 
-#define STATUS_MASK_IPL  0xe000u
-#define STATUS_SHIFT_IPL 13
-
 // Compile-time toggle for batching - default to disabled to ensure stability
 #ifndef PISTORM_ENABLE_BATCH
 #define PISTORM_ENABLE_BATCH 1
@@ -117,9 +114,12 @@ static int backend_logged;
 static volatile unsigned int gpio_shadow[32];
 volatile unsigned int *gpio = gpio_shadow; /* legacy pointer */
 static bool ps_queue_enabled = (PISTORM_ENABLE_QUEUE != 0);
+static bool ps_queue_mode_initialized;
 static bool ps_queue_error_logged;
 static uint64_t ps_queue_full_events;
 static uint64_t ps_queue_full_fallbacks;
+static uint16_t ps_last_status_debug;
+static bool ps_status_debug_valid;
 
 #ifndef PS_QUEUE_BACKOFF_NS
 #define PS_QUEUE_BACKOFF_NS 200000
@@ -131,7 +131,27 @@ static uint64_t ps_queue_full_fallbacks;
 
 static int ps_busop(int is_read, int width, unsigned addr, unsigned *val, unsigned short flags);
 
+static void ps_queue_init_from_env(void) {
+    if(ps_queue_mode_initialized) {
+        return;
+    }
+    ps_queue_mode_initialized = true;
+
+    const char *env = getenv("PISTORM_ENABLE_QUEUE");
+    if(!env || !*env) {
+        return;
+    }
+
+    if(strcmp(env, "0") == 0 || strcasecmp(env, "false") == 0 ||
+       strcasecmp(env, "off") == 0 || strcasecmp(env, "no") == 0) {
+        ps_queue_enabled = false;
+    } else {
+        ps_queue_enabled = true;
+    }
+}
+
 static int ps_open_dev(void) {
+    ps_queue_init_from_env();
     if(ps_fd >= 0) {
         return 0;
     }
@@ -413,7 +433,25 @@ uint16_t ps_read_status_reg(void) {
     };
 
     if(ps_busop(op.is_read, op.width, op.addr, &op.value, op.flags) == 0) {
-        return (uint16_t)(op.value & 0xffffu);
+        uint16_t status = (uint16_t)(op.value & 0xffffu);
+        if(log_get_level() >= LOG_LEVEL_DEBUG) {
+            uint16_t prev = ps_last_status_debug;
+            if(!ps_status_debug_valid ||
+               ((status ^ prev) & (STATUS_BIT_ARB_REL | STATUS_BIT_BR | STATUS_BIT_BG |
+                                   STATUS_BIT_BGACK | STATUS_BIT_ARB_EN)) != 0) {
+                LOG_DEBUG("[BUS_ARB] status=0x%04X ipl=%u arb_en=%u br=%u bg=%u bgack=%u relinquished=%u\n",
+                          status,
+                          (unsigned)((status & STATUS_MASK_IPL) >> STATUS_SHIFT_IPL),
+                          !!(status & STATUS_BIT_ARB_EN),
+                          !!(status & STATUS_BIT_BR),
+                          !!(status & STATUS_BIT_BG),
+                          !!(status & STATUS_BIT_BGACK),
+                          !!(status & STATUS_BIT_ARB_REL));
+            }
+            ps_last_status_debug = status;
+            ps_status_debug_valid = true;
+        }
+        return status;
     }
     return 0;
 }

@@ -31,6 +31,13 @@ Enables Function Code (FC) handling. Valid values: `stub`, `cpld`, or `off`.
 `stub` only tracks/logs FC in the emulator.  
 `cpld` is intended for FC-aware CPLD builds (experimental).  
 
+# enable_bus_arb
+
+Example: `setvar enable_bus_arb on`  
+Enables CPLD bus-release arbitration mode (`BR/BG`) through the kernel parameter `bus_arb_release`.  
+Valid values: `on/off`, `1/0`, `true/false`, `yes/no`.  
+Use this when testing DMA-sensitive behaviour where PiStorm must fully relinquish the bus to other masters.
+
 # queue
 
 Example: `setvar queue 1`  

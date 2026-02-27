@@ -17,7 +17,6 @@ PISTORM_USE_DIRECT_OPS ?= 1
 
 # RTG defaults
 RTG_GFX_MEM ?= 128
-RTG_WIDTH ?= 1920
-RTG_HEIGHT ?= 1080
-
+RTG_WIDTH ?= 3840
+RTG_HEIGHT ?= 2160
 # Additional configuration options can be added here as needed

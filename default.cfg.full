@@ -1,17 +1,58 @@
-cpu 68040
-platform amiga 500
-map type=rom address=0xF80000 size=0x80000 file=../Amiga/kick/Kickstart-v3.1-r40.068.rom ovl=0 id=kickstart autodump_mem
+cpu 68030
+#cpu 68040
+platform amiga
+map type=rom address=0xF80000 size=0x80000 file=../Amiga/kick/kick.a1200.46.143 ovl=0 id=kickstart autodump_mem
+#map type=rom address=0xF80000 size=0x80000 file=../Amiga/kick/Kickstart-v3.1-r40.068.rom ovl=0 id=kickstart autodump_mem
+
+
 map type=ram address=0x00100000 size=1M id=chipram_extra
+<<<<<<< HEAD
 map type=ram address=0x10000000 size=64M id=z3_autoconf_fast
 map type=ram address=0x00400000 size=4M   id=z2_autoconf_fast
+=======
+
+# Map 128MB of Fast RAM at 0x8000000, also known as 32-bit Fast RAM or CPU local Fast RAM.
+# Only supported properly on select Kickstarts, such as 3.1+ for Amiga 1200, 3000 and 4000.
+map type=ram address=0x08000000 size=128M id=cpu_slot_ram
+# Map 128MB of Z3 Fast. Note that the address here is not actually used, as it gets auto-assigned by Kickstart itself.
+# Enabling Z3 fast requires at least Kickstart 2.0.
+# If for some reason you need more than 128MB, you can change the size=128M to a valid supported Z3 PIC size,
+# like 256M, 512M, 1024M, or add additional map lines.
+map type=ram address=0x10000000 size=128M id=z3_autoconf_fast
+# Max 8MB of Z2 Fast can be mapped due to addressing space limitations, but for instance 2+4MB can be chained to leave 2MB for something else.
+# Do not map Zorro II Fast RAM unless you absolutely need it, as Z2 address space is very limited.
+# Cases where you may need Zorro II Fast may include emulating a 68000, 68010 or 68EC020, and/or if you are using Kickstart 1.3.
+#map type=ram address=0x200000 size=8M id=z2_autoconf_fast
+map type=ram address=0x200000 size=2M id=z2_autoconf_fast
+#map type=ram address=0x400000 size=4M id=z2_autoconf_fast
 
 
-loopcycles 512
+loopcycles 2048
+#setvar z3bus
+#setvar z3bus-demo 1
+#setvar zorro-serial 1
+#setvar zorro-rng 1
+#setvar zorro-pissa 1
+
+setvar enable_fc cpld
+setvar enable_bus_arb on
+setvar queue 1
+setvar batch_bits 4096
+>>>>>>> feature/23_02_stabalise
+
+
 setvar piscsi64
+<<<<<<< HEAD
 setvar piscsi64_2 /opt/Amiga/hdf/KernelPiStormBench.hdf
 setvar piscsi64_4 ./src/platforms/amiga/pistorm.hdf
+=======
+setvar piscsi64_1 ../KernelPiStormBench.hdf
+#setvar piscsi64_2 ../Amiga/LC060new.img
+setvar piscsi64_4 ./src/platforms/amiga/pistorm.hdf
+#setvar piscsi64_3 cdrom:/home/smalley/amiga_iso/tsvideo.iso
+>>>>>>> feature/23_02_stabalise
 #setvar piscsi64_5 remote:dqt3t@172.16.0.2:4964/remote,mode=rw,blocksize=4096
-#setvar rtg64 yes
+setvar rtg64 yes
 
 # -----------------------------------------------------------------------------
 # Platform Features
@@ -30,12 +71,12 @@ map type=register address=0xDC0000 size=0x10000
 setvar enable_rtc_emulation 1
 
 # Uncomment to enable PiRTG
-setvar pirtg64
-setvar rtg_mem 64
-setvar rtg-width 0
-setvar rtg-height 0
-#setvar rtg-width 1280
-#setvar rtg-height 720
+setvar rtg
+
+setvar rtg-width 1920
+setvar rtg-height 1080
+#setvar rtg-width  3840
+#setvar rtg-height 2160
 
 setvar pi-net
 setvar pistorm_root /opt/pistorm64
@@ -44,5 +85,8 @@ setvar pistorm_data /opt/pistorm64/data
 setvar a314_shared /opt/pistorm64/data/a314-shared
 setvar a314_conf /opt/pistorm64/a314/a314d.conf
 setvar a314_fs_conf /opt/pistorm64/a314/a314fs.conf
-
+#
 setvar a314
+
+keyboard k nograb noautoconnect
+mouse /dev/input/mice m noautoconnect
