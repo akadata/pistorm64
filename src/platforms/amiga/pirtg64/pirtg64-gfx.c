@@ -523,8 +523,8 @@ void rtg_blitrect_nomask_complete(uint16_t src_x, uint16_t src_y, uint16_t dst_x
             {
               size_t src_offset = rtg_index_offset(xs, sizeof(uint16_t));
               size_t dst_offset = rtg_index_offset(xs, sizeof(uint16_t));
-              uint16_t src_val = load_u16_be(&sptr[src_offset]);
-              uint16_t dst_val = load_u16_be(&dptr[dst_offset]);
+              uint32_t src_val = (uint32_t)load_u16_be(&sptr[src_offset]);
+              uint32_t dst_val = (uint32_t)load_u16_be(&dptr[dst_offset]);
               HANDLE_MINTERM_PIXEL(src_val, dst_val, format);
             }
             break;
@@ -567,8 +567,8 @@ void rtg_blitrect_nomask_complete(uint16_t src_x, uint16_t src_y, uint16_t dst_x
             {
               size_t src_offset = rtg_index_offset(xs, sizeof(uint16_t));
               size_t dst_offset = rtg_index_offset(xs, sizeof(uint16_t));
-              uint16_t src_val = load_u16_be(&sptr[src_offset]);
-              uint16_t dst_val = load_u16_be(&dptr[dst_offset]);
+              uint32_t src_val = (uint32_t)load_u16_be(&sptr[src_offset]);
+              uint32_t dst_val = (uint32_t)load_u16_be(&dptr[dst_offset]);
               HANDLE_MINTERM_PIXEL(src_val, dst_val, format);
             }
             break;

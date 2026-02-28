@@ -17,6 +17,7 @@ PISTORM_USE_DIRECT_OPS ?= 1
 
 # RTG defaults
 RTG_GFX_MEM ?= 128
-RTG_WIDTH ?= 3840
-RTG_HEIGHT ?= 2160
+RTG_WIDTH ?= 1920 # or 2650 or 3840 or 1280 
+RTG_HEIGHT ?= 1080 # or  1440 or 2160 or 720
+# there is little point using bellow 1080p this is still 60fps + 
 # Additional configuration options can be added here as needed
