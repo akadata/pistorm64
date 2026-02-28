@@ -8,6 +8,58 @@
 // Developed by AKADATA, with help and support from Codex.
 
 
+/* RTG layout (VRAM + scratch) */
+
+// Base of RTG region (registers live at RTG_BASE .. RTG_BASE+RTG_REG_SIZE-1)
+#define MiB 0x00100000u
+
+#define RTG_BASE     0x70000000u
+#define RTG_REG_SIZE 0x00010000u
+
+// VRAM size in MiB (set via -DRTG_GFX_MEM=... or -DRTG_MEM_MB=...)
+#ifndef RTG_GFX_MEM
+#define RTG_GFX_MEM 128u
+#endif
+
+#ifndef RTG_MEM_MB
+#define RTG_MEM_MB RTG_GFX_MEM
+#endif
+
+#define RTG_VRAM_MB   (RTG_MEM_MB)
+#define RTG_VRAM_SIZE (RTG_VRAM_MB * MiB)
+
+// Scratch scaling defaults (override with -DRTG_SCRATCH_MB=... if needed)
+#ifndef RTG_SCRATCH_MIN_MB
+#define RTG_SCRATCH_MIN_MB 8u
+#endif
+
+#ifndef RTG_SCRATCH_MAX_MB
+#define RTG_SCRATCH_MAX_MB 64u
+#endif
+
+#define RTG_SCRATCH_MB_RAW        (RTG_VRAM_MB / 16u)
+#define RTG_SCRATCH_MB_CLAMP_MIN  ((RTG_SCRATCH_MB_RAW < RTG_SCRATCH_MIN_MB) ? RTG_SCRATCH_MIN_MB : RTG_SCRATCH_MB_RAW)
+#ifndef RTG_SCRATCH_MB
+#define RTG_SCRATCH_MB            ((RTG_SCRATCH_MB_CLAMP_MIN > RTG_SCRATCH_MAX_MB) ? RTG_SCRATCH_MAX_MB : RTG_SCRATCH_MB_CLAMP_MIN)
+#endif
+
+#define RTG_SCRATCH_SIZE (RTG_SCRATCH_MB * MiB)
+
+// VRAM is placed immediately after the register window.
+#define RTG_VRAM_BASE (RTG_BASE + RTG_REG_SIZE)
+#define RTG_VRAM_END  (RTG_VRAM_BASE + RTG_VRAM_SIZE - 1u)
+
+// Scratch lives at the top end of VRAM.
+#define RTG_SCRATCH_END  (RTG_VRAM_END)
+#define RTG_SCRATCH_AREA (RTG_SCRATCH_END - RTG_SCRATCH_SIZE + 1u)
+
+// Convenience: end of the whole RTG region (regs + vram)
+#define RTG_UPPER (RTG_VRAM_END + 1u)
+
+#define CARD_OFFSET 0u
+
+
+/*
 #define RTG_BASE 0x70000000
 #define RTG_REG_SIZE 0x00010000
 #ifndef RTG_GFX_MEM
@@ -23,7 +75,7 @@
 #define RTG_UPPER 0x72810000
 
 #define CARD_OFFSET 0
-
+*/
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
