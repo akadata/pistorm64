@@ -29,6 +29,11 @@ Physical drives can also be mounted using their mount point files on Linux, such
 
 You can mount up to 7 disk images using setvar `piscsi0` through `piscsi6`.
 
+PiSCSI also supports media prefixes and remote backends:
+- `setvar piscsi0 cdrom:../AmigaOS39.iso`
+- `setvar piscsi1 remote:token@172.16.0.2:4964/remotewb,mode=rw`
+- `setvar piscsi2 remote:token@[2001:db8::10]:4964/remotewb,mode=ro`
+
 For preparing a disk image **on your Amiga with a PiStorm connected**, you can for instance make a copy of the Workbench tool `HDToolBox`, and then edit the tooltypes (`Icon -> Information` menu) to use `pi-scsi.device` instead of `scsi.device`.
 
 **No copying of the pi-scsi.device driver to `DEVS:` or anything like that is necessary, as the driver is loaded from ROM on boot/config time.**
@@ -87,4 +92,3 @@ MaxTransfer can be left default or set to the traditional IDE maximum theoretica
 While the PiSCSI interface can be used to mount physical drives that are available as block device nodes on the Pi, you should not do this unless you are absolutely sure what you're doing.
 
 Directly mounting a block device connected to the Pi may corrupt or destroy the data on the device, depending on what you or the file system drivers do with this disk on the Amiga side.
-

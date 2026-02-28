@@ -3,7 +3,12 @@
 PiSCSI64 is the newer SCSI backend for PiStorm64 on Amiga.  
 It presents host-backed storage to the Amiga as normal SCSI devices (hard disk, CD-ROM), with boot ROM support and direct `pi-scsi64.device` integration.
 
-Status: active development target. Legacy `PiSCSI` is compatibility/maintenance only.
+Status: feature-complete backend, but currently not recommended in configs that also enable extra Zorro demo/utility devices.
+
+## Important compatibility warning
+
+- Do not combine `piscsi64` with `z3bus` / `zorro-*` devices in the same boot config right now.
+- For those mixed setups, use `piscsi` (which now supports `cdrom:` and `remote:`) until `piscsi64` + Zorro coexistence is fixed.
 
 Validation status:
 

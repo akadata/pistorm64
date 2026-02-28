@@ -934,29 +934,36 @@ void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val)
   }
   if (piscsi_enabled) {
     if CHKVAR ("piscsi0") {
+      LOG_INFO("[AMIGA] PISCSI map request: unit 0 -> %s\n", val);
       piscsi_map_drive(val, 0);
     }
     if CHKVAR ("piscsi1") {
+      LOG_INFO("[AMIGA] PISCSI map request: unit 1 -> %s\n", val);
       piscsi_map_drive(val, 1);
     }
     if CHKVAR ("piscsi2") {
+      LOG_INFO("[AMIGA] PISCSI map request: unit 2 -> %s\n", val);
       piscsi_map_drive(val, 2);
     }
     if CHKVAR ("piscsi3") {
+      LOG_INFO("[AMIGA] PISCSI map request: unit 3 -> %s\n", val);
       piscsi_map_drive(val, 3);
     }
     if CHKVAR ("piscsi4") {
+      LOG_INFO("[AMIGA] PISCSI map request: unit 4 -> %s\n", val);
       piscsi_map_drive(val, 4);
     }
     if CHKVAR ("piscsi5") {
+      LOG_INFO("[AMIGA] PISCSI map request: unit 5 -> %s\n", val);
       piscsi_map_drive(val, 5);
     }
     if CHKVAR ("piscsi6") {
+      LOG_INFO("[AMIGA] PISCSI map request: unit 6 -> %s\n", val);
       piscsi_map_drive(val, 6);
     }
   }
 
-  // PiSCSI64 stuff (Z2 virtual HBA)
+  // PiSCSI64 stuff (Z3 virtual HBA)
   if (CHKVAR("piscsi64") && !piscsi64_enabled) {
     LOG_INFO("[AMIGA] PISCSI64 Interface Enabled (manuf=$%04X product=$%04X).\n",
              PISTORM_MANUF_ID, PISTORM_PROD_PISCSI64_Z2);

@@ -860,8 +860,8 @@ full:
 		echo "ERROR: run 'make full' as a normal user (it calls sudo internally)."; \
 		exit 1; \
 	fi
-	-pkill -x emulator 2>/dev/null || true
-	-sudo rmmod pistorm 2>/dev/null || true
+	sudo pkill -x emulator 2>/dev/null || true
+	sudo rmmod pistorm 2>/dev/null || true
 	$(MAKE) clean
 ifeq ($(USE_UAE_JIT),1)
 	$(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) uae-jit

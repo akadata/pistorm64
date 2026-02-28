@@ -47,6 +47,8 @@ struct piscsi_base {
     uint8_t present;
     uint8_t valid;
     uint8_t read_only;
+    uint8_t scsi_type;
+    uint8_t backend_type;
     uint8_t motor;
     uint8_t unit_num;
     uint16_t scsi_num;
@@ -104,6 +106,42 @@ uint8_t piscsi_scsi(struct piscsi_unit* u, struct IORequest* io);
 
 struct piscsi_base* dev_base = NULL;
 
+static uint32_t piscsi_min_u32(uint32_t a, uint32_t b) {
+  return (a < b) ? a : b;
+}
+
+/*
+ * Keep legacy Amiga tooling from showing 0-size at exact 32-bit wrap points
+ * while still exposing large media via sector size + total sectors.
+ */
+static uint32_t piscsi_report_blocks_compat(uint32_t blocks, uint32_t block_size) {
+  uint64_t bytes;
+  if (blocks <= 1) {
+    return blocks;
+  }
+  if (block_size == 0) {
+    block_size = 512;
+  }
+  bytes = ((uint64_t)blocks) * ((uint64_t)block_size);
+  if ((bytes & 0xFFFFFFFFULL) == 0ULL) {
+    return blocks - 1u;
+  }
+  return blocks;
+}
+
+static void piscsi_copy_ascii_field(uint8_t* dst, uint32_t len, const char* src) {
+  uint32_t i = 0;
+  for (i = 0; i < len; i++) {
+    dst[i] = ' ';
+  }
+  if (!src) {
+    return;
+  }
+  for (i = 0; i < len && src[i] != '\0'; i++) {
+    dst[i] = (uint8_t)src[i];
+  }
+}
+
 static struct Library __attribute__((used)) *
     init_device(uint8_t* seg_list asm("a0"), struct Library* dev asm("d0")) {
   SysBase = *(struct ExecBase**)4L;
@@ -118,9 +156,23 @@ static struct Library __attribute__((used)) *
     WRITESHORT(PISCSI_CMD_DRVNUM, (i));
     dev_base->units[i].regs_ptr = PISCSI_OFFSET;
     READSHORT(PISCSI_CMD_DRVTYPE, r);
-    dev_base->units[i].enabled = r;
-    dev_base->units[i].present = r;
-    dev_base->units[i].valid = r;
+    dev_base->units[i].enabled = PISCSI_DRVTYPE_IS_PRESENT(r);
+    dev_base->units[i].present = PISCSI_DRVTYPE_IS_PRESENT(r);
+    dev_base->units[i].valid = PISCSI_DRVTYPE_IS_PRESENT(r);
+    dev_base->units[i].read_only = PISCSI_DRVTYPE_IS_READONLY(r);
+    dev_base->units[i].scsi_type = PISCSI_DRVTYPE_SCSI_TYPE(r);
+    if (dev_base->units[i].scsi_type == 0) {
+      dev_base->units[i].scsi_type = PISCSI_SCSI_TYPE_DIRECT_ACCESS;
+    }
+    {
+      uint32_t backend_info = 0;
+      READLONG(PISCSI_CMD_BACKEND_INFO, backend_info);
+      dev_base->units[i].backend_type = (uint8_t)(backend_info & PISCSI_BACKEND_INFO_TYPE_MASK);
+      if (dev_base->units[i].backend_type == PISCSI_BACKEND_TYPE_NONE &&
+          dev_base->units[i].present) {
+        dev_base->units[i].backend_type = PISCSI_BACKEND_TYPE_FILE;
+      }
+    }
     dev_base->units[i].unit_num = i;
     dev_base->units[i].scsi_num = i;
     if (dev_base->units[i].present) {
@@ -240,6 +292,20 @@ uint8_t piscsi_rw(struct piscsi_unit* u, struct IORequest* io) {
     return IOERR_BADLENGTH;
   }
 
+  if (u->read_only) {
+    switch (io->io_Command) {
+    case TD_WRITE64:
+    case NSCMD_TD_WRITE64:
+    case TD_FORMAT64:
+    case NSCMD_TD_FORMAT64:
+    case TD_FORMAT:
+    case CMD_WRITE:
+      return TDERR_WriteProt;
+    default:
+      break;
+    }
+  }
+
   switch (io->io_Command) {
   case TD_WRITE64:
   case NSCMD_TD_WRITE64:
@@ -300,7 +366,12 @@ uint8_t piscsi_rw(struct piscsi_unit* u, struct IORequest* io) {
   return 0;
 }
 
-#define PISCSI_ID_STRING "PISTORM Fake SCSI Disk  0.1 1111111111111111"
+#define PISCSI_VENDOR_ID "PISTORM "
+#define PISCSI_PRODID_DISK "PISCSI DISK"
+#define PISCSI_PRODID_CDROM "PISCSI CDROM"
+#define PISCSI_PRODID_REMOTE "PISCSI REMOTE"
+#define PISCSI_PRODID_REMOTE_CDROM "PISCSI R-CDROM"
+#define PISCSI_REV_ID "1.0 "
 
 uint8_t piscsi_scsi(struct piscsi_unit* u, struct IORequest* io) {
   struct IOStdReq* iostd = (struct IOStdReq*)io;
@@ -342,34 +413,43 @@ uint8_t piscsi_scsi(struct piscsi_unit* u, struct IORequest* io) {
 
   case SCSICMD_INQUIRY:
     for (i = 0; i < scsi->scsi_Length; i++) {
-      uint8_t val = 0;
-
-      switch (i) {
-      case 0: // SCSI device type: direct-access device
-        val = (0 << 5) | 0;
-        break;
-      case 1: // RMB = 1
-        val = (1 << 7);
-        break;
-      case 2: // VERSION = 0
-        val = 0;
-        break;
-      case 3: // NORMACA=0, HISUP = 0, RESPONSE_DATA_FORMAT = 2
-        val = (0 << 5) | (0 << 4) | 2;
-        break;
-      case 4: // ADDITIONAL_LENGTH = 44 - 4
-        val = 44 - 4;
-        break;
-      default:
-        if (i >= 8 && i < 44)
-          val = PISCSI_ID_STRING[i - 8];
-        else
-          val = 0;
-        break;
-      }
-      data[i] = val;
+      data[i] = 0;
     }
-    scsi->scsi_Actual = i;
+    if (scsi->scsi_Length > 0) {
+      data[0] = (0 << 5) | (u ? (u->scsi_type & 0x1F) : PISCSI_SCSI_TYPE_DIRECT_ACCESS);
+    }
+    if (scsi->scsi_Length > 1) {
+      data[1] = (u && u->scsi_type == PISCSI_SCSI_TYPE_CDROM) ? 0x80 : 0x00;
+    }
+    if (scsi->scsi_Length > 2) {
+      data[2] = 2; // SCSI-2
+    }
+    if (scsi->scsi_Length > 3) {
+      data[3] = 2; // response format
+    }
+    if (scsi->scsi_Length > 4) {
+      data[4] = 31; // additional length (36-byte inquiry)
+    }
+    if (scsi->scsi_Length > 8) {
+      piscsi_copy_ascii_field(&data[8], 8, PISCSI_VENDOR_ID);
+    }
+    if (scsi->scsi_Length > 16) {
+      const char* prodid = PISCSI_PRODID_DISK;
+      if (u) {
+        if (u->backend_type == PISCSI_BACKEND_TYPE_REMOTE) {
+          prodid = (u->scsi_type == PISCSI_SCSI_TYPE_CDROM)
+                     ? PISCSI_PRODID_REMOTE_CDROM
+                     : PISCSI_PRODID_REMOTE;
+        } else if (u->scsi_type == PISCSI_SCSI_TYPE_CDROM) {
+          prodid = PISCSI_PRODID_CDROM;
+        }
+      }
+      piscsi_copy_ascii_field(&data[16], 16, prodid);
+    }
+    if (scsi->scsi_Length > 32) {
+      piscsi_copy_ascii_field(&data[32], 4, PISCSI_REV_ID);
+    }
+    scsi->scsi_Actual = piscsi_min_u32(scsi->scsi_Length, 36u);
     err = 0;
     break;
 
@@ -400,6 +480,10 @@ uint8_t piscsi_scsi(struct piscsi_unit* u, struct IORequest* io) {
     blocks = (blocks << 8) | scsi->scsi_Command[8];
 
   scsireadwrite:;
+    if (write && u->read_only) {
+      err = HFERR_BadStatus;
+      break;
+    }
     WRITESHORT(PISCSI_CMD_DRVNUM, (u->scsi_num));
     READLONG(PISCSI_CMD_BLOCKS, maxblocks);
     if (block + blocks > maxblocks || blocks == 0) {
@@ -411,16 +495,19 @@ uint8_t piscsi_scsi(struct piscsi_unit* u, struct IORequest* io) {
       break;
     }
 
-    if (write == 0) {
-      WRITELONG(PISCSI_CMD_ADDR1, block);
-      WRITELONG(PISCSI_CMD_ADDR2, (blocks << 9));
-      WRITELONG(PISCSI_CMD_ADDR3, (uint32_t)data);
-      WRITESHORT(PISCSI_CMD_READ, u->unit_num);
-    } else {
-      WRITELONG(PISCSI_CMD_ADDR1, block);
-      WRITELONG(PISCSI_CMD_ADDR2, (blocks << 9));
-      WRITELONG(PISCSI_CMD_ADDR3, (uint32_t)data);
-      WRITESHORT(PISCSI_CMD_WRITE, u->unit_num);
+    {
+      uint32_t byte_len = blocks * block_size;
+      if (write == 0) {
+        WRITELONG(PISCSI_CMD_ADDR1, block);
+        WRITELONG(PISCSI_CMD_ADDR2, byte_len);
+        WRITELONG(PISCSI_CMD_ADDR3, (uint32_t)data);
+        WRITESHORT(PISCSI_CMD_READ, u->unit_num);
+      } else {
+        WRITELONG(PISCSI_CMD_ADDR1, block);
+        WRITELONG(PISCSI_CMD_ADDR2, byte_len);
+        WRITELONG(PISCSI_CMD_ADDR3, (uint32_t)data);
+        WRITESHORT(PISCSI_CMD_WRITE, u->unit_num);
+      }
     }
 
     scsi->scsi_Actual = scsi->scsi_Length;
@@ -440,7 +527,8 @@ uint8_t piscsi_scsi(struct piscsi_unit* u, struct IORequest* io) {
 
     WRITESHORT(PISCSI_CMD_DRVNUM, (u->scsi_num));
     READLONG(PISCSI_CMD_BLOCKS, blocks);
-    ((uint32_t*)data)[0] = blocks - 1;
+    blocks = piscsi_report_blocks_compat(blocks, block_size);
+    ((uint32_t*)data)[0] = (blocks > 0) ? (blocks - 1) : 0;
     ((uint32_t*)data)[1] = block_size;
 
     scsi->scsi_Actual = 8;
@@ -458,6 +546,7 @@ uint8_t piscsi_scsi(struct piscsi_unit* u, struct IORequest* io) {
 
     WRITESHORT(PISCSI_CMD_DRVNUM, (u->scsi_num));
     READLONG(PISCSI_CMD_BLOCKS, maxblocks);
+    maxblocks = piscsi_report_blocks_compat(maxblocks, block_size);
     (blocks = (maxblocks - 1) & 0xFFFFFF);
 
     *((uint32_t*)&data[4]) = blocks;
@@ -606,7 +695,9 @@ uint8_t piscsi_perform_io(struct piscsi_unit* u, struct IORequest* io) {
   case TD_CHANGESTATE:
     DUMMYCMD;
   case TD_GETDRIVETYPE:
-    iostd->io_Actual = DG_DIRECT_ACCESS;
+    iostd->io_Actual = (u->scsi_type == PISCSI_SCSI_TYPE_CDROM)
+                         ? DG_CDROM
+                         : DG_DIRECT_ACCESS;
     break;
   case TD_MOTOR:
     iostd->io_Actual = u->motor;
@@ -617,12 +708,15 @@ uint8_t piscsi_perform_io(struct piscsi_unit* u, struct IORequest* io) {
     WRITESHORT(PISCSI_CMD_DRVNUMX, u->unit_num);
     READLONG(PISCSI_CMD_BLOCKSIZE, res->dg_SectorSize);
     READLONG(PISCSI_CMD_BLOCKS, res->dg_TotalSectors);
+    res->dg_TotalSectors = piscsi_report_blocks_compat(res->dg_TotalSectors, res->dg_SectorSize);
     res->dg_Cylinders = u->c;
     res->dg_CylSectors = u->s * u->h;
     res->dg_Heads = u->h;
     res->dg_TrackSectors = u->s;
     res->dg_BufMemType = MEMF_PUBLIC;
-    res->dg_DeviceType = 0;
+    res->dg_DeviceType = (u->scsi_type == PISCSI_SCSI_TYPE_CDROM)
+                           ? DG_CDROM
+                           : DG_DIRECT_ACCESS;
     res->dg_Flags = 0;
 
     return 0;

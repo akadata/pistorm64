@@ -9,6 +9,8 @@
 - HDToolBox scan behavior can be limited to SCSI IDs `0..6` on some versions/tooltype setups.
   - PiSCSI64 itself supports units `1..15`; IDs above 6 are usable once prepared/mounted.
   - Treat this as an Amiga tool limitation, not a PiSCSI64 backend/controller limit.
+- `piscsi64` currently conflicts with mixed Zorro demo/utility device configs (`z3bus`, `zorro-serial`, `zorro-rng`, `zorro-pissa`) and is not recommended in those combinations.
+  - Workaround: use `piscsi` for storage in mixed Zorro setups.
 
 Add new issues here as they are discovered.
 

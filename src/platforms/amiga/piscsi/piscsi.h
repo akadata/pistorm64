@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: MIT
 
 #include <stdint.h>
+#include <sys/types.h>
 
 #include "platforms/amiga/hunk-reloc.h"
+
+#define PISCSI_MAX_SPEC 384
 
 #define	TDF_EXTCOM (1<<15)
 
@@ -64,15 +67,57 @@
 #define PISCSI_DRIVER_OFFSET 0x1000
 #define NUM_FILESYSTEMS 32
 
+enum piscsi_media_kind {
+    PISCSI_MEDIA_NONE = 0,
+    PISCSI_MEDIA_DISK = 1,
+    PISCSI_MEDIA_CDROM = 2,
+};
+
+enum piscsi_backend_type {
+    PISCSI_BACKEND_NONE = 0,
+    PISCSI_BACKEND_FILE = 1,
+    PISCSI_BACKEND_BLOCK = 2,
+    PISCSI_BACKEND_REMOTE = 3,
+};
+
+struct piscsi_dev;
+struct piscsi_backend_ops {
+    const char *name;
+    int (*close)(struct piscsi_dev *d);
+    off64_t (*seek)(struct piscsi_dev *d, off64_t offset, int whence);
+    ssize_t (*read)(struct piscsi_dev *d, void *buf, size_t count);
+    ssize_t (*write)(struct piscsi_dev *d, const void *buf, size_t count);
+    ssize_t (*pread)(struct piscsi_dev *d, void *buf, size_t count, off64_t offset);
+    int (*sync)(struct piscsi_dev *d);
+};
+
 struct piscsi_dev {
     uint32_t c;
     uint16_t h, s;
     uint64_t fs;
     int32_t fd;
+    int32_t remote_sock;
+    uint64_t remote_pos;
+    uint64_t remote_last_probe_ms;
+    uint64_t remote_tx_ctr;
+    uint64_t remote_rx_ctr;
+    uint8_t remote_crypto_enabled;
+    uint8_t remote_key[32];
+    uint8_t remote_iv[16];
+    void *remote_tls_ctx;
+    void *remote_tls;
+    uint32_t remote_block_size;
+    uint8_t remote_media_kind;
+    enum piscsi_backend_type backend_type;
+    const struct piscsi_backend_ops *backend_ops;
+    char backend_spec[256];
+    char configured_spec[PISCSI_MAX_SPEC];
     uint32_t lba;
     uint32_t num_partitions;
     uint32_t fshd_offs;
     uint32_t block_size;
+    uint8_t media_kind;
+    uint8_t read_only;
     struct PartitionBlock *pb[16];
     struct RigidDiskBlock *rdb;
 };

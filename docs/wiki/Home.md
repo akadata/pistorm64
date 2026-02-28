@@ -3,12 +3,14 @@
 Welcome to the PiStorm64 wiki for this repository. These pages document build, install, configuration, and platform features, plus how we integrated Pi-side services (A314, PiSCSI, RTG, AHI, networking) and the development environment under `/opt/amiga`.
 
 Milestones:
+- PiSCSI remote backend is now validated for real boot use in mixed Zorro setups (`setvar piscsi` + `remote:`).
 - PiSCSI64 remote backend is now validated for real boot use: remote disk on a separate host, partitioned/formatted, copied, and booted over a wired 1Gb LAN link.
 - Native PiSCSI64 CD-ROM workflow is validated (`cdrom:` + `pi-scsi64.device` + `CDFileSystem`) including AmigaOS install media usage.
 - Dhrystone has passed the 64,000 mark on the validated Pi4 baseline.
 
 Current status:
-- PiSCSI64 is the active storage path; legacy PiSCSI remains compatibility-only.
+- For mixed Zorro setups (`z3bus`, `zorro-serial`, `zorro-rng`, `zorro-pissa`), use PiSCSI (legacy path with new `cdrom:`/`remote:` support).
+- Avoid enabling PiSCSI64 together with those Zorro devices until coexistence is fixed.
 - RTG is usable, with a known window-decoration issue under active work.
 - UAE JIT remains bring-up only and is not yet a reliable day-to-day runtime path.
 - Windows/macOS remote clients build, but full runtime validation is still pending.

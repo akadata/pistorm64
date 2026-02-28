@@ -1,29 +1,67 @@
 # PiSCSI
 
-PiSCSI provides an Amiga-side SCSI-like block device backed by host files.
+PiSCSI provides Amiga-side SCSI devices backed by local files/block devices and remote exports.
 
-For the newer backend and current CD-ROM workflow, see `piscsi64.md`.
+This is the recommended storage path when using Zorro extras (`z3bus-demo`, `zorro-serial`, `zorro-rng`, `zorro-pissa`) in the same setup.
 
-Key files:
-- `platforms/amiga/piscsi/`
-- `platforms/amiga/piscsi/readme.md`
+Validation status:
 
-## HDF mapping
+- Local HDF boot: verified.
+- CD-ROM mapping: verified.
+- Remote disk boot (`remote:`): verified.
 
-HDF images are listed in the config or platform settings. On boot, PiSCSI:
+## Compatibility note
 
-- Loads the PiSCSI ROM.
-- Scans partitions.
-- Installs filesystem handlers (e.g. PFS/3, DOS/1).
+- Avoid `piscsi64` in configs that also enable Zorro demo/utility devices.
+- Use `piscsi` instead for mixed setups that need stable boot + Zorro devices.
 
-## DMA and memory safety
+## Supported media
 
-For stability:
+- Disk: plain path or `disk:...`
+- CD-ROM: `cdrom:...` (read-only, 2048-byte sectors)
+- Remote: `remote:token@host:port/export[,mode=ro|rw]`
 
-- Keep ROM ranges read-only in the mapper.
-- Ensure DMA destinations are within RAM maps (Z2/Z3/RTG) and never into ROM.
-- If using a dedicated DMA window, prefer Z3 space (e.g. `0x60000000+`).
+PiSCSI remote/CD-ROM support does not require A314.
 
-## ADF read/write
+## Example config
 
-ADF support is handled via host files in `data/` and device handlers. See ADF-Read-Write.md.
+```ini
+setvar piscsi
+setvar piscsi0 ../KernelPiStormBench.hdf
+setvar piscsi5 remote:token@172.16.0.2:4964/remote,mode=rw
+setvar piscsi6 cdrom:../amiga_iso/tsvideo.iso
+```
+
+Remote server example:
+
+```sh
+sudo piscsi64-remote \
+  --listen 0.0.0.0:4964 \
+  --export remote \
+  --path /dev/zvol/tank/piscsi64remotedisk \
+  --token token \
+  --kind disk \
+  --mode rw \
+  --block-size 4096
+```
+
+Block size notes:
+
+- `cdrom:` is fixed at `2048` bytes/sector.
+- Disk media can be `512` or `4096` (and larger where tooling supports it).
+- For `remote:`, the server-defined block size is authoritative.
+
+## HDToolBox / device identity
+
+`pi-scsi.device` now exposes media type in SCSI inquiry/product identity:
+
+- Local disk: `PISCSI DISK`
+- CD-ROM: `PISCSI CDROM`
+- Remote disk: `PISCSI REMOTE`
+- Remote CD-ROM: `PISCSI R-CDROM`
+
+Use this to verify unit mapping from Amiga tools.
+
+## Performance note
+
+If running `--log-level debug`, PiSCSI I/O traces are very verbose and can make remote I/O look slow. Use `info` level for normal runtime performance tests.

@@ -9,29 +9,9 @@
 #include "z3_piscsi64.h"
 #include "log.h"
 
-static uint8_t z3_piscsi64_rom[] = {
-    Z2_Z2 | Z2_BOOTROM,
-    AC_MEM_SIZE_64KB, // 00/01, Z2, bootrom, 64KB
-    0x1,
-    0x2,              // 04/06, product id = 0x12
-    0x0,
-    0x0,              // 08/0A, any space where it fits
-    0x0,
-    0x0,              // 0C/0E, reserved
-    PISTORM_AC_MANUF_ID,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-    0x4,
-    0x2,
-    0x1,              // serial nibble (match known-good PiSCSI Z2 format)
-    0x4,
-    0x0,
-    0x0,
-    0x0,              // optional BOOT ROM vector nibble tail
-};
+/* Z3 autoconfig uses board registers, not the Z2 ROM data.
+ * Keep ac_rom NULL and rely on BOOTROM default diag vector ($4000).
+ */
 
 static uint8_t z3_piscsi64_read8(zorro_device_t *dev, uint32_t offset) {
   return (uint8_t)handle_piscsi64_read(dev->base + offset, OP_TYPE_BYTE);
@@ -58,14 +38,14 @@ static void z3_piscsi64_write32(zorro_device_t *dev, uint32_t offset, uint32_t v
 }
 
 static zorro_device_t z3_piscsi64_device = {
-    .name = "z2-piscsi64",
-    .bus = ZORRO_BUS_Z2,
+    .name = "z3-piscsi64",
+    .bus = ZORRO_BUS_Z3,
     .size = PISCSI64_REGSIZE,
     .manufacturer = PISTORM_MANUF_ID,
-    .product = PISTORM_PROD_PISCSI64_Z2,
+    .product = PISTORM_PROD_PISCSI64_Z3,
     .flags = ZORRO_DEV_FLAG_BOOTROM,
-    .ac_rom = z3_piscsi64_rom,
-    .ac_rom_size = sizeof(z3_piscsi64_rom),
+    .ac_rom = NULL,
+    .ac_rom_size = 0,
     .read8 = z3_piscsi64_read8,
     .read16 = z3_piscsi64_read16,
     .read32 = z3_piscsi64_read32,
@@ -76,9 +56,9 @@ static zorro_device_t z3_piscsi64_device = {
 };
 
 void z3_piscsi64_register(void) {
-  LOG_INFO("[ZORRO] Registering Z2 PiSCSI64 device.\n");
+  LOG_INFO("[ZORRO] Registering Z3 PiSCSI64 device.\n");
   int slot = zorro_register_device(&z3_piscsi64_device);
   if (slot < 0) {
-    LOG_WARN("[ZORRO] Failed to register Z2 PiSCSI64 device.\n");
+    LOG_WARN("[ZORRO] Failed to register Z3 PiSCSI64 device.\n");
   }
 }
