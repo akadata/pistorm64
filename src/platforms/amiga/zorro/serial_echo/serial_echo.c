@@ -36,6 +36,20 @@ typedef struct {
 
 static z2_serial_state_t serial_state;
 
+static int join_path(char *dst, size_t dst_sz, const char *base, const char *suffix) {
+  if (!dst || dst_sz == 0 || !base || !suffix) {
+    return -1;
+  }
+  int n = snprintf(dst, dst_sz, "%s%s", base, suffix);
+  if (n < 0 || (size_t)n >= dst_sz) {
+    if (dst_sz > 0) {
+      dst[0] = '\0';
+    }
+    return -1;
+  }
+  return 0;
+}
+
 static void z2_serial_rx_enqueue(z2_serial_state_t *st, uint8_t value) {
   uint16_t next = (uint16_t)((st->head + 1u) % RX_BUF_SIZE);
   if (next != st->tail) {
@@ -106,7 +120,9 @@ static void z2_serial_host_init(z2_serial_state_t *st) {
   }
 
   char serial_dir[256];
-  snprintf(serial_dir, sizeof(serial_dir), "%s/amiga/serial", runtime_dir);
+  if (join_path(serial_dir, sizeof(serial_dir), runtime_dir, "/amiga/serial") != 0) {
+    strlcpy(serial_dir, "/tmp/amiga/serial", sizeof(serial_dir));
+  }
   if (mkdir(serial_dir, 0700) != 0 && errno != EEXIST) {
     // try fallback /tmp if runtime path failed
     strlcpy(serial_dir, "/tmp/amiga/serial", sizeof(serial_dir));
@@ -121,7 +137,10 @@ static void z2_serial_host_init(z2_serial_state_t *st) {
   }
 
   char link_path[256];
-  snprintf(link_path, sizeof(link_path), "%s/z2serial0", serial_dir);
+  if (join_path(link_path, sizeof(link_path), serial_dir, "/z2serial0") != 0) {
+    LOG_WARN("[ZORRO] Unable to build serial device path from '%s'.\n", serial_dir);
+    return;
+  }
   if (unlink(link_path) != 0 && errno != ENOENT) {
     LOG_WARN("[ZORRO] Unable to remove old %s: %s\n", link_path, strerror(errno));
   }

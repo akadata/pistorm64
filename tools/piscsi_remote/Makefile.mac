@@ -1,4 +1,4 @@
-# PiSCSI64 remote utilities (macOS)
+# PiSCSI remote utilities (macOS)
 #
 # If OpenSSL is installed via Homebrew, use:
 # make -f Makefile.mac OPENSSL_CFLAGS="-I/opt/homebrew/opt/openssl@3/include" \
@@ -11,12 +11,12 @@ LDFLAGS ?=
 OPENSSL_CFLAGS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 
-SERVER_SRC := piscsi64_remote_server.c
-CLIENT_SRC := piscsi64_remote_client.c
+SERVER_SRC := piscsi_remote_server.c
+CLIENT_SRC := piscsi_remote_client.c
 
-SERVER_BIN := $(OUT_DIR)/piscsi64-remote
-SERVER_ALIAS := $(OUT_DIR)/piscsi64-remote-server
-CLIENT_BIN := $(OUT_DIR)/piscsi64-remote-client
+SERVER_BIN := $(OUT_DIR)/piscsi-remote
+SERVER_ALIAS := $(OUT_DIR)/piscsi-remote-server
+CLIENT_BIN := $(OUT_DIR)/piscsi-remote-client
 
 all: $(SERVER_BIN) $(SERVER_ALIAS) $(CLIENT_BIN)
 

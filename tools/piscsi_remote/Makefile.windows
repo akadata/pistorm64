@@ -1,4 +1,4 @@
-# PiSCSI64 remote utilities (Windows, MinGW-w64)
+# PiSCSI remote utilities (Windows, MinGW-w64)
 #
 # Usage:
 #   mingw32-make -f Makefile.windows
@@ -14,9 +14,9 @@ CFLAGS ?= -O2 -Wall -Wextra
 LDFLAGS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto -lws2_32
 
-CLIENT_WIN_SRC := piscsi64_remote_client_win.c
-CLIENT_WIN_BIN := $(OUT_DIR)/piscsi64-remote-client.exe
-CLIENT_WIN_ALIAS := $(OUT_DIR)/piscsi64-remote-client-win.exe
+CLIENT_WIN_SRC := piscsi_remote_client_win.c
+CLIENT_WIN_BIN := $(OUT_DIR)/piscsi-remote-client.exe
+CLIENT_WIN_ALIAS := $(OUT_DIR)/piscsi-remote-client-win.exe
 
 all: $(CLIENT_WIN_BIN) $(CLIENT_WIN_ALIAS)
 

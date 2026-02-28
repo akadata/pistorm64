@@ -442,7 +442,7 @@ static int handle_client(int cfd, const server_cfg_t *cfg, SSL_CTX *tls_ctx)
         int bits = SSL_get_cipher_bits(ssl, NULL);
         const char *tls_ver = SSL_get_version(ssl);
         const char *tls_cipher = SSL_get_cipher_name(ssl);
-        printf("[piscsi64-remote] tls client=%s version=%s cipher=%s bits=%d\n",
+        printf("[piscsi-remote] tls client=%s version=%s cipher=%s bits=%d\n",
                peer,
                tls_ver ? tls_ver : "unknown",
                tls_cipher ? tls_cipher : "unknown",
@@ -521,7 +521,7 @@ static int handle_client(int cfd, const server_cfg_t *cfg, SSL_CTX *tls_ctx)
         SSL_free(ssl);
         return -1;
     }
-    printf("[piscsi64-remote] client=%s export=%s mode=%s kind=%s block=%u size=%llu\n",
+    printf("[piscsi-remote] client=%s export=%s mode=%s kind=%s block=%u size=%llu\n",
            peer,
            cfg->export_name,
            ro ? "ro" : "rw",
@@ -597,7 +597,7 @@ static int handle_client(int cfd, const server_cfg_t *cfg, SSL_CTX *tls_ctx)
             ssize_t r = pread(fd, buf, length, (off_t)offset);
             if (r < 0) {
                 fprintf(stderr,
-                        "[piscsi64-remote] READ error client=%s off=0x%llX len=%u errno=%d\n",
+                        "[piscsi-remote] READ error client=%s off=0x%llX len=%u errno=%d\n",
                         peer, (unsigned long long)offset, (unsigned int)length, errno);
                 if (send_io_rsp(ssl, 1, 0, errno) != 0) {
                     break;
@@ -638,7 +638,7 @@ static int handle_client(int cfd, const server_cfg_t *cfg, SSL_CTX *tls_ctx)
             ssize_t w = pwrite(fd, buf, length, (off_t)offset);
             if (w < 0) {
                 fprintf(stderr,
-                        "[piscsi64-remote] WRITE error client=%s off=0x%llX len=%u errno=%d\n",
+                        "[piscsi-remote] WRITE error client=%s off=0x%llX len=%u errno=%d\n",
                         peer, (unsigned long long)offset, (unsigned int)length, errno);
                 if (send_io_rsp(ssl, 1, 0, errno) != 0) {
                     break;
@@ -670,7 +670,7 @@ static int handle_client(int cfd, const server_cfg_t *cfg, SSL_CTX *tls_ctx)
     SSL_free(ssl);
     uint64_t conn_end_ms = now_ms();
     uint64_t conn_ms = (conn_end_ms >= conn_start_ms) ? (conn_end_ms - conn_start_ms) : 0;
-    printf("[piscsi64-remote] disconnect client=%s ms=%llu reads=%llu/%lluB writes=%llu/%lluB pings=%llu\n",
+    printf("[piscsi-remote] disconnect client=%s ms=%llu reads=%llu/%lluB writes=%llu/%lluB pings=%llu\n",
            peer,
            (unsigned long long)conn_ms,
            (unsigned long long)read_ops,
@@ -752,7 +752,7 @@ int main(int argc, char **argv)
     }
 
     int host_has_colon = strchr(cfg.listen_host, ':') != NULL;
-    printf("[piscsi64-remote] listen=%s%s%s:%u export=%s path=%s mode=%s kind=%s block=%u\n",
+    printf("[piscsi-remote] listen=%s%s%s:%u export=%s path=%s mode=%s kind=%s block=%u\n",
            host_has_colon ? "[" : "",
            cfg.listen_host,
            host_has_colon ? "]" : "",

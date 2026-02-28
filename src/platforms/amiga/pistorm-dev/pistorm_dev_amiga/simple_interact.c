@@ -281,9 +281,8 @@ int get_command(char* cmd) {
       strcmp(cmd, "--net64-enable") == 0 || strcmp(cmd, "--net64-disable") == 0) {
     return PI_CMD_NETSTATUS;
   }
-  if (strcmp(cmd, "--piscsi") == 0 || strcmp(cmd, "--piscsi64") == 0 ||
-      strcmp(cmd, "--piscsi-enable") == 0 || strcmp(cmd, "--piscsi-disable") == 0 ||
-      strcmp(cmd, "--piscsi64-enable") == 0 || strcmp(cmd, "--piscsi64-disable") == 0) {
+  if (strcmp(cmd, "--piscsi") == 0 ||
+      strcmp(cmd, "--piscsi-enable") == 0 || strcmp(cmd, "--piscsi-disable") == 0) {
     return PI_CMD_PISCSI_CTRL;
   }
   if (strcmp(cmd, "--config") == 0 || strcmp(cmd, "--config-file") == 0 ||
@@ -378,8 +377,8 @@ void print_usage(char* exe) {
   printf("         Enable/disable/toggle PiRTG64.\n");
   printf("         %s --net64 [on|off|toggle]\n", exe);
   printf("         Enable/disable/toggle NET64.\n");
-  printf("         %s --piscsi64 [on|off|toggle]\n", exe);
-  printf("         Enable/disable/toggle PiSCSI64.\n");
+  printf("         %s --piscsi [on|off|toggle]\n", exe);
+  printf("         Enable/disable/toggle PiSCSI.\n");
 
   return;
 }

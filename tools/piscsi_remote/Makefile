@@ -1,4 +1,4 @@
-# PiSCSI64 remote local dispatcher Makefile.
+# PiSCSI remote local dispatcher Makefile.
 # Uses a platform-specific file by default.
 #
 # Override with:

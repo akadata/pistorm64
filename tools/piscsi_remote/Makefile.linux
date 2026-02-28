@@ -1,4 +1,4 @@
-# PiSCSI64 remote utilities (Linux)
+# PiSCSI remote utilities (Linux)
 
 OUT_DIR := out
 CC ?= gcc
@@ -6,12 +6,12 @@ CFLAGS ?= -O3 -Wall -Wextra -MMD -MP
 LDFLAGS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 
-SERVER_SRC := piscsi64_remote_server.c
-CLIENT_SRC := piscsi64_remote_client.c
+SERVER_SRC := piscsi_remote_server.c
+CLIENT_SRC := piscsi_remote_client.c
 
-SERVER_BIN := $(OUT_DIR)/piscsi64-remote
-SERVER_ALIAS := $(OUT_DIR)/piscsi64-remote-server
-CLIENT_BIN := $(OUT_DIR)/piscsi64-remote-client
+SERVER_BIN := $(OUT_DIR)/piscsi-remote
+SERVER_ALIAS := $(OUT_DIR)/piscsi-remote-server
+CLIENT_BIN := $(OUT_DIR)/piscsi-remote-client
 
 all: $(SERVER_BIN) $(SERVER_ALIAS) $(CLIENT_BIN)
 

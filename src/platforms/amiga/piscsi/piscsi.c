@@ -818,21 +818,34 @@ static ssize_t piscsi_dev_write(struct piscsi_dev *d, const void *buf, size_t co
     return -1;
 }
 
-static ssize_t piscsi_dev_pread(struct piscsi_dev *d, void *buf, size_t count, off64_t offset)
-{
-    if (d && d->backend_ops && d->backend_ops->pread) {
-        return d->backend_ops->pread(d, buf, count, offset);
-    }
-    errno = ENOTCONN;
-    return -1;
-}
-
 static int piscsi_dev_close(struct piscsi_dev *d)
 {
     if (d && d->backend_ops && d->backend_ops->close) {
         return d->backend_ops->close(d);
     }
     return 0;
+}
+
+static void piscsi_copy_spec(char *dst, size_t dst_sz, const char *src,
+                             const char *field_name, uint8_t unit)
+{
+    if (!dst || dst_sz == 0) {
+        return;
+    }
+    if (!src) {
+        dst[0] = '\0';
+        return;
+    }
+
+    size_t src_len = strlen(src);
+    size_t copy_len = (src_len < (dst_sz - 1)) ? src_len : (dst_sz - 1);
+    memcpy(dst, src, copy_len);
+    dst[copy_len] = '\0';
+
+    if (src_len >= dst_sz) {
+        LOG_WARN("[PISCSI] Truncated %s for unit %u (%zu -> %zu chars).\n",
+                 field_name, (unsigned int)unit, src_len, dst_sz - 1);
+    }
 }
 
 static void piscsi_parse_mode_opt(const char *opt, int *mode_opt)
@@ -1718,8 +1731,8 @@ void piscsi_map_drive(const char *spec, uint8_t index) {
     } else {
         d->backend_ops = &piscsi_backend_file_ops;
     }
-    snprintf(d->backend_spec, sizeof(d->backend_spec), "%s", path);
-    snprintf(d->configured_spec, sizeof(d->configured_spec), "%s", spec);
+    piscsi_copy_spec(d->backend_spec, sizeof(d->backend_spec), path, "backend_spec", index);
+    piscsi_copy_spec(d->configured_spec, sizeof(d->configured_spec), spec, "configured_spec", index);
     d->media_kind = (uint8_t)media_kind;
     d->read_only = (uint8_t)read_only;
 

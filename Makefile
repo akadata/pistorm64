@@ -206,7 +206,6 @@ MAINFILES += src/platforms/platforms.c
 MAINFILES += src/z3bus_iface.c
 MAINFILES += src/platforms/amiga/amiga_zorro.c
 MAINFILES += src/platforms/amiga/zorro/z3bus_demo/z3bus_demo.c
-MAINFILES += src/platforms/amiga/zorro/z3_piscsi64/z3_piscsi64.c
 MAINFILES += src/platforms/amiga/zorro/serial_echo/serial_echo.c
 MAINFILES += src/platforms/amiga/zorro/z2_rng/z2_rng.c
 MAINFILES += src/platforms/amiga/zorro/z2_pissa/z2_pissa.c
@@ -232,7 +231,6 @@ MAINFILES += src/platforms/amiga/pirtg64/pirtg64-output-raylib.c
 MAINFILES += src/platforms/amiga/pirtg64/pirtg64-gfx.c
 
 MAINFILES += src/platforms/amiga/piscsi/piscsi.c
-MAINFILES += src/platforms/amiga/piscsi64/piscsi64.c
 MAINFILES += src/platforms/amiga/net/pi-net.c
 MAINFILES += src/platforms/amiga/net64/net64_config.c
 MAINFILES += src/platforms/amiga/net64/net64_device.c
@@ -499,17 +497,16 @@ HELP_TARGETS = \
 	"make amiga-net"                  "Build Amiga net driver (.device)" \
 	"make amiga-net64"                "Build Amiga net64 driver (.device)" \
 	"make amiga-piscsi"               "Build Amiga PiSCSI driver + bootrom" \
-	"make amiga-piscsi64"             "Build Amiga PiSCSI64 Z3 driver + bootrom" \
 	"make amiga-pirtg64"                  "Build Amiga PiRTG64 driver (.card)" \
 	"make amiga-ahi"                  "Build Amiga AHI driver (.audio)" \
 	"make amiga-pissa"                "Build Amiga PISSA crypto tools" \
 	"make amiga-pissl"                "Build Amiga PISSL TLS tools" \
 	"make amiga-all"                  "Build all Amiga-side drivers" \
 	"make amiga-clean"                "Clean Amiga-side driver build artifacts" \
-	"make piscsi64-remote"            "Build PiSCSI64 remote export daemon (Linux/Unix)" \
-	"make piscsi64-remote-server"     "Build PiSCSI64 remote export daemon alias (Linux/Unix)" \
-	"make piscsi64-remote-client"     "Build PiSCSI64 remote probe client" \
-	"make install [PREFIX=… DESTDIR=…]" "Install emulator, data/, configs, piscsi.rom + piscsi64.rom, a314 files" \
+	"make piscsi-remote"              "Build PiSCSI remote export daemon (Linux/Unix)" \
+	"make piscsi-remote-server"       "Build PiSCSI remote export daemon alias (Linux/Unix)" \
+	"make piscsi-remote-client"       "Build PiSCSI remote probe client" \
+	"make install [PREFIX=… DESTDIR=…]" "Install emulator, data/, configs, piscsi.rom, a314 files" \
 	"make install-boot-firmware"      "Safely install boot/firmware config+cmdline (preserves current root=, rootfstype=)" \
 	"make uninstall [PREFIX=… DESTDIR=…]" "Remove installed tree" \
 	"make kernel_module"              "Build pistorm.ko + z3bus.ko (out-of-tree)" \
@@ -529,7 +526,7 @@ HELP_TARGETS = \
 .DELETE_ON_ERROR:
 
 DELETEFILES = $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(.OFILES) $(.OFILES:%.o=%.d) $(TARGET) buptest pistorm_truth_test pistorm_truth_test.d $(MUSASHIGENERATOR)$(EXE) \
-	piscsi64-remote piscsi64-remote-server piscsi64-remote-client tools/piscsi64_remote/piscsi64_remote_server.d tools/piscsi64_remote/piscsi64_remote_client.d \
+	piscsi-remote piscsi-remote-server piscsi-remote-client tools/piscsi_remote/piscsi_remote_server.d tools/piscsi_remote/piscsi_remote_client.d \
 	$(UAE_TARGET) $(UAE_OBJS) $(UAE_OBJS:%.o=%.d) $(EXTRA_CXX_OBJS) $(EXTRA_CXX_OBJS:%.o=%.d)
 DELETEFILES += $(UAE_FPP_NATIVE_CPP)
 
@@ -616,13 +613,13 @@ buptest: src/buptest/buptest.c $(PS_PROTOCOL_SRC) src/log.c
 pistorm_truth_test: tools/pistorm_truth_test.c include/uapi/linux/pistorm.h
 	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
 
-piscsi64-remote: tools/piscsi64_remote/piscsi64_remote_server.c
+piscsi-remote: tools/piscsi_remote/piscsi_remote_server.c
 	$(CC) -MMD -MP $(CFLAGS) -o $@ $< -lssl -lcrypto
 
-piscsi64-remote-server: tools/piscsi64_remote/piscsi64_remote_server.c
+piscsi-remote-server: tools/piscsi_remote/piscsi_remote_server.c
 	$(CC) -MMD -MP $(CFLAGS) -o $@ $< -lssl -lcrypto
 
-piscsi64-remote-client: tools/piscsi64_remote/piscsi64_remote_client.c
+piscsi-remote-client: tools/piscsi_remote/piscsi_remote_client.c
 	$(CC) -MMD -MP $(CFLAGS) -o $@ $< -lssl -lcrypto
 
 src/a314/a314.o: src/a314/a314.cc src/a314/a314.h
@@ -658,7 +655,7 @@ $(MUSASHIGENCFILES) $(MUSASHIGENHFILES): $(MUSASHIGENERATOR)$(EXE)
 $(MUSASHIGENERATOR)$(EXE): src/musashi/$(MUSASHIGENERATOR).c
 	$(CC) -MMD -MP  -o $(MUSASHIGENERATOR)$(EXE) src/musashi/$(MUSASHIGENERATOR).c
 
-install: all amiga-piscsi amiga-piscsi64
+install: all amiga-piscsi
 	$(INSTALL) -d $(INSTALL_DIR)
 	for bin in $(INSTALL_BINS); do \
 		[ -x $$bin ] && $(INSTALL) -m 755 $$bin $(INSTALL_DIR)/; \
@@ -668,8 +665,6 @@ install: all amiga-piscsi amiga-piscsi64
 	done
 	$(INSTALL) -d $(INSTALL_DIR)/src/platforms/amiga/piscsi
 	$(INSTALL) -m 644 src/platforms/amiga/piscsi/piscsi.rom $(INSTALL_DIR)/src/platforms/amiga/piscsi/piscsi.rom
-	$(INSTALL) -d $(INSTALL_DIR)/src/platforms/amiga/piscsi64
-	$(INSTALL) -m 644 src/platforms/amiga/piscsi64/piscsi64.rom $(INSTALL_DIR)/src/platforms/amiga/piscsi64/piscsi64.rom
 	$(INSTALL) -d $(INSTALL_DIR)/a314
 	cp -a src/a314/files_pi/. $(INSTALL_DIR)/a314/
 	cp -a data $(INSTALL_DIR)/
@@ -828,9 +823,6 @@ amiga-net64:
 amiga-piscsi:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi/device_driver_amiga
 
-amiga-piscsi64:
-	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi64/device_driver_amiga
-
 amiga-pirtg64:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/pirtg64/Amiga/rtg_driver_amiga
 
@@ -843,13 +835,12 @@ amiga-pissa:
 amiga-pissl:
 	$(AMIGA_SUBMAKE) -C amiga/pissl
 
-amiga-all: amiga-net amiga-net64 amiga-piscsi amiga-piscsi64 amiga-pirtg64 amiga-pissa amiga-pissl
+amiga-all: amiga-net amiga-net64 amiga-piscsi amiga-pirtg64 amiga-pissa amiga-pissl
 
 amiga-clean:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/net/net_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/net64/net_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi/device_driver_amiga clean
-	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi64/device_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/pirtg64/Amiga/rtg_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/ahi/ahi_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C amiga/pissa clean
@@ -869,7 +860,7 @@ else
 	$(MAKE) 
 endif
 	$(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD)
-	$(MAKE) amiga-piscsi amiga-piscsi64  amiga-pirtg64
+	$(MAKE) amiga-piscsi amiga-pirtg64
 	$(MAKE) kernel_module
 	sudo $(MAKE) kernel_install
 	sudo $(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD) INSTALL_BOOT_FIRMWARE=$(INSTALL_BOOT_FIRMWARE) BOOT_FIRMWARE_DIR="$(BOOT_FIRMWARE_DIR)" install
@@ -896,6 +887,6 @@ help:
 	@printf "Available targets:\n"
 	@printf "  %-32s %s\n" $(HELP_TARGETS)
 
--include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d tools/piscsi64_remote/piscsi64_remote_server.d tools/piscsi64_remote/piscsi64_remote_client.d $(UAE_OBJS:%.o=%.d)
+-include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d tools/piscsi_remote/piscsi_remote_server.d tools/piscsi_remote/piscsi_remote_client.d $(UAE_OBJS:%.o=%.d)
 
-.PHONY: all clean buptest pistorm_truth_test install install-boot-firmware uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-net64 amiga-piscsi amiga-piscsi64 amiga-pirtg64 amiga-ahi amiga-all amiga-clean
+.PHONY: all clean buptest pistorm_truth_test install install-boot-firmware uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-net64 amiga-piscsi amiga-pirtg64 amiga-ahi amiga-all amiga-clean piscsi-remote piscsi-remote-server piscsi-remote-client

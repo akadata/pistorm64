@@ -19,7 +19,6 @@
 #include "net64/net64_autoconfig.h"
 #include "piscsi/piscsi-enums.h"
 #include "piscsi/piscsi.h"
-#include "piscsi64/piscsi64-api.h"
 #include "ahi/pi_ahi.h"
 #include "ahi/pi-ahi-enums.h"
 #include "pistorm-dev/pistorm-dev-enums.h"
@@ -31,7 +30,6 @@
 #include "a314/a314.h"
 #include "emulator_fc.h"
 #include "amiga_zorro.h"
-#include "zorro/z3_piscsi64/z3_piscsi64.h"
 #include "memory_mapped.h"
 
 #define DEBUG_AMIGA_PLATFORM
@@ -116,7 +114,6 @@ extern int force_move_slow_to_chip;
 
 uint8_t rtg_enabled = 0;
 uint8_t piscsi_enabled = 0;
-uint8_t piscsi64_enabled = 0;
 uint8_t pinet_enabled = 0;
 uint8_t net64_enabled = 0;
 uint8_t kick13_mode = 0;
@@ -127,7 +124,6 @@ uint8_t a314_emulation_enabled = 0;
 uint8_t a314_initialized = 0;
 
 extern uint32_t piscsi_base;
-extern uint32_t piscsi64_base;
 extern uint32_t pistorm_dev_base;
 //extern uint8_t rtg_dpms;
 
@@ -317,12 +313,6 @@ int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned i
     return 1;
   }
 
-  if (piscsi64_enabled && piscsi64_base &&
-      addr >= piscsi64_base && addr < piscsi64_base + (64 * SIZE_KILO)) {
-    *val = handle_piscsi64_read(addr, type);
-    return 1;
-  }
-
   if (zorro_handle_read(addr, type, val) == 1) {
     return 1;
   }
@@ -397,12 +387,6 @@ int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned 
   if (piscsi_enabled && addr >= piscsi_base && addr < piscsi_base + (64 * SIZE_KILO)) {
     printf("[Amiga-Custom] %s write to PISCSI base @$%.8x: %.8X\n", op_type_names[type], addr, val);
     handle_piscsi_write(addr, val, type);
-    return 1;
-  }
-
-  if (piscsi64_enabled && piscsi64_base &&
-      addr >= piscsi64_base && addr < piscsi64_base + (64 * SIZE_KILO)) {
-    handle_piscsi64_write(addr, val, type);
     return 1;
   }
 
@@ -507,9 +491,6 @@ void adjust_ranges_amiga(struct emulator_config* cfg) {
   if (piscsi_enabled) {
     uint32_t pbase = piscsi_base ? piscsi_base : PISCSI_OFFSET;
     CUSTOM_RANGE_STEP("piscsi", pbase, pbase + PISCSI_REGSIZE);
-  }
-  if (piscsi64_enabled && piscsi64_base) {
-    CUSTOM_RANGE_STEP("piscsi64", piscsi64_base, piscsi64_base + PISCSI64_REGSIZE);
   }
   if (pinet_enabled) {
    CUSTOM_RANGE_STEP("pinet", PINET_OFFSET, PINET_UPPER);
@@ -963,50 +944,6 @@ void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val)
     }
   }
 
-  // PiSCSI64 stuff (Z3 virtual HBA)
-  if (CHKVAR("piscsi64") && !piscsi64_enabled) {
-    LOG_INFO("[AMIGA] PISCSI64 Interface Enabled (manuf=$%04X product=$%04X).\n",
-             PISTORM_MANUF_ID, PISTORM_PROD_PISCSI64_Z2);
-    piscsi64_enabled = 1;
-    piscsi64_init();
-    z3_piscsi64_register();
-    adjust_ranges_amiga(cfg);
-  }
-  if (piscsi64_enabled && strncmp(var, "piscsi64_", 9) == 0) {
-    if (strcmp(var, "piscsi64_cdrom") == 0) {
-      if (val && strlen(val) != 0) {
-        int idx = piscsi64_find_free_unit();
-        if (idx < 0) {
-          LOG_WARN("[AMIGA] No free PiSCSI64 unit available for %s\n", val);
-        } else {
-          char spec[PATH_MAX + 8];
-          if (strncmp(val, "disk:", 5) == 0 ||
-              strncmp(val, "cdrom:", 6) == 0 ||
-              strncmp(val, "file:", 5) == 0) {
-            snprintf(spec, sizeof(spec), "%s", val);
-          } else {
-            snprintf(spec, sizeof(spec), "cdrom:%s", val);
-          }
-          piscsi64_map_drive(spec, (uint8_t)idx);
-          LOG_INFO("[AMIGA] PiSCSI64 CD-ROM mapped to unit %d: %s\n", idx, val);
-        }
-      }
-      return;
-    }
-
-    char *end = NULL;
-    long idx = strtol(var + 9, &end, 10);
-    if (end && *end == '\0' && idx > 0 && idx < PISCSI64_NUM_UNITS) {
-      if (val && strlen(val) != 0) {
-        piscsi64_map_drive(val, (uint8_t)idx);
-      }
-    } else if (end && *end == '\0' && idx == 0) {
-      LOG_INFO("[AMIGA] PiSCSI64 unit 0 is reserved for controller identity.\n");
-    } else {
-      LOG_WARN("[AMIGA] Invalid PiSCSI64 unit selector '%s' (expected piscsi64_0..piscsi64_15)\n", var);
-    }
-  }
-
   // Pi-Net stuff
   if (CHKVAR("pi-net") && !pinet_enabled) {
     LOG_INFO("[AMIGA] PI-NET Interface Enabled.\n");
@@ -1119,7 +1056,6 @@ void handle_reset_amiga(struct emulator_config* cfg) {
     ac_base[i] = 0;
   }
   piscsi_base = 0;
-  piscsi64_base = 0;
   pistorm_dev_base = 0;
 
   spoof_df0_id = 0;
@@ -1129,9 +1065,6 @@ void handle_reset_amiga(struct emulator_config* cfg) {
 
   if (piscsi_enabled) {
     piscsi_refresh_drives();
-  }
-  if (piscsi64_enabled) {
-    piscsi64_refresh_drives();
   }
   if (net64_enabled) {
     net64_handle_reset();
@@ -1172,10 +1105,6 @@ void shutdown_platform_amiga(struct emulator_config* cfg) {
   if (piscsi_enabled) {
     piscsi_shutdown();
     piscsi_enabled = 0;
-  }
-  if (piscsi64_enabled) {
-    piscsi64_shutdown();
-    piscsi64_enabled = 0;
   }
   if (rtg_enabled) {
     shutdown_rtg();

@@ -13,7 +13,6 @@
 #include "platforms/amiga/hunk-reloc.h"
 #include "platforms/amiga/piscsi/piscsi.h"
 #include "platforms/amiga/piscsi/piscsi-enums.h"
-#include "platforms/amiga/piscsi64/piscsi64-api.h"
 #include "platforms/amiga/net/pi-net.h"
 #include "platforms/amiga/net/pi-net-enums.h"
 #include "platforms/amiga/ahi/pi_ahi.h"
@@ -2077,10 +2076,6 @@ static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t*
         *res = handle_piscsi_read(addr, type);
         return 1;
       }
-      if (addr >= PISCSI64_OFFSET && addr < PISCSI64_UPPER) {
-        *res = handle_piscsi64_read(addr, type);
-        return 1;
-      }
       if (addr >= PINET_OFFSET && addr < PINET_UPPER) {
         *res = handle_pinet_read(addr, type);
         return 1;
@@ -2308,10 +2303,6 @@ static inline int32_t platform_write_check(uint8_t type, uint32_t addr, uint32_t
     if (addr >= cfg->custom_low && addr < cfg->custom_high) {
       if (addr >= PISCSI_OFFSET && addr < PISCSI_UPPER) {
         handle_piscsi_write(addr, val, type);
-        return 1;
-      }
-      if (addr >= PISCSI64_OFFSET && addr < PISCSI64_UPPER) {
-        handle_piscsi64_write(addr, val, type);
         return 1;
       }
       if (addr >= PINET_OFFSET && addr < PINET_UPPER) {

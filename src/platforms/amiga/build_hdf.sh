@@ -37,7 +37,6 @@ write_if_exists net64/net_driver_amiga/net64info net/net64info
 write_if_exists net64/net_driver_amiga/net64info.info net/net64info.info
 xdftool pistorm.hdf open part=DH99 + makedir scsi
 write_if_exists piscsi/device_driver_amiga/pi-scsi.device scsi/pi-scsi.device
-write_if_exists piscsi64/device_driver_amiga/pi-scsi64.device scsi/pi-scsi64.device
 xdftool pistorm.hdf open part=DH99 + makedir rtg
 write_if_exists "pirtg64/Amiga/PiRTG64/PiRTG64 Installer" "rtg/PiRTG64 Install"
 write_if_exists "pirtg64/Amiga/PiRTG64/PiRTG64 Installer.info" "rtg/PiRTG64 Install.info"
