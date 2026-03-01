@@ -141,6 +141,12 @@ More detailed PiRTG64 information can be found in the `platforms/amiga/pirtg64` 
 
 **Note:** The PiRTG64 **requires** 64-bit CPU emulation to work properly. It will not function with less than 68030 CPU unless recompiled.
 
+# leds
+
+Example: `setvar leds`  
+Enables a compact bottom-right on-screen PiSCSI activity overlay in the Raylib RTG output path.  
+Use `setvar leds 0` to explicitly disable it.
+
 # pi-ahi
 
 Example `setvar pi-ahi plughw:1,0`  

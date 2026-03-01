@@ -215,6 +215,7 @@ MAINFILES += src/platforms/amiga/pirtg64/pirtg64-gfx.c
 
 MAINFILES += src/platforms/amiga/piscsi/piscsi.c
 MAINFILES += src/platforms/amiga/net/pi-net.c
+MAINFILES += src/leds/osd_leds.c
 
 MAINFILES += src/platforms/shared/rtc.c
 MAINFILES += src/platforms/shared/common.c

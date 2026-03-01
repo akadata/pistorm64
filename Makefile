@@ -236,6 +236,7 @@ MAINFILES += src/platforms/amiga/net64/net64_config.c
 MAINFILES += src/platforms/amiga/net64/net64_device.c
 MAINFILES += src/platforms/amiga/net64/net64_bus.c
 MAINFILES += src/platforms/amiga/net64/net64_autoconfig.c
+MAINFILES += src/leds/osd_leds.c
 
 MAINFILES += src/platforms/shared/rtc.c
 MAINFILES += src/platforms/shared/common.c

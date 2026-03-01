@@ -1,0 +1,529 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "PiStorm Control Plane API",
+    "version": "0.1.0",
+    "description": "Phone-first control plane for PiStorm: disk mapping (PiSCSI), A314 virtual floppies, config validate/apply, and reset. Transport is Wi-Fi AP; BLE is onboarding only."
+  },
+  "servers": [
+    {
+      "url": "http://pistorm.local",
+      "description": "Captive convenience name on AP subnet"
+    },
+    {
+      "url": "http://172.20.0.1",
+      "description": "Default AP gateway address"
+    }
+  ],
+  "tags": [
+    { "name": "status" },
+    { "name": "disks" },
+    { "name": "floppy" },
+    { "name": "config" },
+    { "name": "reset" },
+    { "name": "audit" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "SessionToken": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "opaque"
+      }
+    },
+    "schemas": {
+      "ApiError": {
+        "type": "object",
+        "required": ["error", "message"],
+        "properties": {
+          "error": { "type": "string" },
+          "message": { "type": "string" },
+          "details": { "type": "object", "additionalProperties": true }
+        }
+      },
+      "Health": {
+        "type": "object",
+        "required": ["ok", "version", "uptime_s"],
+        "properties": {
+          "ok": { "type": "boolean" },
+          "version": { "type": "string" },
+          "uptime_s": { "type": "integer" },
+          "build": { "type": "string" }
+        }
+      },
+      "LedState": {
+        "type": "string",
+        "enum": ["off", "idle", "read", "write", "error"]
+      },
+      "DiskUnit": {
+        "type": "object",
+        "required": ["unit", "present", "rw", "label", "backend"],
+        "properties": {
+          "unit": { "type": "integer", "minimum": 0, "maximum": 6 },
+          "present": { "type": "boolean" },
+          "rw": { "type": "boolean" },
+          "label": { "type": "string" },
+          "backend": {
+            "type": "string",
+            "enum": ["local", "remote"]
+          },
+          "path": { "type": "string", "description": "Host-side image path, optional redacted in UI mode." },
+          "size_bytes": { "type": "integer" },
+          "block_size": { "type": "integer", "enum": [512, 1024, 2048, 4096] },
+          "scsi_id": { "type": "integer", "minimum": 0, "maximum": 7 },
+          "boot_priority": { "type": "integer", "description": "Amiga boot priority as read from RDB/driver metadata where available." },
+          "activity": { "$ref": "#/components/schemas/LedState" },
+          "last_io_ms": { "type": "integer", "description": "Milliseconds since last logical I/O event." }
+        }
+      },
+      "ControllerStatus": {
+        "type": "object",
+        "required": ["scsi_host_id", "activity"],
+        "properties": {
+          "scsi_host_id": { "type": "integer", "enum": [7] },
+          "activity": { "$ref": "#/components/schemas/LedState" }
+        }
+      },
+      "FloppyUnit": {
+        "type": "object",
+        "required": ["unit", "inserted", "rw", "label", "activity"],
+        "properties": {
+          "unit": { "type": "integer", "minimum": 0, "maximum": 3 },
+          "inserted": { "type": "boolean" },
+          "rw": { "type": "boolean" },
+          "label": { "type": "string" },
+          "filename": { "type": "string", "description": "ADF filename or identifier." },
+          "activity": { "$ref": "#/components/schemas/LedState" },
+          "last_io_ms": { "type": "integer" }
+        }
+      },
+      "SystemStatus": {
+        "type": "object",
+        "required": ["time_utc", "fps", "cpu_mode", "rom", "memory", "controller", "disks", "floppies"],
+        "properties": {
+          "time_utc": { "type": "string", "format": "date-time" },
+          "fps": { "type": "number" },
+          "cpu_mode": { "type": "string", "enum": ["68000", "68010", "68020", "68030", "68040", "68060"] },
+          "jit_enabled": { "type": "boolean" },
+          "rom": {
+            "type": "object",
+            "required": ["name", "base", "size_bytes"],
+            "properties": {
+              "name": { "type": "string" },
+              "base": { "type": "string", "description": "Hex string" },
+              "size_bytes": { "type": "integer" }
+            }
+          },
+          "memory": {
+            "type": "object",
+            "required": ["chip_bytes", "fast_bytes", "z3_bytes", "rtg_vram_bytes"],
+            "properties": {
+              "chip_bytes": { "type": "integer" },
+              "fast_bytes": { "type": "integer" },
+              "z3_bytes": { "type": "integer" },
+              "rtg_vram_bytes": { "type": "integer" }
+            }
+          },
+          "controller": { "$ref": "#/components/schemas/ControllerStatus" },
+          "disks": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/DiskUnit" }
+          },
+          "floppies": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/FloppyUnit" }
+          },
+          "warnings": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "DiskMapRequest": {
+        "type": "object",
+        "required": ["unit", "backend", "rw"],
+        "properties": {
+          "unit": { "type": "integer", "minimum": 0, "maximum": 6 },
+          "backend": { "type": "string", "enum": ["local", "remote"] },
+          "rw": { "type": "boolean" },
+          "path": { "type": "string", "description": "Local image path on Pi." },
+          "remote": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "url": { "type": "string", "description": "Remote disk URL or endpoint identifier." },
+              "auth": { "type": "string", "description": "Opaque auth reference, stored server-side." }
+            }
+          },
+          "label": { "type": "string" }
+        },
+        "additionalProperties": false
+      },
+      "DiskUnmapRequest": {
+        "type": "object",
+        "required": ["unit"],
+        "properties": {
+          "unit": { "type": "integer", "minimum": 0, "maximum": 6 }
+        },
+        "additionalProperties": false
+      },
+      "FloppyInsertRequest": {
+        "type": "object",
+        "required": ["unit", "filename", "rw"],
+        "properties": {
+          "unit": { "type": "integer", "minimum": 0, "maximum": 3 },
+          "filename": { "type": "string" },
+          "rw": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      },
+      "FloppyEjectRequest": {
+        "type": "object",
+        "required": ["unit"],
+        "properties": {
+          "unit": { "type": "integer", "minimum": 0, "maximum": 3 }
+        },
+        "additionalProperties": false
+      },
+      "ConfigGetResponse": {
+        "type": "object",
+        "required": ["active_profile", "files"],
+        "properties": {
+          "active_profile": { "type": "string", "description": "Which config is currently active, e.g. default.cfg" },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name", "path", "sha256", "bytes"],
+              "properties": {
+                "name": { "type": "string" },
+                "path": { "type": "string" },
+                "sha256": { "type": "string" },
+                "bytes": { "type": "integer" }
+              }
+            }
+          }
+        }
+      },
+      "ConfigValidateRequest": {
+        "type": "object",
+        "required": ["file", "content"],
+        "properties": {
+          "file": { "type": "string", "description": "Config filename, e.g. default.cfg" },
+          "content": { "type": "string", "description": "Full proposed file content." }
+        },
+        "additionalProperties": false
+      },
+      "ConfigValidateResponse": {
+        "type": "object",
+        "required": ["ok", "errors", "warnings", "derived"],
+        "properties": {
+          "ok": { "type": "boolean" },
+          "errors": { "type": "array", "items": { "type": "string" } },
+          "warnings": { "type": "array", "items": { "type": "string" } },
+          "derived": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Parsed/derived values: memory map, RTG sizing, device list, etc."
+          }
+        }
+      },
+      "ConfigApplyRequest": {
+        "type": "object",
+        "required": ["file", "content", "mode"],
+        "properties": {
+          "file": { "type": "string" },
+          "content": { "type": "string" },
+          "mode": { "type": "string", "enum": ["stage", "apply"] },
+          "require_validation_token": { "type": "string", "description": "Optional token returned by validate step." },
+          "backup": { "type": "boolean", "default": true },
+          "atomic": { "type": "boolean", "default": true }
+        },
+        "additionalProperties": false
+      },
+      "ConfigApplyResponse": {
+        "type": "object",
+        "required": ["ok", "staged", "backup_path"],
+        "properties": {
+          "ok": { "type": "boolean" },
+          "staged": { "type": "boolean" },
+          "backup_path": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      },
+      "ResetRequest": {
+        "type": "object",
+        "required": ["kind"],
+        "properties": {
+          "kind": { "type": "string", "enum": ["soft", "hard", "reboot_pi"] },
+          "reason": { "type": "string" },
+          "delay_ms": { "type": "integer", "minimum": 0, "maximum": 10000, "default": 250 }
+        },
+        "additionalProperties": false
+      },
+      "ResetResponse": {
+        "type": "object",
+        "required": ["ok", "kind", "scheduled"],
+        "properties": {
+          "ok": { "type": "boolean" },
+          "kind": { "type": "string" },
+          "scheduled": { "type": "boolean" },
+          "message": { "type": "string" }
+        }
+      },
+      "AuditEvent": {
+        "type": "object",
+        "required": ["time_utc", "actor", "action", "ok"],
+        "properties": {
+          "time_utc": { "type": "string", "format": "date-time" },
+          "actor": { "type": "string", "description": "Derived from token/session identity." },
+          "action": { "type": "string" },
+          "ok": { "type": "boolean" },
+          "details": { "type": "object", "additionalProperties": true }
+        }
+      }
+    }
+  },
+  "security": [
+    { "SessionToken": [] }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["status"],
+        "summary": "Service health",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Health" } } }
+          }
+        }
+      }
+    },
+    "/api/status": {
+      "get": {
+        "tags": ["status"],
+        "summary": "Get current system status snapshot",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Status",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SystemStatus" } } }
+          }
+        }
+      }
+    },
+    "/api/disks": {
+      "get": {
+        "tags": ["disks"],
+        "summary": "List PiSCSI disk units (0..6)",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Disk list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["controller", "units"],
+                  "properties": {
+                    "controller": { "$ref": "#/components/schemas/ControllerStatus" },
+                    "units": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/DiskUnit" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/disks/map": {
+      "post": {
+        "tags": ["disks"],
+        "summary": "Map an image to a PiSCSI disk unit",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DiskMapRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Mapped",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DiskUnit" } } }
+          },
+          "400": { "description": "Bad request", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "409": { "description": "Conflict (busy/locked)", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/disks/unmap": {
+      "post": {
+        "tags": ["disks"],
+        "summary": "Unmap a PiSCSI disk unit",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DiskUnmapRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Unmapped",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["ok"],
+                  "properties": { "ok": { "type": "boolean" } }
+                }
+              }
+            }
+          },
+          "409": { "description": "Conflict (busy/locked)", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/floppy": {
+      "get": {
+        "tags": ["floppy"],
+        "summary": "List A314 virtual floppy units (0..3)",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Floppy list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["units"],
+                  "properties": {
+                    "units": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/FloppyUnit" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/floppy/insert": {
+      "post": {
+        "tags": ["floppy"],
+        "summary": "Insert ADF into a virtual floppy unit",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FloppyInsertRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Inserted", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FloppyUnit" } } } },
+          "409": { "description": "Conflict (busy/locked)", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/floppy/eject": {
+      "post": {
+        "tags": ["floppy"],
+        "summary": "Eject ADF from a virtual floppy unit",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FloppyEjectRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Ejected", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FloppyUnit" } } } },
+          "409": { "description": "Conflict (busy/locked)", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/config": {
+      "get": {
+        "tags": ["config"],
+        "summary": "List config files and active profile",
+        "responses": {
+          "200": { "description": "Config list", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConfigGetResponse" } } } }
+        }
+      }
+    },
+    "/api/config/validate": {
+      "post": {
+        "tags": ["config"],
+        "summary": "Validate a proposed config file content",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConfigValidateRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Validation result", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConfigValidateResponse" } } } },
+          "400": { "description": "Bad request", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/config/apply": {
+      "post": {
+        "tags": ["config"],
+        "summary": "Stage or apply a config file atomically with backup",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConfigApplyRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Apply result", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConfigApplyResponse" } } } },
+          "409": { "description": "Conflict (busy/locked)", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/reset": {
+      "post": {
+        "tags": ["reset"],
+        "summary": "Request reset action",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ResetRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Reset scheduled", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ResetResponse" } } } },
+          "409": { "description": "Conflict (busy/locked)", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/audit": {
+      "get": {
+        "tags": ["audit"],
+        "summary": "Read recent audit events",
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 500, "default": 100 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Events",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["events"],
+                  "properties": {
+                    "events": { "type": "array", "items": { "$ref": "#/components/schemas/AuditEvent" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ws": {
+      "get": {
+        "tags": ["status"],
+        "summary": "WebSocket endpoint for live status/activity events",
+        "description": "Upgrade to WebSocket. Server pushes status deltas, disk/floppy activity, and warnings.",
+        "security": [],
+        "responses": {
+          "101": { "description": "Switching Protocols (WebSocket)" }
+        }
+      }
+    }
+  }
+}

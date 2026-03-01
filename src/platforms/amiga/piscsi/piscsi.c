@@ -26,6 +26,7 @@
 #include "config_file/config_file.h"
 #include "gpio/ps_protocol.h"
 #include "log.h"
+#include "leds/osd_leds.h"
 #include "piscsi-enums.h"
 #include "piscsi.h"
 #include "platforms/amiga/fsid.h"
@@ -1245,6 +1246,9 @@ struct hunk_reloc piscsi_hreloc[256];
 
 void piscsi_init(void) {
     for (int i = 0; i < 8; i++) {
+        if (i < NUM_UNITS) {
+            osd_led_piscsi_set_unit_present(i, 0);
+        }
         devs[i].fd = -1;
         devs[i].remote_sock = -1;
         devs[i].lba = 0;
@@ -1298,6 +1302,9 @@ void piscsi_init(void) {
 void piscsi_shutdown(void) {
     printf("[PISCSI] Shutting down PiSCSI.\n");
     for (int i = 0; i < 8; i++) {
+        if (i < NUM_UNITS) {
+            osd_led_piscsi_set_unit_present(i, 0);
+        }
         if (devs[i].fd != -1) {
             piscsi_dev_close(&devs[i]);
             devs[i].fd = -1;
@@ -1758,6 +1765,7 @@ void piscsi_map_drive(const char *spec, uint8_t index) {
         d->fshd_offs = 0;
         LOG_INFO("[PISCSI] Unit %d configured as CD-ROM (%llu blocks @ %u bytes).\n",
                  index, (unsigned long long)blocks, cd_block);
+        osd_led_piscsi_set_unit_present(index, 1);
         return;
     }
 
@@ -1814,6 +1822,8 @@ void piscsi_map_drive(const char *spec, uint8_t index) {
             printf("[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive %d (%s)\n", index, path);
         }
     }
+
+    osd_led_piscsi_set_unit_present(index, 1);
 }
 
 // HDF integrity validation function
@@ -1913,6 +1923,9 @@ int piscsi_validate_hdf(struct piscsi_dev *d, const char *filename) {
 }
 
 void piscsi_unmap_drive(uint8_t index) {
+    if (index < NUM_UNITS) {
+        osd_led_piscsi_set_unit_present(index, 0);
+    }
     if (devs[index].fd != -1) {
         DEBUG("[PISCSI] Unmapped drive %d.\n", index);
         piscsi_dev_close(&devs[index]);
@@ -2153,10 +2166,14 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
         case PISCSI_CMD_READ64:
         case PISCSI_CMD_READ:
         case PISCSI_CMD_READBYTES:
+            osd_led_piscsi_host_pulse();
             d = &devs[val];
             if (d->fd == -1) {
                 DEBUG("[!!!PISCSI] BUG: Attempted read from unmapped drive %d.\n", val);
                 break;
+            }
+            if ((int)val >= 0 && (int)val < NUM_UNITS) {
+                osd_led_piscsi_unit_pulse_read((int)val);
             }
 
             if (cmd == PISCSI_CMD_READBYTES) {
@@ -2286,6 +2303,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
         case PISCSI_CMD_WRITE64:
         case PISCSI_CMD_WRITE:
         case PISCSI_CMD_WRITEBYTES:
+            osd_led_piscsi_host_pulse();
             d = &devs[val];
             if (d->fd == -1) {
                 DEBUG ("[PISCSI] BUG: Attempted write to unmapped drive %d.\n", val);
@@ -2294,6 +2312,9 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
             if (d->read_only) {
                 DEBUG("[PISCSI] Refusing write to read-only drive %d.\n", val);
                 break;
+            }
+            if ((int)val >= 0 && (int)val < NUM_UNITS) {
+                osd_led_piscsi_unit_pulse_write((int)val);
             }
 
             if (cmd == PISCSI_CMD_WRITEBYTES) {
@@ -2444,6 +2465,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
             piscsi_debugme(val);
             break;
         case PISCSI_CMD_DRIVER:
+            osd_led_piscsi_host_pulse();
             DEBUG("[PISCSI] Driver copy/patch called, destination address %.8X.\n", val);
             int32_t driver_r = get_mapped_item_by_address(cfg, val);
             if (driver_r != -1) {
@@ -2534,14 +2556,17 @@ skip_disk:;
 
             break;
         case PISCSI_CMD_NEXTPART:
+            osd_led_piscsi_host_pulse();
             DEBUG("[PISCSI] Switch partition %d -> %d\n", rom_cur_partition, rom_cur_partition + 1);
             rom_cur_partition++;
             break;
         case PISCSI_CMD_NEXTFS:
+            osd_led_piscsi_host_pulse();
             DEBUG("[PISCSI] Switch file file system %d -> %d\n", rom_cur_fs, rom_cur_fs + 1);
             rom_cur_fs++;
             break;
         case PISCSI_CMD_COPYFS:
+            osd_led_piscsi_host_pulse();
             DEBUG("[PISCSI] Copy file system %d to %.8X and reloc.\n", rom_cur_fs, piscsi_u32[2]);
             int32_t copy_r = get_mapped_item_by_address(cfg, piscsi_u32[2]);
             if (copy_r != -1) {
@@ -2570,6 +2595,7 @@ skip_disk:;
             }
             break;
         case PISCSI_CMD_SETFSH: {
+            osd_led_piscsi_host_pulse();
             int fs_idx = 0;
             DEBUG("[PISCSI] Set handler for partition %d (DeviceNode: %.8X)\n", rom_cur_partition, val);
             int32_t setfsh_r = get_mapped_item_by_address(cfg, val);
@@ -2644,6 +2670,7 @@ fs_found:;
             break;
         }
         case PISCSI_CMD_LOADFS: {
+            osd_led_piscsi_host_pulse();
             DEBUG("[PISCSI] Attempt to load file system for partition %d from disk.\n", rom_cur_partition);
             int32_t mapped_r = get_mapped_item_by_address(cfg, val);
             if (mapped_r != -1) {

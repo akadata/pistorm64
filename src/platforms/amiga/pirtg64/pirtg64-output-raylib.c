@@ -14,6 +14,7 @@
 #include "emulator.h"
 #include "pirtg64.h"
 #include "log.h"
+#include "leds/osd_leds.h"
 
 #include "raylib.h"
 
@@ -100,6 +101,114 @@ static inline uint64_t rtg_now_ns(void) {
   struct timespec ts;
   clock_gettime(CLOCK_MONOTONIC, &ts);
   return ((uint64_t)ts.tv_sec * 1000000000ull) + (uint64_t)ts.tv_nsec;
+}
+
+static Color rtg_led_color(enum osd_led_state state, int is_host_led, int pulse_off) {
+  const unsigned char led_alpha = 179; /* ~70% opacity */
+  if (pulse_off && state != LED_IDLE) {
+    state = LED_IDLE;
+  }
+  if (is_host_led) {
+    if (state == LED_BUSY) {
+      return (Color){48, 220, 72, led_alpha};
+    }
+    return (Color){112, 112, 112, led_alpha};
+  }
+
+  if (state == LED_READ) {
+    return (Color){48, 220, 72, led_alpha};
+  }
+  if (state == LED_WRITE) {
+    return (Color){230, 64, 48, led_alpha};
+  }
+  return (Color){112, 112, 112, led_alpha};
+}
+
+static void rtg_draw_piscsi_led_overlay(void) {
+  enum osd_led_state states[OSD_LEDS_TOTAL_COUNT];
+  uint64_t now_ns;
+  uint32_t now_ms;
+  uint32_t present_mask;
+  int screen_w;
+  int screen_h;
+  int led_slots = OSD_LEDS_UNIT_COUNT + 1;
+  int led_w = 20;
+  int led_h = 10;
+  int spacing = 3;
+  int controller_gap = 2;
+  int margin = 3;
+  int font_px;
+  int total_w;
+  int x;
+  int y;
+  int pulse_off;
+
+  if (!osd_leds_is_enabled()) {
+    return;
+  }
+
+  now_ns = rtg_now_ns();
+  now_ms = (uint32_t)(now_ns / 1000000ull);
+  osd_leds_get_states(now_ns, states);
+  present_mask = osd_led_piscsi_get_unit_present_mask();
+  pulse_off = ((now_ms % 160u) >= 115u);
+  font_px = led_h - 2;
+  if (font_px < 4) {
+    font_px = 4;
+  }
+
+  screen_w = GetScreenWidth();
+  screen_h = GetScreenHeight();
+  total_w = (led_slots * led_w) + ((led_slots - 1) * spacing) + controller_gap;
+  x = screen_w - total_w - margin;
+  y = screen_h - led_h - margin;
+
+  if (x < 0) {
+    x = 0;
+  }
+  if (y < 0) {
+    y = 0;
+  }
+
+  for (int slot = 0; slot < led_slots; slot++) {
+    int led_id = slot;
+    int led_x = x + (slot * (led_w + spacing));
+    int text_x;
+    int text_y;
+    int text_w;
+    char label[2];
+    int is_host = (led_id == OSD_LEDS_UNIT_COUNT);
+    int present = is_host || ((present_mask & (1u << (uint32_t)led_id)) != 0);
+    enum osd_led_state led_state;
+    int show_label = present;
+
+    if (present) {
+      led_state = is_host ? states[0] : states[led_id + 1];
+    } else {
+      led_state = LED_IDLE;
+    }
+
+    if (is_host) {
+      led_x += controller_gap;
+    }
+
+    Color color = rtg_led_color(led_state, is_host, pulse_off);
+
+    DrawRectangle(led_x, y, led_w, led_h, color);
+
+    if (show_label) {
+      if (is_host) {
+        label[0] = 'C';
+      } else {
+        label[0] = (char)('0' + led_id);
+      }
+      label[1] = '\0';
+      text_w = MeasureText(label, font_px);
+      text_x = led_x + ((led_w - text_w) / 2);
+      text_y = y + 1;
+      DrawText(label, text_x, text_y, font_px, (Color){8, 8, 8, 255});
+    }
+  }
 }
 
 static void rtg_apply_thread_tuning(void) {
@@ -1152,6 +1261,8 @@ reinit_raylib:;
       if(show_fps) {
         DrawFPS(pi_screen_width - 128, 0);
       }
+
+      rtg_draw_piscsi_led_overlay();
 
       uint64_t render_end_ns = rtg_now_ns();
       EndDrawing();

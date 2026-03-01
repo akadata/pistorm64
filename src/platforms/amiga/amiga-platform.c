@@ -25,6 +25,7 @@
 #include "pistorm-dev/pistorm-dev.h"
 #include "platforms/platforms.h"
 #include "platforms/shared/rtc.h"
+#include "leds/osd_leds.h"
 #include "pirtg64/pirtg64.h"
 #include "amiga-platform.h"
 #include "a314/a314.h"
@@ -805,6 +806,15 @@ void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val)
       LOG_INFO("[AMIGA] Batch bits set to %s via setvar.\n", val);
     }
   }
+  if CHKVAR ("leds") {
+    int enabled = parse_bool_flag(val, 1);
+    if (enabled >= 0) {
+      osd_leds_set_enabled(enabled);
+      LOG_INFO("[AMIGA] OSD LEDs %s via setvar.\n", enabled ? "enabled" : "disabled");
+    } else {
+      LOG_WARN("[AMIGA] Invalid setvar leds value: %s\n", val ? val : "(null)");
+    }
+  }
   if CHKVAR ("enable_rtc_emulation") {
     unsigned int rtc_enabled = 0;
     if (!val || strlen(val) == 0) {
@@ -1143,6 +1153,7 @@ void shutdown_platform_amiga(struct emulator_config* cfg) {
 }
 
 void create_platform_amiga(struct platform_config* cfg, const char* subsys) {
+  osd_leds_set_enabled(0);
   cfg->register_read = handle_register_read_amiga;
   cfg->register_write = handle_register_write_amiga;
   cfg->custom_read = custom_read_amiga;

@@ -1,0 +1,1745 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PiStorm64 Control API",
+    "version": "1.0.0",
+    "summary": "Control plane API for PiStorm64 system, storage, SCSI, A314, and runtime configuration",
+    "description": "Complete API contract for phone/web control of PiStorm64 features including kickstart profile selection, PiSCSI unit management (disk/cdrom/remote/block), A314 drive slots (pi0:/pd0:..pd4:), runtime setvar/config editing, and reset operations."
+  },
+  "servers": [
+    {
+      "url": "http://pistorm.local/api",
+      "description": "Primary AP/LAN endpoint"
+    },
+    {
+      "url": "http://172.20.0.1/api",
+      "description": "Default AP subnet endpoint"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Health",
+      "description": "Service liveness and diagnostics"
+    },
+    {
+      "name": "System",
+      "description": "PiStorm runtime control and reset"
+    },
+    {
+      "name": "Config",
+      "description": "Config/setvar/map read/validate/apply"
+    },
+    {
+      "name": "Kickstart",
+      "description": "Kickstart profile and ROM controls"
+    },
+    {
+      "name": "Media",
+      "description": "Local media catalog and uploads"
+    },
+    {
+      "name": "PiSCSI",
+      "description": "PiSCSI unit and backend controls"
+    },
+    {
+      "name": "Remote",
+      "description": "Remote backend profiles and probes"
+    },
+    {
+      "name": "A314",
+      "description": "A314 service and drive slot controls"
+    }
+  ],
+  "paths": {
+    "/v1/health": {
+      "get": {
+        "tags": ["Health"],
+        "operationId": "getHealth",
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "Service health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/v1/system/status": {
+      "get": {
+        "tags": ["System"],
+        "operationId": "getSystemStatus",
+        "summary": "Get full runtime status",
+        "responses": {
+          "200": {
+            "description": "Runtime status snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/system/reset": {
+      "post": {
+        "tags": ["System"],
+        "operationId": "postSystemReset",
+        "summary": "Request Amiga/PiStorm reset",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Reset accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommandAccepted"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/v1/system/reload-config": {
+      "post": {
+        "tags": ["System"],
+        "operationId": "postReloadConfig",
+        "summary": "Reload active config file",
+        "responses": {
+          "202": {
+            "description": "Reload accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommandAccepted"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/config": {
+      "get": {
+        "tags": ["Config"],
+        "operationId": "getConfig",
+        "summary": "Get active config document",
+        "responses": {
+          "200": {
+            "description": "Active config",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigDocument"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Config"],
+        "operationId": "putConfig",
+        "summary": "Replace active config document in-memory",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigDocument"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Config replaced",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigDocument"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/v1/config/validate": {
+      "post": {
+        "tags": ["Config"],
+        "operationId": "postValidateConfig",
+        "summary": "Validate proposed config/setvar changes",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigValidateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Validation result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigValidateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/config/apply": {
+      "post": {
+        "tags": ["Config"],
+        "operationId": "postApplyConfig",
+        "summary": "Apply config and optionally reset",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigApplyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Apply accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommandAccepted"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/v1/config/setvars": {
+      "get": {
+        "tags": ["Config"],
+        "operationId": "getSetvars",
+        "summary": "List active setvars",
+        "responses": {
+          "200": {
+            "description": "Setvar entries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SetvarEntry"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/config/setvars/{name}": {
+      "put": {
+        "tags": ["Config"],
+        "operationId": "putSetvar",
+        "summary": "Set or update one setvar",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SetvarName"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetvarValueRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Setvar updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetvarEntry"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Config"],
+        "operationId": "deleteSetvar",
+        "summary": "Remove one setvar",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SetvarName"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Setvar removed"
+          }
+        }
+      }
+    },
+    "/v1/kickstart": {
+      "get": {
+        "tags": ["Kickstart"],
+        "operationId": "getKickstart",
+        "summary": "Get active kickstart state",
+        "responses": {
+          "200": {
+            "description": "Kickstart state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KickstartState"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Kickstart"],
+        "operationId": "putKickstart",
+        "summary": "Switch kickstart profile/ROM",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KickstartUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Kickstart updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KickstartState"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/v1/kickstart/profiles": {
+      "get": {
+        "tags": ["Kickstart"],
+        "operationId": "getKickstartProfiles",
+        "summary": "List supported kickstart profiles",
+        "responses": {
+          "200": {
+            "description": "Profile list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/KickstartProfile"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/media/images": {
+      "get": {
+        "tags": ["Media"],
+        "operationId": "getMediaImages",
+        "summary": "List disk/cdrom images",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["adf", "hdf", "img", "iso", "all"],
+              "default": "all"
+            }
+          },
+          {
+            "name": "pathPrefix",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Media list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MediaImage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/piscsi/settings": {
+      "get": {
+        "tags": ["PiSCSI"],
+        "operationId": "getPiScsiSettings",
+        "summary": "Get PiSCSI runtime settings",
+        "responses": {
+          "200": {
+            "description": "Settings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PiScsiSettings"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["PiSCSI"],
+        "operationId": "putPiScsiSettings",
+        "summary": "Update PiSCSI runtime settings",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PiScsiSettings"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Settings updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PiScsiSettings"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/piscsi/units": {
+      "get": {
+        "tags": ["PiSCSI"],
+        "operationId": "getPiScsiUnits",
+        "summary": "List PiSCSI units 0..6",
+        "responses": {
+          "200": {
+            "description": "Unit state list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PiScsiUnitState"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/piscsi/units/{unit}": {
+      "get": {
+        "tags": ["PiSCSI"],
+        "operationId": "getPiScsiUnit",
+        "summary": "Get one PiSCSI unit state",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PiScsiUnit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unit state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PiScsiUnitState"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/v1/piscsi/units/{unit}/mount": {
+      "post": {
+        "tags": ["PiSCSI"],
+        "operationId": "postPiScsiUnitMount",
+        "summary": "Mount a PiSCSI unit (disk/cdrom/remote/block)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PiScsiUnit"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PiScsiMountRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mounted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PiScsiUnitState"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/v1/piscsi/units/{unit}/unmount": {
+      "post": {
+        "tags": ["PiSCSI"],
+        "operationId": "postPiScsiUnitUnmount",
+        "summary": "Unmount PiSCSI unit",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PiScsiUnit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unmounted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PiScsiUnitState"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/piscsi/units/{unit}/eject": {
+      "post": {
+        "tags": ["PiSCSI"],
+        "operationId": "postPiScsiUnitEject",
+        "summary": "Eject media from PiSCSI unit",
+        "description": "Semantic alias for unmount; retained for UI clarity.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PiScsiUnit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PiScsiUnitState"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/remote/profiles": {
+      "get": {
+        "tags": ["Remote"],
+        "operationId": "getRemoteProfiles",
+        "summary": "List saved remote backend profiles",
+        "responses": {
+          "200": {
+            "description": "Remote profile list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RemoteProfile"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Remote"],
+        "operationId": "postRemoteProfile",
+        "summary": "Create remote backend profile",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoteProfile"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoteProfile"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/remote/profiles/{name}": {
+      "get": {
+        "tags": ["Remote"],
+        "operationId": "getRemoteProfile",
+        "summary": "Get remote profile",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RemoteProfileName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Remote profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoteProfile"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Remote"],
+        "operationId": "putRemoteProfile",
+        "summary": "Update remote profile",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RemoteProfileName"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoteProfile"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoteProfile"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Remote"],
+        "operationId": "deleteRemoteProfile",
+        "summary": "Delete remote profile",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RemoteProfileName"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        }
+      }
+    },
+    "/v1/remote/profiles/{name}/probe": {
+      "post": {
+        "tags": ["Remote"],
+        "operationId": "postProbeRemoteProfile",
+        "summary": "Probe/test remote profile endpoint",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RemoteProfileName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Probe result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoteProbeResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/a314/status": {
+      "get": {
+        "tags": ["A314"],
+        "operationId": "getA314Status",
+        "summary": "Get A314 status and drive slots",
+        "responses": {
+          "200": {
+            "description": "A314 status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/A314Status"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/a314/config": {
+      "get": {
+        "tags": ["A314"],
+        "operationId": "getA314Config",
+        "summary": "Get A314 config paths and disk auto-insert policy",
+        "responses": {
+          "200": {
+            "description": "A314 config",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/A314Config"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["A314"],
+        "operationId": "putA314Config",
+        "summary": "Update A314 config",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/A314Config"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/A314Config"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/a314/drives": {
+      "get": {
+        "tags": ["A314"],
+        "operationId": "getA314Drives",
+        "summary": "List A314 drive slots (pi0, pd0..pd4)",
+        "responses": {
+          "200": {
+            "description": "Drive slot states",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/A314DriveState"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/a314/drives/{slot}": {
+      "get": {
+        "tags": ["A314"],
+        "operationId": "getA314Drive",
+        "summary": "Get one A314 drive slot state",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/A314Slot"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Slot state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/A314DriveState"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/v1/a314/drives/{slot}/mount": {
+      "post": {
+        "tags": ["A314"],
+        "operationId": "postA314DriveMount",
+        "summary": "Mount/insert media into A314 slot",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/A314Slot"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/A314MountRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mounted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/A314DriveState"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/v1/a314/drives/{slot}/replace": {
+      "post": {
+        "tags": ["A314"],
+        "operationId": "postA314DriveReplace",
+        "summary": "Replace media in A314 slot",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/A314Slot"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/A314MountRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Replaced",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/A314DriveState"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/a314/drives/{slot}/unmount": {
+      "post": {
+        "tags": ["A314"],
+        "operationId": "postA314DriveUnmount",
+        "summary": "Unmount/eject media from A314 slot",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/A314Slot"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unmounted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/A314DriveState"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/a314/drives/{slot}/eject": {
+      "post": {
+        "tags": ["A314"],
+        "operationId": "postA314DriveEject",
+        "summary": "Eject media from A314 slot",
+        "description": "Semantic alias for unmount; retained for UI clarity.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/A314Slot"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/A314DriveState"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "parameters": {
+      "PiScsiUnit": {
+        "name": "unit",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6
+        },
+        "description": "PiSCSI unit number (maps to setvar piscsi0..piscsi6)"
+      },
+      "A314Slot": {
+        "name": "slot",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": ["pi0", "pd0", "pd1", "pd2", "pd3", "pd4"]
+        },
+        "description": "A314 drive slot (device names: pi0:, pd0:, pd1:, pd2:, pd3:, pd4:)"
+      },
+      "SetvarName": {
+        "name": "name",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_\\-]+$"
+        }
+      },
+      "RemoteProfileName": {
+        "name": "name",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_\\-]+$"
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "ApiError": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "CommandAccepted": {
+        "type": "object",
+        "required": ["accepted", "commandId"],
+        "properties": {
+          "accepted": {
+            "type": "boolean",
+            "const": true
+          },
+          "commandId": {
+            "type": "string"
+          },
+          "etaMs": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "HealthResponse": {
+        "type": "object",
+        "required": ["ok", "service", "version", "time"],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "service": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SystemStatus": {
+        "type": "object",
+        "required": ["platform", "cpu", "rtg", "piscsi", "a314"],
+        "properties": {
+          "platform": {
+            "type": "string"
+          },
+          "subsystem": {
+            "type": "string"
+          },
+          "cpu": {
+            "type": "string"
+          },
+          "jitEnabled": {
+            "type": "boolean"
+          },
+          "rtg": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "width": {
+                "type": "integer"
+              },
+              "height": {
+                "type": "integer"
+              },
+              "ledsOverlay": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          },
+          "piscsi": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "unitsMapped": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 7
+              }
+            },
+            "additionalProperties": false
+          },
+          "a314": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "drivesMounted": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResetRequest": {
+        "type": "object",
+        "required": ["mode"],
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": ["warm", "cold", "hard"]
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SetvarEntry": {
+        "type": "object",
+        "required": ["name", "value"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SetvarValueRequest": {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MapEntry": {
+        "type": "object",
+        "required": ["type", "address", "size"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["ram", "rom", "register"]
+          },
+          "address": {
+            "type": "string",
+            "pattern": "^0x[0-9A-Fa-f]+$"
+          },
+          "size": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "ovl": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      },
+      "ConfigDocument": {
+        "type": "object",
+        "required": ["platform", "setvars", "maps"],
+        "properties": {
+          "sourcePath": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string"
+          },
+          "subsystem": {
+            "type": "string"
+          },
+          "cpu": {
+            "type": "string"
+          },
+          "setvars": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SetvarEntry"
+            }
+          },
+          "maps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MapEntry"
+            }
+          }
+        },
+        "additionalProperties": true
+      },
+      "ConfigValidateRequest": {
+        "type": "object",
+        "required": ["config"],
+        "properties": {
+          "config": {
+            "$ref": "#/components/schemas/ConfigDocument"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ConfigValidateResponse": {
+        "type": "object",
+        "required": ["valid", "errors", "warnings"],
+        "properties": {
+          "valid": {
+            "type": "boolean"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "normalized": {
+            "$ref": "#/components/schemas/ConfigDocument"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ConfigApplyRequest": {
+        "type": "object",
+        "required": ["config"],
+        "properties": {
+          "config": {
+            "$ref": "#/components/schemas/ConfigDocument"
+          },
+          "writeToFile": {
+            "type": "boolean",
+            "default": true
+          },
+          "backup": {
+            "type": "boolean",
+            "default": true
+          },
+          "resetAfterApply": {
+            "type": "boolean",
+            "default": false
+          },
+          "resetMode": {
+            "type": "string",
+            "enum": ["warm", "cold", "hard"],
+            "default": "warm"
+          }
+        },
+        "additionalProperties": false
+      },
+      "KickstartProfile": {
+        "type": "object",
+        "required": ["id", "label"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "a500_13",
+              "a500_31",
+              "a600_31",
+              "a1200_31",
+              "a3000_31",
+              "a4000_31",
+              "custom"
+            ]
+          },
+          "label": {
+            "type": "string"
+          },
+          "recommendedCpu": {
+            "type": "string"
+          },
+          "defaultRomPath": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "KickstartState": {
+        "type": "object",
+        "required": ["profile"],
+        "properties": {
+          "profile": {
+            "$ref": "#/components/schemas/KickstartProfile"
+          },
+          "romPath": {
+            "type": "string"
+          },
+          "checksum": {
+            "type": "string"
+          },
+          "overlayAddress": {
+            "type": "string",
+            "pattern": "^0x[0-9A-Fa-f]+$"
+          },
+          "autodumpMem": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "KickstartUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "profileId": {
+            "$ref": "#/components/schemas/KickstartProfile/properties/id"
+          },
+          "romPath": {
+            "type": "string"
+          },
+          "overlayAddress": {
+            "type": "string",
+            "pattern": "^0x[0-9A-Fa-f]+$"
+          },
+          "autodumpMem": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MediaImage": {
+        "type": "object",
+        "required": ["id", "name", "path", "kind", "sizeBytes"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["adf", "hdf", "img", "iso"]
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "readOnly": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PiScsiSettings": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "controllerId": {
+            "type": "integer",
+            "const": 7
+          },
+          "ledsOverlay": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PiScsiActivity": {
+        "type": "object",
+        "required": ["state"],
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": ["idle", "read", "write"]
+          },
+          "lastPulseMs": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "PiScsiUnitState": {
+        "type": "object",
+        "required": ["unit", "present"],
+        "properties": {
+          "unit": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "present": {
+            "type": "boolean"
+          },
+          "spec": {
+            "type": "string",
+            "description": "Original setvar-style spec"
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": ["disk", "cdrom", "remote", "block"]
+          },
+          "backend": {
+            "type": "string",
+            "enum": ["file", "remote", "block"]
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "blockSize": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "activity": {
+            "$ref": "#/components/schemas/PiScsiActivity"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RemoteEndpoint": {
+        "type": "object",
+        "required": ["host", "exportName"],
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "host": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535,
+            "default": 4964
+          },
+          "exportName": {
+            "type": "string"
+          },
+          "tls": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PiScsiMountRequest": {
+        "type": "object",
+        "required": ["sourceType"],
+        "properties": {
+          "sourceType": {
+            "type": "string",
+            "enum": ["disk", "cdrom", "remote", "block"]
+          },
+          "path": {
+            "type": "string",
+            "description": "Local path for disk/cdrom/block"
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["ro", "rw"],
+            "default": "rw"
+          },
+          "blockSize": {
+            "type": "integer",
+            "minimum": 512,
+            "maximum": 65536
+          },
+          "remote": {
+            "$ref": "#/components/schemas/RemoteEndpoint"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "sourceType": {
+                  "const": "remote"
+                }
+              }
+            },
+            "then": {
+              "required": ["remote"]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "sourceType": {
+                  "enum": ["disk", "cdrom", "block"]
+                }
+              }
+            },
+            "then": {
+              "required": ["path"]
+            }
+          }
+        ],
+        "additionalProperties": false
+      },
+      "RemoteProfile": {
+        "type": "object",
+        "required": ["name", "endpoint"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "endpoint": {
+            "$ref": "#/components/schemas/RemoteEndpoint"
+          },
+          "defaultMode": {
+            "type": "string",
+            "enum": ["ro", "rw"],
+            "default": "ro"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RemoteProbeResult": {
+        "type": "object",
+        "required": ["ok"],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "latencyMs": {
+            "type": "number"
+          },
+          "message": {
+            "type": "string"
+          },
+          "blockSize": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "A314AutoInsertEntry": {
+        "type": "object",
+        "required": ["unit", "filename", "rw"],
+        "properties": {
+          "unit": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "filename": {
+            "type": "string"
+          },
+          "rw": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "A314Config": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "a314ConfPath": {
+            "type": "string"
+          },
+          "a314FsConfPath": {
+            "type": "string"
+          },
+          "sharedPath": {
+            "type": "string"
+          },
+          "diskConfPath": {
+            "type": "string"
+          },
+          "autoInsert": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/A314AutoInsertEntry"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "A314DriveState": {
+        "type": "object",
+        "required": ["slot", "deviceName", "mounted"],
+        "properties": {
+          "slot": {
+            "type": "string",
+            "enum": ["pi0", "pd0", "pd1", "pd2", "pd3", "pd4"]
+          },
+          "deviceName": {
+            "type": "string",
+            "enum": ["pi0:", "pd0:", "pd1:", "pd2:", "pd3:", "pd4:"]
+          },
+          "mounted": {
+            "type": "boolean"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "rw": {
+            "type": "boolean"
+          },
+          "lastChange": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "A314MountRequest": {
+        "type": "object",
+        "required": ["filename"],
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "rw": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "A314Status": {
+        "type": "object",
+        "required": ["enabled", "drives"],
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "config": {
+            "$ref": "#/components/schemas/A314Config"
+          },
+          "drives": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/A314DriveState"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}
