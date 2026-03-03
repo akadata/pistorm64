@@ -1,3 +1,6 @@
 [submodule "external/DiagROM"]
 	path = external/DiagROM
 	url = https://github.com/ChuckyGang/DiagROM.git
+[submodule "amiga-workbench-companion"]
+	path = amiga-workbench-companion
+	url = git@github.com:akadatalimited/amiga-workbench-companion.git

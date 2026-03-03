@@ -1,0 +1,98 @@
+# PiStorm64 frontend + API reverse proxy
+#
+# Frontend static files are served from:
+#   /var/www/pistorm64
+#
+# API/WS backend is expected at:
+#   http://127.0.0.1:8081
+#
+# NOTE: Do not point root to /home/smalley/... because /home/smalley is 0700
+# and unreadable to nginx worker user.
+
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    ''      close;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name pistorm64.zerodns.co.uk;
+
+    # Optional ACME challenge path.
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/www/letsencrypt;
+        try_files $uri =404;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name pistorm64.zerodns.co.uk;
+    http2 on;
+
+    ssl_certificate /etc/letsencrypt/live/pistorm64.zerodns.co.uk/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/pistorm64.zerodns.co.uk/privkey.pem;
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_tickets off;
+
+    # Frontend SPA build output path.
+    root /var/www/pistorm64;
+    index index.html;
+
+    # Basic hardening headers.
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options SAMEORIGIN always;
+    add_header Referrer-Policy no-referrer-when-downgrade always;
+
+    # UI compatibility + v1 API to control service.
+    location /api/ {
+        proxy_pass http://127.0.0.1:8081;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Health endpoint used by the web app.
+    location = /health {
+        proxy_pass http://127.0.0.1:8081/health;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # WebSocket live updates.
+    location /ws {
+        proxy_pass http://127.0.0.1:8081/ws;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 3600s;
+    }
+
+    # Static assets (cache-friendly).
+    location /assets/ {
+        try_files $uri =404;
+        expires 7d;
+        add_header Cache-Control "public, max-age=604800, immutable";
+    }
+
+    # SPA fallback.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
