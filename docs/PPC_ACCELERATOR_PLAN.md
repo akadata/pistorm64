@@ -48,6 +48,7 @@ scheduling.
 - Add compatibility notes for BlizzardPPC-style startup expectations and
   explicitly document what is implemented vs. not implemented.
 - Add regression checks for contract invariants.
+- Canonical reference: `docs/PPC_ACCEL_BOOTSTRAP_CONTRACT.md`.
 
 ### Stage 9: OS Integration Attempt
 

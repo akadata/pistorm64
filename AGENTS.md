@@ -213,6 +213,8 @@ Stage 6C status (frozen summary):
   * `export QEMU_UAE_SO=/usr/local/lib/qemu-uae.so`
   * Optional probe tracing: `export PPC_ACCEL_AC_TRACE=1` (logs AutoConfig accesses for PPC board compatibility debugging)
 * Host helper script: `./stage6.sh` (builds emulator + `amiga/zorro-ppc` tool and prints manual test steps)
+* Stage 8 helper script: `./stage8.sh` (builds emulator + tool and prints bootstrap-contract regression flow)
+* Bootstrap contract (frozen Stage 8 reference): `docs/PPC_ACCEL_BOOTSTRAP_CONTRACT.md`
 
 Amiga-side Stage 6A tool:
 

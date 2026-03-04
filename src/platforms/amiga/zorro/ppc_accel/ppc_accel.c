@@ -49,6 +49,44 @@ _Static_assert(PPC_ACCEL_MB_VERSION == PPC_MAILBOX_VERSION,
                "mailbox version value mismatch");
 _Static_assert(PPC_ACCEL_MAILBOX_SIZE == PPC_MAILBOX_SIZE,
                "mailbox size mismatch");
+_Static_assert(PPC_ACCEL_REG_WINDOW_SIZE == 0x1000u,
+               "register window size changed");
+_Static_assert(PPC_ACCEL_MAILBOX_OFFSET == PPC_ACCEL_REG_WINDOW_SIZE,
+               "mailbox offset no longer follows register window");
+_Static_assert(PPC_ACCEL_SHARED_OFFSET == (PPC_ACCEL_MAILBOX_OFFSET + PPC_ACCEL_MAILBOX_SIZE),
+               "shared offset no longer follows mailbox page");
+_Static_assert((PPC_ACCEL_SHARED_OFFSET + PPC_ACCEL_SHARED_SIZE) == PPC_ACCEL_Z2_SIZE,
+               "device shared window no longer reaches end of Z2 aperture");
+_Static_assert(PPC_ACCEL_SHARED_INFO_OFFSET == PPC_ACCEL_SHARED_OFFSET,
+               "shared info block must start at shared window base");
+_Static_assert(PPC_ACCEL_SHARED_INFO_SIZE == 0x20u,
+               "shared info block size changed");
+_Static_assert(PPC_ACCEL_SHARED_INFO_OFF_SIGNATURE == 0x00u,
+               "shared info signature offset changed");
+_Static_assert(PPC_ACCEL_SHARED_INFO_OFF_ABI_VERSION == 0x04u,
+               "shared info abi offset changed");
+_Static_assert(PPC_ACCEL_SHARED_INFO_OFF_MB_OFFSET == 0x08u,
+               "shared info mailbox offset changed");
+_Static_assert(PPC_ACCEL_SHARED_INFO_OFF_MB_SIZE == 0x0cu,
+               "shared info mailbox size offset changed");
+_Static_assert(PPC_ACCEL_SHARED_INFO_OFF_DB_REG == 0x10u,
+               "shared info doorbell offset changed");
+_Static_assert(PPC_ACCEL_SHARED_INFO_OFF_FEATURES == 0x14u,
+               "shared info feature offset changed");
+_Static_assert(PPC_ACCEL_SHARED_INFO_OFF_RESERVED0 == 0x18u,
+               "shared info reserved0 offset changed");
+_Static_assert(PPC_ACCEL_SHARED_INFO_OFF_RESERVED1 == 0x1cu,
+               "shared info reserved1 offset changed");
+_Static_assert(PPC_ACCEL_CTRL_START == 0x00000001u,
+               "control start bit changed");
+_Static_assert(PPC_ACCEL_CTRL_RESET == 0x00000002u,
+               "control reset bit changed");
+_Static_assert(PPC_ACCEL_CTRL_IRQ_ENABLE == 0x00000004u,
+               "control irq-enable bit changed");
+_Static_assert(PPC_ACCEL_IRQ_CMD_DONE == 0x00000001u,
+               "cmd_done irq bit changed");
+_Static_assert(PPC_ACCEL_IRQ_HOST_DOORBELL == 0x00000002u,
+               "host doorbell irq bit changed");
 
 typedef struct ppc_accel_host_service_context {
   uint8_t *mailbox;
