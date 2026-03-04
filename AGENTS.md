@@ -163,6 +163,27 @@ Expected latency marker:
 * `bench-lat: mode=lat samples=... warmup=... elapsed=...s ops/s=... avg_us=... p50_us=... p95_us=... p99_us=... max_us=...`
 * Optional histogram when `PPC_BENCH_HISTO=1`: `bench-histo(us):`
 
+Stage 5B optional doorbell + host thread tuning:
+
+unset LD_LIBRARY_PATH
+export QEMU_UAE_SO=/usr/local/lib/qemu-uae.so
+export PPC_MODEL=603e
+export PPC_BENCH=0
+export PPC_HOST_SERVICE=1
+export PPC_HOST_SERVICE_TEST=1
+export PPC_HOSTSVC_DOORBELL=1
+export PPC_HOST_SERVICE_IDLE_MS=1
+export PPC_HOST_SERVICE_CPU=-1
+export PPC_HOST_SERVICE_SCHED_FIFO=0
+export PPC_HOST_SERVICE_SCHED_PRIO=10
+./build/ppc/test_ppc_mailbox
+
+Doorbell semantics:
+
+* Host writes `host_result*` + `host_status`, then `host_ack_seq`.
+* With `PPC_HOSTSVC_DOORBELL=1`, host pulses `qemu_uae_ppc_external_interrupt(true/false)` after publishing `host_ack_seq`.
+* Polling remains baseline and works when doorbell is disabled or unavailable.
+
 ---
 
 ## Immediate Tasks (Codex Priority)

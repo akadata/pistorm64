@@ -28,6 +28,10 @@
  *   export PPC_BENCH_HISTO=0
  *   export PPC_HOST_SERVICE=1
  *   export PPC_HOST_SERVICE_TEST=1
+ *   export PPC_HOSTSVC_DOORBELL=0
+ *   export PPC_HOST_SERVICE_CPU=-1
+ *   export PPC_HOST_SERVICE_SCHED_FIFO=0
+ *   export PPC_HOST_SERVICE_SCHED_PRIO=10
  *   ./build/ppc/test_ppc_mailbox
  */
 
@@ -39,6 +43,7 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <pthread.h>
+#include <sched.h>
 #include <stdatomic.h>
 #include <stdbool.h>
 #include <stdarg.h>
@@ -77,7 +82,12 @@ typedef struct host_service_context {
     uint8_t *ram;
     uint32_t ram_size;
     int idle_sleep_ms;
+    int cpu_affinity;
+    int sched_priority;
+    bool use_sched_fifo;
+    bool doorbell_enabled;
     bool verbose;
+    qemu_uae_external_interrupt_function external_interrupt;
     volatile bool stop;
 } host_service_context;
 
@@ -687,6 +697,76 @@ static uint32_t crc32_ieee(const uint8_t *data, uint32_t len)
     return crc ^ 0xffffffffU;
 }
 
+static void host_service_configure_thread(host_service_context *ctx)
+{
+    if (ctx->cpu_affinity >= 0) {
+        cpu_set_t cpu_set;
+        int rc;
+
+        if (ctx->cpu_affinity >= CPU_SETSIZE) {
+            fprintf(stderr, "[PPC] hostsvc: invalid CPU affinity index %d (max %d)\n",
+                    ctx->cpu_affinity, CPU_SETSIZE - 1);
+        } else {
+            CPU_ZERO(&cpu_set);
+            CPU_SET(ctx->cpu_affinity, &cpu_set);
+            rc = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set), &cpu_set);
+            if (rc != 0) {
+                fprintf(stderr, "[PPC] hostsvc: pthread_setaffinity_np(cpu=%d) failed: %s\n",
+                        ctx->cpu_affinity, strerror(rc));
+            } else if (ctx->verbose == true) {
+                fprintf(stderr, "[PPC] hostsvc: pinned thread to cpu=%d\n", ctx->cpu_affinity);
+            }
+        }
+    }
+
+    if (ctx->use_sched_fifo == true) {
+        struct sched_param sched;
+        int min_prio;
+        int max_prio;
+        int rc;
+
+        min_prio = sched_get_priority_min(SCHED_FIFO);
+        max_prio = sched_get_priority_max(SCHED_FIFO);
+        if ((min_prio == -1) || (max_prio == -1)) {
+            fprintf(stderr, "[PPC] hostsvc: failed to query SCHED_FIFO priority range: %s\n",
+                    strerror(errno));
+            return;
+        }
+
+        if (ctx->sched_priority < min_prio) {
+            ctx->sched_priority = min_prio;
+        }
+        if (ctx->sched_priority > max_prio) {
+            ctx->sched_priority = max_prio;
+        }
+
+        memset(&sched, 0, sizeof(sched));
+        sched.sched_priority = ctx->sched_priority;
+        rc = pthread_setschedparam(pthread_self(), SCHED_FIFO, &sched);
+        if (rc != 0) {
+            fprintf(stderr,
+                    "[PPC] hostsvc: pthread_setschedparam(SCHED_FIFO, prio=%d) failed: %s\n",
+                    ctx->sched_priority, strerror(rc));
+        } else if (ctx->verbose == true) {
+            fprintf(stderr, "[PPC] hostsvc: enabled SCHED_FIFO prio=%d\n", ctx->sched_priority);
+        }
+    }
+}
+
+static void host_service_ring_doorbell(const host_service_context *ctx)
+{
+    if ((ctx->doorbell_enabled == false) || (ctx->external_interrupt == NULL)) {
+        return;
+    }
+
+    /*
+     * Pulse EXT interrupt line so PPC can observe host response promptly even
+     * when the host service thread is configured with a longer idle sleep.
+     */
+    ctx->external_interrupt(true);
+    ctx->external_interrupt(false);
+}
+
 static bool host_service_handle_request(host_service_context *ctx, uint32_t req_seq)
 {
     uint32_t cmd;
@@ -734,6 +814,8 @@ static bool host_service_handle_request(host_service_context *ctx, uint32_t req_
     mailbox_write_u32(ctx->mailbox, PPC_MAILBOX_OFF_HOST_STATUS, status);
     PPC_MAILBOX_MEMORY_BARRIER();
     mailbox_write_u32(ctx->mailbox, PPC_MAILBOX_OFF_HOST_ACK_SEQ, req_seq);
+    PPC_MAILBOX_MEMORY_BARRIER();
+    host_service_ring_doorbell(ctx);
 
     if (ctx->verbose == true) {
         fprintf(stderr,
@@ -754,6 +836,8 @@ static void *host_service_thread_main(void *opaque)
         return NULL;
     }
 
+    host_service_configure_thread(ctx);
+
     while (ctx->stop == false) {
         uint32_t req_seq;
         uint32_t ack_seq;
@@ -763,6 +847,8 @@ static void *host_service_thread_main(void *opaque)
         if (req_seq == ack_seq) {
             if (ctx->idle_sleep_ms > 0) {
                 sleep_ms(ctx->idle_sleep_ms);
+            } else {
+                sched_yield();
             }
             continue;
         }
@@ -1227,8 +1313,19 @@ int main(void)
     host_ctx.ram = ram;
     host_ctx.ram_size = ram_size;
     host_ctx.idle_sleep_ms = env_nonneg_int_or_default("PPC_HOST_SERVICE_IDLE_MS", 1);
+    host_ctx.cpu_affinity = env_nonneg_int_or_default("PPC_HOST_SERVICE_CPU", -1);
+    host_ctx.use_sched_fifo = env_bool_or_default("PPC_HOST_SERVICE_SCHED_FIFO", false);
+    host_ctx.sched_priority = env_int_or_default("PPC_HOST_SERVICE_SCHED_PRIO", 10);
+    host_ctx.doorbell_enabled = env_bool_or_default("PPC_HOSTSVC_DOORBELL", false);
     host_ctx.verbose = g_verbose;
+    host_ctx.external_interrupt = loader.qemu_uae_ppc_external_interrupt;
     host_ctx.stop = false;
+    if ((host_ctx.doorbell_enabled == true) && (host_ctx.external_interrupt == NULL)) {
+        fprintf(stderr,
+                "[PPC] hostsvc: PPC_HOSTSVC_DOORBELL=1 requested but "
+                "qemu_uae_ppc_external_interrupt is unavailable; disabling doorbell\n");
+        host_ctx.doorbell_enabled = false;
+    }
 
     if (install_mailbox_firmware(ram, ram_size, 0x00000000U) == false) {
         fprintf(stderr, "[PPC] failed to place mailbox firmware at 0x00000000\n");
@@ -1277,6 +1374,15 @@ int main(void)
             return 8;
         }
         host_thread_started = true;
+        if (g_verbose == true) {
+            fprintf(stderr,
+                    "[PPC] hostsvc: idle_ms=%d cpu=%d doorbell=%s sched_fifo=%s prio=%d\n",
+                    host_ctx.idle_sleep_ms,
+                    host_ctx.cpu_affinity,
+                    host_ctx.doorbell_enabled ? "on" : "off",
+                    host_ctx.use_sched_fifo ? "on" : "off",
+                    host_ctx.sched_priority);
+        }
     }
 
     loader.ppc_cpu_set_state(QEMU_UAE_PPC_CPU_STATE_RUNNING);
