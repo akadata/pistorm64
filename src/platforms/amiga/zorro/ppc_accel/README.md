@@ -1,4 +1,4 @@
-# Z2 PPC Accelerator (Stage 6A)
+# Z2 PPC Accelerator (Stage 6C)
 
 This is a first board-model slice for a PiStorm PPC accelerator device exposed via
 Zorro-II AutoConfig.
@@ -60,7 +60,14 @@ All fields are `32-bit big-endian`.
 - `+0x20` `result0`
 - `+0x24` `result1`
 
-Commands implemented in Stage 6A:
+Single in-flight contract:
+
+- command is in-flight while `seq != ack_seq`
+- host must only submit when `seq == ack_seq`
+- host publishes `seq` last
+- responder publishes `status/result` first and `ack_seq` last
+
+Commands implemented:
 
 - `1` `PING` -> `result0 = arg0 ^ 0xFFFFFFFF`
 - `3` `HOST_TIME32` -> `result0 = monotonic_time_ns_low32`
@@ -74,5 +81,7 @@ Statuses:
 
 ## Notes
 
-This Stage 6A implementation proves Amiga-side discovery and mailbox handshake.
-It does not yet run the QEMU PPC core behind this board model.
+- Stage 6C runs the mailbox handler on a real QEMU-UAE PPC core.
+- The mailbox page is single-backed: Amiga Zorro access and PPC access touch the same memory.
+- Runtime assets must be available (`qemu-uae.so`, firmware/config paths) and
+  `LD_LIBRARY_PATH` should not include Python 2.7 build paths at runtime.

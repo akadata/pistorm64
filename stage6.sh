@@ -4,14 +4,16 @@ make -j4 emulator
 make -C amiga/zorro-ppc
 
 cat <<'EOF'
-Stage 6A build complete.
+Stage 6C build complete.
 
 Manual test steps:
 1) Enable the board in your PiStorm Amiga config:
    setvar zorro-ppc
    (alias: setvar ppc-accel)
 
-2) Start emulator with that config and boot AmigaOS.
+2) Keep runtime clean, then start emulator and boot AmigaOS:
+   unset LD_LIBRARY_PATH
+   export QEMU_UAE_SO=/usr/local/lib/qemu-uae.so
 
 3) Copy/run the handshake tool from Amiga shell:
    ppcshake

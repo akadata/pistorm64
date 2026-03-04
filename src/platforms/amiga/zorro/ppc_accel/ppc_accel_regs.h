@@ -59,6 +59,14 @@
 #define PPC_ACCEL_MB_OFF_RESULT0      0x0020u
 #define PPC_ACCEL_MB_OFF_RESULT1      0x0024u
 
+/*
+ * Single in-flight command contract:
+ * - Command is in-flight while SEQ != ACK_SEQ.
+ * - Host must not publish a new command until ACK_SEQ == SEQ.
+ * - Host writes cmd/args/result placeholders first, then writes SEQ last.
+ * - Responder publishes RESULT/STATUS first, then ACK_SEQ last.
+ */
+
 /* Mailbox values */
 #define PPC_ACCEL_MB_MAGIC            0x504D4241u /* "PMBA" */
 #define PPC_ACCEL_MB_VERSION          1u

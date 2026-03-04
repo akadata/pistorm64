@@ -184,7 +184,7 @@ Doorbell semantics:
 * With `PPC_HOSTSVC_DOORBELL=1`, host pulses `qemu_uae_ppc_external_interrupt(true/false)` after publishing `host_ack_seq`.
 * Polling remains baseline and works when doorbell is disabled or unavailable.
 
-Stage 6A board-model bring-up (Amiga Zorro device, handshake-only):
+Stage 6A/6B/6C board-model bring-up (Amiga Zorro device, PPC-backed mailbox):
 
 * Enable in Amiga config: `setvar zorro-ppc` (alias: `setvar ppc-accel`)
 * AutoConfig identity: manufacturer `$07DB`, product `$0040`
@@ -192,7 +192,13 @@ Stage 6A board-model bring-up (Amiga Zorro device, handshake-only):
   * `+0x0000-0x0FFF` registers
   * `+0x1000-0x1FFF` mailbox page
   * `+0x2000-0xFFFF` shared window
-* Stage 6A command path currently supports mailbox `PING` and `HOST_TIME32` for vertical-slice probing from Amiga side.
+* Mailbox command path supports `PING` and `HOST_TIME32` for vertical-slice probing from Amiga side.
+* Stage 6C backend: `CONTROL.START` boots QEMU-UAE PPC runtime and runs mailbox firmware on PPC.
+* Mailbox page is single-backed between Zorro-visible window and PPC-visible mapping.
+* Mailbox command lane is single in-flight (`seq!=ack_seq` means busy, submit only when `seq==ack_seq`).
+* Keep runtime clean before launching emulator:
+  * `unset LD_LIBRARY_PATH`
+  * `export QEMU_UAE_SO=/usr/local/lib/qemu-uae.so`
 * Host helper script: `./stage6.sh` (builds emulator + `amiga/zorro-ppc` tool and prints manual test steps)
 
 Amiga-side Stage 6A tool:
@@ -202,6 +208,7 @@ Amiga-side Stage 6A tool:
 * Run on Amiga shell: `ppcshake` (or `ppcshake 10`)
 * Stage 6B IRQ semantics probe: `ppcshake --irq`
   * Expected marker: `IRQ test OK: doorbell raise/ack and cmd_done raise/ack.`
+  * Concurrent start guard: `ppcshake busy: another instance is running. Try again.`
 
 ---
 
