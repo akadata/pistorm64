@@ -86,6 +86,32 @@ export PPC_START_TIMEOUT_MS=2000
 
 The harness dynamically loads qemu-uae.so using dlopen.
 
+Stage 3 mailbox harness:
+
+Build:
+
+cc -O2 -g -Wall -Wextra -Wpedantic -std=c11 
+-pthread -Isrc/ppc -o build/ppc/test_ppc_mailbox 
+src/ppc/test_ppc_mailbox.c src/ppc/qemu_uae_loader.c -ldl
+
+Run:
+
+unset LD_LIBRARY_PATH
+export QEMU_UAE_SO=/usr/local/lib/qemu-uae.so
+export PPC_MODEL=603e
+export PPC_START_TIMEOUT_MS=2000
+export PPC_MAILBOX_CMD_TIMEOUT_MS=500
+export PPC_MAILBOX_LOOPS=100
+./build/ppc/test_ppc_mailbox
+
+Expected Stage 3 markers:
+
+* `mailbox: send seq=... cmd=1` (PING)
+* `mailbox: send seq=... cmd=2` (MEMCPY32)
+* `mailbox: done seq=... status=2 result0=...`
+* `fetch sanity: NIP=0x... instr=0x...`
+* `mailbox test complete: loops=100`
+
 ---
 
 ## Immediate Tasks (Codex Priority)
