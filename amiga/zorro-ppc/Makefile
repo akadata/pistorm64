@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: MIT
+
+AMIGA_PREFIX ?= /opt/amiga
+CROSS ?= $(AMIGA_PREFIX)/bin/m68k-amigaos-
+
+CC := $(CROSS)gcc
+CFLAGS := -m68020 -O2 -Wall -Wextra -noixemul
+
+TOOL := C/ppcshake
+TOOL_OBJS := C/ppcshake.o
+
+all: $(TOOL)
+
+C/ppcshake.o: C/ppcshake.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(TOOL): $(TOOL_OBJS)
+	$(CC) $(CFLAGS) -o $@ $(TOOL_OBJS)
+
+install: all
+	mkdir -p $(AMIGA_PREFIX)/C
+	cp C/ppcshake $(AMIGA_PREFIX)/C/
+
+clean:
+	rm -f C/*.o $(TOOL)
+
+.PHONY: all install clean

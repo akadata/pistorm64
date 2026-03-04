@@ -169,3 +169,11 @@ Swaps DF0 with DF1/2/3. Useful for Kickstart 1.x and/or Trackloader games that w
 Example: `setvar physical-z2-first`  
 Explicitly waits for physical (real) Zorro boards to initialize before initializing any of the virtual ones. This may be required for certain devices that are hard coded to assume that they're always in the first Z2 64KB IO memory slot range.  
 **Note:** Depending on what your particular computer returns when reading the AutoConfig registers, this may or may not work properly at all. Do not enable this if you're not sure what it is or does.
+
+# zorro-ppc
+
+Example: `setvar zorro-ppc`  
+Registers an experimental Zorro-II PPC accelerator board model (`manuf=$07DB`, `product=$0040`) with a register window, mailbox page, and shared RAM window.  
+This is intended for Stage 6A board-discovery and mailbox handshake testing.
+
+Alias: `setvar ppc-accel`

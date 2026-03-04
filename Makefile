@@ -206,6 +206,7 @@ MAINFILES += src/platforms/platforms.c
 MAINFILES += src/z3bus_iface.c
 MAINFILES += src/platforms/amiga/amiga_zorro.c
 MAINFILES += src/platforms/amiga/zorro/z3bus_demo/z3bus_demo.c
+MAINFILES += src/platforms/amiga/zorro/ppc_accel/ppc_accel.c
 MAINFILES += src/platforms/amiga/zorro/serial_echo/serial_echo.c
 MAINFILES += src/platforms/amiga/zorro/z2_rng/z2_rng.c
 MAINFILES += src/platforms/amiga/zorro/z2_pissa/z2_pissa.c

@@ -184,6 +184,23 @@ Doorbell semantics:
 * With `PPC_HOSTSVC_DOORBELL=1`, host pulses `qemu_uae_ppc_external_interrupt(true/false)` after publishing `host_ack_seq`.
 * Polling remains baseline and works when doorbell is disabled or unavailable.
 
+Stage 6A board-model bring-up (Amiga Zorro device, handshake-only):
+
+* Enable in Amiga config: `setvar zorro-ppc` (alias: `setvar ppc-accel`)
+* AutoConfig identity: manufacturer `$07DB`, product `$0040`
+* Device map:
+  * `+0x0000-0x0FFF` registers
+  * `+0x1000-0x1FFF` mailbox page
+  * `+0x2000-0xFFFF` shared window
+* Stage 6A command path currently supports mailbox `PING` and `HOST_TIME32` for vertical-slice probing from Amiga side.
+* Host helper script: `./stage6.sh` (builds emulator + `amiga/zorro-ppc` tool and prints manual test steps)
+
+Amiga-side Stage 6A tool:
+
+* Source: `amiga/zorro-ppc/C/ppcshake.c`
+* Build: `make -C amiga/zorro-ppc`
+* Run on Amiga shell: `ppcshake` (or `ppcshake 10`)
+
 ---
 
 ## Immediate Tasks (Codex Priority)
