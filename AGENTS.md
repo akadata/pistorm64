@@ -129,6 +129,7 @@ export PPC_MODEL=603e
 export PPC_START_TIMEOUT_MS=2000
 export PPC_MAILBOX_CMD_TIMEOUT_MS=500
 export PPC_BENCH=1
+export PPC_BENCH_MODE=throughput
 export PPC_BENCH_ITERS=100000
 export PPC_BENCH_WARMUP=1000
 export PPC_VERBOSE=0
@@ -136,9 +137,31 @@ export PPC_HOST_SERVICE=0
 export PPC_HOST_SERVICE_TEST=0
 ./build/ppc/test_ppc_mailbox
 
-Expected benchmark marker:
+Expected throughput marker:
 
-* `bench: iters=... warmup=... elapsed=...s ops/s=... avg_us=...`
+* `bench: mode=throughput iters=... warmup=... elapsed=...s ops/s=... avg_us=...`
+
+Stage 5A latency benchmark mode (mailbox round-trip percentiles):
+
+unset LD_LIBRARY_PATH
+export QEMU_UAE_SO=/usr/local/lib/qemu-uae.so
+export PPC_MODEL=603e
+export PPC_START_TIMEOUT_MS=2000
+export PPC_MAILBOX_CMD_TIMEOUT_MS=500
+export PPC_BENCH=1
+export PPC_BENCH_MODE=lat
+export PPC_BENCH_SAMPLES=200000
+export PPC_BENCH_WARMUP=1000
+export PPC_BENCH_HISTO=0
+export PPC_VERBOSE=0
+export PPC_HOST_SERVICE=0
+export PPC_HOST_SERVICE_TEST=0
+./build/ppc/test_ppc_mailbox
+
+Expected latency marker:
+
+* `bench-lat: mode=lat samples=... warmup=... elapsed=...s ops/s=... avg_us=... p50_us=... p95_us=... p99_us=... max_us=...`
+* Optional histogram when `PPC_BENCH_HISTO=1`: `bench-histo(us):`
 
 ---
 

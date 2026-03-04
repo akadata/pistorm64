@@ -22,6 +22,10 @@
  *   export PPC_MAILBOX_LOOPS=100
  *   export PPC_VERBOSE=1
  *   export PPC_BENCH=0
+ *   export PPC_BENCH_MODE=throughput
+ *   export PPC_BENCH_ITERS=100000
+ *   export PPC_BENCH_SAMPLES=100000
+ *   export PPC_BENCH_HISTO=0
  *   export PPC_HOST_SERVICE=1
  *   export PPC_HOST_SERVICE_TEST=1
  *   ./build/ppc/test_ppc_mailbox
@@ -77,6 +81,11 @@ typedef struct host_service_context {
     volatile bool stop;
 } host_service_context;
 
+typedef enum bench_mode_kind {
+    BENCH_MODE_THROUGHPUT = 0,
+    BENCH_MODE_LATENCY = 1
+} bench_mode_kind;
+
 static harness_debug_state g_debug_state = {
     .lock = PTHREAD_MUTEX_INITIALIZER,
     .have_last_nip = false,
@@ -109,14 +118,28 @@ static void mailbox_write_u32(uint8_t *mailbox, uint32_t offset, uint32_t value)
     write_be32_at(mailbox, offset, value);
 }
 
-static uint64_t monotonic_ms(void)
+static bool monotonic_ns(uint64_t *out_ns)
 {
     struct timespec ts;
 
+    if (out_ns == NULL) {
+        return false;
+    }
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
+        return false;
+    }
+    *out_ns = ((uint64_t)ts.tv_sec * 1000000000ULL) + (uint64_t)ts.tv_nsec;
+    return true;
+}
+
+static uint64_t monotonic_ms(void)
+{
+    uint64_t ns;
+
+    if (monotonic_ns(&ns) == false) {
         return 0U;
     }
-    return ((uint64_t)ts.tv_sec * 1000U) + ((uint64_t)ts.tv_nsec / 1000000U);
+    return ns / 1000000ULL;
 }
 
 static bool io_read32(uint32_t addr, uint32_t *data, int size)
@@ -295,6 +318,109 @@ static bool env_bool_or_default(const char *name, bool default_value)
         return false;
     }
     return default_value;
+}
+
+static bench_mode_kind env_bench_mode_or_default(bench_mode_kind default_mode)
+{
+    const char *value;
+
+    value = getenv("PPC_BENCH_MODE");
+    if ((value == NULL) || (value[0] == '\0')) {
+        return default_mode;
+    }
+    if ((strcmp(value, "throughput") == 0) || (strcmp(value, "tput") == 0)) {
+        return BENCH_MODE_THROUGHPUT;
+    }
+    if ((strcmp(value, "lat") == 0) || (strcmp(value, "latency") == 0)) {
+        return BENCH_MODE_LATENCY;
+    }
+
+    fprintf(stderr, "[PPC] unknown PPC_BENCH_MODE='%s', defaulting to throughput\n", value);
+    return BENCH_MODE_THROUGHPUT;
+}
+
+static const char *bench_mode_name(bench_mode_kind mode)
+{
+    if (mode == BENCH_MODE_LATENCY) {
+        return "lat";
+    }
+    return "throughput";
+}
+
+static int compare_u64_ascending(const void *lhs, const void *rhs)
+{
+    const uint64_t *a;
+    const uint64_t *b;
+
+    a = (const uint64_t *)lhs;
+    b = (const uint64_t *)rhs;
+    if (*a < *b) {
+        return -1;
+    }
+    if (*a > *b) {
+        return 1;
+    }
+    return 0;
+}
+
+static size_t percentile_index(size_t count, uint32_t percentile)
+{
+    size_t rank;
+    uint64_t numerator;
+
+    if (count == 0U) {
+        return 0U;
+    }
+    if (percentile >= 100U) {
+        return count - 1U;
+    }
+
+    numerator = (uint64_t)percentile * (uint64_t)count;
+    rank = (size_t)((numerator + 99ULL) / 100ULL);
+    if (rank < 1U) {
+        rank = 1U;
+    }
+    if (rank > count) {
+        rank = count;
+    }
+    return rank - 1U;
+}
+
+static void print_latency_histogram(const uint64_t *samples_ns, size_t count)
+{
+    static const uint32_t upper_bounds_us[] = {
+        1U, 2U, 5U, 10U, 20U, 50U, 100U, 200U, 500U, 1000U, 2000U, 5000U, 10000U
+    };
+    uint64_t buckets[(sizeof(upper_bounds_us) / sizeof(upper_bounds_us[0])) + 1U];
+    size_t i;
+    size_t j;
+
+    memset(buckets, 0, sizeof(buckets));
+    for (i = 0U; i < count; i++) {
+        uint64_t value_us;
+        bool placed;
+
+        value_us = (samples_ns[i] + 999ULL) / 1000ULL;
+        placed = false;
+        for (j = 0U; j < (sizeof(upper_bounds_us) / sizeof(upper_bounds_us[0])); j++) {
+            if (value_us <= upper_bounds_us[j]) {
+                buckets[j] += 1U;
+                placed = true;
+                break;
+            }
+        }
+        if (placed == false) {
+            buckets[sizeof(upper_bounds_us) / sizeof(upper_bounds_us[0])] += 1U;
+        }
+    }
+
+    fprintf(stderr, "[PPC] bench-histo(us):\n");
+    for (j = 0U; j < (sizeof(upper_bounds_us) / sizeof(upper_bounds_us[0])); j++) {
+        fprintf(stderr, "[PPC]   <=%5" PRIu32 " : %" PRIu64 "\n", upper_bounds_us[j], buckets[j]);
+    }
+    fprintf(stderr, "[PPC]   >%5" PRIu32 " : %" PRIu64 "\n",
+            upper_bounds_us[(sizeof(upper_bounds_us) / sizeof(upper_bounds_us[0])) - 1U],
+            buckets[sizeof(upper_bounds_us) / sizeof(upper_bounds_us[0])]);
 }
 
 static void sleep_ms(int milliseconds)
@@ -825,17 +951,27 @@ static bool run_mailbox_bench(
     int warmup_iters,
     int bench_iters,
     int cmd_timeout_ms,
-    uint32_t *seq_in_out)
+    uint32_t *seq_in_out,
+    bench_mode_kind mode,
+    bool histogram_enabled)
 {
     uint32_t seq;
     int i;
-    struct timespec ts_start;
-    struct timespec ts_end;
+    uint64_t start_ns;
+    uint64_t end_ns;
+    uint64_t elapsed_ns;
     double elapsed_seconds;
     double ops_per_sec;
     double avg_us_per_op;
+    uint64_t *samples_ns;
 
     seq = *seq_in_out;
+    samples_ns = NULL;
+
+    if (bench_iters <= 0) {
+        fprintf(stderr, "[PPC] benchmark iterations must be > 0\n");
+        return false;
+    }
 
     for (i = 0; i < warmup_iters; i++) {
         mailbox_result result;
@@ -855,48 +991,116 @@ static bool run_mailbox_bench(
         }
     }
 
-    if (clock_gettime(CLOCK_MONOTONIC, &ts_start) != 0) {
+    if (mode == BENCH_MODE_LATENCY) {
+        samples_ns = (uint64_t *)calloc((size_t)bench_iters, sizeof(*samples_ns));
+        if (samples_ns == NULL) {
+            fprintf(stderr, "[PPC] benchmark sample allocation failed (%d)\n", bench_iters);
+            return false;
+        }
+    }
+
+    if (monotonic_ns(&start_ns) == false) {
         fprintf(stderr, "[PPC] benchmark start clock_gettime failed: %s\n", strerror(errno));
+        free(samples_ns);
         return false;
     }
 
     for (i = 0; i < bench_iters; i++) {
         mailbox_result result;
         uint32_t arg0;
+        uint64_t op_start_ns;
+        uint64_t op_end_ns;
 
         arg0 = 0xa5a50000U ^ (uint32_t)i;
+        op_start_ns = 0U;
+        if (mode == BENCH_MODE_LATENCY) {
+            if (monotonic_ns(&op_start_ns) == false) {
+                fprintf(stderr, "[PPC] benchmark op-start clock_gettime failed: %s\n",
+                        strerror(errno));
+                free(samples_ns);
+                return false;
+            }
+        }
         seq += 1U;
         if (mailbox_send_and_wait(
                 mailbox, seq, PPC_MAILBOX_CMD_PING, arg0, 0U, cmd_timeout_ms, &result)
             == false) {
+            free(samples_ns);
             return false;
         }
         if ((result.status != PPC_MAILBOX_STATUS_DONE)
             || (result.result0 != (arg0 ^ 0xffffffffU))) {
             fprintf(stderr, "[PPC] benchmark validation failed at iter=%d\n", i);
+            free(samples_ns);
             return false;
+        }
+        if (mode == BENCH_MODE_LATENCY) {
+            if (monotonic_ns(&op_end_ns) == false) {
+                fprintf(stderr, "[PPC] benchmark op-end clock_gettime failed: %s\n",
+                        strerror(errno));
+                free(samples_ns);
+                return false;
+            }
+            if (op_end_ns < op_start_ns) {
+                fprintf(stderr, "[PPC] benchmark op duration underflow at iter=%d\n", i);
+                free(samples_ns);
+                return false;
+            }
+            samples_ns[i] = op_end_ns - op_start_ns;
         }
     }
 
-    if (clock_gettime(CLOCK_MONOTONIC, &ts_end) != 0) {
+    if (monotonic_ns(&end_ns) == false) {
         fprintf(stderr, "[PPC] benchmark end clock_gettime failed: %s\n", strerror(errno));
+        free(samples_ns);
+        return false;
+    }
+    if (end_ns < start_ns) {
+        fprintf(stderr, "[PPC] benchmark elapsed time underflow\n");
+        free(samples_ns);
         return false;
     }
 
-    elapsed_seconds = (double)(ts_end.tv_sec - ts_start.tv_sec)
-                      + ((double)(ts_end.tv_nsec - ts_start.tv_nsec) / 1000000000.0);
+    elapsed_ns = end_ns - start_ns;
+    elapsed_seconds = (double)elapsed_ns / 1000000000.0;
     if (elapsed_seconds <= 0.0) {
         fprintf(stderr, "[PPC] benchmark elapsed time is non-positive\n");
+        free(samples_ns);
         return false;
     }
 
     ops_per_sec = (double)bench_iters / elapsed_seconds;
     avg_us_per_op = (elapsed_seconds * 1000000.0) / (double)bench_iters;
-    fprintf(stderr,
-            "[PPC] bench: iters=%d warmup=%d elapsed=%.3fs ops/s=%.0f avg_us=%.2f\n",
-            bench_iters, warmup_iters, elapsed_seconds, ops_per_sec, avg_us_per_op);
+    if (mode == BENCH_MODE_THROUGHPUT) {
+        fprintf(stderr,
+                "[PPC] bench: mode=%s iters=%d warmup=%d elapsed=%.3fs ops/s=%.0f avg_us=%.2f\n",
+                bench_mode_name(mode), bench_iters, warmup_iters, elapsed_seconds, ops_per_sec,
+                avg_us_per_op);
+    } else {
+        uint64_t p50_ns;
+        uint64_t p95_ns;
+        uint64_t p99_ns;
+        uint64_t max_ns;
+
+        qsort(samples_ns, (size_t)bench_iters, sizeof(*samples_ns), compare_u64_ascending);
+        p50_ns = samples_ns[percentile_index((size_t)bench_iters, 50U)];
+        p95_ns = samples_ns[percentile_index((size_t)bench_iters, 95U)];
+        p99_ns = samples_ns[percentile_index((size_t)bench_iters, 99U)];
+        max_ns = samples_ns[(size_t)bench_iters - 1U];
+        fprintf(stderr,
+                "[PPC] bench-lat: mode=%s samples=%d warmup=%d elapsed=%.3fs ops/s=%.0f "
+                "avg_us=%.2f p50_us=%.2f p95_us=%.2f p99_us=%.2f max_us=%.2f\n",
+                bench_mode_name(mode), bench_iters, warmup_iters, elapsed_seconds, ops_per_sec,
+                avg_us_per_op,
+                (double)p50_ns / 1000.0, (double)p95_ns / 1000.0, (double)p99_ns / 1000.0,
+                (double)max_ns / 1000.0);
+        if (histogram_enabled == true) {
+            print_latency_histogram(samples_ns, (size_t)bench_iters);
+        }
+    }
 
     *seq_in_out = seq;
+    free(samples_ns);
     return true;
 }
 
@@ -916,6 +1120,8 @@ int main(void)
     int start_timeout_ms;
     int cmd_timeout_ms;
     bool bench_mode;
+    bool bench_histo;
+    bench_mode_kind bench_kind;
     bool host_service_enabled;
     bool host_service_test;
     host_service_context host_ctx;
@@ -928,6 +1134,12 @@ int main(void)
     qemu_uae_loader_warn_if_bad_ld_library_path(stderr);
     g_verbose = env_bool_or_default("PPC_VERBOSE", false);
     bench_mode = env_bool_or_default("PPC_BENCH", false);
+    bench_kind = BENCH_MODE_THROUGHPUT;
+    bench_histo = false;
+    if (bench_mode == true) {
+        bench_kind = env_bench_mode_or_default(BENCH_MODE_THROUGHPUT);
+        bench_histo = env_bool_or_default("PPC_BENCH_HISTO", false);
+    }
     if (bench_mode == true) {
         /*
          * Keep benchmark measurements representative of mailbox throughput by
@@ -1073,9 +1285,23 @@ int main(void)
     seq = 0U;
 
     if (bench_mode == true) {
-        bench_iters = env_int_or_default("PPC_BENCH_ITERS", 100000);
+        if (bench_kind == BENCH_MODE_LATENCY) {
+            bench_iters = env_int_or_default(
+                "PPC_BENCH_SAMPLES",
+                env_int_or_default("PPC_BENCH_ITERS", 100000));
+        } else {
+            bench_iters = env_int_or_default("PPC_BENCH_ITERS", 100000);
+        }
         bench_warmup = env_int_or_default("PPC_BENCH_WARMUP", 1000);
-        if (run_mailbox_bench(mailbox, bench_warmup, bench_iters, cmd_timeout_ms, &seq) == false) {
+        if (run_mailbox_bench(
+                mailbox,
+                bench_warmup,
+                bench_iters,
+                cmd_timeout_ms,
+                &seq,
+                bench_kind,
+                bench_histo)
+            == false) {
             exit_code = 9;
             goto shutdown;
         }
