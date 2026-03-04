@@ -103,6 +103,8 @@ export PPC_START_TIMEOUT_MS=2000
 export PPC_MAILBOX_CMD_TIMEOUT_MS=500
 export PPC_MAILBOX_LOOPS=100
 export PPC_VERBOSE=1
+export PPC_HOST_SERVICE=1
+export PPC_HOST_SERVICE_TEST=1
 ./build/ppc/test_ppc_mailbox
 
 Expected Stage 3 markers:
@@ -112,6 +114,12 @@ Expected Stage 3 markers:
 * `mailbox: done seq=... status=2 result0=...`
 * `fetch sanity: NIP=0x... instr=0x...`
 * `mailbox test complete: loops=100`
+
+Stage 4 host service proof markers:
+
+* `mailbox: send seq=... cmd=3` (HOST_TIME32 via PPC->host request lane)
+* `mailbox: send seq=... cmd=4` (MEM_CRC32 via PPC->host request lane)
+* `hostsvc proof: time32 ... -> ..., crc32=...`
 
 Stage 3 benchmark mode (mailbox throughput):
 
@@ -124,6 +132,8 @@ export PPC_BENCH=1
 export PPC_BENCH_ITERS=100000
 export PPC_BENCH_WARMUP=1000
 export PPC_VERBOSE=0
+export PPC_HOST_SERVICE=0
+export PPC_HOST_SERVICE_TEST=0
 ./build/ppc/test_ppc_mailbox
 
 Expected benchmark marker:

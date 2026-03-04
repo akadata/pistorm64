@@ -12,12 +12,29 @@ export PPC_MAILBOX_LOOPS=100
 export PPC_BENCH=${PPC_BENCH:-0}
 export PPC_BENCH_ITERS=${PPC_BENCH_ITERS:-100000}
 export PPC_BENCH_WARMUP=${PPC_BENCH_WARMUP:-1000}
+export PPC_MAILBOX_POLL_SLEEP_MS=${PPC_MAILBOX_POLL_SLEEP_MS:-}
 
 if [ -z "${PPC_VERBOSE+x}" ]; then
   if [ "${PPC_BENCH}" = "1" ]; then
     export PPC_VERBOSE=0
   else
     export PPC_VERBOSE=1
+  fi
+fi
+
+if [ -z "${PPC_HOST_SERVICE+x}" ]; then
+  if [ "${PPC_BENCH}" = "1" ]; then
+    export PPC_HOST_SERVICE=0
+  else
+    export PPC_HOST_SERVICE=1
+  fi
+fi
+
+if [ -z "${PPC_HOST_SERVICE_TEST+x}" ]; then
+  if [ "${PPC_BENCH}" = "1" ]; then
+    export PPC_HOST_SERVICE_TEST=0
+  else
+    export PPC_HOST_SERVICE_TEST=1
   fi
 fi
 
