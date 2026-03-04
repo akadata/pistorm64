@@ -4,7 +4,7 @@ AMIGA_PREFIX ?= /opt/amiga
 CROSS ?= $(AMIGA_PREFIX)/bin/m68k-amigaos-
 
 CC := $(CROSS)gcc
-CFLAGS := -m68020 -O2 -Wall -Wextra -noixemul
+CFLAGS := -m68020 -O2 -Wall -Wextra -noixemul -I../../src/platforms/amiga/zorro/ppc_accel
 
 TOOL := C/ppcshake
 TOOL_OBJS := C/ppcshake.o

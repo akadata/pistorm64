@@ -5,11 +5,16 @@
 #include <stdint.h>
 
 /*
- * PiStorm PPC accelerator board v1 (Z2) memory map.
+ * Canonical Stage 6 ABI for PiStorm PPC accelerator board v1 (Z2).
+ * This header is shared by emulator-side board code and Amiga-side tools.
+ *
  * - 0x0000-0x0FFF: register window
  * - 0x1000-0x1FFF: mailbox page
  * - 0x2000-...   : shared RAM window
  */
+#define PPC_ACCEL_MANUFACTURER_ID      0x07DBu
+#define PPC_ACCEL_PRODUCT_ID           0x0040u
+
 #define PPC_ACCEL_Z2_SIZE             (64u * 1024u)
 #define PPC_ACCEL_REG_WINDOW_SIZE     0x1000u
 #define PPC_ACCEL_MAILBOX_OFFSET      0x1000u

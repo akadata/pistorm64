@@ -200,6 +200,8 @@ Amiga-side Stage 6A tool:
 * Source: `amiga/zorro-ppc/C/ppcshake.c`
 * Build: `make -C amiga/zorro-ppc`
 * Run on Amiga shell: `ppcshake` (or `ppcshake 10`)
+* Stage 6B IRQ semantics probe: `ppcshake --irq`
+  * Expected marker: `IRQ test OK: doorbell raise/ack and cmd_done raise/ack.`
 
 ---
 

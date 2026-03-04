@@ -4,7 +4,6 @@
 
 #include "platforms/amiga/amiga-autoconf.h"
 #include "platforms/amiga/amiga_zorro.h"
-#include "platforms/amiga/pistorm-dev/pistorm-dev-enums.h"
 #include "ppc_accel.h"
 #include "ppc_accel_regs.h"
 #include "log.h"
@@ -21,13 +20,16 @@ static ppc_accel_state_t g_ppc_accel_state;
 static uint8_t ppc_accel_rom[] = {
     Z2_Z2,
     AC_MEM_SIZE_64KB,
-    0x4, /* product high nibble */
-    0x0, /* product low nibble */
+    (uint8_t)((PPC_ACCEL_PRODUCT_ID >> 4) & 0x0Fu), /* product high nibble */
+    (uint8_t)(PPC_ACCEL_PRODUCT_ID & 0x0Fu),        /* product low nibble */
     0x0,
     0x0,
     0x0,
     0x0,
-    PISTORM_AC_MANUF_ID,
+    (uint8_t)((PPC_ACCEL_MANUFACTURER_ID >> 12) & 0x0Fu),
+    (uint8_t)((PPC_ACCEL_MANUFACTURER_ID >> 8) & 0x0Fu),
+    (uint8_t)((PPC_ACCEL_MANUFACTURER_ID >> 4) & 0x0Fu),
+    (uint8_t)(PPC_ACCEL_MANUFACTURER_ID & 0x0Fu),
     0x0,
     0x0,
     0x0,
@@ -338,8 +340,8 @@ static zorro_device_t z2_ppc_accel_device = {
     .name = "z2-ppc-accel",
     .bus = ZORRO_BUS_Z2,
     .size = PPC_ACCEL_Z2_SIZE,
-    .manufacturer = PISTORM_MANUF_ID,
-    .product = PISTORM_PROD_PPC_ACCEL_Z2,
+    .manufacturer = PPC_ACCEL_MANUFACTURER_ID,
+    .product = PPC_ACCEL_PRODUCT_ID,
     .flags = 0,
     .ac_rom = ppc_accel_rom,
     .ac_rom_size = sizeof(ppc_accel_rom),

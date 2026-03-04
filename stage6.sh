@@ -17,9 +17,12 @@ Manual test steps:
    ppcshake
    # or:
    ppcshake 10
+   # Stage 6B IRQ/doorbell semantics:
+   ppcshake --irq
 
 Expected output:
 - "PPC accel found at $........"
 - "TIME32[0] = $........ (...)"
+- with --irq: "IRQ test OK: doorbell raise/ack and cmd_done raise/ack."
 - Exit code 0
 EOF

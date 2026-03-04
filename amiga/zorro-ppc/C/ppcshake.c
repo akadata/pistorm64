@@ -6,34 +6,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define PPC_ACCEL_MANUFACTURER 0x07DBu
-#define PPC_ACCEL_PRODUCT      0x0040u
+#include "ppc_accel_regs.h"
 
-#define PPC_ACCEL_REG_MAGIC       0x0000u
-#define PPC_ACCEL_REG_CONTROL     0x0008u
-#define PPC_ACCEL_REG_STATUS      0x000Cu
-#define PPC_ACCEL_REG_MB_OFFSET   0x001Cu
-
-#define PPC_ACCEL_MAGIC           0x50504341u
-#define PPC_ACCEL_CTRL_START      0x00000001u
-#define PPC_ACCEL_STATUS_RUNNING  0x00000001u
-
-#define PPC_ACCEL_MB_OFF_MAGIC    0x0000u
-#define PPC_ACCEL_MB_OFF_SEQ      0x0008u
-#define PPC_ACCEL_MB_OFF_ACK_SEQ  0x000Cu
-#define PPC_ACCEL_MB_OFF_CMD      0x0010u
-#define PPC_ACCEL_MB_OFF_STATUS   0x0014u
-#define PPC_ACCEL_MB_OFF_ARG0     0x0018u
-#define PPC_ACCEL_MB_OFF_ARG1     0x001Cu
-#define PPC_ACCEL_MB_OFF_RESULT0  0x0020u
-#define PPC_ACCEL_MB_OFF_RESULT1  0x0024u
-
-#define PPC_ACCEL_MB_MAGIC        0x504D4241u
-#define PPC_ACCEL_MB_CMD_TIME32   3u
-#define PPC_ACCEL_MB_STATUS_IDLE  0u
-#define PPC_ACCEL_MB_STATUS_DONE  2u
-#define PPC_ACCEL_MB_STATUS_ERR   3u
+#define PPC_ACCEL_MANUFACTURER PPC_ACCEL_MANUFACTURER_ID
+#define PPC_ACCEL_PRODUCT PPC_ACCEL_PRODUCT_ID
 
 static ULONG read_be32(volatile UBYTE *base, ULONG offset) {
   ULONG b0;
@@ -62,7 +40,7 @@ static ULONG do_time32_roundtrip(volatile UBYTE *board) {
   ULONG ack;
   ULONG status;
 
-  mailbox = board + read_be32(board, PPC_ACCEL_REG_MB_OFFSET);
+  mailbox = board + read_be32(board, PPC_ACCEL_REG_MAILBOX_OFFSET);
   if (read_be32(mailbox, PPC_ACCEL_MB_OFF_MAGIC) != PPC_ACCEL_MB_MAGIC) {
     printf("Mailbox magic mismatch.\n");
     return 0xFFFFFFFFu;
@@ -73,7 +51,7 @@ static ULONG do_time32_roundtrip(volatile UBYTE *board) {
     seq = 1u;
   }
 
-  write_be32(mailbox, PPC_ACCEL_MB_OFF_CMD, PPC_ACCEL_MB_CMD_TIME32);
+  write_be32(mailbox, PPC_ACCEL_MB_OFF_CMD, PPC_ACCEL_MB_CMD_HOST_TIME32);
   write_be32(mailbox, PPC_ACCEL_MB_OFF_ARG0, 0u);
   write_be32(mailbox, PPC_ACCEL_MB_OFF_ARG1, 0u);
   write_be32(mailbox, PPC_ACCEL_MB_OFF_RESULT0, 0u);
@@ -104,18 +82,74 @@ static ULONG do_time32_roundtrip(volatile UBYTE *board) {
   return read_be32(mailbox, PPC_ACCEL_MB_OFF_RESULT0);
 }
 
+static int do_irq_semantics_test(volatile UBYTE *board) {
+  ULONG control;
+  ULONG irq_status;
+  ULONG t32;
+
+  control = read_be32(board, PPC_ACCEL_REG_CONTROL);
+  control |= PPC_ACCEL_CTRL_START | PPC_ACCEL_CTRL_IRQ_ENABLE;
+  write_be32(board, PPC_ACCEL_REG_CONTROL, control);
+
+  write_be32(board, PPC_ACCEL_REG_IRQ_ACK, PPC_ACCEL_IRQ_CMD_DONE | PPC_ACCEL_IRQ_HOST_DOORBELL);
+  irq_status = read_be32(board, PPC_ACCEL_REG_IRQ_STATUS);
+  if ((irq_status & (PPC_ACCEL_IRQ_CMD_DONE | PPC_ACCEL_IRQ_HOST_DOORBELL)) != 0u) {
+    printf("IRQ clear failed, status=$%08X.\n", (unsigned int)irq_status);
+    return 1;
+  }
+
+  write_be32(board, PPC_ACCEL_REG_DOORBELL, 1u);
+  irq_status = read_be32(board, PPC_ACCEL_REG_IRQ_STATUS);
+  if ((irq_status & PPC_ACCEL_IRQ_HOST_DOORBELL) == 0u) {
+    printf("Doorbell IRQ not raised, status=$%08X.\n", (unsigned int)irq_status);
+    return 2;
+  }
+  write_be32(board, PPC_ACCEL_REG_IRQ_ACK, PPC_ACCEL_IRQ_HOST_DOORBELL);
+  irq_status = read_be32(board, PPC_ACCEL_REG_IRQ_STATUS);
+  if ((irq_status & PPC_ACCEL_IRQ_HOST_DOORBELL) != 0u) {
+    printf("Doorbell IRQ not cleared, status=$%08X.\n", (unsigned int)irq_status);
+    return 3;
+  }
+
+  t32 = do_time32_roundtrip(board);
+  if (t32 == 0xFFFFFFFFu) {
+    return 4;
+  }
+
+  irq_status = read_be32(board, PPC_ACCEL_REG_IRQ_STATUS);
+  if ((irq_status & PPC_ACCEL_IRQ_CMD_DONE) == 0u) {
+    printf("CMD_DONE IRQ not raised, status=$%08X.\n", (unsigned int)irq_status);
+    return 5;
+  }
+  write_be32(board, PPC_ACCEL_REG_IRQ_ACK, PPC_ACCEL_IRQ_CMD_DONE);
+  irq_status = read_be32(board, PPC_ACCEL_REG_IRQ_STATUS);
+  if ((irq_status & PPC_ACCEL_IRQ_CMD_DONE) != 0u) {
+    printf("CMD_DONE IRQ not cleared, status=$%08X.\n", (unsigned int)irq_status);
+    return 6;
+  }
+
+  printf("IRQ test OK: doorbell raise/ack and cmd_done raise/ack.\n");
+  return 0;
+}
+
 int main(int argc, char **argv) {
   struct ExpansionBase *ExpansionBase;
   struct ConfigDev *cd;
   volatile UBYTE *board;
   ULONG loops;
   ULONG i;
+  int do_irq_test;
 
   loops = 1u;
-  if (argc >= 2) {
-    loops = (ULONG)strtoul(argv[1], NULL, 0);
-    if (loops == 0u) {
-      loops = 1u;
+  do_irq_test = 0;
+  for (i = 1u; i < (ULONG)argc; i++) {
+    if ((strcmp(argv[i], "--irq") == 0) || (strcmp(argv[i], "-i") == 0)) {
+      do_irq_test = 1;
+    } else {
+      loops = (ULONG)strtoul(argv[i], NULL, 0);
+      if (loops == 0u) {
+        loops = 1u;
+      }
     }
   }
 
@@ -142,6 +176,12 @@ int main(int argc, char **argv) {
     return 3;
   }
 
+  if (read_be32(board, PPC_ACCEL_REG_ABI_VERSION) != PPC_ACCEL_ABI_VERSION) {
+    printf("Register ABI version mismatch.\n");
+    CloseLibrary((struct Library *)ExpansionBase);
+    return 6;
+  }
+
   write_be32(board, PPC_ACCEL_REG_CONTROL, read_be32(board, PPC_ACCEL_REG_CONTROL) | PPC_ACCEL_CTRL_START);
   if ((read_be32(board, PPC_ACCEL_REG_STATUS) & PPC_ACCEL_STATUS_RUNNING) == 0u) {
     printf("PPC accel did not enter running state.\n");
@@ -158,6 +198,16 @@ int main(int argc, char **argv) {
       return 5;
     }
     printf("TIME32[%u] = $%08X (%u)\n", (unsigned int)i, (unsigned int)t32, (unsigned int)t32);
+  }
+
+  if (do_irq_test != 0) {
+    int irq_rc;
+
+    irq_rc = do_irq_semantics_test(board);
+    if (irq_rc != 0) {
+      CloseLibrary((struct Library *)ExpansionBase);
+      return 10 + irq_rc;
+    }
   }
 
   CloseLibrary((struct Library *)ExpansionBase);

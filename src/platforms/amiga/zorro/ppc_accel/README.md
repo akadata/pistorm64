@@ -3,6 +3,9 @@
 This is a first board-model slice for a PiStorm PPC accelerator device exposed via
 Zorro-II AutoConfig.
 
+Canonical ABI constants are defined in `ppc_accel_regs.h` and shared with
+Amiga-side tools to prevent register/mailbox offset drift.
+
 Enable in config:
 
 ```ini

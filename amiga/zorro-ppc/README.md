@@ -32,9 +32,16 @@ Optional loop count:
 ppcshake 10
 ```
 
+IRQ/doorbell semantics check:
+
+```sh
+ppcshake --irq
+```
+
 Expected output includes:
 
 - detected board base from `FindConfigDev(0x07DB, 0x0040)`
 - `TIME32[...] = $XXXXXXXX (...)` lines
+- with `--irq`: `IRQ test OK: doorbell raise/ack and cmd_done raise/ack.`
 
 This validates Stage 6A discovery + mailbox round-trip over Zorro.
