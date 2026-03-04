@@ -17,6 +17,8 @@ Manual test steps:
 
 3) Copy/run the handshake tool from Amiga shell:
    ppcshake
+   # board identity/sanity dump:
+   ppcshake --id
    # or:
    ppcshake 10
    # Stage 6B IRQ/doorbell semantics:

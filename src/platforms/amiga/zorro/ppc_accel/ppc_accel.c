@@ -585,6 +585,7 @@ static void ppc_accel_mailbox_reset(ppc_accel_state_t *state)
       state->window,
       PPC_ACCEL_MAILBOX_OFFSET + PPC_MAILBOX_OFF_HOST_STATUS,
       PPC_MAILBOX_STATUS_IDLE);
+  ppc_accel_write_shared_info(state);
 
   state->have_last_ack_seq = false;
   state->last_ack_seq = 0u;
@@ -668,6 +669,55 @@ static bool ppc_accel_allow_host_mailbox_write(ppc_accel_state_t *state, uint32_
         return false;
       }
     }
+  }
+  return true;
+}
+
+static uint32_t ppc_accel_shared_info_features(const ppc_accel_state_t *state)
+{
+  uint32_t features;
+
+  features = PPC_ACCEL_SHARED_INFO_FEAT_HOSTSVC | PPC_ACCEL_SHARED_INFO_FEAT_IRQ;
+  if ((state->runtime_started == true) && (state->loader.qemu_uae_ppc_external_interrupt != NULL)) {
+    features |= PPC_ACCEL_SHARED_INFO_FEAT_DOORBELL;
+  }
+  return features;
+}
+
+static void ppc_accel_write_shared_info(ppc_accel_state_t *state)
+{
+  uint32_t base;
+
+  base = PPC_ACCEL_SHARED_INFO_OFFSET;
+  write_be32(state->window, base + PPC_ACCEL_SHARED_INFO_OFF_SIGNATURE, PPC_ACCEL_SHARED_INFO_SIGNATURE);
+  write_be32(state->window, base + PPC_ACCEL_SHARED_INFO_OFF_ABI_VERSION,
+             PPC_ACCEL_SHARED_INFO_ABI_VERSION);
+  write_be32(state->window, base + PPC_ACCEL_SHARED_INFO_OFF_MB_OFFSET, PPC_ACCEL_MAILBOX_OFFSET);
+  write_be32(state->window, base + PPC_ACCEL_SHARED_INFO_OFF_MB_SIZE, PPC_ACCEL_MAILBOX_SIZE);
+  write_be32(state->window, base + PPC_ACCEL_SHARED_INFO_OFF_DB_REG, PPC_ACCEL_REG_DOORBELL);
+  write_be32(state->window, base + PPC_ACCEL_SHARED_INFO_OFF_FEATURES,
+             ppc_accel_shared_info_features(state));
+  write_be32(state->window, base + PPC_ACCEL_SHARED_INFO_OFF_RESERVED0, 0u);
+  write_be32(state->window, base + PPC_ACCEL_SHARED_INFO_OFF_RESERVED1, 0u);
+}
+
+static bool ppc_accel_shared_info_write_protected(uint32_t offset, uint32_t size)
+{
+  uint32_t info_start;
+  uint32_t info_end;
+  uint32_t write_start;
+  uint32_t write_end;
+
+  info_start = PPC_ACCEL_SHARED_INFO_OFFSET;
+  info_end = info_start + PPC_ACCEL_SHARED_INFO_SIZE;
+  write_start = offset;
+  write_end = offset + size;
+
+  if (write_end <= info_start) {
+    return false;
+  }
+  if (write_start >= info_end) {
+    return false;
   }
   return true;
 }
@@ -851,6 +901,7 @@ static bool ppc_accel_backend_bootstrap(ppc_accel_state_t *state)
 
   state->runtime_started = true;
   state->runtime_state = PPC_ACCEL_RUNTIME_PAUSED;
+  ppc_accel_write_shared_info(state);
   LOG_INFO("[PPC-ACCEL] runtime started using %s\n", state->loader.loaded_path);
   return true;
 
@@ -1090,6 +1141,12 @@ static void ppc_accel_write8(zorro_device_t *dev, uint32_t offset, uint8_t value
     reg_value = (reg_value & ~mask) | ((uint32_t)value << shift);
     ppc_accel_reg_write32(state, reg_base, reg_value);
   } else {
+    if (ppc_accel_shared_info_write_protected(offset, 1u) == true) {
+      if (state->verbose == true) {
+        LOG_INFO("[PPC-ACCEL] ignored write8 to shared-info +0x%04" PRIx32 "\n", offset);
+      }
+      return;
+    }
     if (ppc_accel_allow_host_mailbox_write(state, offset, 1u) == false) {
       if (state->verbose == true) {
         LOG_INFO("[PPC-ACCEL] ignored overlapping mailbox write8 at +0x%04" PRIx32 "\n", offset);
@@ -1129,6 +1186,12 @@ static void ppc_accel_write16(zorro_device_t *dev, uint32_t offset, uint16_t val
     reg_value = (reg_value & ~mask) | ((uint32_t)value << shift);
     ppc_accel_reg_write32(state, reg_base, reg_value);
   } else {
+    if (ppc_accel_shared_info_write_protected(offset, 2u) == true) {
+      if (state->verbose == true) {
+        LOG_INFO("[PPC-ACCEL] ignored write16 to shared-info +0x%04" PRIx32 "\n", offset);
+      }
+      return;
+    }
     if (ppc_accel_allow_host_mailbox_write(state, offset, 2u) == false) {
       if (state->verbose == true) {
         LOG_INFO("[PPC-ACCEL] ignored overlapping mailbox write16 at +0x%04" PRIx32 "\n", offset);
@@ -1154,6 +1217,12 @@ static void ppc_accel_write32(zorro_device_t *dev, uint32_t offset, uint32_t val
   if ((offset < PPC_ACCEL_REG_WINDOW_SIZE) && ((offset & 0x3u) == 0u)) {
     ppc_accel_reg_write32(state, offset, value);
   } else {
+    if (ppc_accel_shared_info_write_protected(offset, 4u) == true) {
+      if (state->verbose == true) {
+        LOG_INFO("[PPC-ACCEL] ignored write32 to shared-info +0x%04" PRIx32 "\n", offset);
+      }
+      return;
+    }
     if (ppc_accel_allow_host_mailbox_write(state, offset, 4u) == false) {
       if (state->verbose == true) {
         LOG_INFO("[PPC-ACCEL] ignored overlapping mailbox write32 at +0x%04" PRIx32 "\n", offset);

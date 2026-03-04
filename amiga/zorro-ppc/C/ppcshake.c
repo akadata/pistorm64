@@ -208,6 +208,95 @@ static int do_irq_semantics_test(volatile UBYTE *board) {
   return 0;
 }
 
+static int dump_board_identity(volatile UBYTE *board) {
+  ULONG magic;
+  ULONG abi_version;
+  ULONG control;
+  ULONG status;
+  ULONG irq_status;
+  ULONG mb_offset;
+  ULONG mb_size;
+  ULONG shared_offset;
+  ULONG shared_size;
+  ULONG shared_sig;
+  ULONG shared_abi;
+  ULONG shared_mb_offset;
+  ULONG shared_mb_size;
+  ULONG shared_db_reg;
+  ULONG shared_features;
+  ULONG irq_before;
+  ULONG irq_after_ring;
+  ULONG irq_after_ack;
+
+  magic = read_be32(board, PPC_ACCEL_REG_MAGIC);
+  abi_version = read_be32(board, PPC_ACCEL_REG_ABI_VERSION);
+  control = read_be32(board, PPC_ACCEL_REG_CONTROL);
+  status = read_be32(board, PPC_ACCEL_REG_STATUS);
+  irq_status = read_be32(board, PPC_ACCEL_REG_IRQ_STATUS);
+  mb_offset = read_be32(board, PPC_ACCEL_REG_MAILBOX_OFFSET);
+  mb_size = read_be32(board, PPC_ACCEL_REG_MAILBOX_SIZE);
+  shared_offset = read_be32(board, PPC_ACCEL_REG_SHARED_OFFSET);
+  shared_size = read_be32(board, PPC_ACCEL_REG_SHARED_SIZE);
+
+  printf("Board identity:\n");
+  printf("  MAGIC         = $%08X\n", (unsigned int)magic);
+  printf("  ABI_VERSION   = %u\n", (unsigned int)abi_version);
+  printf("  CONTROL       = $%08X\n", (unsigned int)control);
+  printf("  STATUS        = $%08X (RUNNING=%u FAULT=%u)\n",
+         (unsigned int)status,
+         (unsigned int)((status & PPC_ACCEL_STATUS_RUNNING) != 0u),
+         (unsigned int)((status & PPC_ACCEL_STATUS_FAULT) != 0u));
+  printf("  IRQ_STATUS    = $%08X\n", (unsigned int)irq_status);
+  printf("  MAILBOX       = off=$%08X size=$%08X\n",
+         (unsigned int)mb_offset,
+         (unsigned int)mb_size);
+  printf("  SHARED        = off=$%08X size=$%08X\n",
+         (unsigned int)shared_offset,
+         (unsigned int)shared_size);
+
+  shared_sig = read_be32(board, PPC_ACCEL_SHARED_INFO_OFFSET + PPC_ACCEL_SHARED_INFO_OFF_SIGNATURE);
+  shared_abi = read_be32(board, PPC_ACCEL_SHARED_INFO_OFFSET + PPC_ACCEL_SHARED_INFO_OFF_ABI_VERSION);
+  shared_mb_offset = read_be32(board, PPC_ACCEL_SHARED_INFO_OFFSET + PPC_ACCEL_SHARED_INFO_OFF_MB_OFFSET);
+  shared_mb_size = read_be32(board, PPC_ACCEL_SHARED_INFO_OFFSET + PPC_ACCEL_SHARED_INFO_OFF_MB_SIZE);
+  shared_db_reg = read_be32(board, PPC_ACCEL_SHARED_INFO_OFFSET + PPC_ACCEL_SHARED_INFO_OFF_DB_REG);
+  shared_features = read_be32(board, PPC_ACCEL_SHARED_INFO_OFFSET + PPC_ACCEL_SHARED_INFO_OFF_FEATURES);
+
+  printf("Shared info @ +$%08X:\n", (unsigned int)PPC_ACCEL_SHARED_INFO_OFFSET);
+  printf("  SIG           = $%08X\n", (unsigned int)shared_sig);
+  printf("  ABI_VERSION   = %u\n", (unsigned int)shared_abi);
+  printf("  MB_OFFSET     = $%08X\n", (unsigned int)shared_mb_offset);
+  printf("  MB_SIZE       = $%08X\n", (unsigned int)shared_mb_size);
+  printf("  DOORBELL_REG  = $%08X\n", (unsigned int)shared_db_reg);
+  printf("  FEATURES      = $%08X (HOSTSVC=%u IRQ=%u DOORBELL=%u)\n",
+         (unsigned int)shared_features,
+         (unsigned int)((shared_features & PPC_ACCEL_SHARED_INFO_FEAT_HOSTSVC) != 0u),
+         (unsigned int)((shared_features & PPC_ACCEL_SHARED_INFO_FEAT_IRQ) != 0u),
+         (unsigned int)((shared_features & PPC_ACCEL_SHARED_INFO_FEAT_DOORBELL) != 0u));
+
+  write_be32(board, PPC_ACCEL_REG_IRQ_ACK, PPC_ACCEL_IRQ_CMD_DONE | PPC_ACCEL_IRQ_HOST_DOORBELL);
+  irq_before = read_be32(board, PPC_ACCEL_REG_IRQ_STATUS);
+  write_be32(board, PPC_ACCEL_REG_DOORBELL, 1u);
+  irq_after_ring = read_be32(board, PPC_ACCEL_REG_IRQ_STATUS);
+  write_be32(board, PPC_ACCEL_REG_IRQ_ACK, PPC_ACCEL_IRQ_HOST_DOORBELL);
+  irq_after_ack = read_be32(board, PPC_ACCEL_REG_IRQ_STATUS);
+
+  printf("IRQ doorbell check: before=$%08X after_ring=$%08X after_ack=$%08X\n",
+         (unsigned int)irq_before,
+         (unsigned int)irq_after_ring,
+         (unsigned int)irq_after_ack);
+
+  if ((irq_after_ring & PPC_ACCEL_IRQ_HOST_DOORBELL) == 0u) {
+    printf("IRQ doorbell check failed: HOST_DOORBELL did not set.\n");
+    return 1;
+  }
+  if ((irq_after_ack & PPC_ACCEL_IRQ_HOST_DOORBELL) != 0u) {
+    printf("IRQ doorbell check failed: HOST_DOORBELL did not clear.\n");
+    return 2;
+  }
+
+  return 0;
+}
+
 int main(int argc, char **argv) {
   struct ExpansionBase *ExpansionBase;
   struct ConfigDev *cd;
@@ -215,10 +304,12 @@ int main(int argc, char **argv) {
   volatile UBYTE *board;
   ULONG loops;
   ULONG i;
+  int do_identity_dump;
   int do_irq_test;
   int exit_code;
 
   loops = 1u;
+  do_identity_dump = 0;
   do_irq_test = 0;
   exit_code = 0;
   instance_lock = (BPTR)0;
@@ -226,6 +317,8 @@ int main(int argc, char **argv) {
   for (i = 1u; i < (ULONG)argc; i++) {
     if ((strcmp(argv[i], "--irq") == 0) || (strcmp(argv[i], "-i") == 0)) {
       do_irq_test = 1;
+    } else if ((strcmp(argv[i], "--id") == 0) || (strcmp(argv[i], "--identity") == 0)) {
+      do_identity_dump = 1;
     } else {
       loops = (ULONG)strtoul(argv[i], NULL, 0);
       if (loops == 0u) {
@@ -268,6 +361,16 @@ int main(int argc, char **argv) {
   if (read_be32(board, PPC_ACCEL_REG_ABI_VERSION) != PPC_ACCEL_ABI_VERSION) {
     printf("Register ABI version mismatch.\n");
     exit_code = 6;
+    goto cleanup;
+  }
+
+  if (do_identity_dump != 0) {
+    int id_rc;
+
+    id_rc = dump_board_identity(board);
+    if (id_rc != 0) {
+      exit_code = 30 + id_rc;
+    }
     goto cleanup;
   }
 

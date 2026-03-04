@@ -672,6 +672,9 @@ install: all amiga-piscsi
 	cp -a src/a314/files_pi/. $(INSTALL_DIR)/a314/
 	cp -a data $(INSTALL_DIR)/
 	$(MAKE) -C src/platforms/amiga/pistorm-dev/pistorm_dev_amiga install INSTALL_DIR=$(INSTALL_DIR)/data/a314-shared BUILD_PISTORM_GUI=$(BUILD_PISTORM_GUI)
+	$(MAKE) -C amiga/zorro-ppc all
+	$(INSTALL) -d $(INSTALL_DIR)/data/a314-shared
+	cp amiga/zorro-ppc/C/ppcshake $(INSTALL_DIR)/data/a314-shared/
 #	$(INSTALL) -d $(INSTALL_DIR)/data/a314-shared
 #	@if [ -d $(INSTALL_DIR)/data/a314-shared ] && [ "$$(ls -A $(INSTALL_DIR)/data/a314-shared 2>/dev/null)" ]; then \
 #		echo "Warning: $(INSTALL_DIR)/data/a314-shared is not empty; Python code must not be installed there."; \

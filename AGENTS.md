@@ -186,6 +186,17 @@ Doorbell semantics:
 
 Stage 6A/6B/6C board-model bring-up (Amiga Zorro device, PPC-backed mailbox):
 
+Stage 6C baseline tags:
+
+* `ppc-stage6c-ppc-backend`
+* `ppc-stage6c-ppcshake-lock`
+
+Stage 6C status (frozen summary):
+
+* Real: QEMU-UAE PPC runtime starts from board `CONTROL.START`, mailbox runs on PPC, host service lane is active.
+* Stubbed: no OS4 kernel/platform integration yet; this is still board-level bring-up plus mailbox transport.
+* Known UX issue: rapid AmigaShell re-entry can wedge a CLI line; mitigated by `ppcshake` single-instance lock and busy checks.
+
 * Enable in Amiga config: `setvar zorro-ppc` (alias: `setvar ppc-accel`)
 * AutoConfig identity: manufacturer `$07DB`, product `$0040`
 * Device map:
@@ -206,6 +217,7 @@ Amiga-side Stage 6A tool:
 * Source: `amiga/zorro-ppc/C/ppcshake.c`
 * Build: `make -C amiga/zorro-ppc`
 * Run on Amiga shell: `ppcshake` (or `ppcshake 10`)
+* Stage 7A identity dump: `ppcshake --id`
 * Stage 6B IRQ semantics probe: `ppcshake --irq`
   * Expected marker: `IRQ test OK: doorbell raise/ack and cmd_done raise/ack.`
   * Concurrent start guard: `ppcshake busy: another instance is running. Try again.`

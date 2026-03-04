@@ -31,6 +31,17 @@ setvar ppc-accel
 - `0x1000-0x1FFF`: mailbox page
 - `0x2000-0xFFFF`: shared RAM window
 
+Shared window starts with a read-only shared-info block at `0x2000`:
+
+- `+0x00` signature (`PPCA`)
+- `+0x04` abi_version
+- `+0x08` mailbox_offset
+- `+0x0C` mailbox_size
+- `+0x10` doorbell_register_offset
+- `+0x14` feature_flags
+- `+0x18` reserved0
+- `+0x1C` reserved1
+
 Register block (`32-bit big-endian`):
 
 - `0x0000` `MAGIC` = `0x50504341` (`PPCA`)

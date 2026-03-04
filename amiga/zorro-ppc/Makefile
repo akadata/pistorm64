@@ -19,7 +19,7 @@ $(TOOL): $(TOOL_OBJS)
 
 install: all
 	mkdir -p $(AMIGA_PREFIX)/C
-	cp C/ppcshake $(AMIGA_PREFIX)/C/
+	cp C/ppcshake /opt/pistorm64/data/a314-shared/
 
 clean:
 	rm -f C/*.o $(TOOL)
