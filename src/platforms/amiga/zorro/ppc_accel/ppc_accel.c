@@ -903,6 +903,10 @@ static bool ppc_accel_set_running(ppc_accel_state_t *state, bool running)
     return true;
   }
 
+  if ((state->runtime_state == PPC_ACCEL_RUNTIME_STOPPED) && (state->runtime_started == false)) {
+    state->status &= ~PPC_ACCEL_STATUS_RUNNING;
+    return true;
+  }
   if (state->runtime_state == PPC_ACCEL_RUNTIME_PAUSED) {
     state->status &= ~PPC_ACCEL_STATUS_RUNNING;
     return true;

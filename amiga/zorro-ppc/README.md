@@ -47,3 +47,9 @@ Expected output includes:
 - concurrent invocations now fail fast with `ppcshake busy: another instance is running. Try again.`
 
 This validates Stage 6A discovery + mailbox round-trip over Zorro.
+
+Known CLI behavior:
+
+- AmigaShell can queue rapid cursor-up/enter re-entry in ways that look like a stuck command.
+- `ppcshake` is single-instance and should fail fast when another instance is active.
+- If a shell wedges, open a fresh shell and run `ppcshake` again.

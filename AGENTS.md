@@ -209,6 +209,7 @@ Amiga-side Stage 6A tool:
 * Stage 6B IRQ semantics probe: `ppcshake --irq`
   * Expected marker: `IRQ test OK: doorbell raise/ack and cmd_done raise/ack.`
   * Concurrent start guard: `ppcshake busy: another instance is running. Try again.`
+* Known AmigaShell UX quirk: rapid cursor-up/enter re-entry can wedge a shell command line; open a fresh shell and retry.
 
 ---
 
