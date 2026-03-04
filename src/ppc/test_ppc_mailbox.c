@@ -20,6 +20,8 @@
  *   export PPC_START_TIMEOUT_MS=2000
  *   export PPC_MAILBOX_CMD_TIMEOUT_MS=500
  *   export PPC_MAILBOX_LOOPS=100
+ *   export PPC_VERBOSE=1
+ *   export PPC_BENCH=0
  *   ./build/ppc/test_ppc_mailbox
  */
 
@@ -43,6 +45,9 @@
 static const uint32_t PPC_RAM_BASE = 0x00000000U;
 static const uint32_t PPC_RAM_BYTES_DEFAULT = 1024U * 1024U;
 static const uint32_t PPC_RESET_WINDOW_BASE = 0xfff00000U;
+static bool g_verbose = false;
+static bool g_qemu_log_output = false;
+static int g_poll_sleep_ms = 1;
 
 typedef struct harness_debug_state {
     pthread_mutex_t lock;
@@ -109,15 +114,19 @@ static bool io_read32(uint32_t addr, uint32_t *data, int size)
     if (data != NULL) {
         *data = 0xDEADBEEFU;
     }
-    fprintf(stderr, "[PPC-IO] read addr=0x%08" PRIx32 " size=%d -> 0x%08" PRIx32 "\n",
-            addr, size, (data != NULL) ? *data : 0U);
+    if (g_verbose == true) {
+        fprintf(stderr, "[PPC-IO] read addr=0x%08" PRIx32 " size=%d -> 0x%08" PRIx32 "\n",
+                addr, size, (data != NULL) ? *data : 0U);
+    }
     return true;
 }
 
 static bool io_write32(uint32_t addr, uint32_t data, int size)
 {
-    fprintf(stderr, "[PPC-IO] write addr=0x%08" PRIx32 " size=%d data=0x%08" PRIx32 "\n",
-            addr, size, data);
+    if (g_verbose == true) {
+        fprintf(stderr, "[PPC-IO] write addr=0x%08" PRIx32 " size=%d data=0x%08" PRIx32 "\n",
+                addr, size, data);
+    }
     return true;
 }
 
@@ -129,15 +138,19 @@ static bool io_read64(uint32_t addr, uint64_t *data)
         *data = 0xDEADBEEFDEADBEEFULL;
     }
     value = (data != NULL) ? *data : UINT64_C(0);
-    fprintf(stderr, "[PPC-IO] read64 addr=0x%08" PRIx32 " -> 0x%016" PRIx64 "\n",
-            addr, value);
+    if (g_verbose == true) {
+        fprintf(stderr, "[PPC-IO] read64 addr=0x%08" PRIx32 " -> 0x%016" PRIx64 "\n",
+                addr, value);
+    }
     return true;
 }
 
 static bool io_write64(uint32_t addr, uint64_t data)
 {
-    fprintf(stderr, "[PPC-IO] write64 addr=0x%08" PRIx32 " data=0x%016" PRIx64 "\n",
-            addr, data);
+    if (g_verbose == true) {
+        fprintf(stderr, "[PPC-IO] write64 addr=0x%08" PRIx32 " data=0x%016" PRIx64 "\n",
+                addr, data);
+    }
     return true;
 }
 
@@ -178,7 +191,9 @@ static void harness_log(const char *format, ...)
     va_end(args);
 
     capture_nip_from_log_message(message);
-    fprintf(stderr, "[QEMU-UAE] %s", message);
+    if (g_qemu_log_output == true) {
+        fprintf(stderr, "[QEMU-UAE] %s", message);
+    }
 }
 
 static int env_int_or_default(const char *name, int default_value)
@@ -198,6 +213,28 @@ static int env_int_or_default(const char *name, int default_value)
         return default_value;
     }
     if ((parsed < 1L) || (parsed > 0x7fffffffL)) {
+        return default_value;
+    }
+    return (int)parsed;
+}
+
+static int env_nonneg_int_or_default(const char *name, int default_value)
+{
+    const char *value;
+    char *end;
+    long parsed;
+
+    value = getenv(name);
+    if ((value == NULL) || (value[0] == '\0')) {
+        return default_value;
+    }
+
+    errno = 0;
+    parsed = strtol(value, &end, 0);
+    if ((errno != 0) || (end == value) || (*end != '\0')) {
+        return default_value;
+    }
+    if ((parsed < 0L) || (parsed > 0x7fffffffL)) {
         return default_value;
     }
     return (int)parsed;
@@ -223,6 +260,30 @@ static uint32_t env_u32_or_default(const char *name, uint32_t default_value)
         return default_value;
     }
     return (uint32_t)parsed;
+}
+
+static bool env_bool_or_default(const char *name, bool default_value)
+{
+    const char *value;
+
+    value = getenv(name);
+    if ((value == NULL) || (value[0] == '\0')) {
+        return default_value;
+    }
+
+    if ((strcmp(value, "1") == 0) || (strcmp(value, "true") == 0)
+        || (strcmp(value, "TRUE") == 0) || (strcmp(value, "yes") == 0)
+        || (strcmp(value, "YES") == 0) || (strcmp(value, "on") == 0)
+        || (strcmp(value, "ON") == 0)) {
+        return true;
+    }
+    if ((strcmp(value, "0") == 0) || (strcmp(value, "false") == 0)
+        || (strcmp(value, "FALSE") == 0) || (strcmp(value, "no") == 0)
+        || (strcmp(value, "NO") == 0) || (strcmp(value, "off") == 0)
+        || (strcmp(value, "OFF") == 0)) {
+        return false;
+    }
+    return default_value;
 }
 
 static void sleep_ms(int milliseconds)
@@ -413,7 +474,9 @@ static bool mailbox_send_and_wait(
     atomic_thread_fence(memory_order_seq_cst);
     mailbox_write_u32(mailbox, PPC_MAILBOX_OFF_SEQ, seq);
 
-    fprintf(stderr, "[PPC] mailbox: send seq=%" PRIu32 " cmd=%" PRIu32 "\n", seq, cmd);
+    if (g_verbose == true) {
+        fprintf(stderr, "[PPC] mailbox: send seq=%" PRIu32 " cmd=%" PRIu32 "\n", seq, cmd);
+    }
 
     deadline = monotonic_ms() + (uint64_t)timeout_ms;
     for (;;) {
@@ -434,10 +497,12 @@ static bool mailbox_send_and_wait(
                 out->result0 = result0;
                 out->result1 = result1;
             }
-            fprintf(stderr,
-                    "[PPC] mailbox: done seq=%" PRIu32 " status=%" PRIu32
-                    " result0=0x%08" PRIx32 "\n",
-                    seq, status, result0);
+            if (g_verbose == true) {
+                fprintf(stderr,
+                        "[PPC] mailbox: done seq=%" PRIu32 " status=%" PRIu32
+                        " result0=0x%08" PRIx32 "\n",
+                        seq, status, result0);
+            }
             return true;
         }
 
@@ -448,8 +513,176 @@ static bool mailbox_send_and_wait(
                     seq, ack_seq, status);
             return false;
         }
-        sleep_ms(1);
+        if (g_poll_sleep_ms > 0) {
+            sleep_ms(g_poll_sleep_ms);
+        }
     }
+}
+
+static bool run_mailbox_functional(
+    uint8_t *mailbox,
+    int loops,
+    int cmd_timeout_ms,
+    uint32_t *seq_in_out)
+{
+    uint32_t i;
+    uint32_t seq;
+
+    seq = *seq_in_out;
+    for (i = 0U; i < (uint32_t)loops; i++) {
+        mailbox_result ping_result;
+        mailbox_result memcpy_result;
+        uint32_t ping_arg0;
+        uint32_t len_words;
+        uint32_t j;
+
+        ping_arg0 = 0x12345678U ^ i;
+        seq += 1U;
+        if (mailbox_send_and_wait(
+                mailbox, seq, PPC_MAILBOX_CMD_PING, ping_arg0, 0U, cmd_timeout_ms, &ping_result)
+            == false) {
+            return false;
+        }
+        if (ping_result.status != PPC_MAILBOX_STATUS_DONE) {
+            fprintf(stderr, "[PPC] mailbox ping status error: %" PRIu32 "\n", ping_result.status);
+            return false;
+        }
+        if (ping_result.result0 != (ping_arg0 ^ 0xffffffffU)) {
+            fprintf(stderr,
+                    "[PPC] mailbox ping mismatch: arg0=0x%08" PRIx32 " result0=0x%08" PRIx32 "\n",
+                    ping_arg0, ping_result.result0);
+            return false;
+        }
+
+        len_words = (i % PPC_MAILBOX_MEMCPY32_MAX_WORDS) + 1U;
+        for (j = 0U; j < len_words; j++) {
+            uint32_t value;
+            uint32_t in_off;
+            uint32_t out_off;
+
+            value = (i << 16U) | j;
+            in_off = PPC_MAILBOX_OFF_PAYLOAD + PPC_MAILBOX_PAYLOAD_IN_OFFSET + (j * 4U);
+            out_off = PPC_MAILBOX_OFF_PAYLOAD + PPC_MAILBOX_PAYLOAD_OUT_OFFSET + (j * 4U);
+            mailbox_write_u32(mailbox, in_off, value);
+            mailbox_write_u32(mailbox, out_off, 0U);
+        }
+
+        seq += 1U;
+        if (mailbox_send_and_wait(
+                mailbox, seq, PPC_MAILBOX_CMD_MEMCPY32, len_words, 0U,
+                cmd_timeout_ms, &memcpy_result)
+            == false) {
+            return false;
+        }
+        if (memcpy_result.status != PPC_MAILBOX_STATUS_DONE) {
+            fprintf(stderr, "[PPC] mailbox memcpy status error: %" PRIu32 "\n",
+                    memcpy_result.status);
+            return false;
+        }
+        if (memcpy_result.result0 != len_words) {
+            fprintf(stderr, "[PPC] mailbox memcpy result length mismatch: expected=%" PRIu32
+                    " got=%" PRIu32 "\n", len_words, memcpy_result.result0);
+            return false;
+        }
+
+        for (j = 0U; j < len_words; j++) {
+            uint32_t expected;
+            uint32_t got;
+            uint32_t out_off;
+
+            expected = (i << 16U) | j;
+            out_off = PPC_MAILBOX_OFF_PAYLOAD + PPC_MAILBOX_PAYLOAD_OUT_OFFSET + (j * 4U);
+            got = mailbox_read_u32(mailbox, out_off);
+            if (got != expected) {
+                fprintf(stderr, "[PPC] mailbox memcpy verify mismatch at word %" PRIu32
+                        ": expected=0x%08" PRIx32 " got=0x%08" PRIx32 "\n",
+                        j, expected, got);
+                return false;
+            }
+        }
+    }
+    *seq_in_out = seq;
+    return true;
+}
+
+static bool run_mailbox_bench(
+    uint8_t *mailbox,
+    int warmup_iters,
+    int bench_iters,
+    int cmd_timeout_ms,
+    uint32_t *seq_in_out)
+{
+    uint32_t seq;
+    int i;
+    struct timespec ts_start;
+    struct timespec ts_end;
+    double elapsed_seconds;
+    double ops_per_sec;
+    double avg_us_per_op;
+
+    seq = *seq_in_out;
+
+    for (i = 0; i < warmup_iters; i++) {
+        mailbox_result result;
+        uint32_t arg0;
+
+        arg0 = 0x12345678U ^ (uint32_t)i;
+        seq += 1U;
+        if (mailbox_send_and_wait(
+                mailbox, seq, PPC_MAILBOX_CMD_PING, arg0, 0U, cmd_timeout_ms, &result)
+            == false) {
+            return false;
+        }
+        if ((result.status != PPC_MAILBOX_STATUS_DONE)
+            || (result.result0 != (arg0 ^ 0xffffffffU))) {
+            fprintf(stderr, "[PPC] benchmark warmup validation failed at iter=%d\n", i);
+            return false;
+        }
+    }
+
+    if (clock_gettime(CLOCK_MONOTONIC, &ts_start) != 0) {
+        fprintf(stderr, "[PPC] benchmark start clock_gettime failed: %s\n", strerror(errno));
+        return false;
+    }
+
+    for (i = 0; i < bench_iters; i++) {
+        mailbox_result result;
+        uint32_t arg0;
+
+        arg0 = 0xa5a50000U ^ (uint32_t)i;
+        seq += 1U;
+        if (mailbox_send_and_wait(
+                mailbox, seq, PPC_MAILBOX_CMD_PING, arg0, 0U, cmd_timeout_ms, &result)
+            == false) {
+            return false;
+        }
+        if ((result.status != PPC_MAILBOX_STATUS_DONE)
+            || (result.result0 != (arg0 ^ 0xffffffffU))) {
+            fprintf(stderr, "[PPC] benchmark validation failed at iter=%d\n", i);
+            return false;
+        }
+    }
+
+    if (clock_gettime(CLOCK_MONOTONIC, &ts_end) != 0) {
+        fprintf(stderr, "[PPC] benchmark end clock_gettime failed: %s\n", strerror(errno));
+        return false;
+    }
+
+    elapsed_seconds = (double)(ts_end.tv_sec - ts_start.tv_sec)
+                      + ((double)(ts_end.tv_nsec - ts_start.tv_nsec) / 1000000000.0);
+    if (elapsed_seconds <= 0.0) {
+        fprintf(stderr, "[PPC] benchmark elapsed time is non-positive\n");
+        return false;
+    }
+
+    ops_per_sec = (double)bench_iters / elapsed_seconds;
+    avg_us_per_op = (elapsed_seconds * 1000000.0) / (double)bench_iters;
+    fprintf(stderr,
+            "[PPC] bench: iters=%d warmup=%d elapsed=%.3fs ops/s=%.0f avg_us=%.2f\n",
+            bench_iters, warmup_iters, elapsed_seconds, ops_per_sec, avg_us_per_op);
+
+    *seq_in_out = seq;
+    return true;
 }
 
 int main(void)
@@ -462,14 +695,30 @@ int main(void)
     uint8_t *ram;
     uint8_t *mailbox;
     uint32_t seq;
-    int loops;
+    int loops = 0;
+    int bench_iters;
+    int bench_warmup;
     int start_timeout_ms;
     int cmd_timeout_ms;
-    uint32_t i;
+    bool bench_mode;
     PPCMemoryRegion regions[2];
     bool ppc_ok;
 
     qemu_uae_loader_warn_if_bad_ld_library_path(stderr);
+    g_verbose = env_bool_or_default("PPC_VERBOSE", false);
+    bench_mode = env_bool_or_default("PPC_BENCH", false);
+    if (bench_mode == true) {
+        /*
+         * Keep benchmark measurements representative of mailbox throughput by
+         * defaulting to quiet logging in benchmark mode.
+         */
+        g_qemu_log_output = false;
+    } else {
+        g_qemu_log_output = g_verbose;
+    }
+    g_poll_sleep_ms = env_nonneg_int_or_default(
+        "PPC_MAILBOX_POLL_SLEEP_MS",
+        bench_mode ? 0 : 1);
     qemu_uae_loader_init(&loader);
 
     so_path = getenv("QEMU_UAE_SO");
@@ -570,80 +819,19 @@ int main(void)
 
     loader.ppc_cpu_set_state(QEMU_UAE_PPC_CPU_STATE_RUNNING);
 
-    loops = env_int_or_default("PPC_MAILBOX_LOOPS", 100);
     cmd_timeout_ms = env_int_or_default("PPC_MAILBOX_CMD_TIMEOUT_MS", 500);
     seq = 0U;
 
-    for (i = 0U; i < (uint32_t)loops; i++) {
-        mailbox_result ping_result;
-        mailbox_result memcpy_result;
-        uint32_t ping_arg0;
-        uint32_t len_words;
-        uint32_t j;
-
-        ping_arg0 = 0x12345678U ^ i;
-        seq += 1U;
-        if (mailbox_send_and_wait(
-                mailbox, seq, PPC_MAILBOX_CMD_PING, ping_arg0, 0U, cmd_timeout_ms, &ping_result)
-            == false) {
+    if (bench_mode == true) {
+        bench_iters = env_int_or_default("PPC_BENCH_ITERS", 100000);
+        bench_warmup = env_int_or_default("PPC_BENCH_WARMUP", 1000);
+        if (run_mailbox_bench(mailbox, bench_warmup, bench_iters, cmd_timeout_ms, &seq) == false) {
             return 8;
         }
-        if (ping_result.status != PPC_MAILBOX_STATUS_DONE) {
-            fprintf(stderr, "[PPC] mailbox ping status error: %" PRIu32 "\n", ping_result.status);
+    } else {
+        loops = env_int_or_default("PPC_MAILBOX_LOOPS", 100);
+        if (run_mailbox_functional(mailbox, loops, cmd_timeout_ms, &seq) == false) {
             return 9;
-        }
-        if (ping_result.result0 != (ping_arg0 ^ 0xffffffffU)) {
-            fprintf(stderr,
-                    "[PPC] mailbox ping mismatch: arg0=0x%08" PRIx32 " result0=0x%08" PRIx32 "\n",
-                    ping_arg0, ping_result.result0);
-            return 10;
-        }
-
-        len_words = (i % PPC_MAILBOX_MEMCPY32_MAX_WORDS) + 1U;
-        for (j = 0U; j < len_words; j++) {
-            uint32_t value;
-            uint32_t in_off;
-            uint32_t out_off;
-
-            value = (i << 16U) | j;
-            in_off = PPC_MAILBOX_OFF_PAYLOAD + PPC_MAILBOX_PAYLOAD_IN_OFFSET + (j * 4U);
-            out_off = PPC_MAILBOX_OFF_PAYLOAD + PPC_MAILBOX_PAYLOAD_OUT_OFFSET + (j * 4U);
-            mailbox_write_u32(mailbox, in_off, value);
-            mailbox_write_u32(mailbox, out_off, 0U);
-        }
-
-        seq += 1U;
-        if (mailbox_send_and_wait(
-                mailbox, seq, PPC_MAILBOX_CMD_MEMCPY32, len_words, 0U,
-                cmd_timeout_ms, &memcpy_result)
-            == false) {
-            return 11;
-        }
-        if (memcpy_result.status != PPC_MAILBOX_STATUS_DONE) {
-            fprintf(stderr, "[PPC] mailbox memcpy status error: %" PRIu32 "\n",
-                    memcpy_result.status);
-            return 12;
-        }
-        if (memcpy_result.result0 != len_words) {
-            fprintf(stderr, "[PPC] mailbox memcpy result length mismatch: expected=%" PRIu32
-                    " got=%" PRIu32 "\n", len_words, memcpy_result.result0);
-            return 13;
-        }
-
-        for (j = 0U; j < len_words; j++) {
-            uint32_t expected;
-            uint32_t got;
-            uint32_t out_off;
-
-            expected = (i << 16U) | j;
-            out_off = PPC_MAILBOX_OFF_PAYLOAD + PPC_MAILBOX_PAYLOAD_OUT_OFFSET + (j * 4U);
-            got = mailbox_read_u32(mailbox, out_off);
-            if (got != expected) {
-                fprintf(stderr, "[PPC] mailbox memcpy verify mismatch at word %" PRIu32
-                        ": expected=0x%08" PRIx32 " got=0x%08" PRIx32 "\n",
-                        j, expected, got);
-                return 14;
-            }
         }
     }
 
@@ -661,13 +849,13 @@ int main(void)
 
         if (have_nip == false) {
             fprintf(stderr, "[PPC] ERROR: did not capture NIP from paused CPU dump\n");
-            return 15;
+            return 10;
         }
         if (fetch_instruction_from_backing(ram, ram_size, last_nip, &instruction) == false) {
             fprintf(stderr,
                     "[PPC] ERROR: NIP=0x%08" PRIx32 " not mapped in reset-window backing store\n",
                     last_nip);
-            return 16;
+            return 11;
         }
         fprintf(stderr, "[PPC] fetch sanity: NIP=0x%08" PRIx32 " instr=0x%08" PRIx32 "\n",
                 last_nip, instruction);
@@ -678,6 +866,10 @@ int main(void)
                 loader.qemu_uae_main_loop_should_exit() ? "true" : "false");
     }
 
-    fprintf(stderr, "[PPC] mailbox test complete: loops=%d\n", loops);
+    if (bench_mode == true) {
+        fprintf(stderr, "[PPC] mailbox benchmark complete\n");
+    } else {
+        fprintf(stderr, "[PPC] mailbox test complete: loops=%d\n", loops);
+    }
     return 0;
 }

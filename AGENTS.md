@@ -102,6 +102,7 @@ export PPC_MODEL=603e
 export PPC_START_TIMEOUT_MS=2000
 export PPC_MAILBOX_CMD_TIMEOUT_MS=500
 export PPC_MAILBOX_LOOPS=100
+export PPC_VERBOSE=1
 ./build/ppc/test_ppc_mailbox
 
 Expected Stage 3 markers:
@@ -111,6 +112,23 @@ Expected Stage 3 markers:
 * `mailbox: done seq=... status=2 result0=...`
 * `fetch sanity: NIP=0x... instr=0x...`
 * `mailbox test complete: loops=100`
+
+Stage 3 benchmark mode (mailbox throughput):
+
+unset LD_LIBRARY_PATH
+export QEMU_UAE_SO=/usr/local/lib/qemu-uae.so
+export PPC_MODEL=603e
+export PPC_START_TIMEOUT_MS=2000
+export PPC_MAILBOX_CMD_TIMEOUT_MS=500
+export PPC_BENCH=1
+export PPC_BENCH_ITERS=100000
+export PPC_BENCH_WARMUP=1000
+export PPC_VERBOSE=0
+./build/ppc/test_ppc_mailbox
+
+Expected benchmark marker:
+
+* `bench: iters=... warmup=... elapsed=...s ops/s=... avg_us=...`
 
 ---
 

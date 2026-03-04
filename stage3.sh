@@ -9,6 +9,17 @@ export PPC_MODEL=603e
 export PPC_START_TIMEOUT_MS=2000
 export PPC_MAILBOX_CMD_TIMEOUT_MS=500
 export PPC_MAILBOX_LOOPS=100
+export PPC_BENCH=${PPC_BENCH:-0}
+export PPC_BENCH_ITERS=${PPC_BENCH_ITERS:-100000}
+export PPC_BENCH_WARMUP=${PPC_BENCH_WARMUP:-1000}
+
+if [ -z "${PPC_VERBOSE+x}" ]; then
+  if [ "${PPC_BENCH}" = "1" ]; then
+    export PPC_VERBOSE=0
+  else
+    export PPC_VERBOSE=1
+  fi
+fi
+
 ./build/ppc/test_ppc_mailbox
 echo $?
-
