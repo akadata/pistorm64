@@ -40,7 +40,6 @@ enum {
 
 typedef struct qemu_uae_loader {
     void *handle;
-    bool runtime_started;
     char error[256];
     const char *loaded_path;
 
@@ -79,10 +78,6 @@ void qemu_uae_loader_init(qemu_uae_loader *loader);
 const char *qemu_uae_loader_error(const qemu_uae_loader *loader);
 bool qemu_uae_loader_open(qemu_uae_loader *loader, const char *so_path);
 void qemu_uae_loader_close(qemu_uae_loader *loader);
-bool qemu_uae_loader_runtime_init(qemu_uae_loader *loader);
-bool qemu_uae_loader_runtime_start_and_wait(qemu_uae_loader *loader);
-bool qemu_uae_loader_runtime_start(qemu_uae_loader *loader);
-bool qemu_uae_loader_ppc_init(qemu_uae_loader *loader, const char *model, uint32_t hid1);
 bool qemu_uae_loader_install_io_callbacks(
     qemu_uae_loader *loader,
     qemu_uae_io_mem_read_function io_read,

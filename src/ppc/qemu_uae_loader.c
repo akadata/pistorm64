@@ -110,7 +110,6 @@ bool qemu_uae_loader_open(qemu_uae_loader *loader, const char *so_path)
 
     qemu_uae_loader_set_error(loader, "%s", "");
     loader->loaded_path = so_path;
-    loader->runtime_started = false;
 
     loader->handle = dlopen(so_path, RTLD_NOW | RTLD_GLOBAL);
     if (loader->handle == NULL) {
@@ -180,89 +179,10 @@ void qemu_uae_loader_close(qemu_uae_loader *loader)
     if (loader == NULL) {
         return;
     }
-    if ((loader->handle != NULL) && (loader->runtime_started == false)) {
+    if (loader->handle != NULL) {
         (void)dlclose(loader->handle);
     }
     qemu_uae_loader_init(loader);
-}
-
-bool qemu_uae_loader_runtime_start(qemu_uae_loader *loader)
-{
-    if (loader == NULL) {
-        return false;
-    }
-    if ((loader->qemu_uae_init == NULL) || (loader->qemu_uae_start == NULL)
-        || (loader->qemu_uae_wait_until_started == NULL)) {
-        qemu_uae_loader_set_error(loader, "runtime functions not resolved");
-        return false;
-    }
-
-    if (qemu_uae_loader_runtime_init(loader) == false) {
-        return false;
-    }
-    if (qemu_uae_loader_runtime_start_and_wait(loader) == false) {
-        return false;
-    }
-
-    return true;
-}
-
-bool qemu_uae_loader_runtime_init(qemu_uae_loader *loader)
-{
-    if (loader == NULL) {
-        return false;
-    }
-    if (loader->qemu_uae_init == NULL) {
-        qemu_uae_loader_set_error(loader, "qemu_uae_init not resolved");
-        return false;
-    }
-    loader->qemu_uae_init();
-    return true;
-}
-
-bool qemu_uae_loader_runtime_start_and_wait(qemu_uae_loader *loader)
-{
-    if (loader == NULL) {
-        return false;
-    }
-    if ((loader->qemu_uae_start == NULL) || (loader->qemu_uae_wait_until_started == NULL)) {
-        qemu_uae_loader_set_error(loader, "qemu_uae_start/wait symbols not resolved");
-        return false;
-    }
-    loader->qemu_uae_start();
-    if ((loader->qemu_uae_mutex_lock != NULL) && (loader->qemu_uae_mutex_unlock != NULL)) {
-        loader->qemu_uae_mutex_lock();
-        loader->qemu_uae_wait_until_started();
-        loader->qemu_uae_mutex_unlock();
-    } else {
-        loader->qemu_uae_wait_until_started();
-    }
-    loader->runtime_started = true;
-    return true;
-}
-
-bool qemu_uae_loader_ppc_init(qemu_uae_loader *loader, const char *model, uint32_t hid1)
-{
-    if (loader == NULL) {
-        return false;
-    }
-    if ((model == NULL) || (model[0] == '\0')) {
-        model = "603e";
-    }
-    if (loader->qemu_uae_ppc_init != NULL) {
-        if (loader->qemu_uae_ppc_init(model, hid1)) {
-            return true;
-        }
-    }
-    if (loader->ppc_cpu_init != NULL) {
-        if (loader->ppc_cpu_init(model, hid1)) {
-            return true;
-        }
-    }
-
-    qemu_uae_loader_set_error(loader, "PPC init failed for model '%s' hid1=0x%08x",
-                              model, hid1);
-    return false;
 }
 
 bool qemu_uae_loader_install_io_callbacks(

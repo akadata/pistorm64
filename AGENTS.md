@@ -63,7 +63,7 @@ Runtime hygiene:
   7. `qemu_uae_mutex_lock()`
   8. `qemu_uae_wait_until_started()`
   9. `qemu_uae_mutex_unlock()`
-  10. run control (`ppc_cpu_run_single` if available, else `ppc_cpu_set_state`)
+  10. run control (`ppc_cpu_set_state` RUNNING/PAUSED) and verify RAM counter changes
 
 The test harness exists at:
 
@@ -72,7 +72,7 @@ src/ppc/test_ppc_qemuuae.c
 Built with:
 
 cc -O2 -g -Wall -Wextra -Wpedantic -std=c11 
--Isrc/ppc -o build/ppc/test_ppc_qemuuae 
+-pthread -Isrc/ppc -o build/ppc/test_ppc_qemuuae 
 src/ppc/test_ppc_qemuuae.c src/ppc/qemu_uae_loader.c -ldl
 
 Run with clean runtime:
@@ -80,7 +80,8 @@ Run with clean runtime:
 unset LD_LIBRARY_PATH
 export QEMU_UAE_SO=/usr/local/lib/qemu-uae.so
 export PPC_MODEL=603e
-export PPC_STEPS=100000
+export PPC_RUN_MS=50
+export PPC_START_TIMEOUT_MS=2000
 ./build/ppc/test_ppc_qemuuae
 
 The harness dynamically loads qemu-uae.so using dlopen.
