@@ -91,6 +91,10 @@ static bool g_ppc_qemu_log_enabled;
 static bool g_ppc_accel_registered;
 static bool g_ppc_accel_atexit_installed;
 
+#define PPC_ACCEL_AC_SERIAL 0x10000001u
+
+static void ppc_accel_write_shared_info(ppc_accel_state_t *state);
+
 static const char *ppc_accel_runtime_state_name(ppc_accel_runtime_state_t state)
 {
   switch (state) {
@@ -120,14 +124,15 @@ static uint8_t ppc_accel_rom[] = {
     (uint8_t)((PPC_ACCEL_MANUFACTURER_ID >> 8) & 0x0Fu),
     (uint8_t)((PPC_ACCEL_MANUFACTURER_ID >> 4) & 0x0Fu),
     (uint8_t)(PPC_ACCEL_MANUFACTURER_ID & 0x0Fu),
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
+    /* er_SerialNumber nibbles (manufacturer-defined; keep non-zero for tooling heuristics). */
+    (uint8_t)((PPC_ACCEL_AC_SERIAL >> 28) & 0x0Fu),
+    (uint8_t)((PPC_ACCEL_AC_SERIAL >> 24) & 0x0Fu),
+    (uint8_t)((PPC_ACCEL_AC_SERIAL >> 20) & 0x0Fu),
+    (uint8_t)((PPC_ACCEL_AC_SERIAL >> 16) & 0x0Fu),
+    (uint8_t)((PPC_ACCEL_AC_SERIAL >> 12) & 0x0Fu),
+    (uint8_t)((PPC_ACCEL_AC_SERIAL >> 8) & 0x0Fu),
+    (uint8_t)((PPC_ACCEL_AC_SERIAL >> 4) & 0x0Fu),
+    (uint8_t)(PPC_ACCEL_AC_SERIAL & 0x0Fu),
     0x0,
     0x0,
     0x0,

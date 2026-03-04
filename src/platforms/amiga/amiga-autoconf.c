@@ -16,6 +16,7 @@
 #include "log.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <strings.h>
 #include <string.h>
 
 // PiStorm Zorro II AutoConfig Fast RAM ROM
@@ -257,6 +258,46 @@ static inline void log_autoconf_assignment(const char* label, uint32_t amiga_bas
   uint32_t amiga_hi = size ? (amiga_base + size - 1u) : amiga_base;
   LOG_INFO("[AUTOCONF] %s AMIGA=$%.8X-$%.8X host=%p size=$%.8X\n",
            label, amiga_base, amiga_hi, host_ptr, size);
+}
+
+static bool autoconfig_ppc_trace_enabled(void) {
+  static int cached = -1;
+  const char *env;
+
+  if (cached >= 0) {
+    return cached != 0;
+  }
+
+  env = getenv("PPC_ACCEL_AC_TRACE");
+  if (env == NULL) {
+    cached = 0;
+    return false;
+  }
+  if (env[0] == '\0') {
+    cached = 0;
+    return false;
+  }
+  if ((strcmp(env, "0") == 0) || (strcasecmp(env, "false") == 0)
+      || (strcasecmp(env, "no") == 0) || (strcasecmp(env, "off") == 0)) {
+    cached = 0;
+    return false;
+  }
+
+  cached = 1;
+  return true;
+}
+
+static bool autoconfig_is_ppc_accel_device(const zorro_device_t *dev) {
+  if (dev == NULL) {
+    return false;
+  }
+  if (dev->manufacturer != PISTORM_MANUF_ID) {
+    return false;
+  }
+  if (dev->product != PISTORM_PROD_PPC_ACCEL_Z2) {
+    return false;
+  }
+  return true;
 }
 
 
@@ -640,6 +681,8 @@ void remove_z2_pic(uint8_t type, uint8_t index) {
 unsigned int autoconfig_read_memory_8(struct emulator_config* cfg, unsigned int address) {
   const unsigned char* rom = NULL;
   size_t rom_size = sizeof(ac_fast_ram_rom);
+  zorro_device_t *zorro_dev = NULL;
+  unsigned char rom_nibble = 0;
   unsigned char val = 0;
 
   switch (ac_z2_type[ac_z2_current_pic]) {
@@ -660,11 +703,10 @@ unsigned int autoconfig_read_memory_8(struct emulator_config* cfg, unsigned int 
     rom_size = sizeof(ac_pistorm_rom);
     break;
   case ACTYPE_ZORRO_GENERIC: {
-    zorro_device_t *dev =
-        zorro_get_device_by_index((uint8_t)ac_z2_index[ac_z2_current_pic]);
-    if (dev && dev->ac_rom) {
-      rom = dev->ac_rom;
-      rom_size = dev->ac_rom_size;
+    zorro_dev = zorro_get_device_by_index((uint8_t)ac_z2_index[ac_z2_current_pic]);
+    if ((zorro_dev != NULL) && (zorro_dev->ac_rom != NULL)) {
+      rom = zorro_dev->ac_rom;
+      rom_size = zorro_dev->ac_rom_size;
     } else {
       return 0;
     }
@@ -680,13 +722,24 @@ unsigned int autoconfig_read_memory_8(struct emulator_config* cfg, unsigned int 
       val = get_autoconf_size(cfg->map_size[ac_z2_index[ac_z2_current_pic]]);
       if (ac_z2_current_pic + 1 < ac_z2_pic_count)
         val |= BOARDTYPE_LINKED;
-    } else
+    } else {
       val = rom[address / 2];
-      //printf("Read byte %d from Z2 autoconf for PIC %d (%.2X).\n", address/2, ac_z2_current_pic, val);
+    }
+    rom_nibble = val;
   }
   val <<= 4;
-  if (address != 0 && address != 2 && address != 0x40 && address != 0x42)
+  if (address != 0 && address != 2 && address != 0x40 && address != 0x42) {
     val ^= 0xff;
+  }
+
+  if ((autoconfig_ppc_trace_enabled() == true)
+      && (autoconfig_is_ppc_accel_device(zorro_dev) == true)) {
+    LOG_INFO("[AUTOCONF] ppc-accel ac-read pic=%u addr=$%02X nibble=$%X bus=$%02X\n",
+             (unsigned int)ac_z2_current_pic,
+             address & 0xffu,
+             rom_nibble & 0x0fu,
+             val & 0xffu);
+  }
 
   return (unsigned int)val;
 }
@@ -902,6 +955,16 @@ void autoconfig_write_memory_8(struct emulator_config* cfg,
     }
   }
 
+  if ((autoconfig_ppc_trace_enabled() == true)
+      && (autoconfig_is_ppc_accel_device(zorro_dev) == true)) {
+    LOG_INFO("[AUTOCONF] ppc-accel ac-write pic=%u addr=$%02X value=$%02X base=$%.8X done=%d\n",
+             (unsigned int)ac_z2_current_pic,
+             address & 0xffu,
+             value & 0xffu,
+             base ? *base : 0u,
+             done);
+  }
+
   if (!done) {
     return;
   }
@@ -943,6 +1006,11 @@ void autoconfig_write_memory_8(struct emulator_config* cfg,
         LOG_INFO("[AUTOCONF] Zorro device %s assigned to $%.8X\n",
                  zorro_dev->name ? zorro_dev->name : "unnamed",
                  zorro_dev->base);
+        if ((autoconfig_ppc_trace_enabled() == true)
+            && (autoconfig_is_ppc_accel_device(zorro_dev) == true)) {
+          LOG_INFO("[AUTOCONF] ppc-accel assigned base=$%.8X (PIC %u)\n",
+                   zorro_dev->base, (unsigned int)ac_z2_current_pic);
+        }
       } else {
         LOG_WARN("[AUTOCONF] Zorro generic device index=%d missing during assignment. base=$%.8X\n",
                  (int)ac_z2_index[ac_z2_current_pic], base ? *base : 0);

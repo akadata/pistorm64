@@ -18,14 +18,17 @@ Make the PiStorm PPC board model visible and usable as a real accelerator path:
 - Runtime assets are externally provided (`qemu-uae.so`, firmware, config).
 - Stage 6 ABI/register map remains stable unless explicitly version-bumped.
 
-## Compatibility Targets (Research Track)
+## Compatibility Target (Chosen Path: 1A)
 
-Shortlist the minimal behavior contract to resemble known classic PPC accelerator expectations:
+Active direction is compatibility-first so OS-facing software can use the board
+without inventing a new stack first.
 
-- BlizzardPPC-style expectations (identity/boot/control/IRQ behavior).
-- CyberStormPPC-style expectations (identity/boot/control/IRQ behavior).
+- Primary target: BlizzardPPC-style expectations (identity/boot/control/IRQ behavior).
+- Secondary fallback: CyberStormPPC-style expectations if primary assumptions fail.
 
-This does not mean full emulation yet. The immediate objective is to identify and implement the minimum contract needed for OS-facing detection and work scheduling.
+This still does not mean full board emulation. The immediate objective is to
+implement the minimum behavior contract needed for OS-facing detection and work
+scheduling.
 
 ## Milestones
 
@@ -34,6 +37,7 @@ This does not mean full emulation yet. The immediate objective is to identify an
 - Add deterministic board identity dump path (`ppcshake --id`).
 - Keep register block semantics fixed and documented.
 - Publish read-only shared info struct in shared window (`0x2000`).
+- Freeze this as the compatibility baseline and avoid ABI drift.
 
 ### Stage 8: Bootstrapping Contract
 
@@ -41,6 +45,8 @@ This does not mean full emulation yet. The immediate objective is to identify an
   - shared memory layout
   - mailbox/IRQ usage
   - CPU start/reset sequence
+- Add compatibility notes for BlizzardPPC-style startup expectations and
+  explicitly document what is implemented vs. not implemented.
 - Add regression checks for contract invariants.
 
 ### Stage 9: OS Integration Attempt

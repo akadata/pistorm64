@@ -22,6 +22,7 @@ setvar ppc-accel
 
 - Manufacturer: `0x07DB` (PiStorm)
 - Product: `0x0040` (`PISTORM_PROD_PPC_ACCEL_Z2`)
+- AutoConfig serial: `0x10000001` (non-zero, deterministic)
 - Device name: `z2-ppc-accel`
 - Device size: `64 KiB`
 
@@ -94,5 +95,7 @@ Statuses:
 
 - Stage 6C runs the mailbox handler on a real QEMU-UAE PPC core.
 - The mailbox page is single-backed: Amiga Zorro access and PPC access touch the same memory.
+- For legacy probe debugging, set `PPC_ACCEL_AC_TRACE=1` before launching emulator to log
+  PPC board AutoConfig reads/writes.
 - Runtime assets must be available (`qemu-uae.so`, firmware/config paths) and
   `LD_LIBRARY_PATH` should not include Python 2.7 build paths at runtime.

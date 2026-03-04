@@ -196,6 +196,7 @@ Stage 6C status (frozen summary):
 * Real: QEMU-UAE PPC runtime starts from board `CONTROL.START`, mailbox runs on PPC, host service lane is active.
 * Stubbed: no OS4 kernel/platform integration yet; this is still board-level bring-up plus mailbox transport.
 * Known UX issue: rapid AmigaShell re-entry can wedge a CLI line; mitigated by `ppcshake` single-instance lock and busy checks.
+* Stage 7 direction (chosen): `1A` compatibility-first path toward classic PPC accelerator expectations (BlizzardPPC-style baseline, CyberStormPPC-style fallback).
 
 * Enable in Amiga config: `setvar zorro-ppc` (alias: `setvar ppc-accel`)
 * AutoConfig identity: manufacturer `$07DB`, product `$0040`
@@ -210,6 +211,7 @@ Stage 6C status (frozen summary):
 * Keep runtime clean before launching emulator:
   * `unset LD_LIBRARY_PATH`
   * `export QEMU_UAE_SO=/usr/local/lib/qemu-uae.so`
+  * Optional probe tracing: `export PPC_ACCEL_AC_TRACE=1` (logs AutoConfig accesses for PPC board compatibility debugging)
 * Host helper script: `./stage6.sh` (builds emulator + `amiga/zorro-ppc` tool and prints manual test steps)
 
 Amiga-side Stage 6A tool:
