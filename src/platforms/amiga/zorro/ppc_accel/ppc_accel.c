@@ -1174,12 +1174,19 @@ static bool ppc_accel_backend_bootstrap(ppc_accel_state_t *state)
              qemu_uae_loader_error(&state->loader));
     goto fail;
   }
+  if (state->trace_io_enabled == true) {
+    LOG_INFO("[PPC-ACCEL] io callback tracing armed (limit=%" PRIu32 ")\n",
+             state->trace_io_limit);
+  }
 
   g_ppc_qemu_log_enabled = state->qemu_log_enabled;
   if (qemu_uae_loader_install_log_callback(&state->loader, ppc_accel_qemu_log) == false) {
     LOG_WARN("[PPC-ACCEL] install log callback failed: %s\n",
              qemu_uae_loader_error(&state->loader));
     goto fail;
+  }
+  if (state->qemu_log_enabled == true) {
+    LOG_INFO("[PPC-ACCEL] qemu log callback armed\n");
   }
 
   state->loader.qemu_uae_init();
@@ -1413,8 +1420,12 @@ static void ppc_accel_reg_write32(ppc_accel_state_t *state, uint32_t offset, uin
   switch (offset) {
   case PPC_ACCEL_REG_CONTROL: {
     uint32_t new_control;
+    bool running_ok;
 
     new_control = value & (PPC_ACCEL_CTRL_START | PPC_ACCEL_CTRL_RESET | PPC_ACCEL_CTRL_IRQ_ENABLE);
+    LOG_INFO("[PPC-ACCEL] CONTROL write value=0x%08" PRIx32 " masked=0x%08" PRIx32 "\n",
+             value,
+             new_control);
     if ((new_control & PPC_ACCEL_CTRL_RESET) != 0u) {
       uint32_t keep_irq;
 
@@ -1422,12 +1433,18 @@ static void ppc_accel_reg_write32(ppc_accel_state_t *state, uint32_t offset, uin
       ppc_accel_device_reset_state(state);
       state->control = keep_irq;
       state->status &= ~PPC_ACCEL_STATUS_FAULT;
+      LOG_INFO("[PPC-ACCEL] CONTROL.RESET applied (irq_enable=%u)\n",
+               (keep_irq & PPC_ACCEL_CTRL_IRQ_ENABLE) != 0u ? 1u : 0u);
     } else {
       state->control = new_control;
       if ((state->control & PPC_ACCEL_CTRL_START) != 0u) {
-        (void)ppc_accel_set_running(state, true);
+        running_ok = ppc_accel_set_running(state, true);
+        LOG_INFO("[PPC-ACCEL] CONTROL.START requested -> %s\n",
+                 running_ok == true ? "running" : "failed");
       } else {
-        (void)ppc_accel_set_running(state, false);
+        running_ok = ppc_accel_set_running(state, false);
+        LOG_INFO("[PPC-ACCEL] CONTROL.START cleared -> %s\n",
+                 running_ok == true ? "paused/stopped" : "failed");
       }
     }
     break;
