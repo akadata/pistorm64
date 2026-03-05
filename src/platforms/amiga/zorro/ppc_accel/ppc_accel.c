@@ -22,6 +22,9 @@
 static const uint32_t PPC_ACCEL_RESET_WINDOW_BASE = 0xFFF00000u;
 static const uint32_t PPC_ACCEL_FIRMWARE_ENTRY_PRIMARY = 0x00000000u;
 static const uint32_t PPC_ACCEL_FIRMWARE_ENTRY_SECONDARY = 0x00000100u;
+static const uint32_t PPC_ACCEL_PPC_RAM_BASE_DEFAULT = 0x08000000u;
+static const uint32_t PPC_ACCEL_PPC_RAM_MB_DEFAULT = 128u;
+static const uint32_t PPC_ACCEL_PPC_RAM_MB_MIN = 1u;
 
 _Static_assert(PPC_ACCEL_MB_OFF_MAGIC == PPC_MAILBOX_OFF_MAGIC,
                "mailbox magic offset mismatch");
@@ -90,8 +93,11 @@ _Static_assert(PPC_ACCEL_IRQ_HOST_DOORBELL == 0x00000002u,
 
 typedef struct ppc_accel_host_service_context {
   uint8_t *mailbox;
-  uint8_t *ram;
-  uint32_t ram_size;
+  uint8_t *window;
+  uint32_t window_size;
+  uint8_t *ppc_ram;
+  uint32_t ppc_ram_base;
+  uint32_t ppc_ram_size;
   int idle_sleep_ms;
   bool doorbell_enabled;
   bool verbose;
@@ -108,6 +114,9 @@ typedef enum ppc_accel_runtime_state {
 
 typedef struct ppc_accel_state {
   uint8_t window[PPC_ACCEL_Z2_SIZE];
+  uint8_t *ppc_ram;
+  uint32_t ppc_ram_base;
+  uint32_t ppc_ram_size;
   qemu_uae_loader loader;
   ppc_accel_host_service_context_t host_service;
   pthread_t host_thread;
@@ -121,6 +130,15 @@ typedef struct ppc_accel_state {
   bool host_thread_started;
   bool verbose;
   bool qemu_log_enabled;
+  bool trace_io_enabled;
+  bool trace_io_seen;
+  bool trace_io_limit_noted;
+  uint32_t trace_io_limit;
+  uint32_t trace_io_emitted;
+  uint64_t io_read32_count;
+  uint64_t io_write32_count;
+  uint64_t io_read64_count;
+  uint64_t io_write64_count;
   ppc_accel_runtime_state_t runtime_state;
 } ppc_accel_state_t;
 
@@ -129,7 +147,14 @@ static bool g_ppc_qemu_log_enabled;
 static bool g_ppc_accel_registered;
 static bool g_ppc_accel_atexit_installed;
 
-#define PPC_ACCEL_AC_SERIAL 0x10000001u
+#define PPC_ACCEL_AC_SERIAL_DEFAULT 0x00420001u
+#define PPC_ACCEL_AC_SERIAL_ROM_NIBBLE_OFFSET 12u
+#define PPC_ACCEL_AC_DIAG_VEC_DEFAULT 0x4000u
+#define PPC_ACCEL_AC_DIAG_VEC_ROM_NIBBLE_OFFSET 20u
+
+#define PPC_ACCEL_DIAG_OFFSET 0x00004000u
+#define PPC_ACCEL_DIAG_AREA_SIZE 0x0040u
+#define PPC_ACCEL_DIAG_NAME_OFFSET 0x0010u
 
 static void ppc_accel_write_shared_info(ppc_accel_state_t *state);
 
@@ -150,7 +175,7 @@ static const char *ppc_accel_runtime_state_name(ppc_accel_runtime_state_t state)
 }
 
 static uint8_t ppc_accel_rom[] = {
-    Z2_Z2,
+    Z2_Z2 | Z2_BOOTROM,
     AC_MEM_SIZE_64KB,
     (uint8_t)((PPC_ACCEL_PRODUCT_ID >> 4) & 0x0Fu),
     (uint8_t)(PPC_ACCEL_PRODUCT_ID & 0x0Fu),
@@ -162,23 +187,80 @@ static uint8_t ppc_accel_rom[] = {
     (uint8_t)((PPC_ACCEL_MANUFACTURER_ID >> 8) & 0x0Fu),
     (uint8_t)((PPC_ACCEL_MANUFACTURER_ID >> 4) & 0x0Fu),
     (uint8_t)(PPC_ACCEL_MANUFACTURER_ID & 0x0Fu),
-    /* er_SerialNumber nibbles (manufacturer-defined; keep non-zero for tooling heuristics). */
-    (uint8_t)((PPC_ACCEL_AC_SERIAL >> 28) & 0x0Fu),
-    (uint8_t)((PPC_ACCEL_AC_SERIAL >> 24) & 0x0Fu),
-    (uint8_t)((PPC_ACCEL_AC_SERIAL >> 20) & 0x0Fu),
-    (uint8_t)((PPC_ACCEL_AC_SERIAL >> 16) & 0x0Fu),
-    (uint8_t)((PPC_ACCEL_AC_SERIAL >> 12) & 0x0Fu),
-    (uint8_t)((PPC_ACCEL_AC_SERIAL >> 8) & 0x0Fu),
-    (uint8_t)((PPC_ACCEL_AC_SERIAL >> 4) & 0x0Fu),
-    (uint8_t)(PPC_ACCEL_AC_SERIAL & 0x0Fu),
+    /* er_SerialNumber nibbles (filled at register time, default 0x00420001). */
+    0x0,
+    0x0,
+    0x0,
+    0x0,
+    0x0,
+    0x0,
+    0x0,
+    0x0,
+    /* er_InitDiagVec nibbles (filled at register time, default 0x4000). */
+    0x0,
     0x0,
     0x0,
     0x0,
 };
 
+static void ppc_accel_set_autoconfig_serial(uint32_t serial)
+{
+  ppc_accel_rom[PPC_ACCEL_AC_SERIAL_ROM_NIBBLE_OFFSET + 0u] = (uint8_t)((serial >> 28u) & 0x0Fu);
+  ppc_accel_rom[PPC_ACCEL_AC_SERIAL_ROM_NIBBLE_OFFSET + 1u] = (uint8_t)((serial >> 24u) & 0x0Fu);
+  ppc_accel_rom[PPC_ACCEL_AC_SERIAL_ROM_NIBBLE_OFFSET + 2u] = (uint8_t)((serial >> 20u) & 0x0Fu);
+  ppc_accel_rom[PPC_ACCEL_AC_SERIAL_ROM_NIBBLE_OFFSET + 3u] = (uint8_t)((serial >> 16u) & 0x0Fu);
+  ppc_accel_rom[PPC_ACCEL_AC_SERIAL_ROM_NIBBLE_OFFSET + 4u] = (uint8_t)((serial >> 12u) & 0x0Fu);
+  ppc_accel_rom[PPC_ACCEL_AC_SERIAL_ROM_NIBBLE_OFFSET + 5u] = (uint8_t)((serial >> 8u) & 0x0Fu);
+  ppc_accel_rom[PPC_ACCEL_AC_SERIAL_ROM_NIBBLE_OFFSET + 6u] = (uint8_t)((serial >> 4u) & 0x0Fu);
+  ppc_accel_rom[PPC_ACCEL_AC_SERIAL_ROM_NIBBLE_OFFSET + 7u] = (uint8_t)(serial & 0x0Fu);
+}
+
+static void ppc_accel_set_autoconfig_diag_vec(uint16_t diag_vec)
+{
+  ppc_accel_rom[PPC_ACCEL_AC_DIAG_VEC_ROM_NIBBLE_OFFSET + 0u] =
+      (uint8_t)((diag_vec >> 12u) & 0x0Fu);
+  ppc_accel_rom[PPC_ACCEL_AC_DIAG_VEC_ROM_NIBBLE_OFFSET + 1u] =
+      (uint8_t)((diag_vec >> 8u) & 0x0Fu);
+  ppc_accel_rom[PPC_ACCEL_AC_DIAG_VEC_ROM_NIBBLE_OFFSET + 2u] =
+      (uint8_t)((diag_vec >> 4u) & 0x0Fu);
+  ppc_accel_rom[PPC_ACCEL_AC_DIAG_VEC_ROM_NIBBLE_OFFSET + 3u] =
+      (uint8_t)(diag_vec & 0x0Fu);
+}
+
+static void write_be16(uint8_t *base, uint32_t offset, uint16_t value)
+{
+  base[offset + 0u] = (uint8_t)((value >> 8u) & 0xFFu);
+  base[offset + 1u] = (uint8_t)(value & 0xFFu);
+}
+
+static void ppc_accel_write_diag_area(ppc_accel_state_t *state)
+{
+  static const char diag_name[] = "PiStorm PPC Accelerator";
+  uint32_t base;
+  uint32_t name_len;
+
+  base = PPC_ACCEL_DIAG_OFFSET;
+  name_len = (uint32_t)sizeof(diag_name);
+  if ((base + PPC_ACCEL_DIAG_NAME_OFFSET + name_len) > PPC_ACCEL_Z2_SIZE) {
+    return;
+  }
+
+  /* Minimal read-only DiagArea: discoverable name, no boot/diag entry execution. */
+  state->window[base + 0u] = 0x00u; /* DAC_NIBBLEWIDE | DAC_NEVER */
+  state->window[base + 1u] = 0x00u;
+  write_be16(state->window, base + 2u, (uint16_t)PPC_ACCEL_DIAG_AREA_SIZE);
+  write_be16(state->window, base + 4u, 0u); /* da_DiagPoint */
+  write_be16(state->window, base + 6u, 0u); /* da_BootPoint */
+  write_be16(state->window, base + 8u, (uint16_t)PPC_ACCEL_DIAG_NAME_OFFSET);
+  write_be16(state->window, base + 10u, 0u);
+  write_be16(state->window, base + 12u, 0u);
+  memcpy(state->window + base + PPC_ACCEL_DIAG_NAME_OFFSET, diag_name, name_len);
+}
+
 static void ppc_accel_qemu_log(const char *format, ...)
 {
   char message[1024];
+  size_t message_len;
   va_list args;
 
   if (g_ppc_qemu_log_enabled == false) {
@@ -189,7 +271,17 @@ static void ppc_accel_qemu_log(const char *format, ...)
   (void)vsnprintf(message, sizeof(message), format, args);
   va_end(args);
 
-  fprintf(stderr, "[PPC-QEMU] %s", message);
+  message_len = strlen(message);
+  while ((message_len > 0u)
+         && ((message[message_len - 1u] == '\n') || (message[message_len - 1u] == '\r'))) {
+    message[message_len - 1u] = '\0';
+    message_len--;
+  }
+  if (message[0] == '\0') {
+    return;
+  }
+
+  LOG_INFO("[PPC-QEMU] %s\n", message);
 }
 
 static uint32_t read_be32(const uint8_t *base, uint32_t offset)
@@ -312,6 +404,22 @@ static uint32_t env_u32_or_default(const char *name, uint32_t default_value)
   return (uint32_t)parsed;
 }
 
+static uint32_t ppc_accel_env_ppc_ram_size_bytes_or_default(void)
+{
+  uint32_t ram_mb;
+  const uint32_t mb_bytes = (1024u * 1024u);
+
+  ram_mb = env_u32_or_default("PPC_ACCEL_PPC_RAM_MB", PPC_ACCEL_PPC_RAM_MB_DEFAULT);
+  if (ram_mb < PPC_ACCEL_PPC_RAM_MB_MIN) {
+    ram_mb = PPC_ACCEL_PPC_RAM_MB_DEFAULT;
+  }
+  if (ram_mb > (0xffffffffu / mb_bytes)) {
+    ram_mb = PPC_ACCEL_PPC_RAM_MB_DEFAULT;
+  }
+
+  return ram_mb * mb_bytes;
+}
+
 static bool env_bool_or_default(const char *name, bool default_value)
 {
   const char *value;
@@ -337,37 +445,134 @@ static bool env_bool_or_default(const char *name, bool default_value)
   return default_value;
 }
 
+static void ppc_accel_reset_io_trace(ppc_accel_state_t *state)
+{
+  if (state == NULL) {
+    return;
+  }
+
+  state->trace_io_seen = false;
+  state->trace_io_limit_noted = false;
+  state->trace_io_emitted = 0u;
+  state->io_read32_count = 0u;
+  state->io_write32_count = 0u;
+  state->io_read64_count = 0u;
+  state->io_write64_count = 0u;
+}
+
+static void ppc_accel_trace_io_event(
+    ppc_accel_state_t *state,
+    const char *kind,
+    uint32_t addr,
+    uint64_t value,
+    int width_bytes)
+{
+  if ((state == NULL) || (state->trace_io_enabled == false)) {
+    return;
+  }
+  if (width_bytes <= 0) {
+    width_bytes = 4;
+  }
+  if (state->trace_io_seen == false) {
+    state->trace_io_seen = true;
+    LOG_INFO("[PPC-ACCEL] qemu-uae PPC I/O callback path is active\n");
+  }
+  if ((state->trace_io_limit != 0u) && (state->trace_io_emitted >= state->trace_io_limit)) {
+    if (state->trace_io_limit_noted == false) {
+      state->trace_io_limit_noted = true;
+      LOG_INFO("[PPC-ACCEL] IO trace limit reached (%" PRIu32 " events)\n", state->trace_io_limit);
+    }
+    return;
+  }
+
+  state->trace_io_emitted++;
+  LOG_INFO("[PPC-ACCEL][IO] %s addr=0x%08" PRIx32 " width=%d value=0x%0*" PRIx64 "\n",
+           kind,
+           addr,
+           width_bytes,
+           width_bytes * 2,
+           value);
+}
+
+static void ppc_accel_log_io_summary(const ppc_accel_state_t *state)
+{
+  if (state == NULL) {
+    return;
+  }
+  if ((state->trace_io_enabled == false) && (state->qemu_log_enabled == false)) {
+    return;
+  }
+
+  LOG_INFO("[PPC-ACCEL] io summary r32=%" PRIu64 " w32=%" PRIu64 " r64=%" PRIu64 " w64=%" PRIu64
+           " traced=%" PRIu32 "%s\n",
+           state->io_read32_count,
+           state->io_write32_count,
+           state->io_read64_count,
+           state->io_write64_count,
+           state->trace_io_emitted,
+           (state->trace_io_limit != 0u) ? " (limited)" : "");
+}
+
 static bool io_read32(uint32_t addr, uint32_t *data, int size)
 {
-  (void)addr;
-  (void)size;
-  if (data != NULL) {
-    *data = 0xDEADBEEFu;
+  ppc_accel_state_t *state;
+  uint32_t value;
+  int width_bytes;
+
+  state = &g_ppc_accel_state;
+  value = 0xDEADBEEFu;
+  width_bytes = size;
+  if (width_bytes <= 0) {
+    width_bytes = 4;
   }
+
+  if (data != NULL) {
+    *data = value;
+  }
+  state->io_read32_count++;
+  ppc_accel_trace_io_event(state, "read32", addr, (uint64_t)value, width_bytes);
   return true;
 }
 
 static bool io_write32(uint32_t addr, uint32_t data, int size)
 {
-  (void)addr;
-  (void)data;
-  (void)size;
+  ppc_accel_state_t *state;
+  int width_bytes;
+
+  state = &g_ppc_accel_state;
+  width_bytes = size;
+  if (width_bytes <= 0) {
+    width_bytes = 4;
+  }
+
+  state->io_write32_count++;
+  ppc_accel_trace_io_event(state, "write32", addr, (uint64_t)data, width_bytes);
   return true;
 }
 
 static bool io_read64(uint32_t addr, uint64_t *data)
 {
-  (void)addr;
+  ppc_accel_state_t *state;
+  uint64_t value;
+
+  state = &g_ppc_accel_state;
+  value = 0xDEADBEEFDEADBEEFULL;
   if (data != NULL) {
-    *data = 0xDEADBEEFDEADBEEFULL;
+    *data = value;
   }
+
+  state->io_read64_count++;
+  ppc_accel_trace_io_event(state, "read64", addr, value, 8);
   return true;
 }
 
 static bool io_write64(uint32_t addr, uint64_t data)
 {
-  (void)addr;
-  (void)data;
+  ppc_accel_state_t *state;
+
+  state = &g_ppc_accel_state;
+  state->io_write64_count++;
+  ppc_accel_trace_io_event(state, "write64", addr, data, 8);
   return true;
 }
 
@@ -390,6 +595,42 @@ static uint32_t crc32_ieee(const uint8_t *data, uint32_t len)
   }
 
   return crc ^ 0xffffffffu;
+}
+
+static bool ppc_accel_resolve_ppc_address(
+    const ppc_accel_host_service_context_t *ctx,
+    uint32_t addr,
+    uint32_t len,
+    uint8_t **out_ptr)
+{
+  uint64_t end_addr;
+  uint64_t window_size64;
+  uint64_t ram_start;
+  uint64_t ram_end;
+
+  if ((ctx == NULL) || (out_ptr == NULL)) {
+    return false;
+  }
+
+  end_addr = (uint64_t)addr + (uint64_t)len;
+  window_size64 = (uint64_t)ctx->window_size;
+  if ((ctx->window != NULL) && (addr < ctx->window_size) && (end_addr <= window_size64)) {
+    *out_ptr = ctx->window + addr;
+    return true;
+  }
+
+  if ((ctx->ppc_ram == NULL) || (ctx->ppc_ram_size == 0u)) {
+    return false;
+  }
+
+  ram_start = (uint64_t)ctx->ppc_ram_base;
+  ram_end = ram_start + (uint64_t)ctx->ppc_ram_size;
+  if (((uint64_t)addr < ram_start) || (end_addr > ram_end)) {
+    return false;
+  }
+
+  *out_ptr = ctx->ppc_ram + (uint32_t)((uint64_t)addr - ram_start);
+  return true;
 }
 
 static void ppc_accel_hostsvc_ring_doorbell(const ppc_accel_host_service_context_t *ctx)
@@ -429,13 +670,13 @@ static bool ppc_accel_hostsvc_handle_request(
       status = PPC_MAILBOX_STATUS_DONE;
     }
   } else if (cmd == PPC_MAILBOX_HOST_CMD_MEM_CRC32) {
-    uint64_t end_addr;
+    uint8_t *data;
 
-    end_addr = (uint64_t)arg0 + (uint64_t)arg1;
-    if ((arg0 >= ctx->ram_size) || (end_addr > ctx->ram_size)) {
+    data = NULL;
+    if (ppc_accel_resolve_ppc_address(ctx, arg0, arg1, &data) == false) {
       status = PPC_MAILBOX_STATUS_RANGE;
     } else {
-      result0 = crc32_ieee(ctx->ram + arg0, arg1);
+      result0 = crc32_ieee(data, arg1);
       status = PPC_MAILBOX_STATUS_DONE;
     }
   }
@@ -562,6 +803,62 @@ static bool wait_until_started_with_timeout(qemu_uae_loader *loader, int timeout
   return false;
 }
 
+static bool ppc_accel_ranges_overlap(uint32_t start_a, uint32_t size_a, uint32_t start_b, uint32_t size_b)
+{
+  uint64_t a_start;
+  uint64_t a_end;
+  uint64_t b_start;
+  uint64_t b_end;
+
+  if ((size_a == 0u) || (size_b == 0u)) {
+    return false;
+  }
+
+  a_start = (uint64_t)start_a;
+  a_end = a_start + (uint64_t)size_a;
+  b_start = (uint64_t)start_b;
+  b_end = b_start + (uint64_t)size_b;
+
+  if ((a_end <= b_start) || (b_end <= a_start)) {
+    return false;
+  }
+  return true;
+}
+
+static bool ppc_accel_prepare_ppc_ram(ppc_accel_state_t *state)
+{
+  uint32_t ram_base;
+  uint32_t ram_size;
+  uint64_t ram_end;
+
+  if (state->ppc_ram != NULL) {
+    return true;
+  }
+
+  ram_base = env_u32_or_default("PPC_ACCEL_PPC_RAM_BASE", PPC_ACCEL_PPC_RAM_BASE_DEFAULT);
+  ram_size = ppc_accel_env_ppc_ram_size_bytes_or_default();
+  ram_end = (uint64_t)ram_base + (uint64_t)ram_size;
+  if (ram_end > 0x100000000ULL) {
+    LOG_WARN("[PPC-ACCEL] PPC RAM mapping overflows 32-bit space: base=0x%08" PRIx32
+             " size=0x%08" PRIx32 "\n",
+             ram_base, ram_size);
+    return false;
+  }
+
+  state->ppc_ram = (uint8_t *)calloc(1, (size_t)ram_size);
+  if (state->ppc_ram == NULL) {
+    LOG_WARN("[PPC-ACCEL] failed to allocate PPC RAM (%" PRIu32 " MiB)\n",
+             ram_size / (1024u * 1024u));
+    return false;
+  }
+
+  state->ppc_ram_base = ram_base;
+  state->ppc_ram_size = ram_size;
+  LOG_INFO("[PPC-ACCEL] PPC RAM mapped at 0x%08" PRIx32 " size=%" PRIu32 " MiB\n",
+           state->ppc_ram_base, state->ppc_ram_size / (1024u * 1024u));
+  return true;
+}
+
 static bool install_mailbox_firmware(uint8_t *ram, uint32_t ram_size, uint32_t entry_offset,
                                      uint32_t mailbox_base)
 {
@@ -629,6 +926,7 @@ static void ppc_accel_mailbox_reset(ppc_accel_state_t *state)
       PPC_ACCEL_MAILBOX_OFFSET + PPC_MAILBOX_OFF_HOST_STATUS,
       PPC_MAILBOX_STATUS_IDLE);
   ppc_accel_write_shared_info(state);
+  ppc_accel_write_diag_area(state);
 
   state->have_last_ack_seq = false;
   state->last_ack_seq = 0u;
@@ -786,6 +1084,12 @@ static void ppc_accel_cleanup_at_exit(void)
     state->runtime_state = PPC_ACCEL_RUNTIME_PAUSED;
   }
   ppc_accel_stop_host_thread(state);
+  if (state->ppc_ram != NULL) {
+    free(state->ppc_ram);
+    state->ppc_ram = NULL;
+    state->ppc_ram_base = 0u;
+    state->ppc_ram_size = 0u;
+  }
 }
 
 static bool ppc_accel_start_host_thread(ppc_accel_state_t *state)
@@ -798,8 +1102,11 @@ static bool ppc_accel_start_host_thread(ppc_accel_state_t *state)
 
   memset(&state->host_service, 0, sizeof(state->host_service));
   state->host_service.mailbox = state->window + PPC_ACCEL_MAILBOX_OFFSET;
-  state->host_service.ram = state->window;
-  state->host_service.ram_size = PPC_ACCEL_Z2_SIZE;
+  state->host_service.window = state->window;
+  state->host_service.window_size = PPC_ACCEL_Z2_SIZE;
+  state->host_service.ppc_ram = state->ppc_ram;
+  state->host_service.ppc_ram_base = state->ppc_ram_base;
+  state->host_service.ppc_ram_size = state->ppc_ram_size;
   state->host_service.idle_sleep_ms = env_nonneg_int_or_default("PPC_HOST_SERVICE_IDLE_MS", 1);
   state->host_service.doorbell_enabled = env_bool_or_default("PPC_HOSTSVC_DOORBELL", false);
   state->host_service.verbose = state->verbose;
@@ -829,7 +1136,8 @@ static bool ppc_accel_backend_bootstrap(ppc_accel_state_t *state)
   const char *model;
   uint32_t hid1;
   bool ppc_ok;
-  PPCMemoryRegion regions[2];
+  PPCMemoryRegion regions[3];
+  int region_count;
   int start_timeout_ms;
   bool qemu_started;
 
@@ -843,6 +1151,7 @@ static bool ppc_accel_backend_bootstrap(ppc_accel_state_t *state)
 
   state->runtime_state = PPC_ACCEL_RUNTIME_STARTING;
   qemu_started = false;
+  ppc_accel_reset_io_trace(state);
 
   qemu_uae_loader_warn_if_bad_ld_library_path(stderr);
 
@@ -892,6 +1201,24 @@ static bool ppc_accel_backend_bootstrap(ppc_accel_state_t *state)
     LOG_WARN("[PPC-ACCEL] PPC init failed (model=%s hid1=0x%08" PRIx32 ")\n", model, hid1);
     goto fail;
   }
+  if (ppc_accel_prepare_ppc_ram(state) == false) {
+    goto fail;
+  }
+
+  if (ppc_accel_ranges_overlap(0u, PPC_ACCEL_Z2_SIZE, state->ppc_ram_base, state->ppc_ram_size) == true) {
+    LOG_WARN("[PPC-ACCEL] PPC RAM mapping overlaps board window: base=0x%08" PRIx32
+             " size=0x%08" PRIx32 "\n",
+             state->ppc_ram_base, state->ppc_ram_size);
+    goto fail;
+  }
+  if (ppc_accel_ranges_overlap(
+          PPC_ACCEL_RESET_WINDOW_BASE, PPC_ACCEL_Z2_SIZE, state->ppc_ram_base, state->ppc_ram_size)
+      == true) {
+    LOG_WARN("[PPC-ACCEL] PPC RAM mapping overlaps reset window: base=0x%08" PRIx32
+             " size=0x%08" PRIx32 "\n",
+             state->ppc_ram_base, state->ppc_ram_size);
+    goto fail;
+  }
 
   if (install_mailbox_firmware(
           state->window,
@@ -919,13 +1246,20 @@ static bool ppc_accel_backend_bootstrap(ppc_accel_state_t *state)
   regions[0].name = (char *)"ppc-accel-z2-window";
   regions[0].alias = 0u;
 
-  regions[1].start = PPC_ACCEL_RESET_WINDOW_BASE;
-  regions[1].size = PPC_ACCEL_Z2_SIZE;
-  regions[1].memory = state->window;
-  regions[1].name = (char *)"ppc-accel-reset-window";
+  regions[1].start = state->ppc_ram_base;
+  regions[1].size = state->ppc_ram_size;
+  regions[1].memory = state->ppc_ram;
+  regions[1].name = (char *)"ppc-accel-ppc-ram";
   regions[1].alias = 0u;
 
-  state->loader.ppc_cpu_map_memory(regions, 2);
+  regions[2].start = PPC_ACCEL_RESET_WINDOW_BASE;
+  regions[2].size = PPC_ACCEL_Z2_SIZE;
+  regions[2].memory = state->window;
+  regions[2].name = (char *)"ppc-accel-reset-window";
+  regions[2].alias = 0u;
+
+  region_count = 3;
+  state->loader.ppc_cpu_map_memory(regions, region_count);
   state->loader.ppc_cpu_reset();
   if (state->loader.ppc_cpu_set_pc != NULL) {
     state->loader.ppc_cpu_set_pc(0, PPC_ACCEL_FIRMWARE_ENTRY_PRIMARY);
@@ -1011,6 +1345,7 @@ static bool ppc_accel_set_running(ppc_accel_state_t *state, bool running)
   } else {
     state->runtime_state = PPC_ACCEL_RUNTIME_STOPPED;
   }
+  ppc_accel_log_io_summary(state);
   state->status &= ~PPC_ACCEL_STATUS_RUNNING;
   if (state->verbose == true) {
     LOG_INFO("[PPC-ACCEL] runtime state -> %s\n",
@@ -1058,6 +1393,16 @@ static uint32_t ppc_accel_reg_read32(ppc_accel_state_t *state, uint32_t offset)
     return PPC_ACCEL_SHARED_OFFSET;
   case PPC_ACCEL_REG_SHARED_SIZE:
     return PPC_ACCEL_SHARED_SIZE;
+  case PPC_ACCEL_REG_PPC_RAM_BASE:
+    if (state->ppc_ram_size != 0u) {
+      return state->ppc_ram_base;
+    }
+    return env_u32_or_default("PPC_ACCEL_PPC_RAM_BASE", PPC_ACCEL_PPC_RAM_BASE_DEFAULT);
+  case PPC_ACCEL_REG_PPC_RAM_SIZE:
+    if (state->ppc_ram_size != 0u) {
+      return state->ppc_ram_size;
+    }
+    return ppc_accel_env_ppc_ram_size_bytes_or_default();
   default:
     return read_be32(state->window, offset);
   }
@@ -1101,6 +1446,8 @@ static void ppc_accel_reg_write32(ppc_accel_state_t *state, uint32_t offset, uin
   case PPC_ACCEL_REG_MAILBOX_SIZE:
   case PPC_ACCEL_REG_SHARED_OFFSET:
   case PPC_ACCEL_REG_SHARED_SIZE:
+  case PPC_ACCEL_REG_PPC_RAM_BASE:
+  case PPC_ACCEL_REG_PPC_RAM_SIZE:
     break;
   default:
     write_be32(state->window, offset, value);
@@ -1311,6 +1658,8 @@ static zorro_device_t z2_ppc_accel_device = {
 void z2_ppc_accel_register(void)
 {
   int slot;
+  uint32_t ac_serial;
+  uint32_t ac_diag_vec;
 
   if (g_ppc_accel_registered == true) {
     LOG_WARN("[ZORRO] Z2 PPC accelerator already registered; ignoring duplicate setvar\n");
@@ -1322,10 +1671,28 @@ void z2_ppc_accel_register(void)
     g_ppc_accel_atexit_installed = true;
   }
 
+  ac_serial = env_u32_or_default("PPC_ACCEL_AC_SERIAL", PPC_ACCEL_AC_SERIAL_DEFAULT);
+  ac_diag_vec = env_u32_or_default("PPC_ACCEL_AC_DIAG_VEC", PPC_ACCEL_AC_DIAG_VEC_DEFAULT);
+  ppc_accel_set_autoconfig_serial(ac_serial);
+  ppc_accel_set_autoconfig_diag_vec((uint16_t)(ac_diag_vec & 0xffffu));
+
   memset(&g_ppc_accel_state, 0, sizeof(g_ppc_accel_state));
   g_ppc_accel_state.verbose = env_bool_or_default("PPC_VERBOSE", false);
   g_ppc_accel_state.qemu_log_enabled = env_bool_or_default("PPC_ACCEL_QEMU_LOG", false);
+  g_ppc_accel_state.trace_io_enabled = env_bool_or_default("PPC_ACCEL_TRACE_IO", false);
+  g_ppc_accel_state.trace_io_limit = env_u32_or_default("PPC_ACCEL_TRACE_IO_LIMIT", 256u);
   g_ppc_accel_state.runtime_state = PPC_ACCEL_RUNTIME_STOPPED;
+  ppc_accel_reset_io_trace(&g_ppc_accel_state);
+
+  if (g_ppc_accel_state.verbose == true) {
+    LOG_INFO("[ZORRO] z2-ppc-accel AutoConfig serial=0x%08" PRIx32 "\n", ac_serial);
+    LOG_INFO("[ZORRO] z2-ppc-accel AutoConfig diagvec=0x%04" PRIx32 "\n",
+             ac_diag_vec & 0xffffu);
+    LOG_INFO("[PPC-ACCEL] qemu_log=%d trace_io=%d trace_io_limit=%" PRIu32 "\n",
+             g_ppc_accel_state.qemu_log_enabled ? 1 : 0,
+             g_ppc_accel_state.trace_io_enabled ? 1 : 0,
+             g_ppc_accel_state.trace_io_limit);
+  }
 
   LOG_INFO("[ZORRO] Registering Z2 PPC accelerator device.\n");
   ppc_accel_device_reset_state(&g_ppc_accel_state);
