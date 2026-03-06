@@ -656,6 +656,49 @@ static void ppc_accel_write_boot_descriptor(ppc_accel_state_t *state)
   }
 }
 
+static uint32_t ppc_accel_boot_desc_read_field(const ppc_accel_state_t *state, uint32_t field_offset)
+{
+  uint32_t base;
+
+  if (state == NULL) {
+    return 0u;
+  }
+
+  base = PPC_ACCEL_BOOT_DESC_OFFSET;
+  if ((base + PPC_ACCEL_BOOT_DESC_SIZE) > PPC_ACCEL_Z2_SIZE) {
+    return 0u;
+  }
+  if ((field_offset + 4u) > PPC_ACCEL_BOOT_DESC_SIZE) {
+    return 0u;
+  }
+
+  return read_be32(state->window, base + field_offset);
+}
+
+static void ppc_accel_boot_desc_write_field(ppc_accel_state_t *state, uint32_t field_offset, uint32_t value)
+{
+  uint32_t base;
+
+  if (state == NULL) {
+    return;
+  }
+
+  base = PPC_ACCEL_BOOT_DESC_OFFSET;
+  if ((base + PPC_ACCEL_BOOT_DESC_SIZE) > PPC_ACCEL_Z2_SIZE) {
+    return;
+  }
+  if ((field_offset + 4u) > PPC_ACCEL_BOOT_DESC_SIZE) {
+    return;
+  }
+
+  write_be32(state->window, base + field_offset, value);
+  if (field_offset != PPC_ACCEL_BOOT_DESC_OFF_MARKER) {
+    write_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_MARKER, 0u);
+    state->boot_marker_last = 0u;
+    state->have_boot_marker_last = false;
+  }
+}
+
 static void ppc_accel_reset_io_trace(ppc_accel_state_t *state)
 {
   if (state == NULL) {
@@ -1759,6 +1802,14 @@ static uint32_t ppc_accel_reg_read32(ppc_accel_state_t *state, uint32_t offset)
       return state->ppc_ram_size;
     }
     return ppc_accel_env_ppc_ram_size_bytes_or_default();
+  case PPC_ACCEL_REG_BOOT_MAGIC:
+    return ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_MAGIC);
+  case PPC_ACCEL_REG_BOOT_ENTRY:
+    return ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_ENTRY);
+  case PPC_ACCEL_REG_BOOT_STACK:
+    return ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_STACK);
+  case PPC_ACCEL_REG_BOOT_ARG0:
+    return ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_ARG0);
   default:
     return read_be32(state->window, offset);
   }
@@ -1814,6 +1865,18 @@ static void ppc_accel_reg_write32(ppc_accel_state_t *state, uint32_t offset, uin
   case PPC_ACCEL_REG_SHARED_SIZE:
   case PPC_ACCEL_REG_PPC_RAM_BASE:
   case PPC_ACCEL_REG_PPC_RAM_SIZE:
+    break;
+  case PPC_ACCEL_REG_BOOT_MAGIC:
+    ppc_accel_boot_desc_write_field(state, PPC_ACCEL_BOOT_DESC_OFF_MAGIC, value);
+    break;
+  case PPC_ACCEL_REG_BOOT_ENTRY:
+    ppc_accel_boot_desc_write_field(state, PPC_ACCEL_BOOT_DESC_OFF_ENTRY, value);
+    break;
+  case PPC_ACCEL_REG_BOOT_STACK:
+    ppc_accel_boot_desc_write_field(state, PPC_ACCEL_BOOT_DESC_OFF_STACK, value);
+    break;
+  case PPC_ACCEL_REG_BOOT_ARG0:
+    ppc_accel_boot_desc_write_field(state, PPC_ACCEL_BOOT_DESC_OFF_ARG0, value);
     break;
   default:
     write_be32(state->window, offset, value);

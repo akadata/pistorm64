@@ -41,6 +41,10 @@ explicitly out of scope.
 - `SHARED_OFFSET`/`SIZE` (`+0x0024`/`+0x0028`) = `0x2000` / `0xE000`
 - `PPC_RAM_BASE`/`SIZE` (`+0x002C`/`+0x0030`) = PPC runtime RAM mapping
   (default `0x08000000` / `0x08000000`)
+- `BOOT_MAGIC` (`+0x0034`) = reset-trampoline descriptor magic
+- `BOOT_ENTRY` (`+0x0038`) = reset-trampoline branch target
+- `BOOT_STACK` (`+0x003C`) = reset-trampoline stack (`r1`)
+- `BOOT_ARG0` (`+0x0040`) = reset-trampoline arg (`r3`)
 
 ## Shared-Info Block (`+0x2000`)
 

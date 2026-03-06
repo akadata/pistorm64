@@ -86,6 +86,10 @@ Register block (`32-bit big-endian`):
 - `0x0028` `SHARED_SIZE` = `0xE000`
 - `0x002C` `PPC_RAM_BASE` (default `0x08000000`)
 - `0x0030` `PPC_RAM_SIZE` (bytes, default `0x08000000` = `128 MiB`)
+- `0x0034` `BOOT_MAGIC` (reset-trampoline descriptor magic)
+- `0x0038` `BOOT_ENTRY` (reset-trampoline branch target)
+- `0x003C` `BOOT_STACK` (loaded into PPC `r1`)
+- `0x0040` `BOOT_ARG0` (loaded into PPC `r3`)
 
 ## Mailbox ABI v1 (inside device window at `base + 0x1000`)
 
