@@ -16,6 +16,10 @@ Manual regression flow:
    # export PPC_ACCEL_DIAG_CONFIG=0x90
    # export PPC_ACCEL_DIAG_BOOTPOINT=0x0020
    # export PPC_ACCEL_DIAG_DIAGPOINT=0x0032
+   # optional reset-trampoline descriptor overrides:
+   # export PPC_ACCEL_BOOT_ENTRY=0x00000000
+   # export PPC_ACCEL_BOOT_STACK=0x0
+   # export PPC_ACCEL_BOOT_ARG0=0x00001000
    # optional compatibility tuning:
    # export PPC_ACCEL_AC_SERIAL=0x00420001
    # export PPC_ACCEL_AC_DIAG_VEC=0x4000

@@ -39,6 +39,8 @@ explicitly out of scope.
 - `IRQ_ACK` (`+0x0018`) write-1-to-clear bits
 - `MAILBOX_OFFSET`/`SIZE` (`+0x001C`/`+0x0020`) = `0x1000` / `0x1000`
 - `SHARED_OFFSET`/`SIZE` (`+0x0024`/`+0x0028`) = `0x2000` / `0xE000`
+- `PPC_RAM_BASE`/`SIZE` (`+0x002C`/`+0x0030`) = PPC runtime RAM mapping
+  (default `0x08000000` / `0x08000000`)
 
 ## Shared-Info Block (`+0x2000`)
 
@@ -52,6 +54,16 @@ Read-only from Amiga side, written by emulator backend at init/bring-up.
   - bit0 host service lane available
   - bit1 IRQ path available
   - bit2 PPC external interrupt path available
+- `reserved0` = boot descriptor offset (`0x2040`)
+- `reserved1` = boot descriptor size (`0x20`)
+
+Boot descriptor (`+0x2040`, big-endian 32-bit fields):
+
+- `magic` (`PPBT` by default)
+- `entry` (PPC branch target used by reset trampoline)
+- `stack` (loaded to `r1`)
+- `arg0` (loaded to `r3`)
+- `marker` (written by trampoline for trace visibility)
 
 ## Runtime Start/Reset Semantics
 
@@ -68,6 +80,13 @@ Read-only from Amiga side, written by emulator backend at init/bring-up.
   - bit is self-clearing in stored control state
 
 Current behavior is idempotent (repeated start/reset does not leak threads).
+
+Reset-vector behavior:
+
+- PPC reset lands at `0xFFF00100` (board reset window alias).
+- Secondary firmware entry is a trampoline that validates boot descriptor magic,
+  writes marker transitions, and branches to descriptor `entry`.
+- Default descriptor points to primary mailbox firmware entry (`0x00000000`).
 
 ## Mailbox and IRQ Ordering Contract
 
@@ -88,7 +107,9 @@ Ordering:
 Implemented now:
 
 - board discovery and deterministic map
+- bootrom-compatible AutoConfig flags with minimal DiagArea/name block at `base+0x4000`
 - PPC runtime start/pause/reset control path
+- dedicated PPC-visible RAM mapping (default `128 MiB` at `0x08000000`, tunable via env)
 - mailbox command lane on real PPC execution path
 - host service lane (`TIME32`, `MEM_CRC32`) and optional doorbell pulse
 - `ppcshake` regression coverage (`--id`, `--irq`, round-trip path)

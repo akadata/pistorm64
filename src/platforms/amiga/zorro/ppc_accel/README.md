@@ -45,6 +45,14 @@ Optional tuning:
 - `PPC_ACCEL_TRACE_IO_LIMIT=<u32>` caps trace lines (default `256`, `0` = unlimited).
 - `PPC_ACCEL_MMIO_TRACE=1` logs Zorro MMIO reads/writes to the PPC board window.
 - `PPC_ACCEL_MMIO_TRACE_LIMIT=<u32>` caps MMIO trace lines (default `512`, `0` = unlimited).
+- `PPC_ACCEL_BOOT_MAGIC=<u32>` sets PPC reset-trampoline descriptor magic
+  (default `0x50504254`, `PPBT`).
+- `PPC_ACCEL_BOOT_ENTRY=<u32>` sets PPC reset-trampoline branch target
+  (default `0x00000000`, mailbox firmware primary entry).
+- `PPC_ACCEL_BOOT_STACK=<u32>` sets PPC reset-trampoline stack pointer
+  (default top of mapped PPC RAM minus `0x1000`).
+- `PPC_ACCEL_BOOT_ARG0=<u32>` sets PPC reset-trampoline `r3` argument
+  (default mailbox base `0x00001000`).
 
 ## Device memory map
 
@@ -125,6 +133,10 @@ Statuses:
 - The built-in bootpoint stub writes `CONTROL=1` to `board_base+0x0008`
   (using `ConfigDev->cd_BoardAddr`) and returns.
 - The built-in diagpoint stub writes `CONTROL=1` using `A0=BoardBase` and returns `D0=1`.
+- PPC reset now uses a secondary-entry trampoline (`0xFFF00100`) that reads
+  a boot descriptor at shared `+0x2040` and branches to descriptor `entry`.
+- Shared-info `reserved0`/`reserved1` publish boot-descriptor offset/size.
+- Runtime logs `boot marker=...` when trampoline transitions state.
 - For legacy probe debugging, set `PPC_ACCEL_AC_TRACE=1` before launching emulator to log
   PPC board AutoConfig reads/writes.
 - Runtime assets must be available (`qemu-uae.so`, firmware/config paths) and

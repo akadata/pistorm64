@@ -43,6 +43,20 @@
 #define PPC_ACCEL_SHARED_INFO_FEAT_IRQ        0x00000002u
 #define PPC_ACCEL_SHARED_INFO_FEAT_DOORBELL   0x00000004u
 
+/*
+ * Stage 8 reset-trampoline boot descriptor (published via shared-info reserved fields):
+ * - shared_info.reserved0 = descriptor offset
+ * - shared_info.reserved1 = descriptor size
+ */
+#define PPC_ACCEL_BOOT_DESC_OFFSET            (PPC_ACCEL_SHARED_OFFSET + 0x0040u)
+#define PPC_ACCEL_BOOT_DESC_SIZE              0x0020u
+#define PPC_ACCEL_BOOT_DESC_MAGIC             0x50504254u /* "PPBT" */
+#define PPC_ACCEL_BOOT_DESC_OFF_MAGIC         0x0000u
+#define PPC_ACCEL_BOOT_DESC_OFF_ENTRY         0x0004u
+#define PPC_ACCEL_BOOT_DESC_OFF_STACK         0x0008u
+#define PPC_ACCEL_BOOT_DESC_OFF_ARG0          0x000Cu
+#define PPC_ACCEL_BOOT_DESC_OFF_MARKER        0x0010u
+
 #define PPC_ACCEL_REG_MAGIC           0x0000u
 #define PPC_ACCEL_REG_ABI_VERSION     0x0004u
 #define PPC_ACCEL_REG_CONTROL         0x0008u
@@ -54,6 +68,8 @@
 #define PPC_ACCEL_REG_MAILBOX_SIZE    0x0020u
 #define PPC_ACCEL_REG_SHARED_OFFSET   0x0024u
 #define PPC_ACCEL_REG_SHARED_SIZE     0x0028u
+#define PPC_ACCEL_REG_PPC_RAM_BASE    0x002Cu
+#define PPC_ACCEL_REG_PPC_RAM_SIZE    0x0030u
 
 #define PPC_ACCEL_MAGIC               0x50504341u /* "PPCA" */
 #define PPC_ACCEL_ABI_VERSION         1u

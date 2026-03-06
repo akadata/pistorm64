@@ -151,6 +151,8 @@ typedef struct ppc_accel_state {
   uint16_t diag_boot_stub_size;
   uint16_t diag_diag_stub_offset;
   uint16_t diag_diag_stub_size;
+  uint32_t boot_marker_last;
+  bool have_boot_marker_last;
   uint64_t io_read32_count;
   uint64_t io_write32_count;
   uint64_t io_read64_count;
@@ -586,6 +588,72 @@ static bool env_bool_or_default(const char *name, bool default_value)
   }
 
   return default_value;
+}
+
+static uint32_t ppc_accel_boot_desc_default_stack(const ppc_accel_state_t *state)
+{
+  uint64_t stack_top;
+
+  if ((state == NULL) || (state->ppc_ram_size == 0u)) {
+    return 0u;
+  }
+
+  stack_top = (uint64_t)state->ppc_ram_base + (uint64_t)state->ppc_ram_size;
+  if (stack_top > 0x100000000ULL) {
+    return 0u;
+  }
+  if (stack_top < 0x1000ULL) {
+    return 0u;
+  }
+
+  return (uint32_t)(stack_top - 0x1000ULL);
+}
+
+static void ppc_accel_write_boot_descriptor(ppc_accel_state_t *state)
+{
+  uint32_t base;
+  uint32_t default_entry;
+  uint32_t default_stack;
+  uint32_t default_arg0;
+  uint32_t magic;
+  uint32_t entry;
+  uint32_t stack;
+  uint32_t arg0;
+
+  if (state == NULL) {
+    return;
+  }
+
+  base = PPC_ACCEL_BOOT_DESC_OFFSET;
+  if ((base + PPC_ACCEL_BOOT_DESC_SIZE) > PPC_ACCEL_Z2_SIZE) {
+    return;
+  }
+
+  default_entry = PPC_ACCEL_FIRMWARE_ENTRY_PRIMARY;
+  default_stack = ppc_accel_boot_desc_default_stack(state);
+  default_arg0 = PPC_ACCEL_MAILBOX_OFFSET;
+  magic = env_u32_or_default("PPC_ACCEL_BOOT_MAGIC", PPC_ACCEL_BOOT_DESC_MAGIC);
+  entry = env_u32_or_default("PPC_ACCEL_BOOT_ENTRY", default_entry);
+  stack = env_u32_or_default("PPC_ACCEL_BOOT_STACK", default_stack);
+  arg0 = env_u32_or_default("PPC_ACCEL_BOOT_ARG0", default_arg0);
+
+  write_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_MAGIC, magic);
+  write_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_ENTRY, entry);
+  write_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_STACK, stack);
+  write_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_ARG0, arg0);
+  write_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_MARKER, 0u);
+  state->boot_marker_last = 0u;
+  state->have_boot_marker_last = false;
+
+  if (state->verbose == true) {
+    LOG_INFO("[PPC-ACCEL] bootdesc off=0x%04" PRIx32 " magic=0x%08" PRIx32
+             " entry=0x%08" PRIx32 " stack=0x%08" PRIx32 " arg0=0x%08" PRIx32 "\n",
+             base,
+             magic,
+             entry,
+             stack,
+             arg0);
+  }
 }
 
 static void ppc_accel_reset_io_trace(ppc_accel_state_t *state)
@@ -1083,6 +1151,42 @@ static bool install_mailbox_firmware(uint8_t *ram, uint32_t ram_size, uint32_t e
   return true;
 }
 
+static bool install_reset_trampoline(uint8_t *ram, uint32_t ram_size, uint32_t entry_offset,
+                                     uint32_t boot_desc_offset)
+{
+  static const uint32_t program_words[] = {
+      0x3c600000u, 0x60630000u, 0x80830000u, 0x3ca00000u, 0x60a50000u, 0x7c042800u,
+      0x4082fff0u, 0x38c00001u, 0x90c30010u, 0x80830004u, 0x80230008u, 0x38e00002u,
+      0x90e30010u, 0x8063000cu, 0x7c8903a6u, 0x4e800420u};
+  uint32_t word_count;
+  uint32_t program_size;
+  uint32_t i;
+
+  word_count = (uint32_t)(sizeof(program_words) / sizeof(program_words[0]));
+  program_size = word_count * 4u;
+  if ((entry_offset + program_size) > ram_size) {
+    return false;
+  }
+
+  for (i = 0u; i < word_count; i++) {
+    uint32_t value;
+
+    value = program_words[i];
+    if (i == 0u) {
+      value = 0x3c600000u | ((boot_desc_offset >> 16u) & 0xffffu);
+    } else if (i == 1u) {
+      value = 0x60630000u | (boot_desc_offset & 0xffffu);
+    } else if (i == 3u) {
+      value = 0x3ca00000u | ((PPC_ACCEL_BOOT_DESC_MAGIC >> 16u) & 0xffffu);
+    } else if (i == 4u) {
+      value = 0x60a50000u | (PPC_ACCEL_BOOT_DESC_MAGIC & 0xffffu);
+    }
+    write_be32(ram, entry_offset + (i * 4u), value);
+  }
+
+  return true;
+}
+
 static void ppc_accel_mailbox_reset(ppc_accel_state_t *state)
 {
   memset(state->window + PPC_ACCEL_MAILBOX_OFFSET, 0, PPC_ACCEL_MAILBOX_SIZE);
@@ -1101,11 +1205,82 @@ static void ppc_accel_mailbox_reset(ppc_accel_state_t *state)
       state->window,
       PPC_ACCEL_MAILBOX_OFFSET + PPC_MAILBOX_OFF_HOST_STATUS,
       PPC_MAILBOX_STATUS_IDLE);
+  ppc_accel_write_boot_descriptor(state);
   ppc_accel_write_shared_info(state);
   ppc_accel_write_diag_area(state);
 
   state->have_last_ack_seq = false;
   state->last_ack_seq = 0u;
+}
+
+static void ppc_accel_poll_boot_marker(ppc_accel_state_t *state)
+{
+  uint32_t base;
+  uint32_t marker;
+
+  if (state == NULL) {
+    return;
+  }
+
+  base = PPC_ACCEL_BOOT_DESC_OFFSET;
+  if ((base + PPC_ACCEL_BOOT_DESC_SIZE) > PPC_ACCEL_Z2_SIZE) {
+    return;
+  }
+
+  marker = read_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_MARKER);
+  if (state->have_boot_marker_last == false) {
+    state->have_boot_marker_last = true;
+    state->boot_marker_last = marker;
+    if (marker != 0u) {
+      LOG_INFO("[PPC-ACCEL] boot marker=0x%08" PRIx32 " entry=0x%08" PRIx32
+               " stack=0x%08" PRIx32 " arg0=0x%08" PRIx32 "\n",
+               marker,
+               read_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_ENTRY),
+               read_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_STACK),
+               read_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_ARG0));
+    }
+    return;
+  }
+  if (marker == state->boot_marker_last) {
+    return;
+  }
+
+  state->boot_marker_last = marker;
+  LOG_INFO("[PPC-ACCEL] boot marker=0x%08" PRIx32 " entry=0x%08" PRIx32
+           " stack=0x%08" PRIx32 " arg0=0x%08" PRIx32 "\n",
+           marker,
+           read_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_ENTRY),
+           read_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_STACK),
+           read_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_ARG0));
+}
+
+static void ppc_accel_probe_boot_marker_startup(ppc_accel_state_t *state)
+{
+  int polls;
+  int sleep_between_ms;
+  int i;
+
+  if (state == NULL) {
+    return;
+  }
+
+  polls = env_nonneg_int_or_default("PPC_ACCEL_BOOT_MARKER_POLLS", 20);
+  sleep_between_ms = env_nonneg_int_or_default("PPC_ACCEL_BOOT_MARKER_SLEEP_MS", 1);
+  if (polls <= 0) {
+    return;
+  }
+
+  for (i = 0; i < polls; i++) {
+    ppc_accel_poll_boot_marker(state);
+    if ((state->have_boot_marker_last == true) && (state->boot_marker_last >= 2u)) {
+      return;
+    }
+    if (sleep_between_ms > 0) {
+      sleep_ms(sleep_between_ms);
+    } else {
+      sched_yield();
+    }
+  }
 }
 
 static void ppc_accel_poll_mailbox(ppc_accel_state_t *state)
@@ -1118,6 +1293,8 @@ static void ppc_accel_poll_mailbox(ppc_accel_state_t *state)
   if ((state->status & PPC_ACCEL_STATUS_RUNNING) == 0u) {
     return;
   }
+
+  ppc_accel_poll_boot_marker(state);
 
   mailbox_base = PPC_ACCEL_MAILBOX_OFFSET;
   seq = read_be32(state->window, mailbox_base + PPC_MAILBOX_OFF_SEQ);
@@ -1214,8 +1391,8 @@ static void ppc_accel_write_shared_info(ppc_accel_state_t *state)
   write_be32(state->window, base + PPC_ACCEL_SHARED_INFO_OFF_DB_REG, PPC_ACCEL_REG_DOORBELL);
   write_be32(state->window, base + PPC_ACCEL_SHARED_INFO_OFF_FEATURES,
              ppc_accel_shared_info_features(state));
-  write_be32(state->window, base + PPC_ACCEL_SHARED_INFO_OFF_RESERVED0, 0u);
-  write_be32(state->window, base + PPC_ACCEL_SHARED_INFO_OFF_RESERVED1, 0u);
+  write_be32(state->window, base + PPC_ACCEL_SHARED_INFO_OFF_RESERVED0, PPC_ACCEL_BOOT_DESC_OFFSET);
+  write_be32(state->window, base + PPC_ACCEL_SHARED_INFO_OFF_RESERVED1, PPC_ACCEL_BOOT_DESC_SIZE);
 }
 
 static bool ppc_accel_shared_info_write_protected(uint32_t offset, uint32_t size)
@@ -1387,6 +1564,7 @@ static bool ppc_accel_backend_bootstrap(ppc_accel_state_t *state)
   if (ppc_accel_prepare_ppc_ram(state) == false) {
     goto fail;
   }
+  ppc_accel_write_boot_descriptor(state);
 
   if (ppc_accel_ranges_overlap(0u, PPC_ACCEL_Z2_SIZE, state->ppc_ram_base, state->ppc_ram_size) == true) {
     LOG_WARN("[PPC-ACCEL] PPC RAM mapping overlaps board window: base=0x%08" PRIx32
@@ -1412,13 +1590,13 @@ static bool ppc_accel_backend_bootstrap(ppc_accel_state_t *state)
     LOG_WARN("[PPC-ACCEL] failed to install primary mailbox firmware\n");
     goto fail;
   }
-  if (install_mailbox_firmware(
+  if (install_reset_trampoline(
           state->window,
           PPC_ACCEL_Z2_SIZE,
           PPC_ACCEL_FIRMWARE_ENTRY_SECONDARY,
-          PPC_ACCEL_MAILBOX_OFFSET)
+          PPC_ACCEL_BOOT_DESC_OFFSET)
       == false) {
-    LOG_WARN("[PPC-ACCEL] failed to install secondary mailbox firmware\n");
+    LOG_WARN("[PPC-ACCEL] failed to install reset trampoline firmware\n");
     goto fail;
   }
 
@@ -1444,9 +1622,6 @@ static bool ppc_accel_backend_bootstrap(ppc_accel_state_t *state)
   region_count = 3;
   state->loader.ppc_cpu_map_memory(regions, region_count);
   state->loader.ppc_cpu_reset();
-  if (state->loader.ppc_cpu_set_pc != NULL) {
-    state->loader.ppc_cpu_set_pc(0, PPC_ACCEL_FIRMWARE_ENTRY_PRIMARY);
-  }
 
   state->loader.qemu_uae_start();
   qemu_started = true;
@@ -1481,9 +1656,6 @@ static void ppc_accel_backend_reset_cpu(ppc_accel_state_t *state)
   if (state->runtime_started == true) {
     state->loader.ppc_cpu_set_state(QEMU_UAE_PPC_CPU_STATE_PAUSED);
     state->loader.ppc_cpu_reset();
-    if (state->loader.ppc_cpu_set_pc != NULL) {
-      state->loader.ppc_cpu_set_pc(0, PPC_ACCEL_FIRMWARE_ENTRY_PRIMARY);
-    }
     state->runtime_state = PPC_ACCEL_RUNTIME_PAUSED;
   }
 }
@@ -1507,6 +1679,7 @@ static bool ppc_accel_set_running(ppc_accel_state_t *state, bool running)
     state->status |= PPC_ACCEL_STATUS_RUNNING;
     state->status &= ~PPC_ACCEL_STATUS_FAULT;
     state->runtime_state = PPC_ACCEL_RUNTIME_RUNNING;
+    ppc_accel_probe_boot_marker_startup(state);
     if (state->verbose == true) {
       LOG_INFO("[PPC-ACCEL] runtime state -> %s\n",
                ppc_accel_runtime_state_name(state->runtime_state));
