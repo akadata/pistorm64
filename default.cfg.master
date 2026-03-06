@@ -1,0 +1,54 @@
+cpu 68030
+platform amiga 1200
+map type=rom address=0xF80000 size=0x80000 file=../Amiga/kick/Kickstart-v3.1-r40.068.rom ovl=0 id=kickstart autodump_mem
+
+map type=ram address=0x08000000 size=128M id=cpu_slot_ram
+map type=ram address=0x00100000 size=1M id=chipram_extra
+map type=ram address=0x200000 size=2M id=z2_autoconf_fast
+
+setvar piscsi
+setvar piscsi0 ../SFS.hdf
+setvar leds 1
+
+
+
+setvar enable_fc cpld
+setvar enable_bus_arb on
+setvar queue 1
+setvar batch_bits 4096
+
+
+
+setvar piscsi3 ../KernelPiStormBench.hdf
+
+#setvar piscsi64_5 remote:dqt3t@172.16.0.2:4964/remote,mode=rw,blocksize=4096
+setvar rtg64 yes
+
+# -----------------------------------------------------------------------------
+# Platform Features
+# -----------------------------------------------------------------------------
+
+
+map type=register address=0xDC0000 size=0x10000
+setvar enable_rtc_emulation 1
+
+# Uncomment to enable PiRTG
+setvar rtg
+
+setvar rtg-width 1920
+setvar rtg-height 1080
+#setvar rtg-width  3840
+#setvar rtg-height 2160
+
+setvar pi-net
+setvar pistorm_root /opt/pistorm64
+setvar pistorm_a314 /opt/pistorm64/a314
+setvar pistorm_data /opt/pistorm64/data
+setvar a314_shared /opt/pistorm64/data/a314-shared
+setvar a314_conf /opt/pistorm64/a314/a314d.conf
+setvar a314_fs_conf /opt/pistorm64/a314/a314fs.conf
+#
+setvar a314
+
+keyboard k nograb noautoconnect
+mouse /dev/input/mice m noautoconnect

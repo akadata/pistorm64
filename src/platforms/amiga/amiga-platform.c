@@ -661,13 +661,53 @@ int setup_platform_amiga(struct emulator_config* cfg) {
   }
 
   /* --------------------------------------------------------------------
-   * CPU slot RAM (if present)
+   * Mainboard Fast RAM (if present)
    * ------------------------------------------------------------------ */
-  index = get_named_mapped_item(cfg, "cpu_slot_ram");
-  if (index != -1) {
+  int mainboard_fast_found = 0;
+  const char *mainboard_fast_id = "mainboard_fast_ram";
+  const char *mainboard_fast_zap_id = "^ainboard_fast_ram";
+  while ((index = get_named_mapped_item(cfg, mainboard_fast_id)) != -1) {
+    cfg->map_id[index][0] = '^';
+    LOG_INFO("[AMIGA] Mainboard Fast RAM configured at $%08lX (%lu MB)\n",
+             cfg->map_offset[index],
+             cfg->map_size[index] / SIZE_MEGA);
     m68k_add_ram_range((uint32_t)cfg->map_offset[index],
                        (uint32_t)cfg->map_high[index],
                        cfg->map_data[index]);
+    mainboard_fast_found = 1;
+  }
+  if (!mainboard_fast_found) {
+    LOG_INFO("[AMIGA] No Mainboard Fast RAM configured.\n");
+  }
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (cfg->map_id[i] && strcmp(cfg->map_id[i], mainboard_fast_zap_id) == 0) {
+      cfg->map_id[i][0] = mainboard_fast_id[0];
+    }
+  }
+
+  /* --------------------------------------------------------------------
+   * CPU slot RAM (if present)
+   * ------------------------------------------------------------------ */
+  int cpu_slot_ram_found = 0;
+  const char *cpu_slot_ram_id = "cpu_slot_ram";
+  const char *cpu_slot_ram_zap_id = "^pu_slot_ram";
+  while ((index = get_named_mapped_item(cfg, cpu_slot_ram_id)) != -1) {
+    cfg->map_id[index][0] = '^';
+    LOG_INFO("[AMIGA] CPU slot RAM configured at $%08lX (%lu MB)\n",
+             cfg->map_offset[index],
+             cfg->map_size[index] / SIZE_MEGA);
+    m68k_add_ram_range((uint32_t)cfg->map_offset[index],
+                       (uint32_t)cfg->map_high[index],
+                       cfg->map_data[index]);
+    cpu_slot_ram_found = 1;
+  }
+  if (!cpu_slot_ram_found) {
+    LOG_INFO("[AMIGA] No CPU slot RAM configured.\n");
+  }
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (cfg->map_id[i] && strcmp(cfg->map_id[i], cpu_slot_ram_zap_id) == 0) {
+      cfg->map_id[i][0] = cpu_slot_ram_id[0];
+    }
   }
 
   /* --------------------------------------------------------------------

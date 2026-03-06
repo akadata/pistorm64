@@ -120,6 +120,168 @@ static inline void lowvec_trace_log(const char* op, uint32_t addr, uint32_t val)
 #endif
 }
 
+static inline uint32_t cpu_backend_get_pc(void);
+
+typedef struct mem_trace_cfg_s {
+  int init_done;
+  int enabled;
+  int trace_reads;
+  int trace_writes;
+  int skip_fetch_reads;
+  uint32_t base0;
+  uint32_t size0;
+  uint32_t base1;
+  uint32_t size1;
+  uint32_t limit;
+  uint32_t emitted;
+  int limit_noted;
+} mem_trace_cfg_t;
+
+static mem_trace_cfg_t g_mem_trace = {0};
+
+static uint32_t mem_trace_parse_u32(const char* name, uint32_t default_value) {
+  const char* env;
+  char* endptr;
+  unsigned long parsed;
+
+  env = getenv(name);
+  if ((env == NULL) || (env[0] == '\0')) {
+    return default_value;
+  }
+
+  errno = 0;
+  endptr = NULL;
+  parsed = strtoul(env, &endptr, 0);
+  if ((errno != 0) || (endptr == env) || ((endptr != NULL) && (*endptr != '\0'))) {
+    return default_value;
+  }
+  if (parsed > 0xFFFFFFFFul) {
+    return default_value;
+  }
+  return (uint32_t)parsed;
+}
+
+static int mem_trace_parse_bool(const char* name, int default_value) {
+  const char* env;
+
+  env = getenv(name);
+  if ((env == NULL) || (env[0] == '\0')) {
+    return default_value;
+  }
+  if ((strcmp(env, "1") == 0) || (strcasecmp(env, "true") == 0)
+      || (strcasecmp(env, "yes") == 0) || (strcasecmp(env, "on") == 0)) {
+    return 1;
+  }
+  if ((strcmp(env, "0") == 0) || (strcasecmp(env, "false") == 0)
+      || (strcasecmp(env, "no") == 0) || (strcasecmp(env, "off") == 0)) {
+    return 0;
+  }
+  return default_value;
+}
+
+static inline int mem_trace_range_match(uint32_t addr, uint32_t width, uint32_t base, uint32_t size) {
+  uint64_t access_lo;
+  uint64_t access_hi;
+  uint64_t range_lo;
+  uint64_t range_hi;
+
+  if (size == 0u) {
+    return 0;
+  }
+
+  access_lo = (uint64_t)addr;
+  access_hi = access_lo + (uint64_t)width;
+  range_lo = (uint64_t)base;
+  range_hi = range_lo + (uint64_t)size;
+  if ((access_lo < range_hi) && (access_hi > range_lo)) {
+    return 1;
+  }
+  return 0;
+}
+
+static void mem_trace_init_once(void) {
+  mem_trace_cfg_t* trace;
+
+  trace = &g_mem_trace;
+  if (trace->init_done != 0) {
+    return;
+  }
+
+  trace->init_done = 1;
+  trace->enabled = mem_trace_parse_bool("PISTORM_MEM_TRACE", 0);
+  trace->trace_reads = mem_trace_parse_bool("PISTORM_MEM_TRACE_READS", 1);
+  trace->trace_writes = mem_trace_parse_bool("PISTORM_MEM_TRACE_WRITES", 1);
+  trace->skip_fetch_reads = mem_trace_parse_bool("PISTORM_MEM_TRACE_SKIP_FETCH", 1);
+  trace->base0 = mem_trace_parse_u32("PISTORM_MEM_TRACE_BASE", 0x00EC0000u);
+  trace->size0 = mem_trace_parse_u32("PISTORM_MEM_TRACE_SIZE", 0x00010000u);
+  trace->base1 = mem_trace_parse_u32("PISTORM_MEM_TRACE_BASE2", 0u);
+  trace->size1 = mem_trace_parse_u32("PISTORM_MEM_TRACE_SIZE2", 0u);
+  trace->limit = mem_trace_parse_u32("PISTORM_MEM_TRACE_LIMIT", 2048u);
+  trace->emitted = 0u;
+  trace->limit_noted = 0;
+
+  if (trace->enabled != 0) {
+    LOG_INFO("[MEMTRACE] enabled r=%d w=%d skip_fetch=%d range0=$%08X+$%08X range1=$%08X+$%08X limit=%u\n",
+             trace->trace_reads,
+             trace->trace_writes,
+             trace->skip_fetch_reads,
+             trace->base0,
+             trace->size0,
+             trace->base1,
+             trace->size1,
+             trace->limit);
+  }
+}
+
+static inline void mem_trace_log(const char* op,
+                                 uint32_t addr,
+                                 uint32_t value,
+                                 uint32_t width,
+                                 const char* source) {
+  mem_trace_cfg_t* trace;
+  uint32_t pc;
+  int is_read;
+
+  mem_trace_init_once();
+  trace = &g_mem_trace;
+  if (trace->enabled == 0) {
+    return;
+  }
+  if ((mem_trace_range_match(addr, width, trace->base0, trace->size0) == 0)
+      && (mem_trace_range_match(addr, width, trace->base1, trace->size1) == 0)) {
+    return;
+  }
+  is_read = ((op != NULL) && (op[0] == 'R')) ? 1 : 0;
+  if ((is_read != 0) && (trace->trace_reads == 0)) {
+    return;
+  }
+  if ((is_read == 0) && (trace->trace_writes == 0)) {
+    return;
+  }
+  if ((is_read != 0) && (trace->skip_fetch_reads != 0)) {
+    pc = cpu_backend_get_pc();
+    if (addr == pc) {
+      return;
+    }
+  }
+  if ((trace->limit != 0u) && (trace->emitted >= trace->limit)) {
+    if (trace->limit_noted == 0) {
+      trace->limit_noted = 1;
+      LOG_INFO("[MEMTRACE] trace limit reached (%u events)\n", trace->limit);
+    }
+    return;
+  }
+
+  trace->emitted++;
+  pc = cpu_backend_get_pc();
+  LOG_INFO("[MEMTRACE] %s addr=$%08X val=$%08X src=%s pc=$%08X\n",
+           op,
+           addr,
+           value,
+           source,
+           pc);
+}
+
 
 static const char* fc_mode_name(enum fc_mode mode) {
   switch (mode) {
@@ -2113,16 +2275,19 @@ unsigned int m68k_read_memory_8(unsigned int address) {
   fc_shadow_touch(OP_TYPE_BYTE, address, 0);
   if (platform_read_check(OP_TYPE_BYTE, address, &platform_res)) {
     lowvec_trace_log("R08 platform", address, platform_res & 0xFF);
+    mem_trace_log("R08", address, platform_res & 0xFFu, 1u, "platform");
     return platform_res;
   }
 
   if (address & 0xFF000000) {
     lowvec_trace_log("R08 highmask", address, 0);
+    mem_trace_log("R08", address, 0u, 1u, "highmask");
     return 0;
   }
 
   unsigned int v = (unsigned int)ps_read_8((uint32_t)address);
   lowvec_trace_log("R08 ps", address, v & 0xFF);
+  mem_trace_log("R08", address, v & 0xFFu, 1u, "ps");
   return v;
 }
 
@@ -2134,11 +2299,13 @@ unsigned int m68k_read_memory_16(unsigned int address) {
   }
   if (platform_read_check(OP_TYPE_WORD, address, &platform_res)) {
     lowvec_trace_log("R16 platform", address, platform_res & 0xFFFF);
+    mem_trace_log("R16", address, platform_res & 0xFFFFu, 2u, "platform");
     return platform_res;
   }
 
   if (address & 0xFF000000) {
     lowvec_trace_log("R16 highmask", address, 0);
+    mem_trace_log("R16", address, 0u, 2u, "highmask");
     return 0;
   }
 
@@ -2146,10 +2313,12 @@ unsigned int m68k_read_memory_16(unsigned int address) {
   if (address & 0x01) {
     v = ((unsigned int)(ps_read_8(address) << 8) | (unsigned int)ps_read_8(address + 1));
     lowvec_trace_log("R16 ps-odd", address, v & 0xFFFF);
+    mem_trace_log("R16", address, v & 0xFFFFu, 2u, "ps-odd");
     return v;
   }
   v = (unsigned int)ps_read_16((uint32_t)address);
   lowvec_trace_log("R16 ps", address, v & 0xFFFF);
+  mem_trace_log("R16", address, v & 0xFFFFu, 2u, "ps");
   return v;
 }
 
@@ -2161,11 +2330,13 @@ unsigned int m68k_read_memory_32(unsigned int address) {
   }
   if (platform_read_check(OP_TYPE_LONGWORD, address, &platform_res)) {
     lowvec_trace_log("R32 platform", address, platform_res);
+    mem_trace_log("R32", address, platform_res, 4u, "platform");
     return platform_res;
   }
 
   if (address & 0xFF000000) {
     lowvec_trace_log("R32 highmask", address, 0);
+    mem_trace_log("R32", address, 0u, 4u, "highmask");
     return 0;
   }
 
@@ -2173,10 +2344,12 @@ unsigned int m68k_read_memory_32(unsigned int address) {
   if (address & 0x01) {
     v = (unsigned int)ps_read(OP_TYPE_LONGWORD, address);
     lowvec_trace_log("R32 ps-odd", address, v);
+    mem_trace_log("R32", address, v, 4u, "ps-odd");
     return v;
   }
   v = (unsigned int)ps_read(OP_TYPE_LONGWORD, address);
   lowvec_trace_log("R32 ps", address, v);
+  mem_trace_log("R32", address, v, 4u, "ps");
   return v;
 }
 
@@ -2341,16 +2514,19 @@ void m68k_write_memory_8(unsigned int address, unsigned int value) {
   lowvec_trace_log("W08 req", address, value & 0xFF);
   if (platform_write_check(OP_TYPE_BYTE, address, value)) {
     lowvec_trace_log("W08 platform", address, value & 0xFF);
+    mem_trace_log("W08", address, value & 0xFFu, 1u, "platform");
     return;
   }
 
   if (address & 0xFF000000) {
     lowvec_trace_log("W08 highmask", address, value & 0xFF);
+    mem_trace_log("W08", address, value & 0xFFu, 1u, "highmask");
     return;
   }
 
   ps_write_8((uint32_t)address, (uint8_t)value);
   lowvec_trace_log("W08 ps", address, value & 0xFF);
+  mem_trace_log("W08", address, value & 0xFFu, 1u, "ps");
   return;
 }
 
@@ -2363,11 +2539,13 @@ void m68k_write_memory_16(unsigned int address, unsigned int value) {
   }
   if (platform_write_check(OP_TYPE_WORD, address, value)) {
     lowvec_trace_log("W16 platform", address, value & 0xFFFF);
+    mem_trace_log("W16", address, value & 0xFFFFu, 2u, "platform");
     return;
   }
 
   if (address & 0xFF000000) {
     lowvec_trace_log("W16 highmask", address, value & 0xFFFF);
+    mem_trace_log("W16", address, value & 0xFFFFu, 2u, "highmask");
     return;
   }
 
@@ -2375,11 +2553,13 @@ void m68k_write_memory_16(unsigned int address, unsigned int value) {
     ps_write_8((uint32_t)address, (uint8_t)(value & 0xFF));
     ps_write_8((uint32_t)address + 1, (uint8_t)((value >> 8) & 0xFF));
     lowvec_trace_log("W16 ps-odd", address, value & 0xFFFF);
+    mem_trace_log("W16", address, value & 0xFFFFu, 2u, "ps-odd");
     return;
   }
 
   ps_write_16((uint32_t)address, (uint16_t)value);
   lowvec_trace_log("W16 ps", address, value & 0xFFFF);
+  mem_trace_log("W16", address, value & 0xFFFFu, 2u, "ps");
   return;
 }
 
@@ -2392,22 +2572,26 @@ void m68k_write_memory_32(unsigned int address, unsigned int value) {
   }
   if (platform_write_check(OP_TYPE_LONGWORD, address, value)) {
     lowvec_trace_log("W32 platform", address, value);
+    mem_trace_log("W32", address, value, 4u, "platform");
     return;
   }
 
   if (address & 0xFF000000) {
     lowvec_trace_log("W32 highmask", address, value);
+    mem_trace_log("W32", address, value, 4u, "highmask");
     return;
   }
 
   if (address & 0x01) {
     ps_write(OP_TYPE_LONGWORD, address, (uint32_t)value);
     lowvec_trace_log("W32 ps-odd", address, value);
+    mem_trace_log("W32", address, value, 4u, "ps-odd");
     return;
   }
 
   ps_write(OP_TYPE_LONGWORD, address, (uint32_t)value);
   lowvec_trace_log("W32 ps", address, value);
+  mem_trace_log("W32", address, value, 4u, "ps");
   return;
 }
 

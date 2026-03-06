@@ -105,6 +105,39 @@ uint8_t piscsi_scsi(struct piscsi_unit* u, struct IORequest* io);
 //#define debugval(c, v) WRITELONG(c, v)
 
 struct piscsi_base* dev_base = NULL;
+static uint8_t scsi_opcode_seen[32];
+
+static void piscsi_log_unhandled_io_command(uint16_t io_command) {
+  WRITELONG(PISCSI_DBG_VAL1, io_command);
+  WRITESHORT(PISCSI_DBG_MSG, DBG_IOCMD_UNHANDLED);
+}
+
+static void piscsi_log_scsi_command_once(uint8_t opcode, uint32_t io_length, uint8_t cmd1,
+                                         uint8_t cmd2, uint8_t cmd_length,
+                                         uint8_t unit_num) {
+  uint8_t idx;
+  uint8_t mask;
+  idx = (uint8_t)(opcode >> 3);
+  mask = (uint8_t)(1u << (opcode & 7u));
+  if ((scsi_opcode_seen[idx] & mask) != 0u) {
+    return;
+  }
+  scsi_opcode_seen[idx] |= mask;
+
+  WRITELONG(PISCSI_DBG_VAL1, io_length);
+  WRITELONG(PISCSI_DBG_VAL2, opcode);
+  WRITELONG(PISCSI_DBG_VAL3, cmd1);
+  WRITELONG(PISCSI_DBG_VAL4, cmd2);
+  WRITELONG(PISCSI_DBG_VAL5, cmd_length);
+  WRITELONG(PISCSI_DBG_VAL6, unit_num);
+  WRITESHORT(PISCSI_DBG_MSG, DBG_SCSICMD);
+}
+
+static void piscsi_log_unknown_scsi_opcode(uint8_t opcode, uint8_t unit_num) {
+  WRITELONG(PISCSI_DBG_VAL1, opcode);
+  WRITELONG(PISCSI_DBG_VAL2, unit_num);
+  WRITESHORT(PISCSI_DBG_MSG, DBG_SCSI_UNKNOWN_COMMAND);
+}
 
 static uint32_t piscsi_min_u32(uint32_t a, uint32_t b) {
   return (a < b) ? a : b;
@@ -386,13 +419,6 @@ uint8_t piscsi_scsi(struct piscsi_unit* u, struct IORequest* io) {
   WRITESHORT(PISCSI_CMD_DRVNUMX, u->unit_num);
   READLONG(PISCSI_CMD_BLOCKSIZE, block_size);
 
-  debugval(PISCSI_DBG_VAL1, iostd->io_Length);
-  debugval(PISCSI_DBG_VAL2, scsi->scsi_Command[0]);
-  debugval(PISCSI_DBG_VAL3, scsi->scsi_Command[1]);
-  debugval(PISCSI_DBG_VAL4, scsi->scsi_Command[2]);
-  debugval(PISCSI_DBG_VAL5, scsi->scsi_CmdLength);
-  debug(PISCSI_DBG_MSG, DBG_SCSICMD);
-
   // maxblocks = u->s * u->c * u->h;
 
   if (scsi->scsi_CmdLength < 6) {
@@ -403,11 +429,36 @@ uint8_t piscsi_scsi(struct piscsi_unit* u, struct IORequest* io) {
     return IOERR_BADADDRESS;
   }
 
+  piscsi_log_scsi_command_once(scsi->scsi_Command[0], iostd->io_Length, scsi->scsi_Command[1],
+                               scsi->scsi_Command[2], scsi->scsi_CmdLength, u->unit_num);
+
   scsi->scsi_Actual = 0;
   // iostd->io_Actual = sizeof(*scsi);
 
   switch (scsi->scsi_Command[0]) {
   case SCSICMD_TEST_UNIT_READY:
+    err = 0;
+    break;
+  case SCSICMD_REQUEST_SENSE: {
+    uint32_t i;
+    for (i = 0; i < scsi->scsi_Length; i++) {
+      data[i] = 0;
+    }
+    if (scsi->scsi_Length > 0) {
+      data[0] = 0x70;
+    }
+    if (scsi->scsi_Length > 7) {
+      data[7] = 10;
+    }
+    scsi->scsi_Actual = piscsi_min_u32(scsi->scsi_Length, 18u);
+    err = 0;
+    break;
+  }
+  case SCSICMD_FORMAT:
+    if (u->read_only) {
+      err = HFERR_BadStatus;
+      break;
+    }
     err = 0;
     break;
 
@@ -450,6 +501,15 @@ uint8_t piscsi_scsi(struct piscsi_unit* u, struct IORequest* io) {
       piscsi_copy_ascii_field(&data[32], 4, PISCSI_REV_ID);
     }
     scsi->scsi_Actual = piscsi_min_u32(scsi->scsi_Length, 36u);
+    err = 0;
+    break;
+  case SCSICMD_SEEK_6:
+  case SCSICMD_SEEK_10:
+  case SCSICMD_VERIFY_6:
+  case SCSICMD_VERIFY_10:
+  case SCSICMD_START_STOP_UNIT:
+  case SCSICMD_PREVENT_ALLOW_MEDIUM_REMOVAL:
+  case SCSICMD_SYNCHRONIZE_CACHE_10:
     err = 0;
     break;
 
@@ -606,6 +666,7 @@ uint8_t piscsi_scsi(struct piscsi_unit* u, struct IORequest* io) {
     break;
 
   default:
+    piscsi_log_unknown_scsi_opcode(scsi->scsi_Command[0], u->unit_num);
     debugval(PISCSI_DBG_VAL1, scsi->scsi_Command[0]);
     debug(PISCSI_DBG_MSG, DBG_SCSI_UNKNOWN_COMMAND);
     err = HFERR_BadStatus;
@@ -622,19 +683,14 @@ uint8_t piscsi_scsi(struct piscsi_unit* u, struct IORequest* io) {
 }
 
 uint16_t ns_support[] = {
-    NSCMD_DEVICEQUERY, CMD_RESET,
-    CMD_READ,          CMD_WRITE,
-    CMD_UPDATE,        CMD_CLEAR,
-    CMD_START,         CMD_STOP,
-    CMD_FLUSH,         TD_MOTOR,
-    TD_SEEK,           TD_FORMAT,
-    TD_REMOVE,         TD_CHANGENUM,
-    TD_CHANGESTATE,    TD_PROTSTATUS,
-    TD_GETDRIVETYPE,   TD_GETGEOMETRY,
-    TD_ADDCHANGEINT,   TD_REMCHANGEINT,
-    HD_SCSICMD,        NSCMD_TD_READ64,
-    NSCMD_TD_WRITE64,  NSCMD_TD_SEEK64,
-    NSCMD_TD_FORMAT64, 0,
+    NSCMD_DEVICEQUERY, CMD_RESET,        CMD_READ,         CMD_WRITE,
+    CMD_UPDATE,        CMD_CLEAR,        CMD_START,        CMD_STOP,
+    CMD_FLUSH,         TD_MOTOR,         TD_SEEK,          TD_FORMAT,
+    TD_REMOVE,         TD_CHANGENUM,     TD_CHANGESTATE,   TD_PROTSTATUS,
+    TD_GETDRIVETYPE,   TD_GETGEOMETRY,   TD_ADDCHANGEINT,  TD_REMCHANGEINT,
+    HD_SCSICMD,        TD_READ64,        TD_WRITE64,       TD_FORMAT64,
+    NSCMD_TD_READ64,   NSCMD_TD_WRITE64, NSCMD_TD_SEEK64,  NSCMD_TD_FORMAT64,
+    0,
 };
 
 #define DUMMYCMD                                                                                   \
@@ -685,8 +741,33 @@ uint8_t piscsi_perform_io(struct piscsi_unit* u, struct IORequest* io) {
   case CMD_UPDATE:
     /* Flush write buffer */
     DUMMYCMD;
+  case CMD_RESET:
+    u->change_num++;
+    iostd->io_Actual = 0;
+    break;
+  case CMD_START:
+    u->motor = 1;
+    iostd->io_Actual = 0;
+    break;
+  case CMD_STOP:
+    u->motor = 0;
+    iostd->io_Actual = 0;
+    break;
+  case CMD_FLUSH:
+    iostd->io_Actual = 0;
+    break;
   case TD_PROTSTATUS:
     DUMMYCMD;
+  case TD_ADDCHANGEINT:
+    iostd->io_Actual = 0;
+    break;
+  case TD_REMCHANGEINT:
+    iostd->io_Actual = 0;
+    break;
+  case TD_SEEK:
+  case NSCMD_TD_SEEK64:
+    iostd->io_Actual = iostd->io_Offset;
+    break;
   case TD_CHANGENUM:
     iostd->io_Actual = u->change_num;
     break;
@@ -739,6 +820,7 @@ uint8_t piscsi_perform_io(struct piscsi_unit* u, struct IORequest* io) {
     err = piscsi_scsi(u, io);
     break;
   default: {
+    piscsi_log_unhandled_io_command(io->io_Command);
     // int cmd = io->io_Command;
     debug(PISCSI_DBG_MSG, DBG_IOCMD_UNHANDLED);
     err = IOERR_NOCMD;

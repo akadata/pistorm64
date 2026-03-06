@@ -178,6 +178,7 @@ static ULONG wait_boot_marker(volatile UBYTE *board, ULONG expect, ULONG spins) 
 
 static int do_boot_descriptor_test(volatile UBYTE *board) {
   ULONG control_before;
+  ULONG control_restore;
   ULONG keep_irq;
   ULONG old_magic;
   ULONG old_entry;
@@ -185,9 +186,12 @@ static int do_boot_descriptor_test(volatile UBYTE *board) {
   ULONG old_arg0;
   ULONG old_marker;
   ULONG observed;
+  int rc;
 
   control_before = read_be32(board, PPC_ACCEL_REG_CONTROL);
+  control_restore = control_before & (PPC_ACCEL_CTRL_START | PPC_ACCEL_CTRL_IRQ_ENABLE);
   keep_irq = control_before & PPC_ACCEL_CTRL_IRQ_ENABLE;
+  rc = 0;
   old_magic = read_be32(board, PPC_ACCEL_REG_BOOT_MAGIC);
   old_entry = read_be32(board, PPC_ACCEL_REG_BOOT_ENTRY);
   old_stack = read_be32(board, PPC_ACCEL_REG_BOOT_STACK);
@@ -214,7 +218,8 @@ static int do_boot_descriptor_test(volatile UBYTE *board) {
            (unsigned int)read_be32(board, PPC_ACCEL_REG_BOOT_ENTRY),
            (unsigned int)read_be32(board, PPC_ACCEL_REG_BOOT_STACK),
            (unsigned int)read_be32(board, PPC_ACCEL_REG_BOOT_ARG0));
-    return 1;
+    rc = 1;
+    goto out_restore_control;
   }
 
   printf("BOOT test stage1 OK: entry=$%08X marker=$%08X\n",
@@ -233,13 +238,17 @@ static int do_boot_descriptor_test(volatile UBYTE *board) {
     printf("BOOT test restore failed: marker=$%08X expected=$%08X.\n",
            (unsigned int)observed,
            (unsigned int)PPCSHAKE_BOOT_MARKER_DONE);
-    return 2;
+    rc = 2;
+    goto out_restore_control;
   }
 
   printf("BOOT test stage2 OK: restored entry=$%08X marker=$%08X\n",
          (unsigned int)old_entry,
          (unsigned int)observed);
-  return 0;
+
+out_restore_control:
+  write_be32(board, PPC_ACCEL_REG_CONTROL, control_restore);
+  return rc;
 }
 
 static int do_irq_semantics_test(volatile UBYTE *board) {

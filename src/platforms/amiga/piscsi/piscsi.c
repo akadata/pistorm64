@@ -1986,11 +1986,20 @@ static __attribute__((unused)) const char *io_cmd_name(int index) {
 static __attribute__((unused)) const char *scsi_cmd_name(int index) {
     switch(index) {
         GETSCSINAME(SCSICMD_TEST_UNIT_READY);
+        GETSCSINAME(SCSICMD_REQUEST_SENSE);
+        GETSCSINAME(SCSICMD_FORMAT);
         GETSCSINAME(SCSICMD_INQUIRY);
+        GETSCSINAME(SCSICMD_SEEK_6);
+        GETSCSINAME(SCSICMD_VERIFY_6);
         GETSCSINAME(SCSICMD_READ_6);
         GETSCSINAME(SCSICMD_WRITE_6);
+        GETSCSINAME(SCSICMD_START_STOP_UNIT);
+        GETSCSINAME(SCSICMD_PREVENT_ALLOW_MEDIUM_REMOVAL);
         GETSCSINAME(SCSICMD_READ_10);
         GETSCSINAME(SCSICMD_WRITE_10);
+        GETSCSINAME(SCSICMD_SEEK_10);
+        GETSCSINAME(SCSICMD_VERIFY_10);
+        GETSCSINAME(SCSICMD_SYNCHRONIZE_CACHE_10);
         GETSCSINAME(SCSICMD_READ_CAPACITY_10);
         GETSCSINAME(SCSICMD_MODE_SENSE_6);
         GETSCSINAME(SCSICMD_READ_DEFECT_DATA_10);
@@ -2024,14 +2033,14 @@ static __attribute__((unused)) void print_piscsi_debug_message(int index) {
             DEBUG("[PISCSI] AbortIO!\n");
             break;
         case DBG_SCSICMD:
-            DEBUG("[PISCSI] SCSI Command %d (%s)\n", (int)piscsi_dbg[1], scsi_cmd_name((int)piscsi_dbg[1]));
+            DEBUG("[PISCSI] SCSI Command %d (%s) unit=%d\n", (int)piscsi_dbg[1], scsi_cmd_name((int)piscsi_dbg[1]), (int)piscsi_dbg[5]);
             DEBUG("Len: %d - %.2X %.2X %.2X - Command Length: %d\n", (int)piscsi_dbg[0], (int)piscsi_dbg[1], (int)piscsi_dbg[2], (int)piscsi_dbg[3], (int)piscsi_dbg[4]);
             break;
         case DBG_SCSI_UNKNOWN_MODESENSE:
             DEBUG("[!!!PISCSI] SCSI: Unknown modesense %.4X\n", (int)piscsi_dbg[0]);
             break;
         case DBG_SCSI_UNKNOWN_COMMAND:
-            DEBUG("[!!!PISCSI] SCSI: Unknown command %.4X\n", (int)piscsi_dbg[0]);
+            DEBUG("[!!!PISCSI] SCSI: Unknown command opcode=0x%02X unit=%d\n", (int)(piscsi_dbg[0] & 0xFF), (int)piscsi_dbg[1]);
             break;
         case DBG_SCSIERR:
             DEBUG("[!!!PISCSI] SCSI: An error occured: %.4X\n", (int)piscsi_dbg[0]);
