@@ -135,6 +135,22 @@ typedef struct ppc_accel_state {
   bool trace_io_limit_noted;
   uint32_t trace_io_limit;
   uint32_t trace_io_emitted;
+  bool trace_mmio_enabled;
+  bool trace_mmio_limit_noted;
+  uint32_t trace_mmio_limit;
+  uint32_t trace_mmio_emitted;
+  bool diag_trace_enabled;
+  bool diag_trace_limit_noted;
+  uint32_t diag_trace_limit;
+  uint32_t diag_trace_emitted;
+  uint8_t diag_config;
+  uint16_t diag_diagpoint;
+  uint16_t diag_bootpoint;
+  uint16_t diag_size;
+  uint16_t diag_boot_stub_offset;
+  uint16_t diag_boot_stub_size;
+  uint16_t diag_diag_stub_offset;
+  uint16_t diag_diag_stub_size;
   uint64_t io_read32_count;
   uint64_t io_write32_count;
   uint64_t io_read64_count;
@@ -151,12 +167,20 @@ static bool g_ppc_accel_atexit_installed;
 #define PPC_ACCEL_AC_SERIAL_ROM_NIBBLE_OFFSET 12u
 #define PPC_ACCEL_AC_DIAG_VEC_DEFAULT 0x4000u
 #define PPC_ACCEL_AC_DIAG_VEC_ROM_NIBBLE_OFFSET 20u
+#define PPC_ACCEL_DIAG_CONFIG_DEFAULT 0x00u
+#define PPC_ACCEL_DIAG_DIAGPOINT_DEFAULT 0x0000u
 
 #define PPC_ACCEL_DIAG_OFFSET 0x00004000u
 #define PPC_ACCEL_DIAG_AREA_SIZE 0x0040u
 #define PPC_ACCEL_DIAG_NAME_OFFSET 0x0010u
+#define PPC_ACCEL_DIAG_BOOT_STUB_OFFSET 0x0020u
+#define PPC_ACCEL_DIAG_BOOT_STUB_SIZE 0x0012u
+#define PPC_ACCEL_DIAG_DIAG_STUB_OFFSET 0x0032u
+#define PPC_ACCEL_DIAG_DIAG_STUB_SIZE 0x000au
+#define PPC_ACCEL_DIAG_BOOTPOINT_DEFAULT 0x0000u
 
 static void ppc_accel_write_shared_info(ppc_accel_state_t *state);
+static uint32_t env_u32_or_default(const char *name, uint32_t default_value);
 
 static const char *ppc_accel_runtime_state_name(ppc_accel_runtime_state_t state)
 {
@@ -233,11 +257,95 @@ static void write_be16(uint8_t *base, uint32_t offset, uint16_t value)
   base[offset + 1u] = (uint8_t)(value & 0xFFu);
 }
 
+static void ppc_accel_write_diag_stubs(ppc_accel_state_t *state)
+{
+  static const uint8_t boot_stub[PPC_ACCEL_DIAG_BOOT_STUB_SIZE] = {
+      0x20u, 0x6fu, 0x00u, 0x04u, /* move.l 4(%a7), %a0        ; ConfigDev* */
+      0x20u, 0x68u, 0x00u, 0x20u, /* move.l 32(%a0), %a0       ; cd_BoardAddr */
+      0x70u, 0x01u,               /* moveq #1, %d0             */
+      0x21u, 0x40u, 0x00u, 0x08u, /* move.l %d0, 8(%a0)        ; CONTROL=START */
+      0x70u, 0x01u,               /* moveq #1, %d0             ; success/fallback */
+      0x4eu, 0x75u                /* rts                       */
+  };
+  static const uint8_t diag_stub[PPC_ACCEL_DIAG_DIAG_STUB_SIZE] = {
+      0x70u, 0x01u,               /* moveq #1, %d0             */
+      0x21u, 0x40u, 0x00u, 0x08u, /* move.l %d0, 8(%a0)        ; A0 = BoardBase in DiagPoint */
+      0x70u, 0x01u,               /* moveq #1, %d0             */
+      0x4eu, 0x75u                /* rts                       */
+  };
+  uint32_t boot_offset;
+  uint32_t diag_offset;
+
+  boot_offset = PPC_ACCEL_DIAG_OFFSET + (uint32_t)PPC_ACCEL_DIAG_BOOT_STUB_OFFSET;
+  diag_offset = PPC_ACCEL_DIAG_OFFSET + (uint32_t)PPC_ACCEL_DIAG_DIAG_STUB_OFFSET;
+  if ((boot_offset + PPC_ACCEL_DIAG_BOOT_STUB_SIZE) > PPC_ACCEL_Z2_SIZE) {
+    return;
+  }
+  if ((diag_offset + PPC_ACCEL_DIAG_DIAG_STUB_SIZE) > PPC_ACCEL_Z2_SIZE) {
+    return;
+  }
+
+  memcpy(state->window + boot_offset, boot_stub, (size_t)PPC_ACCEL_DIAG_BOOT_STUB_SIZE);
+  memcpy(state->window + diag_offset, diag_stub, (size_t)PPC_ACCEL_DIAG_DIAG_STUB_SIZE);
+}
+
+static void ppc_accel_trace_diag_read(ppc_accel_state_t *state, uint32_t offset, uint8_t value)
+{
+  uint32_t diag_start;
+  uint32_t diag_end;
+  uint32_t boot_stub_start;
+  uint32_t boot_stub_end;
+  uint32_t diag_stub_start;
+  uint32_t diag_stub_end;
+  bool watch_header;
+  bool watch_boot_stub;
+  bool watch_diag_stub;
+
+  if ((state == NULL) || (state->diag_trace_enabled == false)) {
+    return;
+  }
+
+  diag_start = PPC_ACCEL_DIAG_OFFSET;
+  diag_end = diag_start + (uint32_t)state->diag_size;
+  if ((offset < diag_start) || (offset >= diag_end)) {
+    return;
+  }
+
+  boot_stub_start = diag_start + (uint32_t)state->diag_boot_stub_offset;
+  boot_stub_end = boot_stub_start + (uint32_t)state->diag_boot_stub_size;
+  diag_stub_start = diag_start + (uint32_t)state->diag_diag_stub_offset;
+  diag_stub_end = diag_stub_start + (uint32_t)state->diag_diag_stub_size;
+  watch_header = (offset < (diag_start + 0x10u));
+  watch_boot_stub = (offset >= boot_stub_start) && (offset < boot_stub_end);
+  watch_diag_stub = (offset >= diag_stub_start) && (offset < diag_stub_end);
+  if ((watch_header == false) && (watch_boot_stub == false) && (watch_diag_stub == false)) {
+    return;
+  }
+
+  if ((state->diag_trace_limit != 0u) && (state->diag_trace_emitted >= state->diag_trace_limit)) {
+    if (state->diag_trace_limit_noted == false) {
+      state->diag_trace_limit_noted = true;
+      LOG_INFO("[PPC-ACCEL] DIAG trace limit reached (%" PRIu32 " events)\n",
+               state->diag_trace_limit);
+    }
+    return;
+  }
+
+  state->diag_trace_emitted++;
+  LOG_INFO("[PPC-ACCEL][DIAG] R8 off=0x%04" PRIx32 " val=0x%02" PRIx8 " (%s)\n",
+           offset,
+           value,
+           watch_boot_stub ? "boot-stub" : (watch_diag_stub ? "diag-stub" : "hdr"));
+}
+
 static void ppc_accel_write_diag_area(ppc_accel_state_t *state)
 {
   static const char diag_name[] = "PiStorm PPC Accelerator";
   uint32_t base;
   uint32_t name_len;
+  uint8_t diag_config;
+  uint16_t diag_diagpoint;
+  uint16_t diag_bootpoint;
 
   base = PPC_ACCEL_DIAG_OFFSET;
   name_len = (uint32_t)sizeof(diag_name);
@@ -245,16 +353,51 @@ static void ppc_accel_write_diag_area(ppc_accel_state_t *state)
     return;
   }
 
-  /* Minimal read-only DiagArea: discoverable name, no boot/diag entry execution. */
-  state->window[base + 0u] = 0x00u; /* DAC_NIBBLEWIDE | DAC_NEVER */
+  diag_config = (uint8_t)(env_u32_or_default("PPC_ACCEL_DIAG_CONFIG",
+                                             PPC_ACCEL_DIAG_CONFIG_DEFAULT) & 0xFFu);
+  diag_diagpoint = (uint16_t)(env_u32_or_default("PPC_ACCEL_DIAG_DIAGPOINT",
+                                                 PPC_ACCEL_DIAG_DIAGPOINT_DEFAULT) & 0xFFFFu);
+  diag_bootpoint = (uint16_t)(env_u32_or_default("PPC_ACCEL_DIAG_BOOTPOINT",
+                                                 PPC_ACCEL_DIAG_BOOTPOINT_DEFAULT) & 0xFFFFu);
+  if (diag_diagpoint >= PPC_ACCEL_DIAG_AREA_SIZE) {
+    diag_diagpoint = 0u;
+  }
+  if (diag_bootpoint >= PPC_ACCEL_DIAG_AREA_SIZE) {
+    diag_bootpoint = 0u;
+  }
+
+  /* Read-only DiagArea with optional 68k bootpoint stub for CSPPC-style bring-up probes. */
+  state->window[base + 0u] = diag_config;
   state->window[base + 1u] = 0x00u;
   write_be16(state->window, base + 2u, (uint16_t)PPC_ACCEL_DIAG_AREA_SIZE);
-  write_be16(state->window, base + 4u, 0u); /* da_DiagPoint */
-  write_be16(state->window, base + 6u, 0u); /* da_BootPoint */
+  write_be16(state->window, base + 4u, diag_diagpoint);
+  write_be16(state->window, base + 6u, diag_bootpoint);
   write_be16(state->window, base + 8u, (uint16_t)PPC_ACCEL_DIAG_NAME_OFFSET);
   write_be16(state->window, base + 10u, 0u);
   write_be16(state->window, base + 12u, 0u);
   memcpy(state->window + base + PPC_ACCEL_DIAG_NAME_OFFSET, diag_name, name_len);
+  ppc_accel_write_diag_stubs(state);
+
+  state->diag_config = diag_config;
+  state->diag_diagpoint = diag_diagpoint;
+  state->diag_bootpoint = diag_bootpoint;
+  state->diag_size = PPC_ACCEL_DIAG_AREA_SIZE;
+  state->diag_boot_stub_offset = PPC_ACCEL_DIAG_BOOT_STUB_OFFSET;
+  state->diag_boot_stub_size = PPC_ACCEL_DIAG_BOOT_STUB_SIZE;
+  state->diag_diag_stub_offset = PPC_ACCEL_DIAG_DIAG_STUB_OFFSET;
+  state->diag_diag_stub_size = PPC_ACCEL_DIAG_DIAG_STUB_SIZE;
+
+  if (state->verbose == true) {
+    LOG_INFO("[PPC-ACCEL] diag area config=0x%02" PRIx8 " diag=0x%04" PRIx16
+             " boot=0x%04" PRIx16 " size=0x%04" PRIx16 " boot_stub=0x%04" PRIx16
+             " diag_stub=0x%04" PRIx16 "\n",
+             diag_config,
+             diag_diagpoint,
+             diag_bootpoint,
+             (uint16_t)PPC_ACCEL_DIAG_AREA_SIZE,
+             (uint16_t)PPC_ACCEL_DIAG_BOOT_STUB_OFFSET,
+             (uint16_t)PPC_ACCEL_DIAG_DIAG_STUB_OFFSET);
+  }
 }
 
 static void ppc_accel_qemu_log(const char *format, ...)
@@ -454,10 +597,43 @@ static void ppc_accel_reset_io_trace(ppc_accel_state_t *state)
   state->trace_io_seen = false;
   state->trace_io_limit_noted = false;
   state->trace_io_emitted = 0u;
+  state->trace_mmio_limit_noted = false;
+  state->trace_mmio_emitted = 0u;
+  state->diag_trace_limit_noted = false;
+  state->diag_trace_emitted = 0u;
   state->io_read32_count = 0u;
   state->io_write32_count = 0u;
   state->io_read64_count = 0u;
   state->io_write64_count = 0u;
+}
+
+static void ppc_accel_trace_mmio_event(
+    ppc_accel_state_t *state,
+    bool is_write,
+    int width_bits,
+    uint32_t offset,
+    uint32_t value)
+{
+  const char *op;
+
+  if ((state == NULL) || (state->trace_mmio_enabled == false)) {
+    return;
+  }
+  if ((state->trace_mmio_limit != 0u) && (state->trace_mmio_emitted >= state->trace_mmio_limit)) {
+    if (state->trace_mmio_limit_noted == false) {
+      state->trace_mmio_limit_noted = true;
+      LOG_INFO("[PPC-ACCEL] MMIO trace limit reached (%" PRIu32 " events)\n", state->trace_mmio_limit);
+    }
+    return;
+  }
+
+  state->trace_mmio_emitted++;
+  op = is_write ? "W" : "R";
+  LOG_INFO("[PPC-ACCEL][MMIO] %s%d off=0x%04" PRIx32 " val=0x%08" PRIx32 "\n",
+           op,
+           width_bits,
+           offset,
+           value);
 }
 
 static void ppc_accel_trace_io_event(
@@ -1478,6 +1654,7 @@ static uint8_t ppc_accel_read8(zorro_device_t *dev, uint32_t offset)
   uint32_t reg_base;
   uint32_t reg_value;
   uint32_t shift;
+  uint8_t value;
 
   state = (ppc_accel_state_t *)dev->priv;
   if (offset >= PPC_ACCEL_Z2_SIZE) {
@@ -1490,10 +1667,15 @@ static uint8_t ppc_accel_read8(zorro_device_t *dev, uint32_t offset)
     reg_base = offset & ~0x3u;
     reg_value = ppc_accel_reg_read32(state, reg_base);
     shift = (3u - (offset & 0x3u)) * 8u;
-    return (uint8_t)((reg_value >> shift) & 0xFFu);
+    value = (uint8_t)((reg_value >> shift) & 0xFFu);
+    ppc_accel_trace_mmio_event(state, false, 8, offset, (uint32_t)value);
+    return value;
   }
 
-  return state->window[offset];
+  value = state->window[offset];
+  ppc_accel_trace_diag_read(state, offset, value);
+  ppc_accel_trace_mmio_event(state, false, 8, offset, (uint32_t)value);
+  return value;
 }
 
 static uint16_t ppc_accel_read16(zorro_device_t *dev, uint32_t offset)
@@ -1509,6 +1691,7 @@ static uint16_t ppc_accel_read16(zorro_device_t *dev, uint32_t offset)
 static uint32_t ppc_accel_read32(zorro_device_t *dev, uint32_t offset)
 {
   ppc_accel_state_t *state;
+  uint32_t value;
 
   state = (ppc_accel_state_t *)dev->priv;
   if ((offset + 3u) >= PPC_ACCEL_Z2_SIZE) {
@@ -1518,13 +1701,17 @@ static uint32_t ppc_accel_read32(zorro_device_t *dev, uint32_t offset)
   ppc_accel_poll_mailbox(state);
 
   if ((offset < PPC_ACCEL_REG_WINDOW_SIZE) && ((offset & 0x3u) == 0u)) {
-    return ppc_accel_reg_read32(state, offset);
+    value = ppc_accel_reg_read32(state, offset);
+    ppc_accel_trace_mmio_event(state, false, 32, offset, value);
+    return value;
   }
 
-  return ((uint32_t)ppc_accel_read8(dev, offset + 0u) << 24)
-         | ((uint32_t)ppc_accel_read8(dev, offset + 1u) << 16)
-         | ((uint32_t)ppc_accel_read8(dev, offset + 2u) << 8)
-         | (uint32_t)ppc_accel_read8(dev, offset + 3u);
+  value = ((uint32_t)ppc_accel_read8(dev, offset + 0u) << 24)
+          | ((uint32_t)ppc_accel_read8(dev, offset + 1u) << 16)
+          | ((uint32_t)ppc_accel_read8(dev, offset + 2u) << 8)
+          | (uint32_t)ppc_accel_read8(dev, offset + 3u);
+  ppc_accel_trace_mmio_event(state, false, 32, offset, value);
+  return value;
 }
 
 static void ppc_accel_write8(zorro_device_t *dev, uint32_t offset, uint8_t value)
@@ -1563,6 +1750,7 @@ static void ppc_accel_write8(zorro_device_t *dev, uint32_t offset, uint8_t value
     state->window[offset] = value;
   }
 
+  ppc_accel_trace_mmio_event(state, true, 8, offset, (uint32_t)value);
   ppc_accel_poll_mailbox(state);
 }
 
@@ -1642,6 +1830,7 @@ static void ppc_accel_write32(zorro_device_t *dev, uint32_t offset, uint32_t val
     state->window[offset + 3u] = (uint8_t)(value & 0xFFu);
   }
 
+  ppc_accel_trace_mmio_event(state, true, 32, offset, value);
   ppc_accel_poll_mailbox(state);
 }
 
@@ -1698,6 +1887,10 @@ void z2_ppc_accel_register(void)
   g_ppc_accel_state.qemu_log_enabled = env_bool_or_default("PPC_ACCEL_QEMU_LOG", false);
   g_ppc_accel_state.trace_io_enabled = env_bool_or_default("PPC_ACCEL_TRACE_IO", false);
   g_ppc_accel_state.trace_io_limit = env_u32_or_default("PPC_ACCEL_TRACE_IO_LIMIT", 256u);
+  g_ppc_accel_state.trace_mmio_enabled = env_bool_or_default("PPC_ACCEL_MMIO_TRACE", false);
+  g_ppc_accel_state.trace_mmio_limit = env_u32_or_default("PPC_ACCEL_MMIO_TRACE_LIMIT", 512u);
+  g_ppc_accel_state.diag_trace_enabled = env_bool_or_default("PPC_ACCEL_DIAG_TRACE", false);
+  g_ppc_accel_state.diag_trace_limit = env_u32_or_default("PPC_ACCEL_DIAG_TRACE_LIMIT", 256u);
   g_ppc_accel_state.runtime_state = PPC_ACCEL_RUNTIME_STOPPED;
   ppc_accel_reset_io_trace(&g_ppc_accel_state);
 
@@ -1709,6 +1902,12 @@ void z2_ppc_accel_register(void)
              g_ppc_accel_state.qemu_log_enabled ? 1 : 0,
              g_ppc_accel_state.trace_io_enabled ? 1 : 0,
              g_ppc_accel_state.trace_io_limit);
+    LOG_INFO("[PPC-ACCEL] mmio_trace=%d mmio_trace_limit=%" PRIu32 "\n",
+             g_ppc_accel_state.trace_mmio_enabled ? 1 : 0,
+             g_ppc_accel_state.trace_mmio_limit);
+    LOG_INFO("[PPC-ACCEL] diag_trace=%d diag_trace_limit=%" PRIu32 "\n",
+             g_ppc_accel_state.diag_trace_enabled ? 1 : 0,
+             g_ppc_accel_state.diag_trace_limit);
   }
 
   LOG_INFO("[ZORRO] Registering Z2 PPC accelerator device.\n");

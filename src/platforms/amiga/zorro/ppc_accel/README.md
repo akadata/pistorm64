@@ -31,11 +31,20 @@ Optional tuning:
 - `PPC_ACCEL_AC_SERIAL=<u32>` overrides the 32-bit AutoConfig serial field
   (`er_SerialNumber`) encoded into the board ROM nibbles.
 - `PPC_ACCEL_AC_DIAG_VEC=<u16>` overrides `er_InitDiagVec` (default `0x4000`).
+- `PPC_ACCEL_DIAG_CONFIG=<u8>` overrides DiagArea `da_Config` at `base+0x4000`
+  (default `0x00`; legacy probe test value: `0x90` for `DAC_WORDWIDE|DAC_CONFIGTIME`).
+- `PPC_ACCEL_DIAG_DIAGPOINT=<u16>` overrides DiagArea `da_DiagPoint` (default `0x0000`).
+- `PPC_ACCEL_DIAG_BOOTPOINT=<u16>` overrides DiagArea `da_BootPoint`
+  (default `0x0000` = disabled; set `0x0020` to use built-in 68k start-stub).
+- `PPC_ACCEL_DIAG_TRACE=1` logs DiagArea header/stub fetch reads.
+- `PPC_ACCEL_DIAG_TRACE_LIMIT=<u32>` caps DiagArea trace lines (default `256`, `0` = unlimited).
 - `PPC_ACCEL_PPC_RAM_BASE=<u32>` sets PPC-visible RAM base (default `0x08000000`).
 - `PPC_ACCEL_PPC_RAM_MB=<u32>` sets PPC-visible RAM size in MiB (default `128`).
 - `PPC_ACCEL_QEMU_LOG=1` forwards `qemu-uae.so` `uae_log()` output into PiStorm logs.
 - `PPC_ACCEL_TRACE_IO=1` enables PPC I/O callback tracing (`uae_ppc_io_mem_*` path).
 - `PPC_ACCEL_TRACE_IO_LIMIT=<u32>` caps trace lines (default `256`, `0` = unlimited).
+- `PPC_ACCEL_MMIO_TRACE=1` logs Zorro MMIO reads/writes to the PPC board window.
+- `PPC_ACCEL_MMIO_TRACE_LIMIT=<u32>` caps MMIO trace lines (default `512`, `0` = unlimited).
 
 ## Device memory map
 
@@ -110,8 +119,12 @@ Statuses:
 - The mailbox page is single-backed: Amiga Zorro access and PPC access touch the same memory.
 - PPC runtime also maps a dedicated PPC RAM region (`128 MiB` at `0x08000000` by default)
   for compatibility experiments that expect CSPPC-style PPC RAM presence.
-- Card now advertises `Z2_BOOTROM` and publishes a minimal DiagArea at `base+0x4000`
-  with a name string for legacy board discovery tooling.
+- Card advertises `Z2_BOOTROM` and publishes a DiagArea at `base+0x4000`
+  with a name string and minimal 68k stubs:
+  bootpoint stub at `0x0020` and diagpoint-compatible stub at `0x0032`.
+- The built-in bootpoint stub writes `CONTROL=1` to `board_base+0x0008`
+  (using `ConfigDev->cd_BoardAddr`) and returns.
+- The built-in diagpoint stub writes `CONTROL=1` using `A0=BoardBase` and returns `D0=1`.
 - For legacy probe debugging, set `PPC_ACCEL_AC_TRACE=1` before launching emulator to log
   PPC board AutoConfig reads/writes.
 - Runtime assets must be available (`qemu-uae.so`, firmware/config paths) and
