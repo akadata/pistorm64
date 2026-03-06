@@ -212,6 +212,9 @@ Stage 6C status (frozen summary):
   * `unset LD_LIBRARY_PATH`
   * `export QEMU_UAE_SO=/usr/local/lib/qemu-uae.so`
   * Optional probe tracing: `export PPC_ACCEL_AC_TRACE=1` (logs AutoConfig accesses for PPC board compatibility debugging)
+  * Optional serial tuning: `export PPC_ACCEL_AC_SERIAL=0x00420001` (controls AutoConfig `er_SerialNumber` nibbles for compatibility probing)
+  * Optional diag vector tuning: `export PPC_ACCEL_AC_DIAG_VEC=0x4000` (controls AutoConfig `er_InitDiagVec` for board discovery compatibility probing)
+  * Optional PPC RAM tuning: `export PPC_ACCEL_PPC_RAM_BASE=0x08000000` and `export PPC_ACCEL_PPC_RAM_MB=128` (maps dedicated PPC-visible RAM region for CSPPC-style compatibility probing)
 * Host helper script: `./stage6.sh` (builds emulator + `amiga/zorro-ppc` tool and prints manual test steps)
 * Stage 8 helper script: `./stage8.sh` (builds emulator + tool and prints bootstrap-contract regression flow)
 * Bootstrap contract (frozen Stage 8 reference): `docs/PPC_ACCEL_BOOTSTRAP_CONTRACT.md`
@@ -224,7 +227,11 @@ Amiga-side Stage 6A tool:
 * Stage 7A identity dump: `ppcshake --id`
 * Stage 6B IRQ semantics probe: `ppcshake --irq`
   * Expected marker: `IRQ test OK: doorbell raise/ack and cmd_done raise/ack.`
-  * Concurrent start guard: `ppcshake busy: another instance is running. Try again.`
+* Stage 8 descriptor branch probe: `ppcshake --boot-test`
+  * Expected markers:
+    * `BOOT test stage1 OK: entry=$00000200 marker=$00000003`
+    * `BOOT test stage2 OK: restored entry=$00000000 marker=$00000002`
+* Concurrent start guard: `ppcshake busy: another instance is running. Try again.`
 * Known AmigaShell UX quirk: rapid cursor-up/enter re-entry can wedge a shell command line; open a fresh shell and retry.
 
 ---

@@ -131,6 +131,7 @@ Required green checks before compatibility changes:
 - `ppcshake --id`
 - `ppcshake --irq`
 - `ppcshake 10`
+- `ppcshake --boot-test` (must report marker `0x3` at test entry, then restore to marker `0x2`)
 - no regressions in Stage 6C startup logs and mailbox completion ordering
 
 Optional diagnostics:

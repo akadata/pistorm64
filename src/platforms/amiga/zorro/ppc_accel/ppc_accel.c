@@ -184,6 +184,8 @@ static bool g_ppc_accel_atexit_installed;
 
 static void ppc_accel_write_shared_info(ppc_accel_state_t *state);
 static uint32_t env_u32_or_default(const char *name, uint32_t default_value);
+static uint32_t ppc_accel_boot_desc_read_field(const ppc_accel_state_t *state, uint32_t field_offset);
+static void ppc_accel_boot_desc_write_field(ppc_accel_state_t *state, uint32_t field_offset, uint32_t value);
 
 static const char *ppc_accel_runtime_state_name(ppc_accel_runtime_state_t state)
 {
@@ -654,6 +656,45 @@ static void ppc_accel_write_boot_descriptor(ppc_accel_state_t *state)
              entry,
              stack,
              arg0);
+  }
+}
+
+static void ppc_accel_finalize_boot_descriptor_defaults(ppc_accel_state_t *state)
+{
+  uint32_t magic;
+  uint32_t entry;
+  uint32_t stack;
+  uint32_t arg0;
+  uint32_t default_magic;
+  uint32_t default_entry;
+  uint32_t default_stack;
+  uint32_t default_arg0;
+
+  if (state == NULL) {
+    return;
+  }
+
+  magic = ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_MAGIC);
+  entry = ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_ENTRY);
+  stack = ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_STACK);
+  arg0 = ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_ARG0);
+
+  default_magic = env_u32_or_default("PPC_ACCEL_BOOT_MAGIC", PPC_ACCEL_BOOT_DESC_MAGIC);
+  default_entry = env_u32_or_default("PPC_ACCEL_BOOT_ENTRY", PPC_ACCEL_FIRMWARE_ENTRY_PRIMARY);
+  default_stack = env_u32_or_default("PPC_ACCEL_BOOT_STACK", ppc_accel_boot_desc_default_stack(state));
+  default_arg0 = env_u32_or_default("PPC_ACCEL_BOOT_ARG0", PPC_ACCEL_MAILBOX_OFFSET);
+
+  if (magic == 0u) {
+    ppc_accel_boot_desc_write_field(state, PPC_ACCEL_BOOT_DESC_OFF_MAGIC, default_magic);
+  }
+  if (entry == 0u) {
+    ppc_accel_boot_desc_write_field(state, PPC_ACCEL_BOOT_DESC_OFF_ENTRY, default_entry);
+  }
+  if (stack == 0u) {
+    ppc_accel_boot_desc_write_field(state, PPC_ACCEL_BOOT_DESC_OFF_STACK, default_stack);
+  }
+  if (arg0 == 0u) {
+    ppc_accel_boot_desc_write_field(state, PPC_ACCEL_BOOT_DESC_OFF_ARG0, default_arg0);
   }
 }
 
@@ -1653,7 +1694,7 @@ static bool ppc_accel_backend_bootstrap(ppc_accel_state_t *state)
   if (ppc_accel_prepare_ppc_ram(state) == false) {
     goto fail;
   }
-  ppc_accel_write_boot_descriptor(state);
+  ppc_accel_finalize_boot_descriptor_defaults(state);
 
   if (ppc_accel_ranges_overlap(0u, PPC_ACCEL_Z2_SIZE, state->ppc_ram_base, state->ppc_ram_size) == true) {
     LOG_WARN("[PPC-ACCEL] PPC RAM mapping overlaps board window: base=0x%08" PRIx32
@@ -1893,6 +1934,13 @@ static void ppc_accel_reg_write32(ppc_accel_state_t *state, uint32_t offset, uin
     } else {
       state->control = new_control;
       if ((state->control & PPC_ACCEL_CTRL_START) != 0u) {
+        LOG_INFO("[PPC-ACCEL] CONTROL.START bootdesc pre-start"
+                 " magic=0x%08" PRIx32 " entry=0x%08" PRIx32
+                 " stack=0x%08" PRIx32 " arg0=0x%08" PRIx32 "\n",
+                 ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_MAGIC),
+                 ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_ENTRY),
+                 ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_STACK),
+                 ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_ARG0));
         running_ok = ppc_accel_set_running(state, true);
         LOG_INFO("[PPC-ACCEL] CONTROL.START requested -> %s\n",
                  running_ok == true ? "running" : "failed");
@@ -1923,15 +1971,19 @@ static void ppc_accel_reg_write32(ppc_accel_state_t *state, uint32_t offset, uin
     break;
   case PPC_ACCEL_REG_BOOT_MAGIC:
     ppc_accel_boot_desc_write_field(state, PPC_ACCEL_BOOT_DESC_OFF_MAGIC, value);
+    LOG_INFO("[PPC-ACCEL] BOOT_MAGIC write value=0x%08" PRIx32 "\n", value);
     break;
   case PPC_ACCEL_REG_BOOT_ENTRY:
     ppc_accel_boot_desc_write_field(state, PPC_ACCEL_BOOT_DESC_OFF_ENTRY, value);
+    LOG_INFO("[PPC-ACCEL] BOOT_ENTRY write value=0x%08" PRIx32 "\n", value);
     break;
   case PPC_ACCEL_REG_BOOT_STACK:
     ppc_accel_boot_desc_write_field(state, PPC_ACCEL_BOOT_DESC_OFF_STACK, value);
+    LOG_INFO("[PPC-ACCEL] BOOT_STACK write value=0x%08" PRIx32 "\n", value);
     break;
   case PPC_ACCEL_REG_BOOT_ARG0:
     ppc_accel_boot_desc_write_field(state, PPC_ACCEL_BOOT_DESC_OFF_ARG0, value);
+    LOG_INFO("[PPC-ACCEL] BOOT_ARG0 write value=0x%08" PRIx32 "\n", value);
     break;
   default:
     write_be32(state->window, offset, value);

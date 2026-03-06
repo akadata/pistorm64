@@ -194,6 +194,7 @@ static int do_boot_descriptor_test(volatile UBYTE *board) {
   old_arg0 = read_be32(board, PPC_ACCEL_REG_BOOT_ARG0);
   old_marker = read_be32(board, PPC_ACCEL_BOOT_DESC_OFFSET + PPC_ACCEL_BOOT_DESC_OFF_MARKER);
 
+  write_be32(board, PPC_ACCEL_REG_CONTROL, keep_irq | PPC_ACCEL_CTRL_RESET);
   write_be32(board, PPC_ACCEL_REG_BOOT_MAGIC, PPC_ACCEL_BOOT_DESC_MAGIC);
   write_be32(board, PPC_ACCEL_REG_BOOT_ENTRY, PPCSHAKE_BOOT_TEST_ENTRY);
   if (old_stack != 0u) {
@@ -202,8 +203,6 @@ static int do_boot_descriptor_test(volatile UBYTE *board) {
   if (old_arg0 != 0u) {
     write_be32(board, PPC_ACCEL_REG_BOOT_ARG0, old_arg0);
   }
-
-  write_be32(board, PPC_ACCEL_REG_CONTROL, keep_irq | PPC_ACCEL_CTRL_RESET);
   write_be32(board, PPC_ACCEL_REG_CONTROL, keep_irq | PPC_ACCEL_CTRL_START);
   observed = wait_boot_marker(board, PPCSHAKE_BOOT_MARKER_TEST, PPCSHAKE_BOOT_MARKER_SPINS);
   if (observed != PPCSHAKE_BOOT_MARKER_TEST) {
@@ -222,13 +221,12 @@ static int do_boot_descriptor_test(volatile UBYTE *board) {
          (unsigned int)PPCSHAKE_BOOT_TEST_ENTRY,
          (unsigned int)observed);
 
+  write_be32(board, PPC_ACCEL_REG_CONTROL, keep_irq | PPC_ACCEL_CTRL_RESET);
   write_be32(board, PPC_ACCEL_REG_BOOT_MAGIC, old_magic);
   write_be32(board, PPC_ACCEL_REG_BOOT_ENTRY, old_entry);
   write_be32(board, PPC_ACCEL_REG_BOOT_STACK, old_stack);
   write_be32(board, PPC_ACCEL_REG_BOOT_ARG0, old_arg0);
   write_be32(board, PPC_ACCEL_BOOT_DESC_OFFSET + PPC_ACCEL_BOOT_DESC_OFF_MARKER, old_marker);
-
-  write_be32(board, PPC_ACCEL_REG_CONTROL, keep_irq | PPC_ACCEL_CTRL_RESET);
   write_be32(board, PPC_ACCEL_REG_CONTROL, keep_irq | PPC_ACCEL_CTRL_START);
   observed = wait_boot_marker(board, PPCSHAKE_BOOT_MARKER_DONE, PPCSHAKE_BOOT_MARKER_SPINS);
   if (observed != PPCSHAKE_BOOT_MARKER_DONE) {
