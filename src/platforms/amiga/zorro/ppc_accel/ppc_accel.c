@@ -22,6 +22,7 @@
 static const uint32_t PPC_ACCEL_RESET_WINDOW_BASE = 0xFFF00000u;
 static const uint32_t PPC_ACCEL_FIRMWARE_ENTRY_PRIMARY = 0x00000000u;
 static const uint32_t PPC_ACCEL_FIRMWARE_ENTRY_SECONDARY = 0x00000100u;
+static const uint32_t PPC_ACCEL_FIRMWARE_ENTRY_BOOT_TEST = 0x00000200u;
 static const uint32_t PPC_ACCEL_PPC_RAM_BASE_DEFAULT = 0x08000000u;
 static const uint32_t PPC_ACCEL_PPC_RAM_MB_DEFAULT = 128u;
 static const uint32_t PPC_ACCEL_PPC_RAM_MB_MIN = 1u;
@@ -1230,6 +1231,41 @@ static bool install_reset_trampoline(uint8_t *ram, uint32_t ram_size, uint32_t e
   return true;
 }
 
+static bool install_boot_test_firmware(uint8_t *ram, uint32_t ram_size, uint32_t entry_offset,
+                                       uint32_t marker_addr)
+{
+  static const uint32_t program_words[] = {
+      0x3c600000u, /* lis   r3, marker@h */
+      0x60630000u, /* ori   r3, r3, marker@l */
+      0x38800003u, /* li    r4, 3 */
+      0x90830000u, /* stw   r4, 0(r3) */
+      0x4bfffffcu  /* b     . */
+  };
+  uint32_t word_count;
+  uint32_t program_size;
+  uint32_t i;
+
+  word_count = (uint32_t)(sizeof(program_words) / sizeof(program_words[0]));
+  program_size = word_count * 4u;
+  if ((entry_offset + program_size) > ram_size) {
+    return false;
+  }
+
+  for (i = 0u; i < word_count; i++) {
+    uint32_t value;
+
+    value = program_words[i];
+    if (i == 0u) {
+      value = 0x3c600000u | ((marker_addr >> 16u) & 0xffffu);
+    } else if (i == 1u) {
+      value = 0x60630000u | (marker_addr & 0xffffu);
+    }
+    write_be32(ram, entry_offset + (i * 4u), value);
+  }
+
+  return true;
+}
+
 static void ppc_accel_mailbox_reset(ppc_accel_state_t *state)
 {
   memset(state->window + PPC_ACCEL_MAILBOX_OFFSET, 0, PPC_ACCEL_MAILBOX_SIZE);
@@ -1324,6 +1360,16 @@ static void ppc_accel_probe_boot_marker_startup(ppc_accel_state_t *state)
       sched_yield();
     }
   }
+
+  LOG_WARN("[PPC-ACCEL] boot marker did not advance within startup probe"
+           " (polls=%d sleep_ms=%d magic=0x%08" PRIx32
+           " entry=0x%08" PRIx32 " stack=0x%08" PRIx32 " arg0=0x%08" PRIx32 ")\n",
+           polls,
+           sleep_between_ms,
+           ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_MAGIC),
+           ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_ENTRY),
+           ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_STACK),
+           ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_ARG0));
 }
 
 static void ppc_accel_poll_mailbox(ppc_accel_state_t *state)
@@ -1631,6 +1677,15 @@ static bool ppc_accel_backend_bootstrap(ppc_accel_state_t *state)
           PPC_ACCEL_MAILBOX_OFFSET)
       == false) {
     LOG_WARN("[PPC-ACCEL] failed to install primary mailbox firmware\n");
+    goto fail;
+  }
+  if (install_boot_test_firmware(
+          state->window,
+          PPC_ACCEL_Z2_SIZE,
+          PPC_ACCEL_FIRMWARE_ENTRY_BOOT_TEST,
+          PPC_ACCEL_BOOT_DESC_OFFSET + PPC_ACCEL_BOOT_DESC_OFF_MARKER)
+      == false) {
+    LOG_WARN("[PPC-ACCEL] failed to install boot-test firmware\n");
     goto fail;
   }
   if (install_reset_trampoline(

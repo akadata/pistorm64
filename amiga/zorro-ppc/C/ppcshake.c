@@ -20,6 +20,10 @@
 #define PPCSHAKE_BUSY_RESULT 0xFFFFFFFEu
 #define PPCSHAKE_ERROR_RESULT 0xFFFFFFFFu
 #define PPCSHAKE_LOCK_PATH "T:ppcshake.lock"
+#define PPCSHAKE_BOOT_MARKER_SPINS 500000u
+#define PPCSHAKE_BOOT_TEST_ENTRY 0x00000200u
+#define PPCSHAKE_BOOT_MARKER_DONE 0x00000002u
+#define PPCSHAKE_BOOT_MARKER_TEST 0x00000003u
 
 static BPTR ppcshake_acquire_instance_lock(void) {
   BPTR fh;
@@ -155,6 +159,91 @@ static ULONG do_time32_roundtrip(volatile UBYTE *board) {
   return read_be32(mailbox, PPC_ACCEL_MB_OFF_RESULT0);
 }
 
+static ULONG wait_boot_marker(volatile UBYTE *board, ULONG expect, ULONG spins) {
+  ULONG marker_offset;
+  ULONG i;
+
+  marker_offset = PPC_ACCEL_BOOT_DESC_OFFSET + PPC_ACCEL_BOOT_DESC_OFF_MARKER;
+  for (i = 0u; i < spins; i++) {
+    ULONG marker;
+
+    marker = read_be32(board, marker_offset);
+    if (marker == expect) {
+      return marker;
+    }
+  }
+
+  return read_be32(board, marker_offset);
+}
+
+static int do_boot_descriptor_test(volatile UBYTE *board) {
+  ULONG control_before;
+  ULONG keep_irq;
+  ULONG old_magic;
+  ULONG old_entry;
+  ULONG old_stack;
+  ULONG old_arg0;
+  ULONG old_marker;
+  ULONG observed;
+
+  control_before = read_be32(board, PPC_ACCEL_REG_CONTROL);
+  keep_irq = control_before & PPC_ACCEL_CTRL_IRQ_ENABLE;
+  old_magic = read_be32(board, PPC_ACCEL_REG_BOOT_MAGIC);
+  old_entry = read_be32(board, PPC_ACCEL_REG_BOOT_ENTRY);
+  old_stack = read_be32(board, PPC_ACCEL_REG_BOOT_STACK);
+  old_arg0 = read_be32(board, PPC_ACCEL_REG_BOOT_ARG0);
+  old_marker = read_be32(board, PPC_ACCEL_BOOT_DESC_OFFSET + PPC_ACCEL_BOOT_DESC_OFF_MARKER);
+
+  write_be32(board, PPC_ACCEL_REG_BOOT_MAGIC, PPC_ACCEL_BOOT_DESC_MAGIC);
+  write_be32(board, PPC_ACCEL_REG_BOOT_ENTRY, PPCSHAKE_BOOT_TEST_ENTRY);
+  if (old_stack != 0u) {
+    write_be32(board, PPC_ACCEL_REG_BOOT_STACK, old_stack);
+  }
+  if (old_arg0 != 0u) {
+    write_be32(board, PPC_ACCEL_REG_BOOT_ARG0, old_arg0);
+  }
+
+  write_be32(board, PPC_ACCEL_REG_CONTROL, keep_irq | PPC_ACCEL_CTRL_RESET);
+  write_be32(board, PPC_ACCEL_REG_CONTROL, keep_irq | PPC_ACCEL_CTRL_START);
+  observed = wait_boot_marker(board, PPCSHAKE_BOOT_MARKER_TEST, PPCSHAKE_BOOT_MARKER_SPINS);
+  if (observed != PPCSHAKE_BOOT_MARKER_TEST) {
+    printf("BOOT test failed: marker=$%08X expected=$%08X.\n",
+           (unsigned int)observed,
+           (unsigned int)PPCSHAKE_BOOT_MARKER_TEST);
+    printf("BOOT regs: magic=$%08X entry=$%08X stack=$%08X arg0=$%08X\n",
+           (unsigned int)read_be32(board, PPC_ACCEL_REG_BOOT_MAGIC),
+           (unsigned int)read_be32(board, PPC_ACCEL_REG_BOOT_ENTRY),
+           (unsigned int)read_be32(board, PPC_ACCEL_REG_BOOT_STACK),
+           (unsigned int)read_be32(board, PPC_ACCEL_REG_BOOT_ARG0));
+    return 1;
+  }
+
+  printf("BOOT test stage1 OK: entry=$%08X marker=$%08X\n",
+         (unsigned int)PPCSHAKE_BOOT_TEST_ENTRY,
+         (unsigned int)observed);
+
+  write_be32(board, PPC_ACCEL_REG_BOOT_MAGIC, old_magic);
+  write_be32(board, PPC_ACCEL_REG_BOOT_ENTRY, old_entry);
+  write_be32(board, PPC_ACCEL_REG_BOOT_STACK, old_stack);
+  write_be32(board, PPC_ACCEL_REG_BOOT_ARG0, old_arg0);
+  write_be32(board, PPC_ACCEL_BOOT_DESC_OFFSET + PPC_ACCEL_BOOT_DESC_OFF_MARKER, old_marker);
+
+  write_be32(board, PPC_ACCEL_REG_CONTROL, keep_irq | PPC_ACCEL_CTRL_RESET);
+  write_be32(board, PPC_ACCEL_REG_CONTROL, keep_irq | PPC_ACCEL_CTRL_START);
+  observed = wait_boot_marker(board, PPCSHAKE_BOOT_MARKER_DONE, PPCSHAKE_BOOT_MARKER_SPINS);
+  if (observed != PPCSHAKE_BOOT_MARKER_DONE) {
+    printf("BOOT test restore failed: marker=$%08X expected=$%08X.\n",
+           (unsigned int)observed,
+           (unsigned int)PPCSHAKE_BOOT_MARKER_DONE);
+    return 2;
+  }
+
+  printf("BOOT test stage2 OK: restored entry=$%08X marker=$%08X\n",
+         (unsigned int)old_entry,
+         (unsigned int)observed);
+  return 0;
+}
+
 static int do_irq_semantics_test(volatile UBYTE *board) {
   ULONG control;
   ULONG irq_status;
@@ -218,6 +307,13 @@ static int dump_board_identity(volatile UBYTE *board) {
   ULONG mb_size;
   ULONG shared_offset;
   ULONG shared_size;
+  ULONG ppc_ram_base;
+  ULONG ppc_ram_size;
+  ULONG boot_magic;
+  ULONG boot_entry;
+  ULONG boot_stack;
+  ULONG boot_arg0;
+  ULONG boot_marker;
   ULONG shared_sig;
   ULONG shared_abi;
   ULONG shared_mb_offset;
@@ -237,6 +333,13 @@ static int dump_board_identity(volatile UBYTE *board) {
   mb_size = read_be32(board, PPC_ACCEL_REG_MAILBOX_SIZE);
   shared_offset = read_be32(board, PPC_ACCEL_REG_SHARED_OFFSET);
   shared_size = read_be32(board, PPC_ACCEL_REG_SHARED_SIZE);
+  ppc_ram_base = read_be32(board, PPC_ACCEL_REG_PPC_RAM_BASE);
+  ppc_ram_size = read_be32(board, PPC_ACCEL_REG_PPC_RAM_SIZE);
+  boot_magic = read_be32(board, PPC_ACCEL_REG_BOOT_MAGIC);
+  boot_entry = read_be32(board, PPC_ACCEL_REG_BOOT_ENTRY);
+  boot_stack = read_be32(board, PPC_ACCEL_REG_BOOT_STACK);
+  boot_arg0 = read_be32(board, PPC_ACCEL_REG_BOOT_ARG0);
+  boot_marker = read_be32(board, PPC_ACCEL_BOOT_DESC_OFFSET + PPC_ACCEL_BOOT_DESC_OFF_MARKER);
 
   printf("Board identity:\n");
   printf("  MAGIC         = $%08X\n", (unsigned int)magic);
@@ -253,6 +356,16 @@ static int dump_board_identity(volatile UBYTE *board) {
   printf("  SHARED        = off=$%08X size=$%08X\n",
          (unsigned int)shared_offset,
          (unsigned int)shared_size);
+  printf("  PPC_RAM       = base=$%08X size=$%08X (%u MiB)\n",
+         (unsigned int)ppc_ram_base,
+         (unsigned int)ppc_ram_size,
+         (unsigned int)(ppc_ram_size / (1024u * 1024u)));
+  printf("  BOOT_DESC     = magic=$%08X entry=$%08X stack=$%08X arg0=$%08X marker=$%08X\n",
+         (unsigned int)boot_magic,
+         (unsigned int)boot_entry,
+         (unsigned int)boot_stack,
+         (unsigned int)boot_arg0,
+         (unsigned int)boot_marker);
 
   shared_sig = read_be32(board, PPC_ACCEL_SHARED_INFO_OFFSET + PPC_ACCEL_SHARED_INFO_OFF_SIGNATURE);
   shared_abi = read_be32(board, PPC_ACCEL_SHARED_INFO_OFFSET + PPC_ACCEL_SHARED_INFO_OFF_ABI_VERSION);
@@ -306,11 +419,13 @@ int main(int argc, char **argv) {
   ULONG i;
   int do_identity_dump;
   int do_irq_test;
+  int do_boot_test;
   int exit_code;
 
   loops = 1u;
   do_identity_dump = 0;
   do_irq_test = 0;
+  do_boot_test = 0;
   exit_code = 0;
   instance_lock = (BPTR)0;
   ExpansionBase = NULL;
@@ -319,6 +434,8 @@ int main(int argc, char **argv) {
       do_irq_test = 1;
     } else if ((strcmp(argv[i], "--id") == 0) || (strcmp(argv[i], "--identity") == 0)) {
       do_identity_dump = 1;
+    } else if ((strcmp(argv[i], "--boot-test") == 0) || (strcmp(argv[i], "--boot") == 0)) {
+      do_boot_test = 1;
     } else {
       loops = (ULONG)strtoul(argv[i], NULL, 0);
       if (loops == 0u) {
@@ -370,6 +487,16 @@ int main(int argc, char **argv) {
     id_rc = dump_board_identity(board);
     if (id_rc != 0) {
       exit_code = 30 + id_rc;
+    }
+    goto cleanup;
+  }
+
+  if (do_boot_test != 0) {
+    int boot_rc;
+
+    boot_rc = do_boot_descriptor_test(board);
+    if (boot_rc != 0) {
+      exit_code = 40 + boot_rc;
     }
     goto cleanup;
   }
