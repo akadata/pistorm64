@@ -1,0 +1,1 @@
+savedcmd_/home/smalley/pistorm64/kernel_module/z3bus.o := aarch64-linux-gnu-ld -EL  -maarch64elf -z noexecstack --no-warn-rwx-segments   -r -o /home/smalley/pistorm64/kernel_module/z3bus.o @/home/smalley/pistorm64/kernel_module/z3bus.mod 
