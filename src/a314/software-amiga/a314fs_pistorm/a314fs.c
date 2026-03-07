@@ -7,6 +7,9 @@
 #include <exec/nodes.h>
 #include <exec/libraries.h>
 
+#ifndef __USE_NEW_TIMEVAL__
+#define __USE_NEW_TIMEVAL__
+#endif
 #include <devices/timer.h>
 
 #include <libraries/dos.h>
@@ -29,7 +32,13 @@
 #define ID_314_DISK (('3' << 24) | ('1' << 16) | ('4' << 8))
 
 #define REQ_RES_BUF_SIZE 256
-#define BUFFER_SIZE 4096
+
+/*
+ * Throughput tuning: larger chunks reduce request/response round-trip overhead
+ * between Amiga and host. Keep this conservative to avoid stressing legacy
+ * allocators while still being much faster than the old 4KB default.
+ */
+#define BUFFER_SIZE 16384
 
 // Not defined if using NDK13
 #ifndef ACTION_EXAMINE_FH
@@ -53,7 +62,7 @@ char default_volume_name[] = "\006PiDisk";
 char device_name[32]; // "\004PI0:"
 
 struct MsgPort* timer_mp;
-struct timerequest* tr;
+TimeRequest_Type* tr;
 
 struct MsgPort* a314_mp;
 struct A314_IORequest* a314_ior;
@@ -299,7 +308,7 @@ void startup_fs_handler(struct DosPacket* dp) {
   dbg("  node = $l\n", (ULONG)node);
 
   timer_mp = MyCreatePort(NULL, 0);
-  tr = (struct timerequest*)MyCreateExtIO(timer_mp, sizeof(struct timerequest));
+  tr = (TimeRequest_Type*)MyCreateExtIO(timer_mp, sizeof(TimeRequest_Type));
   if(OpenDevice(TIMERNAME, UNIT_MICROHZ, (struct IORequest*)tr, 0) != 0) {
     // If this happens, there's nothing we can do.
     // For now, assume this does not happen.
@@ -327,8 +336,19 @@ void startup_fs_handler(struct DosPacket* dp) {
     return;
   }
 
-  request_buffer = AllocMem(REQ_RES_BUF_SIZE, MEMF_FAST);
-  data_buffer = AllocMem(BUFFER_SIZE, MEMF_FAST);
+  request_buffer = AllocMem(REQ_RES_BUF_SIZE, MEMF_A314 | MEMF_FAST);
+  if(request_buffer == NULL) {
+    request_buffer = AllocMem(REQ_RES_BUF_SIZE, MEMF_FAST);
+  }
+  data_buffer = AllocMem(BUFFER_SIZE, MEMF_A314 | MEMF_FAST);
+  if(data_buffer == NULL) {
+    data_buffer = AllocMem(BUFFER_SIZE, MEMF_FAST);
+  }
+
+  if(request_buffer == NULL || data_buffer == NULL) {
+    dbg("Fatal error: unable to allocate A314FS buffers\n");
+    return;
+  }
 
   // We can assume that we arrive here, and have a stream to the Pi side, to where we can transfer
   // data.

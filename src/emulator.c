@@ -43,6 +43,7 @@ extern "C" {
 #include <sched.h>
 #include <signal.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -81,6 +82,8 @@ static unsigned int fc_boot_log_remaining = 0;
 static int fc_boot_log_inited = 0;
 
 static int use_uae_jit = 0;
+static int reset_trace_setting = -1;
+static uint64_t reset_last_edge_ns = 0;
 
 #if USE_UAE_JIT
 
@@ -118,6 +121,45 @@ static inline void lowvec_trace_log(const char* op, uint32_t addr, uint32_t val)
   (void)addr;
   (void)val;
 #endif
+}
+
+static inline int reset_trace_enabled(void) {
+  const char* env;
+
+  if (reset_trace_setting >= 0) {
+    return reset_trace_setting;
+  }
+  env = getenv("PISTORM_RESET_TRACE");
+  if (env == NULL || env[0] == '\0' || atoi(env) == 0) {
+    reset_trace_setting = 0;
+  } else {
+    reset_trace_setting = 1;
+  }
+  return reset_trace_setting;
+}
+
+static inline void reset_trace_log_edge(uint32_t status_value, unsigned int reset_level) {
+  struct timespec ts;
+  uint64_t now_ns;
+  uint64_t delta_us;
+
+  if (reset_trace_enabled() == 0) {
+    return;
+  }
+
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  now_ns = ((uint64_t)ts.tv_sec * 1000000000ULL) + (uint64_t)ts.tv_nsec;
+  if (reset_last_edge_ns == 0ULL) {
+    delta_us = 0ULL;
+  } else {
+    delta_us = (now_ns - reset_last_edge_ns) / 1000ULL;
+  }
+  reset_last_edge_ns = now_ns;
+
+  LOG_INFO("[RESET-TRACE] edge=%s status=0x%08" PRIx32 " dt_us=%" PRIu64 "\n",
+           (reset_level == 0u) ? "down" : "up",
+           status_value,
+           delta_us);
 }
 
 static inline uint32_t cpu_backend_get_pc(void);
@@ -900,6 +942,7 @@ static void* ipl_task(void* args) {
         amiga_reset = (value & (1 << PIN_RESET));
         if (amiga_reset != amiga_reset_last) {
           amiga_reset_last = amiga_reset;
+          reset_trace_log_edge(value, amiga_reset);
           if (amiga_reset == 0) {
             printf("Amiga Reset is down...\n");
             do_reset = 1;
@@ -953,6 +996,7 @@ static void* ipl_task(void* args) {
       amiga_reset = (value & (1 << PIN_RESET));
       if (amiga_reset != amiga_reset_last) {
         amiga_reset_last = amiga_reset;
+        reset_trace_log_edge(value, amiga_reset);
         if (amiga_reset == 0) {
           printf("Amiga Reset is down...\n");
           do_reset = 1;

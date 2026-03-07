@@ -114,8 +114,11 @@ static int epfd = -1;
 static int irq_fds[2];
 
 extern "C" unsigned int ps_read_8(unsigned int address);
+extern "C" unsigned int ps_read_16(unsigned int address);
+extern "C" unsigned int ps_read_32(unsigned int address);
 extern "C" void ps_write_8(unsigned int address, unsigned int value);
 extern "C" void ps_write_16(unsigned int address, unsigned int value);
+extern "C" void ps_write_32(unsigned int address, unsigned int value);
 
 unsigned int a314_base;
 int a314_base_configured;
@@ -227,6 +230,68 @@ static std::string a314_root;
 static std::string a314_config_file;
 static std::string home_env;
 static bool a314_paths_initialized = false;
+static bool a314_mem_fallback_warned = false;
+
+static void a314_manual_read_from_bus(uint32_t address, uint8_t *dst, size_t length) {
+    while (length > 0) {
+        if ((address & 3u) == 0u && length >= 4u) {
+            const uint32_t v = ps_read_32(address);
+            dst[0] = static_cast<uint8_t>((v >> 24) & 0xFFu);
+            dst[1] = static_cast<uint8_t>((v >> 16) & 0xFFu);
+            dst[2] = static_cast<uint8_t>((v >> 8) & 0xFFu);
+            dst[3] = static_cast<uint8_t>(v & 0xFFu);
+            address += 4u;
+            dst += 4;
+            length -= 4u;
+            continue;
+        }
+
+        if ((address & 1u) == 0u && length >= 2u) {
+            const uint16_t v = static_cast<uint16_t>(ps_read_16(address));
+            dst[0] = static_cast<uint8_t>((v >> 8) & 0xFFu);
+            dst[1] = static_cast<uint8_t>(v & 0xFFu);
+            address += 2u;
+            dst += 2;
+            length -= 2u;
+            continue;
+        }
+
+        dst[0] = static_cast<uint8_t>(ps_read_8(address) & 0xFFu);
+        address += 1u;
+        dst += 1;
+        length -= 1u;
+    }
+}
+
+static void a314_manual_write_to_bus(uint32_t address, const uint8_t *src, size_t length) {
+    while (length > 0) {
+        if ((address & 3u) == 0u && length >= 4u) {
+            const uint32_t v = ((uint32_t)src[0] << 24) |
+                               ((uint32_t)src[1] << 16) |
+                               ((uint32_t)src[2] << 8)  |
+                               ((uint32_t)src[3]);
+            ps_write_32(address, v);
+            address += 4u;
+            src += 4;
+            length -= 4u;
+            continue;
+        }
+
+        if ((address & 1u) == 0u && length >= 2u) {
+            const uint16_t v = (uint16_t)(((uint16_t)src[0] << 8) | (uint16_t)src[1]);
+            ps_write_16(address, v);
+            address += 2u;
+            src += 2;
+            length -= 2u;
+            continue;
+        }
+
+        ps_write_8(address, src[0]);
+        address += 1u;
+        src += 1;
+        length -= 1u;
+    }
+}
 
 static bool path_exists(const std::string &path) {
     struct stat st;
@@ -528,7 +593,7 @@ static std::vector<uint8_t> manual_read_buf;
 static void handle_msg_read_mem_req(ClientConnection *cc) {
     if (cc->payload.size() != 8) {
         logger_warn("Invalid READ_MEM payload size (%zu bytes)\n", cc->payload.size());
-        close_and_remove_connection(cc);
+        create_and_send_msg(cc, MSG_READ_MEM_RES, 0, nullptr, 0);
         return;
     }
 
@@ -542,16 +607,19 @@ static void handle_msg_read_mem_req(ClientConnection *cc) {
 
     if (length == 0 || length > MAX_MEM_RW_LENGTH) {
         logger_warn("Rejecting READ_MEM length %zu for address 0x%08x\n", length, address);
-        close_and_remove_connection(cc);
+        create_and_send_msg(cc, MSG_READ_MEM_RES, 0, nullptr, 0);
         return;
     }
 
     const int32_t index = get_mapped_item_by_address(cfg, address);
-    if (index != -1) {
+    if (index != -1 && cfg->map_data[index] != nullptr) {
         const size_t available = cfg->map_high[index] - address;
         if (length > available) {
-            logger_warn("Rejecting READ_MEM past mapped region at 0x%08x (len %zu, max %zu)\n", address, length, available);
-            close_and_remove_connection(cc);
+            logger_warn("READ_MEM span crosses mapping at 0x%08x (len %zu, max %zu), using bus fallback\n",
+                        address, length, available);
+            manual_read_buf.resize(length);
+            a314_manual_read_from_bus(address, manual_read_buf.data(), length);
+            create_and_send_msg(cc, MSG_READ_MEM_RES, 0, manual_read_buf.data(), length);
             return;
         }
 
@@ -559,8 +627,11 @@ static void handle_msg_read_mem_req(ClientConnection *cc) {
         create_and_send_msg(cc, MSG_READ_MEM_RES, 0, map, length);
     } else {
         manual_read_buf.resize(length);
-        for (size_t i = 0; i < length; i++) {
-            manual_read_buf[i] = static_cast<unsigned char>(ps_read_8(address + static_cast<uint32_t>(i)));
+        a314_manual_read_from_bus(address, manual_read_buf.data(), length);
+        if (!a314_mem_fallback_warned) {
+            logger_warn("READ_MEM using slow bus fallback at 0x%08x len=%zu (address not in mapped RAM/ROM)\n",
+                        address, length);
+            a314_mem_fallback_warned = true;
         }
         create_and_send_msg(cc, MSG_READ_MEM_RES, 0, manual_read_buf.data(), length);
     }
@@ -569,7 +640,7 @@ static void handle_msg_read_mem_req(ClientConnection *cc) {
 static void handle_msg_write_mem_req(ClientConnection *cc) {
     if (cc->payload.size() < 4) {
         logger_warn("Invalid WRITE_MEM payload size (%zu bytes)\n", cc->payload.size());
-        close_and_remove_connection(cc);
+        create_and_send_msg(cc, MSG_WRITE_MEM_RES, 0, nullptr, 0);
         return;
     }
 
@@ -581,25 +652,29 @@ static void handle_msg_write_mem_req(ClientConnection *cc) {
 
     if (length == 0 || length > MAX_MEM_RW_LENGTH) {
         logger_warn("Rejecting WRITE_MEM length %zu for address 0x%08x\n", length, address);
-        close_and_remove_connection(cc);
+        create_and_send_msg(cc, MSG_WRITE_MEM_RES, 0, nullptr, 0);
         return;
     }
 
     const int32_t index = get_mapped_item_by_address(cfg, address);
-    if (index != -1) {
+    if (index != -1 && cfg->map_data[index] != nullptr) {
         const size_t available = cfg->map_high[index] - address;
         if (length > available) {
-            logger_warn("Rejecting WRITE_MEM past mapped region at 0x%08x (len %zu, max %zu)\n", address, length, available);
-            close_and_remove_connection(cc);
+            logger_warn("WRITE_MEM span crosses mapping at 0x%08x (len %zu, max %zu), using bus fallback\n",
+                        address, length, available);
+            a314_manual_write_to_bus(address, &(cc->payload[4]), length);
+            create_and_send_msg(cc, MSG_WRITE_MEM_RES, 0, nullptr, 0);
             return;
         }
 
         uint8_t *map = &cfg->map_data[index][address - cfg->map_offset[index]];
         memcpy(map, &(cc->payload[4]), length);
     } else {
-        // No idea if this actually works.
-        for (size_t i = 0; i < length; i++) {
-            ps_write_8(address + static_cast<uint32_t>(i), cc->payload[4 + i]);
+        a314_manual_write_to_bus(address, &(cc->payload[4]), length);
+        if (!a314_mem_fallback_warned) {
+            logger_warn("WRITE_MEM using slow bus fallback at 0x%08x len=%zu (address not in mapped RAM/ROM)\n",
+                        address, length);
+            a314_mem_fallback_warned = true;
         }
     }
 
@@ -1499,6 +1574,19 @@ void a314_write_memory_8(unsigned int address, unsigned int value) {
         }
     }
 }
+
+static inline bool a314_range_touches_special(unsigned int address, unsigned int width) {
+    const unsigned int last = address + width - 1u;
+    const unsigned int a_events_off = (unsigned int)offsetof(ComArea, a_events);
+    const unsigned int r_events_off = (unsigned int)offsetof(ComArea, r_events);
+
+    if ((address <= a_events_off && last >= a_events_off) ||
+        (address <= r_events_off && last >= r_events_off)) {
+        return true;
+    }
+
+    return false;
+}
 /*
 void a314_write_memory_16(unsigned int address, unsigned int value) {
     (void)address;  // Parameter intentionally unused
@@ -1518,11 +1606,19 @@ void a314_write_memory_16(unsigned int address, unsigned int value) {
         return;
     }
 
-    uint16_t v = (uint16_t)value;
+    const uint16_t v = (uint16_t)value;
 
-    // Big-endian: high byte at lowest address
-    a314_write_memory_8(address + 0u, (unsigned int)((v >> 8) & 0xFFu));
-    a314_write_memory_8(address + 1u, (unsigned int)( v       & 0xFFu));
+    // Preserve register side effects for writes touching special bytes.
+    if (a314_range_touches_special(address, 2u)) {
+        // Big-endian: high byte at lowest address.
+        a314_write_memory_8(address + 0u, (unsigned int)((v >> 8) & 0xFFu));
+        a314_write_memory_8(address + 1u, (unsigned int)( v       & 0xFFu));
+        return;
+    }
+
+    // Fast path for normal data fields: store big-endian value directly.
+    const uint16_t be = htobe16(v);
+    memcpy(((uint8_t *)&ca) + address, &be, sizeof(be));
 }
 
 void a314_write_memory_32(unsigned int address, unsigned int value) {
@@ -1531,13 +1627,21 @@ void a314_write_memory_32(unsigned int address, unsigned int value) {
         return;
     }
 
-    uint32_t v = (uint32_t)value;
+    const uint32_t v = (uint32_t)value;
 
-    // Big-endian: most-significant byte at lowest address
-    a314_write_memory_8(address + 0u, (unsigned int)((v >> 24) & 0xFFu));
-    a314_write_memory_8(address + 1u, (unsigned int)((v >> 16) & 0xFFu));
-    a314_write_memory_8(address + 2u, (unsigned int)((v >>  8) & 0xFFu));
-    a314_write_memory_8(address + 3u, (unsigned int)( v        & 0xFFu));
+    // Preserve register side effects for writes touching special bytes.
+    if (a314_range_touches_special(address, 4u)) {
+        // Big-endian: most-significant byte at lowest address.
+        a314_write_memory_8(address + 0u, (unsigned int)((v >> 24) & 0xFFu));
+        a314_write_memory_8(address + 1u, (unsigned int)((v >> 16) & 0xFFu));
+        a314_write_memory_8(address + 2u, (unsigned int)((v >>  8) & 0xFFu));
+        a314_write_memory_8(address + 3u, (unsigned int)( v        & 0xFFu));
+        return;
+    }
+
+    // Fast path for normal data fields: store big-endian value directly.
+    const uint32_t be = htobe32(v);
+    memcpy(((uint8_t *)&ca) + address, &be, sizeof(be));
 }
 
 void a314_set_config_file(const char *filename) {

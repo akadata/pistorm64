@@ -33,6 +33,19 @@ typedef bool (*qemu_uae_bool_void_function)(void);
 typedef void (*qemu_uae_external_interrupt_function)(bool enable);
 typedef int (*qemu_uae_lock_function)(int type);
 
+/* Keep these values aligned with fs-uae/include/uae/qemu.h and uae/ppc.h. */
+enum {
+    QEMU_UAE_VERSION_MAJOR = 3,
+    QEMU_UAE_VERSION_MINOR = 5
+};
+
+enum {
+    QEMU_UAE_LOCK_TRYLOCK = 1,
+    QEMU_UAE_LOCK_TRYLOCK_CANCEL = 2,
+    QEMU_UAE_LOCK_ACQUIRE = 3,
+    QEMU_UAE_LOCK_RELEASE = 4
+};
+
 enum {
     QEMU_UAE_PPC_CPU_STATE_RUNNING = 1,
     QEMU_UAE_PPC_CPU_STATE_PAUSED = 2

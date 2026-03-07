@@ -132,12 +132,38 @@ extern void stop_cpu_emulation(uint8_t disasm_cur);
 
 static uint32_t ac_waiting_for_physical_pic = 0;
 static unsigned int autoconf_warn_budget = 16;
+static int a314_write_trace_setting = -1;
 
 static inline const char* autoconf_op_name(unsigned char type) {
   if (type < OP_TYPE_NUM) {
     return op_type_names[type];
   }
   return "UNKNOWN";
+}
+
+static int a314_write_trace_enabled(void) {
+  const char* env = NULL;
+  char* endptr = NULL;
+  long parsed = 0;
+
+  if (a314_write_trace_setting >= 0) {
+    return a314_write_trace_setting;
+  }
+
+  env = getenv("PISTORM_A314_WRITE_TRACE");
+  if (env == NULL || env[0] == '\0') {
+    a314_write_trace_setting = 0;
+    return a314_write_trace_setting;
+  }
+
+  parsed = strtol(env, &endptr, 0);
+  if (endptr == env || *endptr != '\0' || parsed == 0) {
+    a314_write_trace_setting = 0;
+    return a314_write_trace_setting;
+  }
+
+  a314_write_trace_setting = 1;
+  return a314_write_trace_setting;
 }
 
 static inline void autoconf_warn_once(const char* dir, const char* space, unsigned int addr,
@@ -399,7 +425,9 @@ int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned 
     addr >= a314_base &&
     addr <  a314_base + (64 * SIZE_KILO)) {
 
-    printf("%s write to A314 @$%.8X: %d\n", op_type_names[type], addr, val);
+    if (a314_write_trace_enabled()) {
+      LOG_DEBUG("[AMIGA-CUSTOM] %s write to A314 @$%.8X: %.8X\n", autoconf_op_name(type), addr, val);
+    }
 
     unsigned int off = (unsigned int)(addr - a314_base);
 

@@ -981,6 +981,16 @@ void autoconfig_write_memory_8(struct emulator_config* cfg,
                          (uint32_t)cfg->map_high[index],
                          cfg->map_data[index]);
 
+      /*
+       * Publish a default A314-accessible memory window backed by Z2 fast RAM.
+       * A314 clients can request MEMF_A314 and stay on the direct mapped path.
+       */
+      a314_set_mem_base_size((unsigned int)cfg->map_offset[index],
+                             (unsigned int)cfg->map_size[index]);
+      LOG_INFO("[AUTOCONF] A314 mem window set to $%.8X size=%u bytes\n",
+               (unsigned int)cfg->map_offset[index],
+               (unsigned int)cfg->map_size[index]);
+
       LOG_INFO("[AUTOCONF] Z2 PIC %d at $%.8lX-%.8lX, Size: %d MB\n",
                ac_z2_current_pic,
                cfg->map_offset[index],

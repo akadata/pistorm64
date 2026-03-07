@@ -33,12 +33,23 @@ Optional tuning:
 - `PPC_ACCEL_AC_DIAG_VEC=<u16>` overrides `er_InitDiagVec` (default `0x4000`).
 - `PPC_ACCEL_DIAG_CONFIG=<u8>` overrides DiagArea `da_Config` at `base+0x4000`
   (default `0x00`; legacy probe test value: `0x90` for `DAC_WORDWIDE|DAC_CONFIGTIME`).
-- `PPC_ACCEL_DIAG_DIAGPOINT=<u16>` overrides DiagArea `da_DiagPoint` (default `0x0000`).
+- `PPC_ACCEL_DIAG_DIAGPOINT=<u16>` overrides DiagArea `da_DiagPoint`
+  (default `0x0050`, built-in diag bootstrap/patch stub).
 - `PPC_ACCEL_DIAG_BOOTPOINT=<u16>` overrides DiagArea `da_BootPoint`
-  (default `0x0000` = disabled; set `0x0020` to use built-in 68k start-stub).
+  (default `0x0020`, built-in boot bootstrap stub).
+- `PPC_ACCEL_DIAG_START_FROM_DIAGPOINT=1` allows DiagPoint callback to directly
+  assert `CONTROL.START`; default `0` keeps DiagPoint as setup/log only and leaves
+  runtime start to BootPoint/bootstrap flow.
+- `PPC_ACCEL_BOOTSTRAP_AUTOSTART_DST3=1` forces `CONTROL.START` when bootstrap stage
+  `DST3` is written (diagnostic bridge for board-contract bring-up; default `0`).
 - `PPC_ACCEL_DIAG_TRACE=1` logs DiagArea header/stub fetch reads.
 - `PPC_ACCEL_DIAG_TRACE_LIMIT=<u32>` caps DiagArea trace lines (default `256`, `0` = unlimited).
-- `PPC_ACCEL_PPC_RAM_BASE=<u32>` sets PPC-visible RAM base (default `0x08000000`).
+- `PPC_ACCEL_PPC_RAM_PROFILE=<name>` selects in-tree PPC RAM placement profile when
+  `PPC_ACCEL_PPC_RAM_BASE` is not set:
+  - `default`/`legacy`/`csppc`/`cyberstormppc` -> base `0x08000000`
+  - `blizzardppc`/`blizzardppc48`/`bppc` -> base `0x48000000 - (ram_size/2)`
+- `PPC_ACCEL_PPC_RAM_BASE=<u32>` sets PPC-visible RAM base explicitly (overrides profile;
+  default `0x08000000`).
 - `PPC_ACCEL_PPC_RAM_MB=<u32>` sets PPC-visible RAM size in MiB (default `128`).
 - `PPC_ACCEL_QEMU_LOG=1` forwards `qemu-uae.so` `uae_log()` output into PiStorm logs.
 - `PPC_ACCEL_TRACE_IO=1` enables PPC I/O callback tracing (`uae_ppc_io_mem_*` path).
@@ -53,6 +64,12 @@ Optional tuning:
   (default top of mapped PPC RAM minus `0x1000`).
 - `PPC_ACCEL_BOOT_ARG0=<u32>` sets PPC reset-trampoline `r3` argument
   (default mailbox base `0x00001000`).
+- `PPC_ACCEL_RESET_ROM=/abs/path/to/rom.bin` points at an external reset ROM image.
+- `PPC_ACCEL_RESET_ROM_ALLOW=1` must also be set; otherwise the ROM path is ignored as a
+  safety guard.
+- When enabled, the external image is mapped at `0xFFF00000` (size = file size) and bypasses
+  the built-in reset trampoline.
+- Leave unset for Stage 6/8 mailbox bootstrap behavior.
 
 ## Device memory map
 
@@ -90,6 +107,8 @@ Register block (`32-bit big-endian`):
 - `0x0038` `BOOT_ENTRY` (reset-trampoline branch target)
 - `0x003C` `BOOT_STACK` (loaded into PPC `r1`)
 - `0x0040` `BOOT_ARG0` (loaded into PPC `r3`)
+- `0x0044` `BOOTSTRAP_STAGE` (debug stage written by Diag/Boot 68k stubs)
+- `0x0048` `BOOTSTRAP_ARG` (debug argument, reserved)
 
 ## Mailbox ABI v1 (inside device window at `base + 0x1000`)
 
@@ -131,12 +150,21 @@ Statuses:
 - The mailbox page is single-backed: Amiga Zorro access and PPC access touch the same memory.
 - PPC runtime also maps a dedicated PPC RAM region (`128 MiB` at `0x08000000` by default)
   for compatibility experiments that expect CSPPC-style PPC RAM presence.
+- QEMU-UAE indirect PPC memory callbacks (`uae_ppc_io_mem_*`) are bridged emulator-side:
+  direct hits on mapped PPC windows are served from local buffers, and out-of-window
+  accesses are forwarded through PiStorm memory/bus accessors (`m68k_read/write_memory_*`),
+  keeping `qemu-uae.so` free of direct `/dev/pistorm`/`ps_protocol` dependencies.
 - Card advertises `Z2_BOOTROM` and publishes a DiagArea at `base+0x4000`
-  with a name string and minimal 68k stubs:
-  bootpoint stub at `0x0020` and diagpoint-compatible stub at `0x0032`.
+  with a name string, resident template, and 68k stubs:
+  bootpoint stub at `0x0020`, diagpoint patch stub at `0x0050`,
+  resident at `0x00b0`, and resident init stub at `0x00d0`.
 - The built-in bootpoint stub writes `CONTROL=1` to `board_base+0x0008`
   (using `ConfigDev->cd_BoardAddr`) and returns.
-- The built-in diagpoint stub writes `CONTROL=1` using `A0=BoardBase` and returns `D0=1`.
+- The built-in diagpoint stub patches resident pointers in the copied DiagArea image
+  and writes bootstrap stage (`DST3`), returning `D0=1`.
+- Optional `PPC_ACCEL_DIAG_START_FROM_DIAGPOINT=1` keeps legacy behavior and also
+  starts runtime directly from DiagPoint (`DST1`).
+- Resident init stub writes bootstrap stage (`RST1`) and asserts `CONTROL.START`.
 - PPC reset now uses a secondary-entry trampoline (`0xFFF00100`) that reads
   a boot descriptor at shared `+0x2040` and branches to descriptor `entry`.
 - Shared-info `reserved0`/`reserved1` publish boot-descriptor offset/size.

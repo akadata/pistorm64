@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "${ROOT_DIR}"
+
+mode="os3"
+if [[ $# -gt 0 ]]; then
+  case "$1" in
+    os3|os4|os4-probe|os4-bridge|os4-force-start|debug|bppc)
+      mode="$1"
+      shift
+      ;;
+  esac
+fi
+
+# Keep runtime clean for qemu-uae.so.
+unset LD_LIBRARY_PATH
+export QEMU_UAE_SO="${QEMU_UAE_SO:-/usr/local/lib/qemu-uae.so}"
+
+# Always reset PPC env so each run is deterministic.
+unset PPC_ACCEL_PPC_RAM_BASE PPC_ACCEL_PPC_RAM_MB PPC_ACCEL_PPC_RAM_PROFILE
+unset PPC_ACCEL_DIAG_CONFIG PPC_ACCEL_DIAG_BOOTPOINT PPC_ACCEL_DIAG_DIAGPOINT
+unset PPC_ACCEL_DIAG_START_FROM_DIAGPOINT
+unset PPC_ACCEL_BOOTSTRAP_AUTOSTART_DST3
+unset PPC_ACCEL_QEMU_LOG PPC_ACCEL_AC_TRACE PPC_ACCEL_MMIO_TRACE PPC_ACCEL_MMIO_TRACE_LIMIT
+unset PPC_ACCEL_DIAG_TRACE PPC_ACCEL_DIAG_TRACE_LIMIT PPC_ACCEL_TRACE_IO PPC_ACCEL_TRACE_IO_LIMIT
+unset PPC_ACCEL_RESET_ROM PPC_ACCEL_RESET_ROM_ALLOW
+
+# Common defaults.
+export PPC_ACCEL_PPC_RAM_PROFILE=default
+export PPC_ACCEL_PPC_RAM_MB=128
+export PPC_ACCEL_DIAG_START_FROM_DIAGPOINT=0
+export PPC_ACCEL_QEMU_LOG=0
+export PPC_ACCEL_AC_TRACE=0
+export PPC_ACCEL_MMIO_TRACE=0
+export PPC_ACCEL_MMIO_TRACE_LIMIT=2048
+export PPC_ACCEL_DIAG_TRACE=0
+export PPC_ACCEL_DIAG_TRACE_LIMIT=256
+export PPC_ACCEL_TRACE_IO=0
+export PPC_ACCEL_TRACE_IO_LIMIT=256
+
+case "${mode}" in
+  os3)
+    export PPC_ACCEL_DIAG_CONFIG=0x00
+    ;;
+  os4)
+    export PPC_ACCEL_PPC_RAM_MB=128
+    export PPC_ACCEL_DIAG_CONFIG=0x90
+    export PPC_ACCEL_DIAG_BOOTPOINT=0x0020
+    export PPC_ACCEL_DIAG_DIAGPOINT=0x0050
+    ;;
+  os4-probe)
+    export PPC_ACCEL_PPC_RAM_MB=128
+    export PPC_ACCEL_DIAG_CONFIG=0x90
+    export PPC_ACCEL_DIAG_BOOTPOINT=0x0020
+    export PPC_ACCEL_DIAG_DIAGPOINT=0x0050
+    export PPC_ACCEL_DIAG_TRACE=1
+    export PPC_ACCEL_DIAG_TRACE_LIMIT=0
+    export PPC_ACCEL_MMIO_TRACE=1
+    export PPC_ACCEL_MMIO_TRACE_LIMIT=0
+    ;;
+  os4-bridge)
+    export PPC_ACCEL_PPC_RAM_MB=128
+    export PPC_ACCEL_DIAG_CONFIG=0x90
+    export PPC_ACCEL_DIAG_BOOTPOINT=0x0020
+    export PPC_ACCEL_DIAG_DIAGPOINT=0x0050
+    export PPC_ACCEL_BOOTSTRAP_AUTOSTART_DST3=1
+    ;;
+  os4-force-start)
+    export PPC_ACCEL_PPC_RAM_MB=128
+    export PPC_ACCEL_DIAG_CONFIG=0x90
+    export PPC_ACCEL_DIAG_BOOTPOINT=0x0020
+    export PPC_ACCEL_DIAG_DIAGPOINT=0x0050
+    export PPC_ACCEL_DIAG_START_FROM_DIAGPOINT=1
+    ;;
+  debug)
+    export PPC_ACCEL_PPC_RAM_MB=128
+    export PPC_ACCEL_DIAG_CONFIG=0x90
+    export PPC_ACCEL_DIAG_BOOTPOINT=0x0020
+    export PPC_ACCEL_DIAG_DIAGPOINT=0x0050
+    export PPC_ACCEL_QEMU_LOG=1
+    export PPC_ACCEL_AC_TRACE=1
+    export PPC_ACCEL_MMIO_TRACE=1
+    export PPC_ACCEL_MMIO_TRACE_LIMIT=0
+    export PPC_ACCEL_DIAG_TRACE=1
+    export PPC_ACCEL_DIAG_TRACE_LIMIT=0
+    export PPC_ACCEL_TRACE_IO=1
+    export PPC_ACCEL_TRACE_IO_LIMIT=0
+    ;;
+  bppc)
+    export PPC_ACCEL_PPC_RAM_PROFILE=blizzardppc
+    export PPC_ACCEL_PPC_RAM_MB=128
+    export PPC_ACCEL_DIAG_CONFIG=0x00
+    ;;
+esac
+
+: > ppc.log
+
+echo "[startppc] mode=${mode}"
+echo "[startppc] QEMU_UAE_SO=${QEMU_UAE_SO}"
+echo "[startppc] PPC_ACCEL_PPC_RAM_PROFILE=${PPC_ACCEL_PPC_RAM_PROFILE} PPC_ACCEL_PPC_RAM_MB=${PPC_ACCEL_PPC_RAM_MB}"
+echo "[startppc] PPC_ACCEL_DIAG_CONFIG=${PPC_ACCEL_DIAG_CONFIG:-unset} BOOTPOINT=${PPC_ACCEL_DIAG_BOOTPOINT:-unset} DIAGPOINT=${PPC_ACCEL_DIAG_DIAGPOINT:-unset} START_FROM_DIAG=${PPC_ACCEL_DIAG_START_FROM_DIAGPOINT}"
+echo "[startppc] PPC_ACCEL_BOOTSTRAP_AUTOSTART_DST3=${PPC_ACCEL_BOOTSTRAP_AUTOSTART_DST3:-0}"
+echo "[startppc] trace: AC=${PPC_ACCEL_AC_TRACE} MMIO=${PPC_ACCEL_MMIO_TRACE} DIAG=${PPC_ACCEL_DIAG_TRACE} IO=${PPC_ACCEL_TRACE_IO} QEMU_LOG=${PPC_ACCEL_QEMU_LOG}"
+echo "[startppc] logging -> ${ROOT_DIR}/ppc.log"
+
+exec ./emulator --log ppc.log --log-level info "$@"

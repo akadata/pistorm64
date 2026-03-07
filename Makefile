@@ -464,7 +464,7 @@ endif
 
 LIBS := $(BASE_LIBS)
 
-INCLUDES  = -I. -Isrc -Isrc/musashi $(RAYLIB_INC) $(VC_INC)
+INCLUDES  = -I. -Isrc -Isrc/musashi -Isrc/uae/include $(RAYLIB_INC) $(VC_INC)
 LDSEARCH  = -L/usr/local/lib $(VC_LIBDIR) $(RAYLIB_LIBDIR)
 
 ifeq ($(PISTORM_KMOD),1)

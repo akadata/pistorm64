@@ -3,6 +3,7 @@
 #include <inttypes.h>
 #include <pthread.h>
 #include <sched.h>
+#include <strings.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -11,6 +12,7 @@
 #include <string.h>
 #include <time.h>
 
+#include "emulator.h"
 #include "platforms/amiga/amiga-autoconf.h"
 #include "platforms/amiga/amiga_zorro.h"
 #include "ppc/ppc_mailbox.h"
@@ -24,8 +26,10 @@ static const uint32_t PPC_ACCEL_FIRMWARE_ENTRY_PRIMARY = 0x00000000u;
 static const uint32_t PPC_ACCEL_FIRMWARE_ENTRY_SECONDARY = 0x00000100u;
 static const uint32_t PPC_ACCEL_FIRMWARE_ENTRY_BOOT_TEST = 0x00000200u;
 static const uint32_t PPC_ACCEL_PPC_RAM_BASE_DEFAULT = 0x08000000u;
+static const uint32_t PPC_ACCEL_PPC_RAM_BASE_BLIZZARD_TOP = 0x48000000u;
 static const uint32_t PPC_ACCEL_PPC_RAM_MB_DEFAULT = 128u;
 static const uint32_t PPC_ACCEL_PPC_RAM_MB_MIN = 1u;
+static const uint32_t PPC_ACCEL_BOOTSTRAP_STAGE_DST3 = 0x44535433u; /* 'DST3' */
 
 _Static_assert(PPC_ACCEL_MB_OFF_MAGIC == PPC_MAILBOX_OFF_MAGIC,
                "mailbox magic offset mismatch");
@@ -118,6 +122,8 @@ typedef struct ppc_accel_state {
   uint8_t *ppc_ram;
   uint32_t ppc_ram_base;
   uint32_t ppc_ram_size;
+  uint8_t *reset_rom;
+  uint32_t reset_rom_size;
   qemu_uae_loader loader;
   ppc_accel_host_service_context_t host_service;
   pthread_t host_thread;
@@ -152,13 +158,19 @@ typedef struct ppc_accel_state {
   uint16_t diag_boot_stub_size;
   uint16_t diag_diag_stub_offset;
   uint16_t diag_diag_stub_size;
+  bool diag_start_in_diagpoint;
+  uint32_t bootstrap_stage;
+  uint32_t bootstrap_arg;
   uint32_t boot_marker_last;
   bool have_boot_marker_last;
+  bool boot_entry0_logged;
   uint64_t io_read32_count;
   uint64_t io_write32_count;
   uint64_t io_read64_count;
   uint64_t io_write64_count;
   ppc_accel_runtime_state_t runtime_state;
+  bool reset_rom_active;
+  bool bootstrap_autostart_dst3;
 } ppc_accel_state_t;
 
 static ppc_accel_state_t g_ppc_accel_state;
@@ -171,19 +183,32 @@ static bool g_ppc_accel_atexit_installed;
 #define PPC_ACCEL_AC_DIAG_VEC_DEFAULT 0x4000u
 #define PPC_ACCEL_AC_DIAG_VEC_ROM_NIBBLE_OFFSET 20u
 #define PPC_ACCEL_DIAG_CONFIG_DEFAULT 0x00u
-#define PPC_ACCEL_DIAG_DIAGPOINT_DEFAULT 0x0000u
 
 #define PPC_ACCEL_DIAG_OFFSET 0x00004000u
-#define PPC_ACCEL_DIAG_AREA_SIZE 0x0040u
-#define PPC_ACCEL_DIAG_NAME_OFFSET 0x0010u
+#define PPC_ACCEL_DIAG_AREA_SIZE 0x0200u
+#define PPC_ACCEL_DIAG_NAME_OFFSET 0x0100u
+#define PPC_ACCEL_DIAG_ID_OFFSET 0x0120u
+#define PPC_ACCEL_DIAG_ENDCOPY_OFFSET 0x0140u
 #define PPC_ACCEL_DIAG_BOOT_STUB_OFFSET 0x0020u
-#define PPC_ACCEL_DIAG_BOOT_STUB_SIZE 0x0012u
-#define PPC_ACCEL_DIAG_DIAG_STUB_OFFSET 0x0032u
-#define PPC_ACCEL_DIAG_DIAG_STUB_SIZE 0x000au
-#define PPC_ACCEL_DIAG_BOOTPOINT_DEFAULT 0x0000u
+#define PPC_ACCEL_DIAG_BOOT_STUB_SIZE 0x0022u
+#define PPC_ACCEL_DIAG_DIAG_STUB_OFFSET 0x0050u
+#define PPC_ACCEL_DIAG_DIAG_STUB_SIZE 0x0058u
+#define PPC_ACCEL_DIAG_RESIDENT_OFFSET 0x00b0u
+#define PPC_ACCEL_DIAG_RESIDENT_SIZE 0x001au
+#define PPC_ACCEL_DIAG_INIT_STUB_OFFSET 0x00d0u
+#define PPC_ACCEL_DIAG_INIT_STUB_SIZE 0x0022u
+#define PPC_ACCEL_DIAG_DIAGPOINT_DEFAULT PPC_ACCEL_DIAG_DIAG_STUB_OFFSET
+#define PPC_ACCEL_DIAG_BOOTPOINT_DEFAULT PPC_ACCEL_DIAG_BOOT_STUB_OFFSET
+
+#define PPC_ACCEL_REG_BOOTSTRAP_STAGE 0x0044u
+#define PPC_ACCEL_REG_BOOTSTRAP_ARG 0x0048u
 
 static void ppc_accel_write_shared_info(ppc_accel_state_t *state);
 static uint32_t env_u32_or_default(const char *name, uint32_t default_value);
+static bool ppc_accel_prepare_reset_window(ppc_accel_state_t *state,
+                                           uint8_t **out_memory,
+                                           uint32_t *out_size,
+                                           bool *out_external_rom);
 static uint32_t ppc_accel_boot_desc_read_field(const ppc_accel_state_t *state, uint32_t field_offset);
 static void ppc_accel_boot_desc_write_field(ppc_accel_state_t *state, uint32_t field_offset, uint32_t value);
 
@@ -264,34 +289,160 @@ static void write_be16(uint8_t *base, uint32_t offset, uint16_t value)
 
 static void ppc_accel_write_diag_stubs(ppc_accel_state_t *state)
 {
+  static const uint8_t nop[] = {0x4eu, 0x71u};
   static const uint8_t boot_stub[PPC_ACCEL_DIAG_BOOT_STUB_SIZE] = {
-      0x20u, 0x6fu, 0x00u, 0x04u, /* move.l 4(%a7), %a0        ; ConfigDev* */
-      0x20u, 0x68u, 0x00u, 0x20u, /* move.l 32(%a0), %a0       ; cd_BoardAddr */
-      0x70u, 0x01u,               /* moveq #1, %d0             */
-      0x21u, 0x40u, 0x00u, 0x08u, /* move.l %d0, 8(%a0)        ; CONTROL=START */
-      0x70u, 0x01u,               /* moveq #1, %d0             ; success/fallback */
-      0x4eu, 0x75u                /* rts                       */
+      0x20u, 0x6fu, 0x00u, 0x04u, /* move.l (4,%sp),%a0        ; ConfigDev* */
+      0x20u, 0x68u, 0x00u, 0x20u, /* move.l (32,%a0),%a0       ; cd_BoardAddr */
+      0x20u, 0x0au,               /* move.l %a2,%d0            ; bootnode/context */
+      0x21u, 0x40u, 0x00u, 0x48u, /* move.l %d0,(72,%a0)       ; BOOTSTRAP_ARG */
+      0x20u, 0x3cu, 0x42u, 0x53u, 0x54u, 0x31u, /* move.l #'BST1',%d0 */
+      0x21u, 0x40u, 0x00u, 0x44u, /* move.l %d0,(68,%a0)       ; BOOTSTRAP_STAGE */
+      0x70u, 0x01u,               /* moveq #1,%d0              */
+      0x21u, 0x40u, 0x00u, 0x08u, /* move.l %d0,(8,%a0)        ; CONTROL=START */
+      0x70u, 0x01u,               /* moveq #1,%d0              */
+      0x4eu, 0x75u                /* rts */
   };
-  static const uint8_t diag_stub[PPC_ACCEL_DIAG_DIAG_STUB_SIZE] = {
-      0x70u, 0x01u,               /* moveq #1, %d0             */
-      0x21u, 0x40u, 0x00u, 0x08u, /* move.l %d0, 8(%a0)        ; A0 = BoardBase in DiagPoint */
-      0x70u, 0x01u,               /* moveq #1, %d0             */
-      0x4eu, 0x75u                /* rts                       */
+  static const uint8_t diag_stub_start[PPC_ACCEL_DIAG_DIAG_STUB_SIZE] = {
+      0x22u, 0x0bu,               /* move.l %a3,%d1            */
+      0x20u, 0x0au,               /* move.l %a2,%d0            */
+      0xd0u, 0xbcu, 0x00u, 0x00u, 0x00u, 0xb0u, /* add.l #0x00b0,%d0 */
+      0x25u, 0x40u, 0x00u, 0xb2u, /* move.l %d0,(0x00b2,%a2)   ; rt_MatchTag */
+      0x20u, 0x0au,               /* move.l %a2,%d0            */
+      0xd0u, 0xbcu, 0x00u, 0x00u, 0x01u, 0x40u, /* add.l #0x0140,%d0 */
+      0x25u, 0x40u, 0x00u, 0xb6u, /* move.l %d0,(0x00b6,%a2)   ; rt_EndSkip */
+      0x20u, 0x0au,               /* move.l %a2,%d0            */
+      0xd0u, 0xbcu, 0x00u, 0x00u, 0x01u, 0x00u, /* add.l #0x0100,%d0 */
+      0x25u, 0x40u, 0x00u, 0xbeu, /* move.l %d0,(0x00be,%a2)   ; rt_Name */
+      0x20u, 0x0au,               /* move.l %a2,%d0            */
+      0xd0u, 0xbcu, 0x00u, 0x00u, 0x01u, 0x20u, /* add.l #0x0120,%d0 */
+      0x25u, 0x40u, 0x00u, 0xc2u, /* move.l %d0,(0x00c2,%a2)   ; rt_IdString */
+      0x20u, 0x0au,               /* move.l %a2,%d0            */
+      0xd0u, 0xbcu, 0x00u, 0x00u, 0x00u, 0xd0u, /* add.l #0x00d0,%d0 */
+      0x25u, 0x40u, 0x00u, 0xc6u, /* move.l %d0,(0x00c6,%a2)   ; rt_Init */
+      0x20u, 0x01u,               /* move.l %d1,%d0            */
+      0x21u, 0x40u, 0x00u, 0x48u, /* move.l %d0,(72,%a0)       ; BOOTSTRAP_ARG */
+      0x20u, 0x3cu, 0x44u, 0x53u, 0x54u, 0x31u, /* move.l #'DST1',%d0 */
+      0x21u, 0x40u, 0x00u, 0x44u, /* move.l %d0,(68,%a0)       ; BOOTSTRAP_STAGE */
+      0x70u, 0x01u,               /* moveq #1,%d0              */
+      0x21u, 0x40u, 0x00u, 0x08u, /* move.l %d0,(8,%a0)        ; CONTROL=START */
+      0x70u, 0x01u,               /* moveq #1,%d0              */
+      0x4eu, 0x75u                /* rts */
   };
+  static const uint8_t diag_stub_nostart[] = {
+      0x22u, 0x0bu,               /* move.l %a3,%d1            */
+      0x20u, 0x0au,               /* move.l %a2,%d0            */
+      0xd0u, 0xbcu, 0x00u, 0x00u, 0x00u, 0xb0u, /* add.l #0x00b0,%d0 */
+      0x25u, 0x40u, 0x00u, 0xb2u, /* move.l %d0,(0x00b2,%a2)   ; rt_MatchTag */
+      0x20u, 0x0au,               /* move.l %a2,%d0            */
+      0xd0u, 0xbcu, 0x00u, 0x00u, 0x01u, 0x40u, /* add.l #0x0140,%d0 */
+      0x25u, 0x40u, 0x00u, 0xb6u, /* move.l %d0,(0x00b6,%a2)   ; rt_EndSkip */
+      0x20u, 0x0au,               /* move.l %a2,%d0            */
+      0xd0u, 0xbcu, 0x00u, 0x00u, 0x01u, 0x00u, /* add.l #0x0100,%d0 */
+      0x25u, 0x40u, 0x00u, 0xbeu, /* move.l %d0,(0x00be,%a2)   ; rt_Name */
+      0x20u, 0x0au,               /* move.l %a2,%d0            */
+      0xd0u, 0xbcu, 0x00u, 0x00u, 0x01u, 0x20u, /* add.l #0x0120,%d0 */
+      0x25u, 0x40u, 0x00u, 0xc2u, /* move.l %d0,(0x00c2,%a2)   ; rt_IdString */
+      0x20u, 0x0au,               /* move.l %a2,%d0            */
+      0xd0u, 0xbcu, 0x00u, 0x00u, 0x00u, 0xd0u, /* add.l #0x00d0,%d0 */
+      0x25u, 0x40u, 0x00u, 0xc6u, /* move.l %d0,(0x00c6,%a2)   ; rt_Init */
+      0x20u, 0x01u,               /* move.l %d1,%d0            */
+      0x21u, 0x40u, 0x00u, 0x48u, /* move.l %d0,(72,%a0)       ; BOOTSTRAP_ARG */
+      0x20u, 0x3cu, 0x44u, 0x53u, 0x54u, 0x33u, /* move.l #'DST3',%d0 */
+      0x21u, 0x40u, 0x00u, 0x44u, /* move.l %d0,(68,%a0)       ; BOOTSTRAP_STAGE */
+      0x70u, 0x01u,               /* moveq #1,%d0              */
+      0x4eu, 0x75u                /* rts */
+  };
+  static const uint8_t resident_template[PPC_ACCEL_DIAG_RESIDENT_SIZE] = {
+      0x4au, 0xfcu,                   /* RT_MATCHWORD */
+      0x00u, 0x00u, 0x00u, 0x00u,     /* rt_MatchTag (patched by DiagPoint) */
+      0x00u, 0x00u, 0x00u, 0x00u,     /* rt_EndSkip (patched by DiagPoint) */
+      0x01u,                          /* RTW_COLDSTART */
+      0x01u,                          /* version */
+      0x03u,                          /* NT_DEVICE */
+      0x14u,                          /* priority */
+      0x00u, 0x00u, 0x00u, 0x00u,     /* rt_Name (patched by DiagPoint) */
+      0x00u, 0x00u, 0x00u, 0x00u,     /* rt_IdString (patched by DiagPoint) */
+      0x00u, 0x00u, 0x00u, 0x00u      /* rt_Init (patched by DiagPoint) */
+  };
+  static const uint8_t init_stub[PPC_ACCEL_DIAG_INIT_STUB_SIZE] = {
+      0x20u, 0x0bu,               /* move.l %a3,%d0 */
+      0x67u, 0x1cu,               /* beq init_done */
+      0x22u, 0x40u,               /* move.l %d0,%a1 */
+      0x20u, 0x69u, 0x00u, 0x20u, /* move.l (32,%a1),%a0 */
+      0x21u, 0x40u, 0x00u, 0x48u, /* move.l %d0,(72,%a0) ; BOOTSTRAP_ARG */
+      0x20u, 0x3cu, 0x52u, 0x53u, 0x54u, 0x31u, /* move.l #'RST1',%d0 */
+      0x21u, 0x40u, 0x00u, 0x44u, /* move.l %d0,(68,%a0) ; BOOTSTRAP_STAGE */
+      0x70u, 0x01u,               /* moveq #1,%d0 */
+      0x21u, 0x40u, 0x00u, 0x08u, /* move.l %d0,(8,%a0) ; CONTROL=START */
+      0x70u, 0x01u,               /* moveq #1,%d0 */
+      0x4eu, 0x75u                /* rts */
+  };
+  static const char diag_name[] = "PiStorm PPC Accelerator";
+  static const char resident_id[] = "PiStorm PPC Bootstrap";
   uint32_t boot_offset;
   uint32_t diag_offset;
+  uint32_t resident_offset;
+  uint32_t init_offset;
+  uint32_t diag_name_offset;
+  uint32_t resident_id_offset;
+  uint8_t *diag_ptr;
+  size_t diag_len;
+  size_t diag_name_len;
+  size_t resident_id_len;
 
   boot_offset = PPC_ACCEL_DIAG_OFFSET + (uint32_t)PPC_ACCEL_DIAG_BOOT_STUB_OFFSET;
   diag_offset = PPC_ACCEL_DIAG_OFFSET + (uint32_t)PPC_ACCEL_DIAG_DIAG_STUB_OFFSET;
+  resident_offset = PPC_ACCEL_DIAG_OFFSET + (uint32_t)PPC_ACCEL_DIAG_RESIDENT_OFFSET;
+  init_offset = PPC_ACCEL_DIAG_OFFSET + (uint32_t)PPC_ACCEL_DIAG_INIT_STUB_OFFSET;
+  diag_name_offset = PPC_ACCEL_DIAG_OFFSET + (uint32_t)PPC_ACCEL_DIAG_NAME_OFFSET;
+  resident_id_offset = PPC_ACCEL_DIAG_OFFSET + (uint32_t)PPC_ACCEL_DIAG_ID_OFFSET;
+  diag_name_len = sizeof(diag_name);
+  resident_id_len = sizeof(resident_id);
   if ((boot_offset + PPC_ACCEL_DIAG_BOOT_STUB_SIZE) > PPC_ACCEL_Z2_SIZE) {
     return;
   }
   if ((diag_offset + PPC_ACCEL_DIAG_DIAG_STUB_SIZE) > PPC_ACCEL_Z2_SIZE) {
     return;
   }
+  if ((resident_offset + PPC_ACCEL_DIAG_RESIDENT_SIZE) > PPC_ACCEL_Z2_SIZE) {
+    return;
+  }
+  if ((init_offset + PPC_ACCEL_DIAG_INIT_STUB_SIZE) > PPC_ACCEL_Z2_SIZE) {
+    return;
+  }
+  if ((diag_name_offset + diag_name_len) > PPC_ACCEL_Z2_SIZE) {
+    return;
+  }
+  if ((resident_id_offset + resident_id_len) > PPC_ACCEL_Z2_SIZE) {
+    return;
+  }
 
   memcpy(state->window + boot_offset, boot_stub, (size_t)PPC_ACCEL_DIAG_BOOT_STUB_SIZE);
-  memcpy(state->window + diag_offset, diag_stub, (size_t)PPC_ACCEL_DIAG_DIAG_STUB_SIZE);
+  memcpy(state->window + resident_offset, resident_template, (size_t)PPC_ACCEL_DIAG_RESIDENT_SIZE);
+  memcpy(state->window + init_offset, init_stub, (size_t)PPC_ACCEL_DIAG_INIT_STUB_SIZE);
+  memcpy(state->window + diag_name_offset, diag_name, diag_name_len);
+  memcpy(state->window + resident_id_offset, resident_id, resident_id_len);
+  if (state->diag_start_in_diagpoint == true) {
+    diag_ptr = (uint8_t *)diag_stub_start;
+    diag_len = sizeof(diag_stub_start);
+  } else {
+    diag_ptr = (uint8_t *)diag_stub_nostart;
+    diag_len = sizeof(diag_stub_nostart);
+  }
+  memset(state->window + diag_offset, 0, (size_t)PPC_ACCEL_DIAG_DIAG_STUB_SIZE);
+  memcpy(state->window + diag_offset, diag_ptr, diag_len);
+  if (diag_len < (size_t)PPC_ACCEL_DIAG_DIAG_STUB_SIZE) {
+    size_t pad;
+    size_t pos;
+
+    pad = ((size_t)PPC_ACCEL_DIAG_DIAG_STUB_SIZE - diag_len) / sizeof(nop);
+    pos = diag_len;
+    while (pad > 0u) {
+      memcpy(state->window + diag_offset + pos, nop, sizeof(nop));
+      pos += sizeof(nop);
+      pad--;
+    }
+  }
 }
 
 static void ppc_accel_trace_diag_read(ppc_accel_state_t *state, uint32_t offset, uint8_t value)
@@ -346,6 +497,8 @@ static void ppc_accel_trace_diag_read(ppc_accel_state_t *state, uint32_t offset,
 static void ppc_accel_write_diag_area(ppc_accel_state_t *state)
 {
   static const char diag_name[] = "PiStorm PPC Accelerator";
+  static const uint8_t dac_boottime_mask = 0x30u;
+  static const uint8_t dac_configtime = 0x10u;
   uint32_t base;
   uint32_t name_len;
   uint8_t diag_config;
@@ -370,6 +523,16 @@ static void ppc_accel_write_diag_area(ppc_accel_state_t *state)
   if (diag_bootpoint >= PPC_ACCEL_DIAG_AREA_SIZE) {
     diag_bootpoint = 0u;
   }
+  if (((diag_config & dac_boottime_mask) == dac_configtime) && (diag_diagpoint == 0u)) {
+    diag_diagpoint = PPC_ACCEL_DIAG_DIAG_STUB_OFFSET;
+    LOG_INFO("[PPC-ACCEL] diagpoint auto-fallback -> 0x%04" PRIx16 " (CONFIGTIME)\n",
+             diag_diagpoint);
+  }
+  if (((diag_config & dac_boottime_mask) == dac_configtime) && (diag_bootpoint == 0u)) {
+    diag_bootpoint = PPC_ACCEL_DIAG_BOOT_STUB_OFFSET;
+    LOG_INFO("[PPC-ACCEL] bootpoint auto-fallback -> 0x%04" PRIx16 " (CONFIGTIME)\n",
+             diag_bootpoint);
+  }
 
   /* Read-only DiagArea with optional 68k bootpoint stub for CSPPC-style bring-up probes. */
   state->window[base + 0u] = diag_config;
@@ -392,17 +555,16 @@ static void ppc_accel_write_diag_area(ppc_accel_state_t *state)
   state->diag_diag_stub_offset = PPC_ACCEL_DIAG_DIAG_STUB_OFFSET;
   state->diag_diag_stub_size = PPC_ACCEL_DIAG_DIAG_STUB_SIZE;
 
-  if (state->verbose == true) {
-    LOG_INFO("[PPC-ACCEL] diag area config=0x%02" PRIx8 " diag=0x%04" PRIx16
-             " boot=0x%04" PRIx16 " size=0x%04" PRIx16 " boot_stub=0x%04" PRIx16
-             " diag_stub=0x%04" PRIx16 "\n",
-             diag_config,
-             diag_diagpoint,
-             diag_bootpoint,
-             (uint16_t)PPC_ACCEL_DIAG_AREA_SIZE,
-             (uint16_t)PPC_ACCEL_DIAG_BOOT_STUB_OFFSET,
-             (uint16_t)PPC_ACCEL_DIAG_DIAG_STUB_OFFSET);
-  }
+  LOG_INFO("[PPC-ACCEL] diag area config=0x%02" PRIx8 " diag=0x%04" PRIx16
+           " boot=0x%04" PRIx16 " size=0x%04" PRIx16 " boot_stub=0x%04" PRIx16
+           " diag_stub=0x%04" PRIx16 " diag_starts=%u\n",
+           diag_config,
+           diag_diagpoint,
+           diag_bootpoint,
+           (uint16_t)PPC_ACCEL_DIAG_AREA_SIZE,
+           (uint16_t)PPC_ACCEL_DIAG_BOOT_STUB_OFFSET,
+           (uint16_t)PPC_ACCEL_DIAG_DIAG_STUB_OFFSET,
+           state->diag_start_in_diagpoint ? 1u : 0u);
 }
 
 static void ppc_accel_qemu_log(const char *format, ...)
@@ -568,6 +730,54 @@ static uint32_t ppc_accel_env_ppc_ram_size_bytes_or_default(void)
   return ram_mb * mb_bytes;
 }
 
+static bool env_has_nonempty_value(const char *name)
+{
+  const char *value;
+
+  value = getenv(name);
+  return (value != NULL) && (value[0] != '\0');
+}
+
+static uint32_t ppc_accel_env_ppc_ram_base_or_default(uint32_t ram_size)
+{
+  const char *profile;
+  uint64_t half_size;
+  uint64_t base64;
+
+  if (env_has_nonempty_value("PPC_ACCEL_PPC_RAM_BASE")) {
+    return env_u32_or_default("PPC_ACCEL_PPC_RAM_BASE", PPC_ACCEL_PPC_RAM_BASE_DEFAULT);
+  }
+
+  profile = getenv("PPC_ACCEL_PPC_RAM_PROFILE");
+  if ((profile == NULL) || (profile[0] == '\0')) {
+    return PPC_ACCEL_PPC_RAM_BASE_DEFAULT;
+  }
+
+  if ((strcasecmp(profile, "default") == 0) ||
+      (strcasecmp(profile, "legacy") == 0) ||
+      (strcasecmp(profile, "csppc") == 0) ||
+      (strcasecmp(profile, "cyberstormppc") == 0)) {
+    return PPC_ACCEL_PPC_RAM_BASE_DEFAULT;
+  }
+
+  if ((strcasecmp(profile, "blizzardppc") == 0) ||
+      (strcasecmp(profile, "blizzardppc48") == 0) ||
+      (strcasecmp(profile, "bppc") == 0)) {
+    half_size = ((uint64_t)ram_size / 2u);
+    if (half_size > (uint64_t)PPC_ACCEL_PPC_RAM_BASE_BLIZZARD_TOP) {
+      LOG_WARN("[PPC-ACCEL] PPC_ACCEL_PPC_RAM_PROFILE=%s invalid for ram_size=0x%08" PRIx32
+               ", falling back to default base\n",
+               profile, ram_size);
+      return PPC_ACCEL_PPC_RAM_BASE_DEFAULT;
+    }
+    base64 = (uint64_t)PPC_ACCEL_PPC_RAM_BASE_BLIZZARD_TOP - half_size;
+    return (uint32_t)base64;
+  }
+
+  LOG_WARN("[PPC-ACCEL] Unknown PPC_ACCEL_PPC_RAM_PROFILE=%s, using default base\n", profile);
+  return PPC_ACCEL_PPC_RAM_BASE_DEFAULT;
+}
+
 static bool env_bool_or_default(const char *name, bool default_value)
 {
   const char *value;
@@ -591,6 +801,118 @@ static bool env_bool_or_default(const char *name, bool default_value)
   }
 
   return default_value;
+}
+
+static bool ppc_accel_load_reset_rom(ppc_accel_state_t *state, const char *path)
+{
+  FILE *fp;
+  long file_size_long;
+  size_t file_size;
+  size_t bytes_read;
+  uint8_t *buffer;
+
+  if ((state == NULL) || (path == NULL) || (path[0] == '\0')) {
+    return false;
+  }
+
+  fp = fopen(path, "rb");
+  if (fp == NULL) {
+    LOG_WARN("[PPC-ACCEL] failed to open PPC reset ROM '%s': %s\n", path, strerror(errno));
+    return false;
+  }
+
+  if (fseek(fp, 0L, SEEK_END) != 0) {
+    LOG_WARN("[PPC-ACCEL] failed to seek PPC reset ROM '%s': %s\n", path, strerror(errno));
+    (void)fclose(fp);
+    return false;
+  }
+  file_size_long = ftell(fp);
+  if (file_size_long <= 0L) {
+    LOG_WARN("[PPC-ACCEL] invalid PPC reset ROM size for '%s'\n", path);
+    (void)fclose(fp);
+    return false;
+  }
+  if (fseek(fp, 0L, SEEK_SET) != 0) {
+    LOG_WARN("[PPC-ACCEL] failed to rewind PPC reset ROM '%s': %s\n", path, strerror(errno));
+    (void)fclose(fp);
+    return false;
+  }
+
+  file_size = (size_t)file_size_long;
+  buffer = (uint8_t *)calloc(1, file_size);
+  if (buffer == NULL) {
+    LOG_WARN("[PPC-ACCEL] failed to allocate %zu bytes for PPC reset ROM\n", file_size);
+    (void)fclose(fp);
+    return false;
+  }
+
+  bytes_read = fread(buffer, 1u, file_size, fp);
+  (void)fclose(fp);
+  if (bytes_read != file_size) {
+    LOG_WARN("[PPC-ACCEL] short read while loading PPC reset ROM '%s' (%zu/%zu)\n",
+             path,
+             bytes_read,
+             file_size);
+    free(buffer);
+    return false;
+  }
+
+  if (state->reset_rom != NULL) {
+    free(state->reset_rom);
+    state->reset_rom = NULL;
+    state->reset_rom_size = 0u;
+  }
+  state->reset_rom = buffer;
+  state->reset_rom_size = (uint32_t)file_size;
+
+  LOG_INFO("[PPC-ACCEL] loaded PPC reset ROM '%s' (%" PRIu32 " bytes)\n",
+           path,
+           state->reset_rom_size);
+  return true;
+}
+
+static bool ppc_accel_prepare_reset_window(ppc_accel_state_t *state,
+                                           uint8_t **out_memory,
+                                           uint32_t *out_size,
+                                           bool *out_external_rom)
+{
+  const char *rom_path;
+  bool allow_external_rom;
+
+  if ((state == NULL) || (out_memory == NULL) || (out_size == NULL) || (out_external_rom == NULL)) {
+    return false;
+  }
+
+  *out_memory = state->window;
+  *out_size = PPC_ACCEL_Z2_SIZE;
+  *out_external_rom = false;
+
+  rom_path = getenv("PPC_ACCEL_RESET_ROM");
+  if ((rom_path == NULL) || (rom_path[0] == '\0')) {
+    state->reset_rom_active = false;
+    return true;
+  }
+  allow_external_rom = env_bool_or_default("PPC_ACCEL_RESET_ROM_ALLOW", false);
+  if (allow_external_rom == false) {
+    LOG_WARN("[PPC-ACCEL] PPC_ACCEL_RESET_ROM is set but ignored "
+             "(set PPC_ACCEL_RESET_ROM_ALLOW=1 to enable external reset ROM)\n");
+    state->reset_rom_active = false;
+    return true;
+  }
+
+  if (ppc_accel_load_reset_rom(state, rom_path) == false) {
+    return false;
+  }
+  if ((state->reset_rom == NULL) || (state->reset_rom_size == 0u)) {
+    LOG_WARN("[PPC-ACCEL] PPC reset ROM '%s' was loaded but appears empty\n", rom_path);
+    return false;
+  }
+
+  *out_memory = state->reset_rom;
+  *out_size = state->reset_rom_size;
+  *out_external_rom = true;
+  state->reset_rom_active = true;
+  return true;
 }
 
 static uint32_t ppc_accel_boot_desc_default_stack(const ppc_accel_state_t *state)
@@ -647,6 +969,7 @@ static void ppc_accel_write_boot_descriptor(ppc_accel_state_t *state)
   write_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_MARKER, 0u);
   state->boot_marker_last = 0u;
   state->have_boot_marker_last = false;
+  state->boot_entry0_logged = false;
 
   if (state->verbose == true) {
     LOG_INFO("[PPC-ACCEL] bootdesc off=0x%04" PRIx32 " magic=0x%08" PRIx32
@@ -738,6 +1061,7 @@ static void ppc_accel_boot_desc_write_field(ppc_accel_state_t *state, uint32_t f
     write_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_MARKER, 0u);
     state->boot_marker_last = 0u;
     state->have_boot_marker_last = false;
+    state->boot_entry0_logged = false;
   }
 }
 
@@ -842,24 +1166,153 @@ static void ppc_accel_log_io_summary(const ppc_accel_state_t *state)
            (state->trace_io_limit != 0u) ? " (limited)" : "");
 }
 
+static bool ppc_accel_resolve_direct_ppc_ptr(
+    const ppc_accel_state_t *state,
+    uint32_t addr,
+    uint32_t len,
+    uint8_t **out_ptr)
+{
+  uint64_t end_addr;
+  uint64_t ram_start;
+  uint64_t ram_end;
+  uint64_t reset_start;
+  uint64_t reset_end;
+  uint64_t reset_size;
+  const uint8_t *reset_base;
+
+  if ((state == NULL) || (out_ptr == NULL) || (len == 0u)) {
+    return false;
+  }
+
+  end_addr = (uint64_t)addr + (uint64_t)len;
+  if (((uint64_t)addr < (uint64_t)PPC_ACCEL_Z2_SIZE) && (end_addr <= (uint64_t)PPC_ACCEL_Z2_SIZE)) {
+    *out_ptr = (uint8_t *)(state->window + addr);
+    return true;
+  }
+
+  if ((state->ppc_ram != NULL) && (state->ppc_ram_size != 0u)) {
+    ram_start = (uint64_t)state->ppc_ram_base;
+    ram_end = ram_start + (uint64_t)state->ppc_ram_size;
+    if (((uint64_t)addr >= ram_start) && (end_addr <= ram_end)) {
+      *out_ptr = state->ppc_ram + (uint32_t)((uint64_t)addr - ram_start);
+      return true;
+    }
+  }
+
+  reset_base = state->reset_rom_active ? state->reset_rom : state->window;
+  reset_size = state->reset_rom_active ? (uint64_t)state->reset_rom_size
+                                       : (uint64_t)PPC_ACCEL_Z2_SIZE;
+  if ((reset_base != NULL) && (reset_size != 0u)) {
+    reset_start = (uint64_t)PPC_ACCEL_RESET_WINDOW_BASE;
+    reset_end = reset_start + reset_size;
+    if (((uint64_t)addr >= reset_start) && (end_addr <= reset_end)) {
+      *out_ptr = (uint8_t *)(reset_base + (uint32_t)((uint64_t)addr - reset_start));
+      return true;
+    }
+  }
+
+  return false;
+}
+
+static uint32_t ppc_accel_read_be_from_ptr(const uint8_t *ptr, int width_bytes)
+{
+  uint32_t value;
+  int i;
+
+  value = 0u;
+  for (i = 0; i < width_bytes; i++) {
+    value = (value << 8u) | (uint32_t)ptr[i];
+  }
+  return value;
+}
+
+static void ppc_accel_write_be_to_ptr(uint8_t *ptr, uint32_t value, int width_bytes)
+{
+  int i;
+
+  for (i = width_bytes - 1; i >= 0; i--) {
+    ptr[i] = (uint8_t)(value & 0xffu);
+    value >>= 8u;
+  }
+}
+
+static uint32_t ppc_accel_bridge_read32_bus(uint32_t addr, int width_bytes)
+{
+  uint32_t value;
+  int i;
+
+  if (width_bytes == 1) {
+    return (uint32_t)(m68k_read_memory_8(addr) & 0xffu);
+  }
+  if (width_bytes == 2) {
+    return (uint32_t)(m68k_read_memory_16(addr) & 0xffffu);
+  }
+  if (width_bytes == 4) {
+    return (uint32_t)m68k_read_memory_32(addr);
+  }
+
+  value = 0u;
+  for (i = 0; i < width_bytes; i++) {
+    value = (value << 8u) | (uint32_t)(m68k_read_memory_8(addr + (uint32_t)i) & 0xffu);
+  }
+  return value;
+}
+
+static void ppc_accel_bridge_write32_bus(uint32_t addr, uint32_t value, int width_bytes)
+{
+  if (width_bytes == 1) {
+    m68k_write_memory_8(addr, value & 0xffu);
+    return;
+  }
+  if (width_bytes == 2) {
+    m68k_write_memory_16(addr, value & 0xffffu);
+    return;
+  }
+  if (width_bytes == 4) {
+    m68k_write_memory_32(addr, value);
+    return;
+  }
+
+  while (width_bytes > 0) {
+    width_bytes--;
+    m68k_write_memory_8(addr + (uint32_t)width_bytes, value & 0xffu);
+    value >>= 8u;
+  }
+}
+
 static bool io_read32(uint32_t addr, uint32_t *data, int size)
 {
   ppc_accel_state_t *state;
   uint32_t value;
   int width_bytes;
+  uint8_t *direct_ptr;
+  bool via_direct;
 
   state = &g_ppc_accel_state;
-  value = 0xDEADBEEFu;
+  value = 0u;
   width_bytes = size;
   if (width_bytes <= 0) {
     width_bytes = 4;
+  }
+  if (width_bytes > 4) {
+    width_bytes = 4;
+  }
+
+  direct_ptr = NULL;
+  via_direct = false;
+  if (ppc_accel_resolve_direct_ppc_ptr(state, addr, (uint32_t)width_bytes, &direct_ptr) == true) {
+    value = ppc_accel_read_be_from_ptr(direct_ptr, width_bytes);
+    via_direct = true;
+  } else {
+    value = ppc_accel_bridge_read32_bus(addr, width_bytes);
   }
 
   if (data != NULL) {
     *data = value;
   }
   state->io_read32_count++;
-  ppc_accel_trace_io_event(state, "read32", addr, (uint64_t)value, width_bytes);
+  ppc_accel_trace_io_event(state, via_direct ? "read32-direct" : "read32-bridge",
+                           addr, (uint64_t)value, width_bytes);
   return true;
 }
 
@@ -867,15 +1320,30 @@ static bool io_write32(uint32_t addr, uint32_t data, int size)
 {
   ppc_accel_state_t *state;
   int width_bytes;
+  uint8_t *direct_ptr;
+  bool via_direct;
 
   state = &g_ppc_accel_state;
   width_bytes = size;
   if (width_bytes <= 0) {
     width_bytes = 4;
   }
+  if (width_bytes > 4) {
+    width_bytes = 4;
+  }
+
+  direct_ptr = NULL;
+  via_direct = false;
+  if (ppc_accel_resolve_direct_ppc_ptr(state, addr, (uint32_t)width_bytes, &direct_ptr) == true) {
+    ppc_accel_write_be_to_ptr(direct_ptr, data, width_bytes);
+    via_direct = true;
+  } else {
+    ppc_accel_bridge_write32_bus(addr, data, width_bytes);
+  }
 
   state->io_write32_count++;
-  ppc_accel_trace_io_event(state, "write32", addr, (uint64_t)data, width_bytes);
+  ppc_accel_trace_io_event(state, via_direct ? "write32-direct" : "write32-bridge",
+                           addr, (uint64_t)data, width_bytes);
   return true;
 }
 
@@ -883,25 +1351,58 @@ static bool io_read64(uint32_t addr, uint64_t *data)
 {
   ppc_accel_state_t *state;
   uint64_t value;
+  uint8_t *direct_ptr;
+  bool via_direct;
 
   state = &g_ppc_accel_state;
-  value = 0xDEADBEEFDEADBEEFULL;
+  value = 0u;
+
+  direct_ptr = NULL;
+  via_direct = false;
+  if (ppc_accel_resolve_direct_ppc_ptr(state, addr, 8u, &direct_ptr) == true) {
+    value = (((uint64_t)ppc_accel_read_be_from_ptr(direct_ptr, 4)) << 32u)
+          | ((uint64_t)ppc_accel_read_be_from_ptr(direct_ptr + 4u, 4));
+    via_direct = true;
+  } else {
+    value = (((uint64_t)ppc_accel_bridge_read32_bus(addr, 4)) << 32u)
+          | ((uint64_t)ppc_accel_bridge_read32_bus(addr + 4u, 4));
+  }
   if (data != NULL) {
     *data = value;
   }
 
   state->io_read64_count++;
-  ppc_accel_trace_io_event(state, "read64", addr, value, 8);
+  ppc_accel_trace_io_event(state, via_direct ? "read64-direct" : "read64-bridge",
+                           addr, value, 8);
   return true;
 }
 
 static bool io_write64(uint32_t addr, uint64_t data)
 {
   ppc_accel_state_t *state;
+  uint8_t *direct_ptr;
+  bool via_direct;
+  uint32_t hi;
+  uint32_t lo;
 
   state = &g_ppc_accel_state;
+  hi = (uint32_t)(data >> 32u);
+  lo = (uint32_t)(data & 0xffffffffu);
+
+  direct_ptr = NULL;
+  via_direct = false;
+  if (ppc_accel_resolve_direct_ppc_ptr(state, addr, 8u, &direct_ptr) == true) {
+    ppc_accel_write_be_to_ptr(direct_ptr, hi, 4);
+    ppc_accel_write_be_to_ptr(direct_ptr + 4u, lo, 4);
+    via_direct = true;
+  } else {
+    ppc_accel_bridge_write32_bus(addr, hi, 4);
+    ppc_accel_bridge_write32_bus(addr + 4u, lo, 4);
+  }
+
   state->io_write64_count++;
-  ppc_accel_trace_io_event(state, "write64", addr, data, 8);
+  ppc_accel_trace_io_event(state, via_direct ? "write64-direct" : "write64-bridge",
+                           addr, data, 8);
   return true;
 }
 
@@ -1164,8 +1665,8 @@ static bool ppc_accel_prepare_ppc_ram(ppc_accel_state_t *state)
     return true;
   }
 
-  ram_base = env_u32_or_default("PPC_ACCEL_PPC_RAM_BASE", PPC_ACCEL_PPC_RAM_BASE_DEFAULT);
   ram_size = ppc_accel_env_ppc_ram_size_bytes_or_default();
+  ram_base = ppc_accel_env_ppc_ram_base_or_default(ram_size);
   ram_end = (uint64_t)ram_base + (uint64_t)ram_size;
   if (ram_end > 0x100000000ULL) {
     LOG_WARN("[PPC-ACCEL] PPC RAM mapping overflows 32-bit space: base=0x%08" PRIx32
@@ -1337,6 +1838,9 @@ static void ppc_accel_poll_boot_marker(ppc_accel_state_t *state)
 {
   uint32_t base;
   uint32_t marker;
+  uint32_t entry;
+  uint32_t stack;
+  uint32_t arg0;
 
   if (state == NULL) {
     return;
@@ -1348,6 +1852,9 @@ static void ppc_accel_poll_boot_marker(ppc_accel_state_t *state)
   }
 
   marker = read_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_MARKER);
+  entry = read_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_ENTRY);
+  stack = read_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_STACK);
+  arg0 = read_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_ARG0);
   if (state->have_boot_marker_last == false) {
     state->have_boot_marker_last = true;
     state->boot_marker_last = marker;
@@ -1355,9 +1862,14 @@ static void ppc_accel_poll_boot_marker(ppc_accel_state_t *state)
       LOG_INFO("[PPC-ACCEL] boot marker=0x%08" PRIx32 " entry=0x%08" PRIx32
                " stack=0x%08" PRIx32 " arg0=0x%08" PRIx32 "\n",
                marker,
-               read_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_ENTRY),
-               read_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_STACK),
-               read_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_ARG0));
+               entry,
+               stack,
+               arg0);
+      if ((marker >= 2u) && (entry == PPC_ACCEL_FIRMWARE_ENTRY_PRIMARY)
+          && (state->boot_entry0_logged == false)) {
+        state->boot_entry0_logged = true;
+        LOG_INFO("[PPC-ACCEL] firmware entry-0 loop reached (marker=0x%08" PRIx32 ")\n", marker);
+      }
     }
     return;
   }
@@ -1369,9 +1881,14 @@ static void ppc_accel_poll_boot_marker(ppc_accel_state_t *state)
   LOG_INFO("[PPC-ACCEL] boot marker=0x%08" PRIx32 " entry=0x%08" PRIx32
            " stack=0x%08" PRIx32 " arg0=0x%08" PRIx32 "\n",
            marker,
-           read_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_ENTRY),
-           read_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_STACK),
-           read_be32(state->window, base + PPC_ACCEL_BOOT_DESC_OFF_ARG0));
+           entry,
+           stack,
+           arg0);
+  if ((marker >= 2u) && (entry == PPC_ACCEL_FIRMWARE_ENTRY_PRIMARY)
+      && (state->boot_entry0_logged == false)) {
+    state->boot_entry0_logged = true;
+    LOG_INFO("[PPC-ACCEL] firmware entry-0 loop reached (marker=0x%08" PRIx32 ")\n", marker);
+  }
 }
 
 static void ppc_accel_probe_boot_marker_startup(ppc_accel_state_t *state)
@@ -1555,6 +2072,7 @@ static void ppc_accel_stop_host_thread(ppc_accel_state_t *state)
   state->host_service.stop = true;
   (void)pthread_join(state->host_thread, NULL);
   state->host_thread_started = false;
+  LOG_INFO("[PPC-ACCEL] hostsvc thread stopped\n");
 }
 
 static void ppc_accel_cleanup_at_exit(void)
@@ -1572,6 +2090,12 @@ static void ppc_accel_cleanup_at_exit(void)
     state->ppc_ram = NULL;
     state->ppc_ram_base = 0u;
     state->ppc_ram_size = 0u;
+  }
+  if (state->reset_rom != NULL) {
+    free(state->reset_rom);
+    state->reset_rom = NULL;
+    state->reset_rom_size = 0u;
+    state->reset_rom_active = false;
   }
 }
 
@@ -1610,6 +2134,10 @@ static bool ppc_accel_start_host_thread(ppc_accel_state_t *state)
   }
 
   state->host_thread_started = true;
+  LOG_INFO("[PPC-ACCEL] hostsvc thread started (idle_ms=%d doorbell=%d verbose=%d)\n",
+           state->host_service.idle_sleep_ms,
+           state->host_service.doorbell_enabled ? 1 : 0,
+           state->host_service.verbose ? 1 : 0);
   return true;
 }
 
@@ -1623,6 +2151,10 @@ static bool ppc_accel_backend_bootstrap(ppc_accel_state_t *state)
   int region_count;
   int start_timeout_ms;
   bool qemu_started;
+  uint8_t *reset_window_memory;
+  uint32_t reset_window_size;
+  bool reset_window_external_rom;
+  const char *reset_window_name;
 
   if (state->runtime_started == true) {
     return true;
@@ -1695,6 +2227,16 @@ static bool ppc_accel_backend_bootstrap(ppc_accel_state_t *state)
     goto fail;
   }
   ppc_accel_finalize_boot_descriptor_defaults(state);
+  if (ppc_accel_prepare_reset_window(
+          state,
+          &reset_window_memory,
+          &reset_window_size,
+          &reset_window_external_rom)
+      == false) {
+    goto fail;
+  }
+  reset_window_name = reset_window_external_rom ? "ppc-accel-reset-rom"
+                                                : "ppc-accel-reset-window";
 
   if (ppc_accel_ranges_overlap(0u, PPC_ACCEL_Z2_SIZE, state->ppc_ram_base, state->ppc_ram_size) == true) {
     LOG_WARN("[PPC-ACCEL] PPC RAM mapping overlaps board window: base=0x%08" PRIx32
@@ -1703,7 +2245,7 @@ static bool ppc_accel_backend_bootstrap(ppc_accel_state_t *state)
     goto fail;
   }
   if (ppc_accel_ranges_overlap(
-          PPC_ACCEL_RESET_WINDOW_BASE, PPC_ACCEL_Z2_SIZE, state->ppc_ram_base, state->ppc_ram_size)
+          PPC_ACCEL_RESET_WINDOW_BASE, reset_window_size, state->ppc_ram_base, state->ppc_ram_size)
       == true) {
     LOG_WARN("[PPC-ACCEL] PPC RAM mapping overlaps reset window: base=0x%08" PRIx32
              " size=0x%08" PRIx32 "\n",
@@ -1729,14 +2271,18 @@ static bool ppc_accel_backend_bootstrap(ppc_accel_state_t *state)
     LOG_WARN("[PPC-ACCEL] failed to install boot-test firmware\n");
     goto fail;
   }
-  if (install_reset_trampoline(
-          state->window,
-          PPC_ACCEL_Z2_SIZE,
-          PPC_ACCEL_FIRMWARE_ENTRY_SECONDARY,
-          PPC_ACCEL_BOOT_DESC_OFFSET)
-      == false) {
-    LOG_WARN("[PPC-ACCEL] failed to install reset trampoline firmware\n");
-    goto fail;
+  if (reset_window_external_rom == false) {
+    if (install_reset_trampoline(
+            state->window,
+            PPC_ACCEL_Z2_SIZE,
+            PPC_ACCEL_FIRMWARE_ENTRY_SECONDARY,
+            PPC_ACCEL_BOOT_DESC_OFFSET)
+        == false) {
+      LOG_WARN("[PPC-ACCEL] failed to install reset trampoline firmware\n");
+      goto fail;
+    }
+  } else {
+    LOG_INFO("[PPC-ACCEL] external PPC reset ROM active; built-in reset trampoline bypassed\n");
   }
 
   memset(regions, 0, sizeof(regions));
@@ -1753,9 +2299,9 @@ static bool ppc_accel_backend_bootstrap(ppc_accel_state_t *state)
   regions[1].alias = 0u;
 
   regions[2].start = PPC_ACCEL_RESET_WINDOW_BASE;
-  regions[2].size = PPC_ACCEL_Z2_SIZE;
-  regions[2].memory = state->window;
-  regions[2].name = (char *)"ppc-accel-reset-window";
+  regions[2].size = reset_window_size;
+  regions[2].memory = reset_window_memory;
+  regions[2].name = (char *)reset_window_name;
   regions[2].alias = 0u;
 
   region_count = 3;
@@ -1854,6 +2400,8 @@ static void ppc_accel_device_reset_state(ppc_accel_state_t *state)
   state->control = 0u;
   state->status = 0u;
   state->irq_status = 0u;
+  state->bootstrap_stage = 0u;
+  state->bootstrap_arg = 0u;
   ppc_accel_mailbox_reset(state);
   ppc_accel_backend_reset_cpu(state);
   if (state->runtime_started == true) {
@@ -1906,6 +2454,10 @@ static uint32_t ppc_accel_reg_read32(ppc_accel_state_t *state, uint32_t offset)
     return ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_STACK);
   case PPC_ACCEL_REG_BOOT_ARG0:
     return ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_ARG0);
+  case PPC_ACCEL_REG_BOOTSTRAP_STAGE:
+    return state->bootstrap_stage;
+  case PPC_ACCEL_REG_BOOTSTRAP_ARG:
+    return state->bootstrap_arg;
   default:
     return read_be32(state->window, offset);
   }
@@ -1934,13 +2486,41 @@ static void ppc_accel_reg_write32(ppc_accel_state_t *state, uint32_t offset, uin
     } else {
       state->control = new_control;
       if ((state->control & PPC_ACCEL_CTRL_START) != 0u) {
+        uint32_t pre_magic;
+        uint32_t pre_entry;
+        uint32_t pre_stack;
+        uint32_t pre_arg0;
+        uint32_t start_magic;
+        uint32_t start_entry;
+        uint32_t start_stack;
+        uint32_t start_arg0;
+
+        pre_magic = ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_MAGIC);
+        pre_entry = ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_ENTRY);
+        pre_stack = ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_STACK);
+        pre_arg0 = ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_ARG0);
+        ppc_accel_finalize_boot_descriptor_defaults(state);
+        start_magic = ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_MAGIC);
+        start_entry = ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_ENTRY);
+        start_stack = ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_STACK);
+        start_arg0 = ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_ARG0);
+        if ((pre_magic != start_magic) || (pre_entry != start_entry) || (pre_stack != start_stack)
+            || (pre_arg0 != start_arg0)) {
+          LOG_INFO("[PPC-ACCEL] CONTROL.START bootdesc defaults applied"
+                   " pre(magic=0x%08" PRIx32 " entry=0x%08" PRIx32
+                   " stack=0x%08" PRIx32 " arg0=0x%08" PRIx32 ")\n",
+                   pre_magic,
+                   pre_entry,
+                   pre_stack,
+                   pre_arg0);
+        }
         LOG_INFO("[PPC-ACCEL] CONTROL.START bootdesc pre-start"
                  " magic=0x%08" PRIx32 " entry=0x%08" PRIx32
                  " stack=0x%08" PRIx32 " arg0=0x%08" PRIx32 "\n",
-                 ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_MAGIC),
-                 ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_ENTRY),
-                 ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_STACK),
-                 ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_ARG0));
+                 start_magic,
+                 start_entry,
+                 start_stack,
+                 start_arg0);
         running_ok = ppc_accel_set_running(state, true);
         LOG_INFO("[PPC-ACCEL] CONTROL.START requested -> %s\n",
                  running_ok == true ? "running" : "failed");
@@ -1984,6 +2564,46 @@ static void ppc_accel_reg_write32(ppc_accel_state_t *state, uint32_t offset, uin
   case PPC_ACCEL_REG_BOOT_ARG0:
     ppc_accel_boot_desc_write_field(state, PPC_ACCEL_BOOT_DESC_OFF_ARG0, value);
     LOG_INFO("[PPC-ACCEL] BOOT_ARG0 write value=0x%08" PRIx32 "\n", value);
+    break;
+  case PPC_ACCEL_REG_BOOTSTRAP_STAGE:
+  {
+    bool running_ok;
+    uint32_t start_magic;
+    uint32_t start_entry;
+    uint32_t start_stack;
+    uint32_t start_arg0;
+
+    state->bootstrap_stage = value;
+    LOG_INFO("[PPC-ACCEL] bootstrap stage=0x%08" PRIx32 "\n", value);
+
+    if ((state->bootstrap_autostart_dst3 == true)
+        && (value == PPC_ACCEL_BOOTSTRAP_STAGE_DST3)
+        && ((state->control & PPC_ACCEL_CTRL_START) == 0u)) {
+      ppc_accel_finalize_boot_descriptor_defaults(state);
+      start_magic = ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_MAGIC);
+      start_entry = ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_ENTRY);
+      start_stack = ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_STACK);
+      start_arg0 = ppc_accel_boot_desc_read_field(state, PPC_ACCEL_BOOT_DESC_OFF_ARG0);
+      LOG_INFO("[PPC-ACCEL] bootstrap DST3 auto-start enabled;"
+               " bootdesc magic=0x%08" PRIx32 " entry=0x%08" PRIx32
+               " stack=0x%08" PRIx32 " arg0=0x%08" PRIx32 "\n",
+               start_magic,
+               start_entry,
+               start_stack,
+               start_arg0);
+      state->control |= PPC_ACCEL_CTRL_START;
+      running_ok = ppc_accel_set_running(state, true);
+      LOG_INFO("[PPC-ACCEL] bootstrap DST3 auto-start -> %s\n",
+               running_ok == true ? "running" : "failed");
+      if (running_ok == false) {
+        state->control &= ~PPC_ACCEL_CTRL_START;
+      }
+    }
+    break;
+  }
+  case PPC_ACCEL_REG_BOOTSTRAP_ARG:
+    state->bootstrap_arg = value;
+    LOG_INFO("[PPC-ACCEL] bootstrap arg=0x%08" PRIx32 "\n", value);
     break;
   default:
     write_be32(state->window, offset, value);
@@ -2234,6 +2854,10 @@ void z2_ppc_accel_register(void)
   g_ppc_accel_state.trace_mmio_limit = env_u32_or_default("PPC_ACCEL_MMIO_TRACE_LIMIT", 512u);
   g_ppc_accel_state.diag_trace_enabled = env_bool_or_default("PPC_ACCEL_DIAG_TRACE", false);
   g_ppc_accel_state.diag_trace_limit = env_u32_or_default("PPC_ACCEL_DIAG_TRACE_LIMIT", 256u);
+  g_ppc_accel_state.diag_start_in_diagpoint =
+      env_bool_or_default("PPC_ACCEL_DIAG_START_FROM_DIAGPOINT", false);
+  g_ppc_accel_state.bootstrap_autostart_dst3 =
+      env_bool_or_default("PPC_ACCEL_BOOTSTRAP_AUTOSTART_DST3", false);
   g_ppc_accel_state.runtime_state = PPC_ACCEL_RUNTIME_STOPPED;
   ppc_accel_reset_io_trace(&g_ppc_accel_state);
 
@@ -2251,6 +2875,10 @@ void z2_ppc_accel_register(void)
     LOG_INFO("[PPC-ACCEL] diag_trace=%d diag_trace_limit=%" PRIu32 "\n",
              g_ppc_accel_state.diag_trace_enabled ? 1 : 0,
              g_ppc_accel_state.diag_trace_limit);
+    LOG_INFO("[PPC-ACCEL] diag_start_from_diagpoint=%d\n",
+             g_ppc_accel_state.diag_start_in_diagpoint ? 1 : 0);
+    LOG_INFO("[PPC-ACCEL] bootstrap_autostart_dst3=%d\n",
+             g_ppc_accel_state.bootstrap_autostart_dst3 ? 1 : 0);
   }
 
   LOG_INFO("[ZORRO] Registering Z2 PPC accelerator device.\n");

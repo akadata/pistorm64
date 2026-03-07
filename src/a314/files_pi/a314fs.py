@@ -812,6 +812,7 @@ if idx != -1:
 else:
     drv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     drv.connect(('localhost', 7110))
+    drv.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
     send_register_req(b'a314fs')
     stream_id, ptype, payload = wait_for_msg()
