@@ -10,3 +10,99 @@ PI0:    FileSystem      = l:a314fs
         Mount           = 1
         DosType         = 0x33313400
 #
+
+PI1:    FileSystem      = l:a314fs
+Device          = a314.device
+Unit            = 1
+Surfaces        = 1
+BlocksPerTrack  = 10
+Reserved        = 2
+LowCyl          = 0
+HighCyl         = 100
+StackSize       = 1000
+Mount           = 1
+DosType         = 0x33313400
+#
+
+PI2:    FileSystem      = l:a314fs
+Device          = a314.device
+Unit            = 2
+Surfaces        = 1
+BlocksPerTrack  = 10
+Reserved        = 2
+LowCyl          = 0
+HighCyl         = 100
+StackSize       = 1000
+Mount           = 1
+DosType         = 0x33313400
+#
+
+PI3:    FileSystem      = l:a314fs
+Device          = a314.device
+Unit            = 3
+Surfaces        = 1
+BlocksPerTrack  = 10
+Reserved        = 2
+LowCyl          = 0
+HighCyl         = 100
+StackSize       = 1000
+Mount           = 1
+DosType         = 0x33313400
+#
+
+PD0:	Device = a314disk.device
+	Unit   = 0
+	Flags  = 1
+	Surfaces  = 2
+	BlocksPerTrack = 11
+	Reserved = 2
+	Interleave = 0
+	LowCyl = 0
+	HighCyl = 79
+	Buffers = 2
+	BufMemType = 0
+	MaxTransfer = 5632
+#
+
+PD1:	Device = a314disk.device
+	Unit   = 1
+	Flags  = 1
+	Surfaces  = 2
+	BlocksPerTrack = 11
+	Reserved = 2
+	Interleave = 0
+	LowCyl = 0
+	HighCyl = 79
+	Buffers = 2
+	BufMemType = 0
+	MaxTransfer = 5632
+#
+
+PD2:	Device = a314disk.device
+	Unit   = 2
+	Flags  = 1
+	Surfaces  = 2
+	BlocksPerTrack = 11
+	Reserved = 2
+	Interleave = 0
+	LowCyl = 0
+	HighCyl = 79
+	Buffers = 2
+	BufMemType = 0
+	MaxTransfer = 5632
+#
+
+PD3:	Device = a314disk.device
+	Unit   = 3
+	Flags  = 1
+	Surfaces  = 2
+	BlocksPerTrack = 11
+	Reserved = 2
+	Interleave = 0
+	LowCyl = 0
+	HighCyl = 79
+	Buffers = 2
+	BufMemType = 0
+	MaxTransfer = 5632
+#
+
