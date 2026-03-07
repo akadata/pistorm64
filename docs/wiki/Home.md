@@ -41,6 +41,7 @@ Development:
 - Setup_Amiga_Compiler.md
 - Tools.md
 - UAE-JIT-Status.md (experimental UAE JIT backend status)
+- ppc_roadmap.md
 - Janus-Bus-Engine.md
 - CPLD.md
 - Zorro-Devices.md

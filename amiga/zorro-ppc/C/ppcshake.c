@@ -544,6 +544,21 @@ static int dump_board_identity(volatile UBYTE *board) {
   ULONG shared_mb_size;
   ULONG shared_db_reg;
   ULONG shared_features;
+  ULONG shared_reserved0;
+  ULONG shared_reserved1;
+  ULONG boot_sig;
+  ULONG boot_ver;
+  ULONG boot_chip_low;
+  ULONG boot_chip_high;
+  ULONG boot_main_low;
+  ULONG boot_main_high;
+  ULONG boot_text_low;
+  ULONG boot_text_size;
+  ULONG boot_data_size;
+  ULONG boot_kern_mem_size;
+  ULONG boot_page_size;
+  ULONG boot_rodata_size;
+  ULONG boot_flags;
   ULONG ppc_ram_base;
   ULONG ppc_ram_size;
   ULONG irq_before;
@@ -587,6 +602,8 @@ static int dump_board_identity(volatile UBYTE *board) {
   shared_mb_size = read_be32(board, PPC_ACCEL_SHARED_INFO_OFFSET + PPC_ACCEL_SHARED_INFO_OFF_MB_SIZE);
   shared_db_reg = read_be32(board, PPC_ACCEL_SHARED_INFO_OFFSET + PPC_ACCEL_SHARED_INFO_OFF_DB_REG);
   shared_features = read_be32(board, PPC_ACCEL_SHARED_INFO_OFFSET + PPC_ACCEL_SHARED_INFO_OFF_FEATURES);
+  shared_reserved0 = read_be32(board, PPC_ACCEL_SHARED_INFO_OFFSET + PPC_ACCEL_SHARED_INFO_OFF_RESERVED0);
+  shared_reserved1 = read_be32(board, PPC_ACCEL_SHARED_INFO_OFFSET + PPC_ACCEL_SHARED_INFO_OFF_RESERVED1);
 
   printf("Shared info @ +$%08X:\n", (unsigned int)PPC_ACCEL_SHARED_INFO_OFFSET);
   printf("  SIG           = $%08X\n", (unsigned int)shared_sig);
@@ -599,6 +616,40 @@ static int dump_board_identity(volatile UBYTE *board) {
          (unsigned int)((shared_features & PPC_ACCEL_SHARED_INFO_FEAT_HOSTSVC) != 0u),
          (unsigned int)((shared_features & PPC_ACCEL_SHARED_INFO_FEAT_IRQ) != 0u),
          (unsigned int)((shared_features & PPC_ACCEL_SHARED_INFO_FEAT_DOORBELL) != 0u));
+  printf("  RESERVED0     = $%08X\n", (unsigned int)shared_reserved0);
+  printf("  RESERVED1     = $%08X\n", (unsigned int)shared_reserved1);
+
+  boot_sig = read_be32(board, PPC_ACCEL_BOOTAREA_OFFSET + PPC_ACCEL_BOOTAREA_OFF_SIGNATURE);
+  boot_ver = read_be32(board, PPC_ACCEL_BOOTAREA_OFFSET + PPC_ACCEL_BOOTAREA_OFF_VERSION);
+  boot_chip_low = read_be32(board, PPC_ACCEL_BOOTAREA_OFFSET + PPC_ACCEL_BOOTAREA_OFF_CHIP_LOW);
+  boot_chip_high = read_be32(board, PPC_ACCEL_BOOTAREA_OFFSET + PPC_ACCEL_BOOTAREA_OFF_CHIP_HIGH);
+  boot_main_low = read_be32(board, PPC_ACCEL_BOOTAREA_OFFSET + PPC_ACCEL_BOOTAREA_OFF_MAIN_LOW);
+  boot_main_high = read_be32(board, PPC_ACCEL_BOOTAREA_OFFSET + PPC_ACCEL_BOOTAREA_OFF_MAIN_HIGH);
+  boot_text_low = read_be32(board, PPC_ACCEL_BOOTAREA_OFFSET + PPC_ACCEL_BOOTAREA_OFF_TEXT_LOW);
+  boot_text_size = read_be32(board, PPC_ACCEL_BOOTAREA_OFFSET + PPC_ACCEL_BOOTAREA_OFF_TEXT_SIZE);
+  boot_data_size = read_be32(board, PPC_ACCEL_BOOTAREA_OFFSET + PPC_ACCEL_BOOTAREA_OFF_DATA_SIZE);
+  boot_kern_mem_size = read_be32(board, PPC_ACCEL_BOOTAREA_OFFSET + PPC_ACCEL_BOOTAREA_OFF_KERN_MEM_SIZE);
+  boot_page_size = read_be32(board, PPC_ACCEL_BOOTAREA_OFFSET + PPC_ACCEL_BOOTAREA_OFF_PAGE_SIZE);
+  boot_rodata_size = read_be32(board, PPC_ACCEL_BOOTAREA_OFFSET + PPC_ACCEL_BOOTAREA_OFF_RODATA_SIZE);
+  boot_flags = read_be32(board, PPC_ACCEL_BOOTAREA_OFFSET + PPC_ACCEL_BOOTAREA_OFF_FLAGS);
+
+  printf("BootArea mirror @ +$%08X:\n", (unsigned int)PPC_ACCEL_BOOTAREA_OFFSET);
+  printf("  SIG           = $%08X\n", (unsigned int)boot_sig);
+  printf("  VERSION       = %u\n", (unsigned int)boot_ver);
+  printf("  CHIP          = $%08X-$%08X\n",
+         (unsigned int)boot_chip_low,
+         (unsigned int)boot_chip_high);
+  printf("  MAIN          = $%08X-$%08X\n",
+         (unsigned int)boot_main_low,
+         (unsigned int)boot_main_high);
+  printf("  TEXT          = $%08X +$%08X\n",
+         (unsigned int)boot_text_low,
+         (unsigned int)boot_text_size);
+  printf("  DATA_SIZE     = $%08X\n", (unsigned int)boot_data_size);
+  printf("  KERN_MEM_SIZE = $%08X\n", (unsigned int)boot_kern_mem_size);
+  printf("  PAGE_SIZE     = $%08X\n", (unsigned int)boot_page_size);
+  printf("  RODATA_SIZE   = $%08X\n", (unsigned int)boot_rodata_size);
+  printf("  FLAGS         = $%08X\n", (unsigned int)boot_flags);
 
   write_be32(board, PPC_ACCEL_REG_IRQ_ACK, PPC_ACCEL_IRQ_CMD_DONE | PPC_ACCEL_IRQ_HOST_DOORBELL);
   irq_before = read_be32(board, PPC_ACCEL_REG_IRQ_STATUS);

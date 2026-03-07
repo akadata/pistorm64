@@ -26,6 +26,10 @@
 #include "../piscsi-enums.h"
 #include <stdint.h>
 
+#ifndef MEMF_24BITDMA
+#define MEMF_24BITDMA 0x00000200UL
+#endif
+
 #define STR(s) #s
 #define XSTR(s) STR(s)
 
@@ -794,7 +798,8 @@ uint8_t piscsi_perform_io(struct piscsi_unit* u, struct IORequest* io) {
     res->dg_CylSectors = u->s * u->h;
     res->dg_Heads = u->h;
     res->dg_TrackSectors = u->s;
-    res->dg_BufMemType = MEMF_PUBLIC;
+    /* PiSCSI is a Z2-facing device: request 24-bit DMA-safe buffers. */
+    res->dg_BufMemType = MEMF_PUBLIC | MEMF_24BITDMA;
     res->dg_DeviceType = (u->scsi_type == PISCSI_SCSI_TYPE_CDROM)
                            ? DG_CDROM
                            : DG_DIRECT_ACCESS;

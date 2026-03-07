@@ -8,7 +8,7 @@
 #define ARRAY_LEN(a) (sizeof(a) / sizeof((a)[0]))
 
 
-// MOVEC2 (0x4E7A) — privileged, 68020+
+// MOVEC2/MOVE2C (0x4E7A/0x4E7B) — privileged, 68020+
 // On real silicon this is MOVEC between Dn/An and control registers.
 // First implementation: privileged NOP that consumes the extension word.
 
@@ -21,6 +21,18 @@ static void op_movec2_4e7a(m68ki_cpu_core *state) {
     /* MOVEC uses an extension word to encode the control reg + source/dest reg.
      * Consume it so PC stays in sync, even if semantics are a NOP for now.
      */
+    (void)m68ki_read_imm_16(state);
+
+    USE_CYCLES(6);  /* ballpark; adjust later if needed */
+}
+
+static void op_move2c_4e7b(m68ki_cpu_core *state) {
+    if (!FLAG_S) {
+        m68ki_exception_privilege_violation(state);
+        return;
+    }
+
+    /* MOVE2C uses the same extension word format as MOVEC2. */
     (void)m68ki_read_imm_16(state);
 
     USE_CYCLES(6);  /* ballpark; adjust later if needed */
@@ -119,6 +131,7 @@ void m68k_enhanced_install(void) {
     //install_cinv_cpush();
     //install_pmmu_misc();
 
-      /* MOVEC2 pseudo-op (0x4E7A) */
+      /* MOVEC2/MOVE2C pseudo-ops (0x4E7A/0x4E7B) */
     m68ki_instruction_jump_table[0x4E7A] = op_movec2_4e7a;
+    m68ki_instruction_jump_table[0x4E7B] = op_move2c_4e7b;
 }

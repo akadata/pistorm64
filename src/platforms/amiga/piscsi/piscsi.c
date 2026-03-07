@@ -18,6 +18,7 @@
 #include <time.h>
 #include <limits.h>
 #include <sys/time.h>
+#include <ctype.h>
 
 #include <openssl/ssl.h>
 #include <openssl/rand.h>
@@ -39,14 +40,44 @@
 
 extern struct emulator_config *cfg;
 
-// Debug output is controlled at runtime via --log-level debug.
-#define PISCSI_DEBUG
+/*
+ * PiSCSI debug is noisy enough to distort timing-sensitive workloads.
+ * Keep it opt-in even when global log level is DEBUG:
+ *   PISCSI_DEBUG=0   (default) no PiSCSI debug logs
+ *   PISCSI_DEBUG=1   normal PiSCSI debug
+ *   PISCSI_DEBUG=2   include trivial/verbose PiSCSI debug
+ */
+static int piscsi_debug_level_cached = -1;
 
-#ifdef PISCSI_DEBUG
-#define DEBUG LOG_DEBUG
-#define DEBUG_TRIVIAL LOG_DEBUG
+static int piscsi_debug_level(void)
+{
+    const char *env;
+    int level = 0;
+    if (piscsi_debug_level_cached >= 0) {
+        return piscsi_debug_level_cached;
+    }
+    env = getenv("PISCSI_DEBUG");
+    if (!env || !*env) {
+        piscsi_debug_level_cached = 0;
+        return 0;
+    }
+    if (!strcasecmp(env, "true") || !strcasecmp(env, "yes") || !strcmp(env, "on")) {
+        level = 1;
+    } else if (!strcasecmp(env, "verbose") || !strcasecmp(env, "trace")) {
+        level = 2;
+    } else {
+        level = atoi(env);
+    }
+    if (level < 0) level = 0;
+    if (level > 2) level = 2;
+    piscsi_debug_level_cached = level;
+    return level;
+}
 
-//extern void stop_cpu_emulation(uint8_t disasm_cur);
+#define DEBUG(...) do { if (piscsi_debug_level() >= 1) LOG_DEBUG(__VA_ARGS__); } while (0)
+#define DEBUG_TRIVIAL(...) do { if (piscsi_debug_level() >= 2) LOG_DEBUG(__VA_ARGS__); } while (0)
+
+/* extern void stop_cpu_emulation(uint8_t disasm_cur); */
 #define stop_cpu_emulation(...)
 
 static const char *op_type_names[4] = {
@@ -55,6 +86,47 @@ static const char *op_type_names[4] = {
     "LONGWORD",
     "MEM",
 };
+
+extern unsigned int cpu_type;
+
+#define PISCSI_MEMF_PUBLIC_HOST      0x00000001u
+#define PISCSI_MEMF_24BITDMA_HOST    0x00000200u
+#define PISCSI_24BIT_ADDR_MASK       0x00FFFFFFu
+#define PISCSI_24BIT_MAXTRANSFER     0x0001FE00u
+
+static int piscsi_force_24bit_dma(void)
+{
+    const char *env = getenv("PISCSI_FORCE_24BITDMA");
+    if (!env || !*env) {
+        return (cpu_type == M68K_CPU_TYPE_68000 || cpu_type == M68K_CPU_TYPE_68010);
+    }
+    if (!strcasecmp(env, "1") || !strcasecmp(env, "true") ||
+        !strcasecmp(env, "yes") || !strcasecmp(env, "on")) {
+        return 1;
+    }
+    if (!strcasecmp(env, "0") || !strcasecmp(env, "false") ||
+        !strcasecmp(env, "no") || !strcasecmp(env, "off")) {
+        return 0;
+    }
+    return atoi(env) != 0;
+}
+
+static int piscsi_force_24bit_dma_strict_mask(void)
+{
+    const char *env = getenv("PISCSI_FORCE_24BITDMA_STRICT_MASK");
+    if (!env || !*env) {
+        return 0;
+    }
+    if (!strcasecmp(env, "1") || !strcasecmp(env, "true") ||
+        !strcasecmp(env, "yes") || !strcasecmp(env, "on")) {
+        return 1;
+    }
+    if (!strcasecmp(env, "0") || !strcasecmp(env, "false") ||
+        !strcasecmp(env, "no") || !strcasecmp(env, "off")) {
+        return 0;
+    }
+    return atoi(env) != 0;
+}
 
 #define PISCSI_REMOTE_DEFAULT_PORT 4964
 #define PISCSI_REMOTE_VERSION 1u
@@ -977,7 +1049,6 @@ static enum piscsi_media_kind piscsi_parse_media_spec(const char *spec, const ch
     return media_kind;
 }
 
-extern unsigned int cpu_type;
 static __thread char piscsi_disasm_buf[256];
 
 static void piscsi_appendf(char *buf, size_t buf_sz, int *off, const char *fmt, ...) {
@@ -998,7 +1069,7 @@ static void piscsi_appendf(char *buf, size_t buf_sz, int *off, const char *fmt, 
     *off += n;
 }
 
-static void piscsi_dump_cpu_state(const char *tag) {
+static void __attribute__((unused)) piscsi_dump_cpu_state(const char *tag) {
     if (log_get_level() < LOG_LEVEL_DEBUG) {
         return;
     }
@@ -1076,15 +1147,6 @@ static void piscsi_dump_cpu_state(const char *tag) {
         }
     }
 }
-#else
-#define DEBUG(...)
-#define DEBUG_TRIVIAL(...)
-#define stop_cpu_emulation(...)
-static inline void piscsi_dump_cpu_state(const char *tag) {
-    (void)tag;
-}
-#endif
-
 #ifdef FAKESTORM
 #define lseek64 lseek
 #endif
@@ -2531,6 +2593,29 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                              */
                             struct pihd_dosnode_data *dat = (struct pihd_dosnode_data *)((char *)(&dst_data[driver_addr2+0x20]));
 #pragma GCC diagnostic pop
+
+                            if (piscsi_force_24bit_dma()) {
+                                uint32_t mem_type = BE(dat->mem_type);
+                                uint32_t maxtransfer = BE(dat->maxtransfer);
+                                uint32_t transfer_mask = BE(dat->transfer_mask);
+
+                                mem_type |= (PISCSI_MEMF_PUBLIC_HOST | PISCSI_MEMF_24BITDMA_HOST);
+                                if (maxtransfer == 0 || maxtransfer > PISCSI_24BIT_MAXTRANSFER) {
+                                    maxtransfer = PISCSI_24BIT_MAXTRANSFER;
+                                }
+                                if (piscsi_force_24bit_dma_strict_mask()) {
+                                    if (transfer_mask == 0 || transfer_mask > PISCSI_24BIT_ADDR_MASK) {
+                                        /* Keep bit0 clear like classic DMA masks. */
+                                        transfer_mask = (PISCSI_24BIT_ADDR_MASK & ~1u);
+                                    }
+                                }
+
+                                dat->mem_type = htobe32(mem_type);
+                                dat->maxtransfer = htobe32(maxtransfer);
+                                if (piscsi_force_24bit_dma_strict_mask()) {
+                                    dat->transfer_mask = htobe32(transfer_mask);
+                                }
+                            }
 
                             if (BE(devs[i].pb[j]->pb_Flags) & 0x01) {
                                 DEBUG("Partition is bootable.\n");

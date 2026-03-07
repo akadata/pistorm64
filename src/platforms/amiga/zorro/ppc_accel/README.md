@@ -31,6 +31,10 @@ Optional tuning:
 - `PPC_ACCEL_AC_SERIAL=<u32>` overrides the 32-bit AutoConfig serial field
   (`er_SerialNumber`) encoded into the board ROM nibbles.
 - `PPC_ACCEL_AC_DIAG_VEC=<u16>` overrides `er_InitDiagVec` (default `0x4000`).
+- `PPC_ACCEL_AC_MANUFACTURER=<u16>` overrides AutoConfig manufacturer id
+  (default `0x07DB`).
+- `PPC_ACCEL_AC_PRODUCT=<u16>` overrides AutoConfig product id
+  (default `0x0040`).
 - `PPC_ACCEL_DIAG_CONFIG=<u8>` overrides DiagArea `da_Config` at `base+0x4000`
   (default `0x00`; legacy probe test value: `0x90` for `DAC_WORDWIDE|DAC_CONFIGTIME`).
 - `PPC_ACCEL_DIAG_DIAGPOINT=<u16>` overrides DiagArea `da_DiagPoint`
@@ -42,8 +46,12 @@ Optional tuning:
   runtime start to BootPoint/bootstrap flow.
 - `PPC_ACCEL_BOOTSTRAP_AUTOSTART_DST3=1` forces `CONTROL.START` when bootstrap stage
   `DST3` is written (diagnostic bridge for board-contract bring-up; default `0`).
+- `PPC_ACCEL_BOOTSTRAP_AUTOSTART_RST1=0` suppresses the resident init-stub
+  `CONTROL.START` write at stage `RST1` (default `1` keeps current behavior).
 - `PPC_ACCEL_DIAG_TRACE=1` logs DiagArea header/stub fetch reads.
 - `PPC_ACCEL_DIAG_TRACE_LIMIT=<u32>` caps DiagArea trace lines (default `256`, `0` = unlimited).
+- `PPC_ACCEL_DIAG_NAME=<string>` overrides DiagArea `da_Name` string (and resident `rt_Name` target).
+- `PPC_ACCEL_DIAG_ID=<string>` overrides resident `rt_IdString`.
 - `PPC_ACCEL_PPC_RAM_PROFILE=<name>` selects in-tree PPC RAM placement profile when
   `PPC_ACCEL_PPC_RAM_BASE` is not set:
   - `default`/`legacy`/`csppc`/`cyberstormppc` -> base `0x08000000`
@@ -64,6 +72,15 @@ Optional tuning:
   (default top of mapped PPC RAM minus `0x1000`).
 - `PPC_ACCEL_BOOT_ARG0=<u32>` sets PPC reset-trampoline `r3` argument
   (default mailbox base `0x00001000`).
+- `PPC_ACCEL_BOOTAREA_CHIP_LOW=<u32>` / `PPC_ACCEL_BOOTAREA_CHIP_HIGH=<u32>`
+  override BootArea mirror Chip range (defaults `0x00010000` / `0x00200000`).
+- `PPC_ACCEL_BOOTAREA_MAIN_LOW=<u32>` / `PPC_ACCEL_BOOTAREA_MAIN_HIGH=<u32>`
+  override BootArea mirror Main range (default derived from PPC RAM base/size).
+- `PPC_ACCEL_BOOTAREA_TEXT_LOW=<u32>` / `PPC_ACCEL_BOOTAREA_TEXT_SIZE=<u32>`
+  override BootArea mirror text range (default `0`).
+- `PPC_ACCEL_BOOTAREA_DATA_SIZE=<u32>`, `PPC_ACCEL_BOOTAREA_KERN_MEM_SIZE=<u32>`,
+  `PPC_ACCEL_BOOTAREA_PAGE_SIZE=<u32>`, `PPC_ACCEL_BOOTAREA_RODATA_SIZE=<u32>`,
+  `PPC_ACCEL_BOOTAREA_FLAGS=<u32>` override remaining BootArea mirror fields.
 - `PPC_ACCEL_RESET_ROM=/abs/path/to/rom.bin` points at an external reset ROM image.
 - `PPC_ACCEL_RESET_ROM_ALLOW=1` must also be set; otherwise the ROM path is ignored as a
   safety guard.
@@ -87,6 +104,22 @@ Shared window starts with a read-only shared-info block at `0x2000`:
 - `+0x14` feature_flags
 - `+0x18` reserved0
 - `+0x1C` reserved1
+
+BootArea mirror block (read-only) at `0x2060`:
+
+- `+0x00` signature (`PBAR`)
+- `+0x04` version (`1`)
+- `+0x08` `ChipLow`
+- `+0x0C` `ChipHigh`
+- `+0x10` `MainLow`
+- `+0x14` `MainHigh`
+- `+0x18` `TextLow`
+- `+0x1C` `TextSize`
+- `+0x20` `DataSize`
+- `+0x24` `KernMemSize`
+- `+0x28` `PageSize`
+- `+0x2C` `RODataSize`
+- `+0x30` flags (`bit0` set when `MainLow/MainHigh` are valid)
 
 Register block (`32-bit big-endian`):
 
@@ -162,12 +195,18 @@ Statuses:
   (using `ConfigDev->cd_BoardAddr`) and returns.
 - The built-in diagpoint stub patches resident pointers in the copied DiagArea image
   and writes bootstrap stage (`DST3`), returning `D0=1`.
+- DiagPoint also patches init-stub literals with current board/configdev pointers so
+  resident init does not depend on volatile register conventions.
+- DIAG trace now labels reads by region: `hdr`, `boot-stub`, `diag-stub`,
+  `resident`, `init-stub`, `name`, `id`.
 - Optional `PPC_ACCEL_DIAG_START_FROM_DIAGPOINT=1` keeps legacy behavior and also
   starts runtime directly from DiagPoint (`DST1`).
 - Resident init stub writes bootstrap stage (`RST1`) and asserts `CONTROL.START`.
 - PPC reset now uses a secondary-entry trampoline (`0xFFF00100`) that reads
   a boot descriptor at shared `+0x2040` and branches to descriptor `entry`.
 - Shared-info `reserved0`/`reserved1` publish boot-descriptor offset/size.
+- Writes that overlap the boot descriptor window (`+0x2040`) are logged with
+  full descriptor state, including entry transitions from `0 -> non-zero`.
 - Runtime logs `boot marker=...` when trampoline transitions state.
 - For legacy probe debugging, set `PPC_ACCEL_AC_TRACE=1` before launching emulator to log
   PPC board AutoConfig reads/writes.

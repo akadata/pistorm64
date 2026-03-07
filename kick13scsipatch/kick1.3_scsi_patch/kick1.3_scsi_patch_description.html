@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Patching Kickstart 1.3 to boot from internal IDE</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+</head>
+<body>
+<h1>Patching Kickstart 1.3 to boot from internal IDE</h1>
+
+<p>
+<b>Motivation:</b>
+Kickstart 1.3 can not boot from the IDE controller of the Amiga 600/1200 or the <a href="http://www.students.tut.fi/~leinone3/ide/ide68k.html">CFIDE68K</A> controller (an A600/A1200 IDE  compatible controller for the 68000 CPU socket) since the <i>scsi.device</i> (which is the driver for the IDE controller) was not yet present in this Kickstart version. There is a tool called <i>GetSCSI11</i> on Aminet which extracts the <i>scsi.device</i> from a Kickstart 3.x ROM and patches it to make it usable using Mountlist entries in Kickstart 1.3, but still does not allow to boot using it. I wanted to use my compact flash card on my CFIDE68K controller as boot device so I had a look how this could be done.
+
+<p>
+<b>What does this patch do?:</b>
+The <i>scsi.device</i> uses the method <i>AddBootNode()</i> in <i>expansion.library</i> which was introduced in Kickstart 2.0 to add the partitions on the disk to the operating system. <i>GetSCSI11</i> adds a version check and does not call this method in case it is running in Kickstart 1.3 (this is why it is necessary to create mountlist entries for adding the partitions to the operating system). Instead of using <i>AddBootNode()</i> it is necessary in Kickstart 1.3 to manually create a boot node and enqueue it into the boot node list of the <i>expansion.library</i>. <a href="add_boot_node.asm">This</a> is equivalent code to <i>AddBootNode()</i> for Kickstart 1.3. I've created a patch which, basing on a <i>scsi.device</i> from <i>GetSCSI11</i> executes this code in case the <i>scsi.library</i> is used from Kickstart 1.3. For being able to boot using the patched <i>scsi.device</i> it is necessary to make it available at boot time (i.e. to put it into the ROM). The solution I've chosen was to create a 256kB ROM that maps into <tt>$F80000</tt> (Kick 1.3 is right after that at <tt>$FC0000</tt>) which contains the <i>scsi.device</i> (<tt>$F80000</tt> would normally be a mirror of the Kickstart in <tt>$FC0000</tt>). This requires a small change to the Kickstart ROM to also scan the range from <tt>$F80000</tt> to <tt>$FC0000</tt> for ROM residents.
+
+<p>
+<b>What do I need to build a patched ROM?:</b>
+To build a 512kB ROM that contains the patched <i>scsi.device</i> and the patched Kick 1.3 you need the following:
+<ul>
+<li>A <i>scsi.device</i> from Kickstart 3.0 - A1200 (Kick v39.106, scsi.device v37.64), Kickstart 3.1 - A1200 (Kick v40.68, scsi.device v40.12) or a SCSI4345p.lha (Aminet) patched <i>scsi.device</i>. The <i>scsi.device</i> can either be obtained by extracting it from a ROM image using <a href="http://www.doobreynet.co.uk/beta/index.html">RomSplit</a> or using <i>GetSCSI11</i>.
+<li>A ROM image of Kickstart 1.3 (v34.5).
+<li>A 27C400 EPROM (or compatible larger one), and a EPROM programmer to write to it.
+</ul>
+
+<p>
+<b>How to build a patched ROM:</b>
+You can either patch your <i>scsi.device</i> to get a version for Kick 1.3 (if you want to build your rom using Remus yourself) or you can use a patch which directly outputs a ROM image.
+<ul>
+<li>Download the <a href="patches.lha">patches</a>.
+<li>Patch your Kickstart 1.3 image (using the <i>gpatch</i> tool from Aminet): <tt>gpatch kick34005.A500 kick34005.A500.gpatch kick34005.A500_patched</tt>
+<li>Extract your 3.x (A1200) <i>scsi.device</i> using <i>RomSplit</i> or <i>GetSCSI11</i>.
+<li>Apply the scsi.device-to-rom-file patch: <tt>gpatch scsi.device scsi.device_xx.xx(A1200)_rom.gpatch scsi_device.rom RECURSIVE</tt>
+<li>Merge the scsi_device.rom and the patched Kickstart: <tt>join scsi_device.rom kick34005.A500_patched TO kick1.3_scsi.rom</tt>
+<li>Write the ROM file to an EPROM (don't forget to swap bytes).
+</ul>
+Instead of applying the scsi.device-to-rom-file patch you can also just patch your <i>scsi.device</i> and build your ROM yourself (in case you want to add other residents to the ROM too):
+<ul>
+<li>Apply the scsi.device patch: <tt>gpatch scsi.device scsi.device_xx.xx(A1200).gpatch scsi.device_ks13_patched RECURSIVE</tt>
+<li>Build a 256kB ROM (base address <tt>$F80000</tt>) using <a href="http://www.doobreynet.co.uk/beta/index.html">Remus</a> which contains a <a href="romheader">romheader</a> (<a href="romheader.asm">source</a>), the patched <i>scsi.device</i> and whatever else you want to be in the ROM. The romheader points to the start address of the <i>exec.library</i> (<tt>$FC00D2</tt>) (this is necessary since now instead of the Kickstart ROM the newly built ROM is mapped to the start of the address space on boot-up.
+<li>Merge and write the ROMs as described before.
+</ul>
+
+<p>
+<b>Known Issues/Limitations:</b>
+For some reason the modified Kickstart does not boot from the <i>scsi.device</i> on power-up in my A500+ with CFIDE68K controller (I get the insert Workbench disk image). After resetting the Amiga it boots from the hard disk. I'm not sure what causes this (some hardware initialisation?), it boots immediately
+ in UAE with A600/A1200 IDE emulation.<br><br>
+I tried to do as few modifications as necessary to keep it as compatible to the unmodified Kick 1.3 as possible, but there might be programs (games) that do not work with the modified version because:
+<ul>
+<li>The Kickstart mirror at <tt>$F80000</tt> is replaced by the ROM containing the <i>scsi.device</i>
+<li>The <i>scsi.device</i> allocates some memory (and loads the filesystem into RAM).
+<li>There is a minimal change to the Kickstart itself to scan the new ROM area.
+</ul>
+The ROM can not be used in tools like <i>BlizKick</i> since they need to patch the parts of the ROM and do not recognise the patched ROM as a Kick 1.3 ROM anymore (i.e. you have to write it to a EPROM to use it).
+
+<p>
+<b>Creating the partitions on the harddisk/compact flash:</b>
+This is not really specific to the patched ROM, but still it might be useful if you want to use a large hard disk/compact flash card with Kickstart 1.3.
+The Rigid Disk Block (RDB) contains information about the structure of the disk, to obtain these values I've used <i>HDToolBox</i> on a AmigaOS 3.9 system, since you have to know these values if you want to initialize a disk using a Kick 1.3 version of <i>HDToolBox</i> (which has no option to detect them automatically). I've used the A590 Setup disk of the Commodore A590 HD controller to setup the partitions on the disk. The setup disk contains a Kick 1.3 version of <i>HDToolBox</i>. You have to add the <i>FastFileSystem</i> to the filesystems installed on the disk, since Kick 1.3 does not yet have it in the ROM. You can either use <i>FastFileSystem</i> 36.3 of Workbench 1.3 (in the <tt>L:</tt> directory) or version 40.1 (which was included in Workbench 3.1), which still works on Kick 1.3 (newer versions do not work since they depend on features not present in Kick 1.3). Version 40.1 has the advantage that it requires far less memory for large harddisks (v36.3 requires more than 1MB of RAM for a hard disk of 4GB size, v40.1 only requires a few kB). The disadvantage of v40.1 is that you will get an additional icon (e.g. <tt>DH0:DOS<font color="#ffffff" style="BACKGROUND-COLOR: black">A</font></tt>) for every partition on your workbench since it seems that the mechanism to register a filesystem changed a bit between those two versions (I have not found out what exactly changed yet, but it is only a cosmetic problem).
+When creating the partitions make sure not to use anything above the 4GB border since <i>FastFileSystem</i> (at least those versions which are compatible with Kick 1.3) does not support partitions above 4GB. You also should be aware that disk validation (which e.g. is required if your system crashes while writing to the disk) of large disks requires quite a <a href="http://www.gregdonner.org/os35faq/diskfileoperation.html#11">lot of memory</a>. 
+
+<p align=right>
+e-mail: <a href="mailto:tkoecker@gmx.net">Thomas K&ouml;ckerbauer &lt;tkoecker@gmx.net&gt;</a>
+</p>
+</body>
+</html>

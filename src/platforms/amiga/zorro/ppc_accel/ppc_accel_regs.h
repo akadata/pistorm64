@@ -57,6 +57,28 @@
 #define PPC_ACCEL_BOOT_DESC_OFF_ARG0          0x000Cu
 #define PPC_ACCEL_BOOT_DESC_OFF_MARKER        0x0010u
 
+/*
+ * BootArea mirror block (read-only from Amiga side) used for diagnostics and
+ * bootstrap contract tracing. All fields are 32-bit big-endian.
+ */
+#define PPC_ACCEL_BOOTAREA_OFFSET             (PPC_ACCEL_SHARED_OFFSET + 0x0060u)
+#define PPC_ACCEL_BOOTAREA_SIZE               0x0040u
+#define PPC_ACCEL_BOOTAREA_SIGNATURE          0x50424152u /* "PBAR" */
+#define PPC_ACCEL_BOOTAREA_VERSION            1u
+#define PPC_ACCEL_BOOTAREA_OFF_SIGNATURE      0x0000u
+#define PPC_ACCEL_BOOTAREA_OFF_VERSION        0x0004u
+#define PPC_ACCEL_BOOTAREA_OFF_CHIP_LOW       0x0008u
+#define PPC_ACCEL_BOOTAREA_OFF_CHIP_HIGH      0x000Cu
+#define PPC_ACCEL_BOOTAREA_OFF_MAIN_LOW       0x0010u
+#define PPC_ACCEL_BOOTAREA_OFF_MAIN_HIGH      0x0014u
+#define PPC_ACCEL_BOOTAREA_OFF_TEXT_LOW       0x0018u
+#define PPC_ACCEL_BOOTAREA_OFF_TEXT_SIZE      0x001Cu
+#define PPC_ACCEL_BOOTAREA_OFF_DATA_SIZE      0x0020u
+#define PPC_ACCEL_BOOTAREA_OFF_KERN_MEM_SIZE  0x0024u
+#define PPC_ACCEL_BOOTAREA_OFF_PAGE_SIZE      0x0028u
+#define PPC_ACCEL_BOOTAREA_OFF_RODATA_SIZE    0x002Cu
+#define PPC_ACCEL_BOOTAREA_OFF_FLAGS          0x0030u
+
 #define PPC_ACCEL_REG_MAGIC           0x0000u
 #define PPC_ACCEL_REG_ABI_VERSION     0x0004u
 #define PPC_ACCEL_REG_CONTROL         0x0008u
