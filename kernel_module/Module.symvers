@@ -1,4 +1,0 @@
-0x476acd7b	pistorm_z3_register_driver	/home/smalley/pistorm64/kernel_module/z3bus	EXPORT_SYMBOL_GPL	
-0x6a580a09	pistorm_z3_unregister_driver	/home/smalley/pistorm64/kernel_module/z3bus	EXPORT_SYMBOL_GPL	
-0x68e1e0d3	pistorm_z3_get_device_count	/home/smalley/pistorm64/kernel_module/z3bus	EXPORT_SYMBOL_GPL	
-0x95a43edd	pistorm_z3_get_device	/home/smalley/pistorm64/kernel_module/z3bus	EXPORT_SYMBOL_GPL	
