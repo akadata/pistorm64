@@ -131,7 +131,6 @@ extern uint32_t pistorm_dev_base;
 extern void stop_cpu_emulation(uint8_t disasm_cur);
 
 static uint32_t ac_waiting_for_physical_pic = 0;
-static unsigned int autoconf_warn_budget = 16;
 static int a314_write_trace_setting = -1;
 
 static inline const char* autoconf_op_name(unsigned char type) {
@@ -166,108 +165,21 @@ static int a314_write_trace_enabled(void) {
   return a314_write_trace_setting;
 }
 
-static inline void autoconf_warn_once(const char* dir, const char* space, unsigned int addr,
-                                      unsigned int base, unsigned char req_type,
-                                      unsigned char norm_type) {
-  if (autoconf_warn_budget == 0) {
-    return;
-  }
-  autoconf_warn_budget--;
-  LOG_WARN("[AUTOCONF] Unexpected %s %s req=%s norm=%s bus=$%.8X off=$%.4X\n", dir, space,
-           autoconf_op_name(req_type), autoconf_op_name(norm_type), addr, addr - base);
-}
-
-static inline unsigned int autoconf_z2_read_width(struct emulator_config* cfg, unsigned int offset,
-                                                  unsigned char type) {
-  // Z2 autoconfig byte lanes are spaced by 2 bytes on the 16-bit bus.
-  if (type == OP_TYPE_BYTE) {
-    return autoconfig_read_memory_8(cfg, offset);
-  }
-  if (type == OP_TYPE_WORD) {
-    unsigned int hi = autoconfig_read_memory_8(cfg, offset);
-    unsigned int lo = autoconfig_read_memory_8(cfg, offset + 2);
-    return ((hi & 0xFF) << 8) | (lo & 0xFF);
-  }
-  if (type == OP_TYPE_LONGWORD) {
-    unsigned int b0 = autoconfig_read_memory_8(cfg, offset);
-    unsigned int b1 = autoconfig_read_memory_8(cfg, offset + 2);
-    unsigned int b2 = autoconfig_read_memory_8(cfg, offset + 4);
-    unsigned int b3 = autoconfig_read_memory_8(cfg, offset + 6);
-    return ((b0 & 0xFF) << 24) | ((b1 & 0xFF) << 16) | ((b2 & 0xFF) << 8) | (b3 & 0xFF);
-  }
-  return 0;
-}
-
-static inline void autoconf_z2_write_width(struct emulator_config* cfg, unsigned int offset,
-                                           unsigned int value, unsigned char type) {
-  if (type == OP_TYPE_BYTE) {
-    autoconfig_write_memory_8(cfg, offset, value);
-    return;
-  }
-  if (type == OP_TYPE_WORD) {
-    autoconfig_write_memory_8(cfg, offset, (value >> 8) & 0xFF);
-    autoconfig_write_memory_8(cfg, offset + 2, value & 0xFF);
-    return;
-  }
-  if (type == OP_TYPE_LONGWORD) {
-    autoconfig_write_memory_8(cfg, offset, (value >> 24) & 0xFF);
-    autoconfig_write_memory_8(cfg, offset + 2, (value >> 16) & 0xFF);
-    autoconfig_write_memory_8(cfg, offset + 4, (value >> 8) & 0xFF);
-    autoconfig_write_memory_8(cfg, offset + 6, value & 0xFF);
-  }
-}
+static unsigned int autoconf_bad_width_budget = 16;
 
 static inline unsigned int autoconf_z3_remap_offset(unsigned int offset) {
   // Z3 config appears in the Z2 aperture with an address swizzle on bit 1.
   return (offset & 0x02) ? ((offset - 2) + 0x100) : offset;
 }
 
-static inline unsigned int autoconf_z3_read_width(struct emulator_config* cfg, unsigned int offset,
-                                                  unsigned char type) {
-  if (type == OP_TYPE_BYTE) {
-    return autoconfig_read_memory_z3_8(cfg, offset);
-  }
-  if (type == OP_TYPE_WORD) {
-    unsigned int hi = autoconfig_read_memory_z3_8(cfg, offset);
-    unsigned int lo = autoconfig_read_memory_z3_8(cfg, offset + 2);
-    return ((hi & 0xFF) << 8) | (lo & 0xFF);
-  }
-  if (type == OP_TYPE_LONGWORD) {
-    unsigned int b0 = autoconfig_read_memory_z3_8(cfg, offset);
-    unsigned int b1 = autoconfig_read_memory_z3_8(cfg, offset + 2);
-    unsigned int b2 = autoconfig_read_memory_z3_8(cfg, offset + 4);
-    unsigned int b3 = autoconfig_read_memory_z3_8(cfg, offset + 6);
-    return ((b0 & 0xFF) << 24) | ((b1 & 0xFF) << 16) | ((b2 & 0xFF) << 8) | (b3 & 0xFF);
-  }
-  return 0;
-}
-
-static inline void autoconf_z3_write_width(struct emulator_config* cfg, unsigned int offset,
-                                           unsigned int value, unsigned char type) {
-  if (type == OP_TYPE_BYTE) {
-    autoconfig_write_memory_z3_8(cfg, offset, value);
+static inline void autoconf_bad_width_once(const char* dir, const char* space, unsigned int addr,
+                                           unsigned int base, unsigned char type) {
+  if (autoconf_bad_width_budget == 0) {
     return;
   }
-  if (type == OP_TYPE_WORD) {
-    autoconfig_write_memory_z3_16(cfg, offset, value);
-    return;
-  }
-  if (type == OP_TYPE_LONGWORD) {
-    autoconfig_write_memory_z3_16(cfg, offset, (value >> 16) & 0xFFFF);
-    autoconfig_write_memory_z3_16(cfg, offset + 4, value & 0xFFFF);
-  }
-}
-
-static inline unsigned char normalize_autoconf_width(unsigned char type) {
-  switch (type) {
-  case OP_TYPE_BYTE:
-  case OP_TYPE_WORD:
-  case OP_TYPE_LONGWORD:
-    return type;
-  default:
-    // JIT can probe with non-core op types; treat as WORD to keep autoconfig progressing.
-    return OP_TYPE_WORD;
-  }
+  autoconf_bad_width_budget--;
+  LOG_WARN("[AUTOCONF] Unexpected %s %s type=%s bus=$%.8X off=$%.4X\n",
+           dir, space, autoconf_op_name(type), addr, addr - base);
 }
 
 int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned int* val,
@@ -276,7 +188,6 @@ int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned i
   const uint32_t z2_cfg_base = zlayout ? zlayout->z2_config_base : AC_Z2_BASE;
   const uint32_t z3_cfg_base = zlayout ? zlayout->z3_config_base : AC_Z3_BASE;
   const uint32_t cfg_win_size = zlayout ? zlayout->config_window_size : AC_SIZE;
-  unsigned char width = normalize_autoconf_width(type);
   if (kick13_mode) {
     ac_z3_done = 1;
   }
@@ -304,13 +215,21 @@ int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned i
       }
     }
     if (!ac_z2_done && ac_z2_current_pic < ac_z2_pic_count) {
-      *val = autoconf_z2_read_width(cfg, addr - z2_cfg_base, width);
-      return 1;
+      if (type == OP_TYPE_BYTE) {
+        *val = autoconfig_read_memory_8(cfg, addr - z2_cfg_base);
+        return 1;
+      }
+      autoconf_bad_width_once("read", "Z2", addr, z2_cfg_base, type);
+      return -1;
     }
     if (!ac_z3_done && ac_z3_current_pic < ac_z3_pic_count) {
       uint32_t addr_ = autoconf_z3_remap_offset(addr - z2_cfg_base);
-      *val = autoconf_z3_read_width(cfg, addr_, width);
-      return 1;
+      if (type == OP_TYPE_BYTE) {
+        *val = autoconfig_read_memory_z3_8(cfg, addr_);
+        return 1;
+      }
+      autoconf_bad_width_once("read", "Z3-via-Z2", addr, z2_cfg_base, type);
+      return -1;
     }
   }
   if (!ac_z3_done && addr >= z3_cfg_base && addr < z3_cfg_base + cfg_win_size) {
@@ -319,11 +238,11 @@ int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned i
       return -1;
     }
 
-    if (width == OP_TYPE_BYTE || width == OP_TYPE_WORD || width == OP_TYPE_LONGWORD) {
-      *val = autoconf_z3_read_width(cfg, addr - z3_cfg_base, width);
+    if (type == OP_TYPE_BYTE) {
+      *val = autoconfig_read_memory_z3_8(cfg, addr - z3_cfg_base);
       return 1;
     }
-    autoconf_warn_once("read", "Z3", addr, z3_cfg_base, type, width);
+    autoconf_bad_width_once("read", "Z3", addr, z3_cfg_base, type);
     return -1;
   }
 
@@ -374,7 +293,6 @@ int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned 
   const uint32_t z2_cfg_base = zlayout ? zlayout->z2_config_base : AC_Z2_BASE;
   const uint32_t z3_cfg_base = zlayout ? zlayout->z3_config_base : AC_Z3_BASE;
   const uint32_t cfg_win_size = zlayout ? zlayout->config_window_size : AC_SIZE;
-  unsigned char width = normalize_autoconf_width(type);
   if (kick13_mode) {
     ac_z3_done = 1;
   }
@@ -383,26 +301,42 @@ int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned 
       return -1;
     }
     if (!ac_z2_done && ac_z2_current_pic < ac_z2_pic_count) {
-      autoconf_z2_write_width(cfg, addr - z2_cfg_base, val, width);
-      return 1;
+      if (type == OP_TYPE_BYTE) {
+        autoconfig_write_memory_8(cfg, addr - z2_cfg_base, val);
+        return 1;
+      }
+      autoconf_bad_width_once("write", "Z2", addr, z2_cfg_base, type);
+      return -1;
     }
     if (!ac_z3_done && ac_z3_current_pic < ac_z3_pic_count) {
       uint32_t addr_ = autoconf_z3_remap_offset(addr - z2_cfg_base);
-      autoconf_z3_write_width(cfg, addr_, val, width);
-      return 1;
+      if (type == OP_TYPE_BYTE) {
+        autoconfig_write_memory_z3_8(cfg, addr_, val);
+        return 1;
+      }
+      if (type == OP_TYPE_WORD) {
+        autoconfig_write_memory_z3_16(cfg, addr_, val);
+        return 1;
+      }
+      autoconf_bad_width_once("write", "Z3-via-Z2", addr, z2_cfg_base, type);
+      return -1;
     }
   }
 
   if (!ac_z3_done && addr >= z3_cfg_base && addr < z3_cfg_base + cfg_win_size) {
-    if (width == OP_TYPE_BYTE || width == OP_TYPE_WORD || width == OP_TYPE_LONGWORD) {
-      if (ac_z3_pic_count == 0) {
-        ac_z3_done = 1;
-        return -1;
-      }
-      autoconf_z3_write_width(cfg, addr - z3_cfg_base, val, width);
+    if (ac_z3_pic_count == 0) {
+      ac_z3_done = 1;
+      return -1;
+    }
+    if (type == OP_TYPE_BYTE) {
+      autoconfig_write_memory_z3_8(cfg, addr - z3_cfg_base, val);
       return 1;
     }
-    autoconf_warn_once("write", "Z3", addr, z3_cfg_base, type, width);
+    if (type == OP_TYPE_WORD) {
+      autoconfig_write_memory_z3_16(cfg, addr - z3_cfg_base, val);
+      return 1;
+    }
+    autoconf_bad_width_once("write", "Z3", addr, z3_cfg_base, type);
   }
 
   if (pistorm_dev_enabled && addr >= pistorm_dev_base &&
