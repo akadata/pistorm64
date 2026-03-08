@@ -168,6 +168,7 @@ AMIGA_HEADERS ?= $(CURDIR)/src/platforms/amiga/headers/include
 AMIGA_SUBMAKE = $(MAKE) AMIGA_TOOLCHAIN=$(AMIGA_TOOLCHAIN) VBCC=$(AMIGA_VBCC) P96DEV=$(AMIGA_P96DEV) AHI_INC=$(AMIGA_AHI_INC) AMIGA_HEADERS=$(AMIGA_HEADERS)
 
 PS_PROTOCOL_SRC := src/gpio/ps_protocol_kmod.c
+PS_BACKEND_SRCS := src/pistorm/backend.c src/pistorm/backend_kmod.c src/pistorm/backend_userspace_mmio.c
 
 
 MAINFILES =
@@ -185,6 +186,7 @@ MAINFILES += src/config_file/rominfo.c
 
 MAINFILES += src/input/input.c
 MAINFILES += $(PS_PROTOCOL_SRC)
+MAINFILES += $(PS_BACKEND_SRCS)
 
 MAINFILES += src/platforms/platforms.c
 MAINFILES += src/z3bus_iface.c
@@ -510,15 +512,15 @@ src/musashi/softfloat/softfloat_fpsp.o: src/musashi/softfloat/softfloat_fpsp.c
 src/emulator.o: src/emulator.c src/musashi/m68kops.h
 	$(CC) -MMD -MP $(CFLAGS) -c -o $@ $<
 
-buptest: src/buptest/buptest.c $(PS_PROTOCOL_SRC) src/log.c
+buptest: src/buptest/buptest.c $(PS_PROTOCOL_SRC) $(PS_BACKEND_SRCS) src/log.c
 	@if [ -f src/buptest/buptest.c ]; then \
-		$(CC) $(CFLAGS) -o $@ src/buptest/buptest.c $(PS_PROTOCOL_SRC) src/log.c; \
+		$(CC) $(CFLAGS) -o $@ src/buptest/buptest.c $(PS_PROTOCOL_SRC) $(PS_BACKEND_SRCS) src/log.c; \
 	else \
 		echo "buptest skipped (src/buptest/buptest.c missing)"; \
 	fi
 
-pistorm_truth_test: tools/pistorm_truth_test.c include/uapi/linux/pistorm.h
-	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
+pistorm_truth_test: tools/pistorm_truth_test.c $(PS_PROTOCOL_SRC) $(PS_BACKEND_SRCS) src/log.c
+	$(CC) $(CFLAGS) -o $@ tools/pistorm_truth_test.c $(PS_PROTOCOL_SRC) $(PS_BACKEND_SRCS) src/log.c
 
 : tools/.c include/uapi/linux/pistorm.h
 	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<

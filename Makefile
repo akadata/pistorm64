@@ -184,6 +184,7 @@ PISTORM_GPCLK_DIV ?= 6
 PISTORM_KMOD_PARAMS ?= run_batch_enable=1 berr_reset_input=1 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV)
 
 PS_PROTOCOL_SRC := src/gpio/ps_protocol_kmod.c
+PS_BACKEND_SRCS := src/pistorm/backend.c src/pistorm/backend_kmod.c src/pistorm/backend_userspace_mmio.c
 
 
 MAINFILES =
@@ -201,6 +202,7 @@ MAINFILES += src/config_file/rominfo.c
 
 MAINFILES += src/input/input.c
 MAINFILES += $(PS_PROTOCOL_SRC)
+MAINFILES += $(PS_BACKEND_SRCS)
 
 MAINFILES += src/platforms/platforms.c
 MAINFILES += src/z3bus_iface.c
@@ -606,15 +608,15 @@ src/musashi/softfloat/softfloat_fpsp.o: src/musashi/softfloat/softfloat_fpsp.c
 src/emulator.o: src/emulator.c src/musashi/m68kops.h
 	$(CC) -MMD -MP $(CFLAGS) -c -o $@ $<
 
-buptest: src/buptest/buptest.c $(PS_PROTOCOL_SRC) src/log.c
+buptest: src/buptest/buptest.c $(PS_PROTOCOL_SRC) $(PS_BACKEND_SRCS) src/log.c
 	@if [ -f src/buptest/buptest.c ]; then \
-		$(CC) $(CFLAGS) -o $@ src/buptest/buptest.c $(PS_PROTOCOL_SRC) src/log.c; \
+		$(CC) $(CFLAGS) -o $@ src/buptest/buptest.c $(PS_PROTOCOL_SRC) $(PS_BACKEND_SRCS) src/log.c; \
 	else \
 		echo "buptest skipped (src/buptest/buptest.c missing)"; \
 	fi
 
-pistorm_truth_test: tools/pistorm_truth_test.c include/uapi/linux/pistorm.h
-	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
+pistorm_truth_test: tools/pistorm_truth_test.c $(PS_PROTOCOL_SRC) $(PS_BACKEND_SRCS) src/log.c
+	$(CC) $(CFLAGS) -o $@ tools/pistorm_truth_test.c $(PS_PROTOCOL_SRC) $(PS_BACKEND_SRCS) src/log.c
 
 piscsi-remote: tools/piscsi_remote/piscsi_remote_server.c
 	$(CC) -MMD -MP $(CFLAGS) -o $@ $< -lssl -lcrypto
@@ -887,7 +889,7 @@ endif
 	# sudo systemctl enable pistorm64.service
 	echo "Loading Kernel PiStorm64"
 #	sudo modprobe pistorm run_batch_enable=1 berr_reset_input=1 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV) 2>/dev/null || true
-	sudo modprobe pistorm $(PISTORM_KMOD_PARAMS) 2>/dev/null || true
+	#sudo modprobe pistorm $(PISTORM_KMOD_PARAMS) 2>/dev/null || true
 
 help:
 	@printf "Available targets:\n"

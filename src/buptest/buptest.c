@@ -13,6 +13,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -31,6 +32,7 @@ static void print_usage(const char *progname) {
   printf("Options:\n");
   printf("  -h, --help        Show this help and exit\n");
   printf("  -a, --about       Show information about this tool and exit\n");
+  printf("  -c, --config CFG  Config file used for pistorm backend + userspace MMIO tuning (default: default.cfg)\n");
   printf("\n");
   printf("SIZE_KB is the amount of memory to test in kilobytes (default: 512).\n");
   printf("Warning: this tool writes test patterns into the selected address range. Only use it on\n");
@@ -66,6 +68,59 @@ static uint32_t load_u32(const uint8_t* data) {
 
 static unsigned int addr_from_size(size_t addr) {
   return (unsigned int)addr;
+}
+
+static void preparse_pistorm_backend_local(const char* filename) {
+  FILE* in = NULL;
+  char line[256];
+
+  if (!filename || !filename[0]) {
+    return;
+  }
+
+  in = fopen(filename, "rb");
+  if (!in) {
+    return;
+  }
+
+  while (fgets(line, sizeof(line), in)) {
+    char key[64];
+    char value[64];
+
+    if (line[0] == '#' || line[0] == '/') {
+      continue;
+    }
+
+    if (sscanf(line, " %63s %63s", key, value) != 2) {
+      continue;
+    }
+
+    if (strcasecmp(key, "pistorm") == 0) {
+      (void)ps_select_backend(value);
+      continue;
+    }
+
+    if (strcasecmp(key, "pistorm-gpclk-src") == 0) {
+      (void)ps_set_userspace_gpclk_src((uint32_t)strtoul(value, NULL, 0));
+      continue;
+    }
+
+    if (strcasecmp(key, "pistorm-gpclk-div") == 0) {
+      (void)ps_set_userspace_gpclk_div((uint32_t)strtoul(value, NULL, 0));
+      continue;
+    }
+
+    if (strcasecmp(key, "pistorm-mmio-wr-stretch") == 0) {
+      (void)ps_set_userspace_wr_stretch((uint32_t)strtoul(value, NULL, 0));
+      continue;
+    }
+
+    if (strcasecmp(key, "pistorm-mmio-rd-stretch") == 0) {
+      (void)ps_set_userspace_rd_stretch((uint32_t)strtoul(value, NULL, 0));
+    }
+  }
+
+  fclose(in);
 }
 
 void m68k_set_irq(unsigned int level);
@@ -185,6 +240,7 @@ static int check_emulator(void) {
 int main(int argc, char* argv[]) {
   const char* progname =
       (argc > 0 && argv[0] != NULL && argv[0][0] != '\0') ? argv[0] : "buptest";
+  const char* cfg_for_backend = "default.cfg";
   size_t test_size = 512u * SIZE_KILO;
   uint32_t cur_loop = 0u;
   const char* size_arg = NULL;
@@ -205,6 +261,14 @@ int main(int argc, char* argv[]) {
       if(strcmp(arg, "-a") == 0 || strcmp(arg, "--about") == 0) {
         print_about(progname);
         return 0;
+      }
+      if(strcmp(arg, "-c") == 0 || strcmp(arg, "--config") == 0) {
+        if(i + 1 >= argc) {
+          fprintf(stderr, "%s: %s requires a path argument\n", progname, arg);
+          return 1;
+        }
+        cfg_for_backend = argv[++i];
+        continue;
       }
       fprintf(stderr, "%s: unknown option '%s'\n", progname, arg);
       print_usage(progname);
@@ -228,6 +292,15 @@ int main(int argc, char* argv[]) {
 
   signal(SIGINT, sigint_handler);
 
+  preparse_pistorm_backend_local(cfg_for_backend);
+  printf("[BUPTEST] Selected backend (pre-init): %s\n", ps_get_backend());
+  if ((strcasecmp(ps_get_backend(), "kmod") == 0 || strcasecmp(ps_get_backend(), "kernel") == 0) &&
+      access("/dev/pistorm", R_OK | W_OK) != 0) {
+    fprintf(stderr,
+            "[BUPTEST] kernel backend selected but /dev/pistorm is unavailable.\n"
+            "          Load pistorm.ko or switch config to 'pistorm userspace'.\n");
+    return 1;
+  }
   ps_setup_protocol();
   reset_amiga("startup");
 

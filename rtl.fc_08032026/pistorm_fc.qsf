@@ -130,10 +130,3 @@ set_global_assignment -name SDC_FILE pistorm_fc.sdc
 set_global_assignment -name VERILOG_FILE pistorm_fc.v
 set_global_assignment -name TIMING_ANALYZER_MULTICORNER_ANALYSIS ON
 set_global_assignment -name NUM_PARALLEL_PROCESSORS ALL
-
-# Performance-oriented timing closure overrides.
-# LC usage is not the limiter; prioritize PI_CLK setup margin.
-set_global_assignment -name FITTER_EFFORT "Standard Fit"
-set_global_assignment -name OPTIMIZATION_MODE "Aggressive Performance"
-set_global_assignment -name ROUTER_TIMING_OPTIMIZATION_LEVEL Maximum
-set_global_assignment -name PLACEMENT_EFFORT_MULTIPLIER 2.0
