@@ -6,269 +6,198 @@ This repository implements a Zorro-visible ARM64 execution path for PiStorm-base
 
 The goal is to let the Amiga launch ARM64 payloads that execute natively on the Pi side through a stable mailbox/shared-memory contract, while keeping Amiga-side integration clean, minimal, and generic.
 
-This is **not** a fake CPU replacement, not an emulator inside an emulator, and not a grab bag of app-specific hacks hidden in launcher code.
+This is **not** a fake CPU replacement, not an emulator inside an emulator, and not a place for application-specific behavior in launcher code.
+
+## Canonical Model (Do Not Drift)
+
+This repository follows one execution model:
+
+* the application artifact is an AArch64 ELF payload
+* launch is initiated from Amiga side (Workbench/CLI)
+* instruction execution happens on the ARM coprocessor side
+* AmigaOS remains the service owner (Exec/DOS/Intuition/devices/libraries/Workbench)
+* all AmigaOS access from payloads is proxied via ARMAccel Service ABI and fulfilled by m68k NDK-backed runtime code
+
+Do not reframe this as a remote-app runtime.
+Do not reframe this as a m68k app with optional ARM helpers unless a project explicitly chooses that hybrid model.
 
 ## Core Architecture
 
-There are three distinct layers:
+There are four distinct layers:
 
-### 1. Zorro ARM64 accelerator device
+### 1. Zorro ARM64 accelerator hardware
 
-The Zorro device exposes:
+The board exposes:
 
-* AutoConfig presence
+* AutoConfig identity
 * MMIO registers
-* shared memory window
 * mailbox/job control
+* shared memory window
 * completion/status reporting
-* optional interrupt signalling
+* optional interrupt signaling
 
-This layer is hardware-facing and protocol-facing.
+This layer is hardware-facing and protocol-facing only.
 
-It must remain generic.
+### 2. `armaccel.device` (transport)
 
-### 2. Launcher / runtime bridge
+Responsibilities:
 
-This begins with `armshake` and later should be complemented or superseded by an Amiga `.library`.
+* board discovery/probe
+* register access
+* mailbox read/write
+* shared-memory staging/chunk upload
+* job start/wait/reset/recovery
+* IRQ and polling completion plumbing
 
-Its job is to:
+`armaccel.device` must not perform app policy decisions.
 
-* detect the ARM64 device
-* validate and load a payload
-* upload payload and job data
-* start execution
-* poll or wait for completion
-* provide diagnostics
+### 3. `armaccel.library` (runtime/policy)
 
-This layer is **not** the application.
+Responsibilities:
 
-### 3. ARM64 payload
+* ELF inspection
+* personality and ABI checks
+* service requirement checks
+* execution orchestration through `armaccel.device`
+* result/status mapping to app-facing API
 
-The payload is the application.
+`armaccel.library` is the single app-facing execution interface.
 
-Examples:
+### 4. ARM64 payload ELF
 
-* fractal renderer
-* file manager
-* editor
-* game
-* media tool
-* OpenGL-style renderer using exported services
+The payload is the application and owns:
 
-The payload owns its own logic, UI semantics, state, and behavior.
+* app behavior and state
+* rendering/compute logic
+* app-specific command handling
+* app-specific UI semantics
 
-## Non-Negotiable Design Rules
+A payload must be replaceable without changing launcher/runtime policy code.
+Payloads do not call Amiga NDK APIs directly; they request services through the ABI.
 
-### Rule 1: `armshake` must remain generic
+## Non-Negotiable Rules
 
-`armshake` is a launcher and diagnostic tool.
+### Rule 1: `armshake` is diagnostics-only
 
-It must never become the place where application logic is hidden.
+`armshake` is only for:
 
-`armshake` must never contain:
+* board identity/probe
+* ping/irq checks
+* mailbox/state/contract diagnostics
+* optional raw descriptor smoke tests for development
 
-* app-specific menu IDs
-* fractal type enums
-* Julia/Mandelbrot selectors
-* app-specific default values
-* editor commands
-* file manager logic
-* game logic
-* rendering semantics specific to one payload
-* feature toggles that belong to a payload
+`armshake` is never the user-facing payload launcher.
 
-If a new payload requires editing `armshake`, that is a design failure unless the change is purely generic ABI/service support.
+### Rule 2: No wrapper binary proliferation
 
-### Rule 2: Payload-specific behavior lives in the payload
+Do not create new app-facing launcher binaries per payload type/class.
 
-The ARM64 ELF owns:
+No `armfractal`-style pattern and no “generic launcher in disguise” replacements.
 
-* menus
-* view state
-* zoom logic
-* reset logic
-* per-app command handling
-* rendering algorithm
-* document model
-* application state machines
-* app-specific UI
+Execution must flow through `armaccel.library`.
 
-A payload must be replaceable without rewriting launcher behavior.
+A single optional generic launcher tool (for example `SYS:Tools/armrun`) is acceptable when it is a thin shim that only forwards to `armaccel.library` and does not add app semantics.
 
-### Rule 3: Diagnostics and execution must stay separate
+`armrun` may:
 
-Keep `armshake` as:
+* locate payload path(s)
+* call `armaccel.library` query/execute
+* report status/result
 
-* a board probe tool
-* a diagnostics tool
-* a manual launcher
-* a contract validation tool
+`armrun` may not:
 
-That keeps it useful even after a `.library` exists.
+* create app windows
+* implement menus/requesters
+* implement file-manager/editor/game/fractal logic
+* contain runtime policy
+* contain payload-specific behavior
 
-### Rule 4: The long-term user-facing path is a library, not `armshake`
+### Rule 3: Keep transport and policy separate
 
-The intended direction is:
+* `armaccel.device` = transport mechanics only
+* `armaccel.library` = detect/decide/execute policy only
 
-* `armshake` remains for diagnostics and development
-* an Amiga `.library` becomes the normal execution interface
+Do not mix these concerns.
 
-That `.library` should eventually:
+### Rule 4: Payload logic belongs in payloads
 
-* detect ARM payloads
-* load metadata
-* allocate job descriptors and shared buffers
-* launch payloads
-* expose helper APIs to Amiga programs
-* support Workbench/tool integration
+Do not move payload-specific menus, commands, defaults, toggles, or semantics into `armshake`, `armaccel.device`, or `armaccel.library`.
 
-### Rule 5: File association belongs in metadata and library logic
+### Rule 5: Personality checks must be explicit
 
-Future payload discovery should be metadata-driven.
+`armaccel.library` personality/compatibility decisions should be explicit and predictable, including checks such as:
 
-Preferred direction:
+* ELF class = 64-bit
+* machine = AArch64
+* endianness = little-endian
+* embedded ELF NOTE `.note.armaccel` (ABI/personality/services/class)
+* required services vs available services
 
-* `something.elf`
-* `something.elf.info` or `something.info`
-* optional payload metadata block or sidecar
+Compatibility outcomes should clearly distinguish:
 
-The launcher/library should identify that a file is an ARM64 payload without needing per-application switches like `--julia`, `--editor`, or `--game`.
+* not an ARMAccel ELF
+* valid and runnable
+* valid but needs unavailable services
+* valid but wrong ABI version
 
-### Rule 6: Stable ABI first, features second
+### Rule 6: File association is metadata-driven
 
-Only two contracts should grow carefully over time:
+Detection must come from metadata embedded in the ELF itself (NOTE section), not sidecar files and not app-specific CLI switches.
 
-#### A. Launch ABI
+### Rule 7: Stable ABI first, features second
 
-How the Amiga side submits a payload and starts execution.
+Evolve carefully:
 
-#### B. Service ABI
+* Launch ABI: submit/start/wait/result contract
+* Service ABI: generic AmigaOS service brokerage (window/menu/requester/surface/input/files/timers/audio/video/io/disk/network as standardized classes)
 
-How the ARM payload requests generic services such as:
+Everything else belongs outside runtime transport/policy layers.
 
-* framebuffer access
-* window creation/update
-* input events
-* timers
-* file services
-* clipboard
-* audio
-* GPU/OpenGL-like services later
+No demo-specific feature work should bypass or pre-empt ABI freeze work.
 
-Everything else belongs outside the launcher.
+### Rule 8: Never bind system limits to visible aperture size
 
-### Rule 7: Never bind the system to the visible Zorro window size
+The visible board window is not the final system limit.
 
-The visible board aperture is not the true upper bound of the system.
+Large payloads/assets/render surfaces must remain supported via chunking/staging/streaming designs.
 
-Large payloads, large assets, large framebuffers, and streamed content must be supported through:
+## Direction for Public API
 
-* chunking
-* mailbox-controlled transfers
-* paged/shared buffers
-* host-side staging
-* streaming protocols
-* external file-backed or memory-backed transport
+The library should remain the canonical execution path for Workbench, CLI tools, and applications.
 
-A 64K, 512K, or 4M board window must never define the final ceiling for:
+Current shape to preserve:
 
-* ELF size
-* asset size
-* framebuffer size
-* package size
-* future shared library size
+* `ARMACCEL_IsSupportedELF(path)`
+* `ARMACCEL_QueryELF(path, struct ArmAccelELFInfo *)`
+* `ARMACCEL_ExecuteELF(path, struct ArmAccelRunOpts *, struct ArmAccelResult *)`
 
-### Rule 8: Generic service growth is allowed
+## Build and Install Conventions
 
-Changes to launcher/library are valid when they add reusable infrastructure, for example:
+When adding build targets in this repo:
 
-* larger transfer support
-* better shared-buffer handling
-* event queue support
-* generic windowing service
-* generic blit/viewport service
-* generic filesystem RPC
-* generic GPU command submission
+* provide `make install`
+* support `INSTALL_DIR=...` override
+* default install path for Amiga-shared transfer: `/opt/pistorm64/data/a314-shared/`
+* runtime binaries follow Amiga naming conventions:
+  * libraries end with `.library`
+  * devices end with `.device`
 
-That is infrastructure.
-
-Adding Julia-specific controls to launcher code is not infrastructure.
-
-## What `armshake` is
-
-`armshake` is:
-
-* a diagnostic tool
-* a launcher
-* a contract exerciser
-* a validation tool
-* a development aid
-
-Typical allowed commands include things such as:
-
-* identify board
-* inspect capabilities
-* load ELF
-* start job
-* wait for completion
-* reset job
-* dump status
-* trace mailbox state
-
-## What `armshake` is never
-
-`armshake` is never:
-
-* an application framework for one demo
-* a place to stash hidden business logic
-* a menu controller for payloads
-* a fractal chooser
-* a file manager frontend
-* an editor UI
-* a game shell
-* a substitute for the future `.library`
-
-## Direction for `.library`
-
-The desired Amiga-side `.library` should:
-
-* auto-detect ARM64 payload files
-* read metadata
-* provide a clean API to launch payloads
-* hide transport/setup details from userland
-* allow Workbench and CLI integration
-* keep payload execution generic
-
-Possible future shape:
-
-* `arm64exec.library`
-* `arm64run.library`
-* `pistormarm.library`
-
-The name matters less than the boundary.
-
-The boundary must remain clean.
-
-## Review Gate for Future Changes
+## Review Gate
 
 Before merging any change, ask:
 
 1. Does this add generic execution/service infrastructure?
-2. Or does this sneak application behavior into launcher code?
+2. Or does it sneak application behavior into diagnostics/runtime layers?
 
-If the answer is the second one, do not merge it in that form.
+If it does the second, reject or redesign.
 
 ## Practical Test
 
 A correct design means:
 
 * a new ARM64 `.elf` can be dropped in
-* the same generic launcher/library can run it
-* no new app-specific switch is needed
-* no new app-specific enum is added to launcher code
-* no launcher rewrite is needed for each application
+* `armaccel.library` can decide compatibility and run it via `armaccel.device`
+* no app-specific switch or enum is added to diagnostics/runtime code
+* no per-app launcher rewrite is needed
 
-When that is true, the system is real.
-
-When that is not true, the architecture is drifting.
-
+When this remains true, the architecture is on track.

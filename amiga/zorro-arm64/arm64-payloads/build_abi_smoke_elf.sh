@@ -5,8 +5,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 
 CC_BIN="${CC:-gcc}"
-OUT_ELF="${SCRIPT_DIR}/julia-fractal.elf"
-SRC="${SCRIPT_DIR}/julia_arm64.c"
+OUT_ELF="${SCRIPT_DIR}/abi-smoke.elf"
+SRC="${SCRIPT_DIR}/abi_smoke_arm64.c"
 INCLUDE_DIR="${REPO_ROOT}/src/platforms/amiga/zorro/arm64_accel"
 
 echo "[build] CC=${CC_BIN}"
@@ -26,4 +26,4 @@ echo "[build] OUT=${OUT_ELF}"
 echo "[build] done"
 file "${OUT_ELF}"
 readelf -h "${OUT_ELF}" | sed -n '1,24p'
-readelf -n "${OUT_ELF}" | sed -n '1,120p'
+readelf -n "${OUT_ELF}" | sed -n '1,160p'

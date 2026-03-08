@@ -1,283 +1,351 @@
-# ARMAccel
+# ARMAccel and Accelerator Framework
 
-## What This Is
+## Overview
 
-`armaccel` is a Zorro-visible ARM64 offload path for PiStorm.
+ARMAccel is the first implementation of a general accelerator framework for PiStorm-based Amiga systems. The goal is to allow Amiga software to dispatch compute workloads to other processor architectures while keeping the Amiga as the controlling host.
 
-It lets Amiga software launch ARM64 ELF payloads that execute natively on the Pi side through a mailbox + shared-memory contract.
+The system exposes accelerator hardware through a Zorro device that provides a mailbox and shared-memory interface. Applications are delivered as AArch64 payloads that execute on the accelerator. AmigaOS remains the host system and provides operating-system services through the runtime Service ABI.
 
-It is **not** a fake replacement Amiga CPU. It is a generic coprocessor execution path.
+The service interface is defined in:
 
-## Architecture
+* `docs/armaccel_service_abi_v1.md`
 
-The stack is split into three layers:
+ARMAccel is the first accelerator personality. The architecture is intentionally designed so other personalities can be added later.
 
-1. Zorro ARM64 device (`z2-arm64-accel`)
-- AutoConfig identity
-- MMIO register window
-- mailbox page
-- shared window/job descriptor
-- optional IRQ completion
+Examples of future accelerators include:
 
-2. Launcher/runtime bridge (today: `armshake`, later: `.device`/`.library`)
-- probe board
-- stage payload/job data
-- start execution
-- wait/report status
+* x86_64accel (local or remote x86_64 execution)
+* cuda_accel (NVIDIA CUDA GPU compute)
+* opencl_accel (OpenCL devices)
+* vector_accel (SIMD engines)
 
-3. ARM64 payload ELF (your app logic)
-- compute/render/business logic
-- app state
-- payload-specific behavior
+All accelerators follow the same job submission contract so Amiga applications do not need to change when new accelerator types appear.
 
-Design rule: payload behavior stays in the payload, not in `armshake`.
+## Core Design Principles
 
-## Current Status
+1. The Amiga remains the host system.
+2. Accelerators execute compute workloads only.
+3. Application semantics live in the payload, not the launcher.
+4. Transport mechanisms are separate from runtime policy.
+5. New accelerator types must reuse the same ABI model.
 
-Implemented now:
+This structure prevents fragmentation and avoids creating separate launchers or custom interfaces for each accelerator.
 
-- Zorro board registration (`setvar arm64-accel` or `setvar zorro-arm64`)
-- ABI v1 register map, mailbox, and `AJOB` descriptor
-- `armshake` generic diagnostics and `--elf` execution path
-- ELF64/AArch64 loader/runner on Pi side
+## System Architecture
 
-Planned next:
+The system is divided into layered components.
 
-- `armaccel.device` transport API
-- `armaccel.library` runtime/policy API
-- `armrun` thin generic launcher client
+### Layer 1: Hardware Accelerator
 
-## Quick Start
+Example: z2-arm64-accel
 
-Enable in config:
+Responsibilities:
 
-```ini
+* Zorro AutoConfig device
+* register window
+* mailbox interface
+* shared memory aperture
+* job descriptor management
+* optional interrupt signaling
+
+This layer is purely hardware transport. It does not understand application semantics.
+
+### Layer 2: Accelerator Device Driver
+
+Example: armaccel.device
+
+Responsibilities:
+
+* board discovery
+* register access
+* mailbox communication
+* shared memory staging
+* interrupt handling
+* error recovery
+
+This driver is responsible only for communicating with the hardware accelerator.
+
+### Layer 3: Accelerator Runtime Library
+
+Example: armaccel.library
+
+Responsibilities:
+
+* executable inspection
+* accelerator personality validation
+* ABI compatibility checks
+* job submission orchestration
+* result retrieval
+* capability queries
+
+Applications interact with the library rather than the device driver.
+
+The library decides whether a given executable matches the accelerator personality.
+
+### Layer 4: Payload Executables
+
+Payloads are native binaries for the accelerator architecture.
+
+For ARMAccel they are AArch64 ELF64 executables.
+
+These payload files are not AmigaDOS-executable commands. They must be inspected and launched through `armaccel.library` (for CLI/Workbench integration this is routed via the thin `armrun` stub).
+
+Workbench/DOS association model:
+
+* `foo.elf` with companion `foo.elf.info` (`WBPROJECT`)
+* `foo.elf.info` Default Tool -> `SYS:Tools/armrun`
+* Workbench launches `armrun` with WBStartup args
+* `armrun` hands off to `armaccel.library` and reports status
+
+`armrun` is launcher glue only. It must not contain app behavior, window policy, menu logic, requesters, or file-manager semantics.
+`armrun` performs only ELF dispatch through `armaccel.library`; it must not implement UI, rendering logic, application policy, or service behavior.
+
+Service-driven UI/OS behavior is defined by the ARMAccel Service ABI:
+
+* `docs/armaccel_service_abi_v1.md`
+
+Payload responsibilities include:
+
+* computation
+* rendering
+* numerical workloads
+* compression
+* AI inference
+* cryptographic operations
+
+Payloads are the application artifact and execute on the coprocessor.
+AmigaOS services (Intuition/DOS/Exec/devices/libraries) remain Amiga-side and are accessed through the runtime Service ABI.
+
+## Current Implementation
+
+Currently implemented components:
+
+* Zorro ARM64 accelerator board
+* ARM64 ELF loader on Pi side
+* mailbox protocol
+* shared-memory job descriptor
+* cooperative Service ABI dispatch hook during `RUN_ELF`
+* baseline service families in `armaccel.library` (session/window/surface/input/requester/file/timer/event-ring)
+* armshake diagnostic tool
+
+The armshake tool currently provides:
+
+* board identity verification
+* mailbox ping testing
+* interrupt signaling tests
+* raw transport/contract smoke tests
+
+armshake exists for diagnostics and development purposes only.
+
+## Enabling the Accelerator
+
+The accelerator can be enabled in PiStorm configuration:
+
+```
 setvar arm64-accel
 ```
 
-Build Amiga launcher tool:
+This registers the ARM accelerator on the Zorro bus.
 
-```bash
-make -C amiga/zorro-arm64
+## Diagnostic Tool
+
+The development utility is armshake.
+
+Example commands:
+
 ```
-
-Install to shared folder used by Amiga side:
-
-```bash
-make -C amiga/zorro-arm64 install
-```
-
-On Amiga shell:
-
-```sh
 armshake --id
 armshake --ping
-armshake --elf <path/to/payload.elf>
+armshake --irq
 ```
 
-## Building Amiga-Side Programs (M68K + NDK)
+These commands verify communication with accelerator hardware and transport behavior.
 
-Amiga-side binaries (launcher/UI/frontends) are normal m68k Amiga programs and should link against Amiga NDK APIs.
+## Amiga-Side Runtime Role
 
-Current toolchain in this repo uses `/opt/amiga/bin/m68k-amigaos-gcc`.
+Amiga-side code in this stack is runtime/broker code, not app-specific frontend code.
 
-Example (same model as `armshake`):
+Responsibilities:
 
-```bash
-/opt/amiga/bin/m68k-amigaos-gcc \
-  -m68030 -O2 -Wall -Wextra -noixemul \
-  -I../../src/platforms/amiga/zorro/arm64_accel \
-  -o myfrontend myfrontend.c
-```
-
-Typical NDK headers for a frontend:
-
-- `exec/types.h`
-- `proto/exec.h`
-- `proto/intuition.h`
-- `proto/graphics.h`
-- `proto/dos.h`
-- `proto/expansion.h`
-
-Important: if you want Workbench/Intuition windows, menus, requesters, etc., that UI lives in the **m68k frontend** (NDK code). The ARM64 payload does not call Amiga Exec/Intuition directly.
+* launch orchestration (`armrun` -> `armaccel.library`)
+* personality/ABI/capability checks
+* service proxy fulfillment via NDK-backed m68k calls
+* transport through `armaccel.device`
 
 ## Building ARM64 Payload ELFs
 
-ARM payloads are freestanding AArch64 ELFs executed by the Pi-side ARM loader.
+Payloads must be compiled as freestanding AArch64 ELF executables.
 
-Current loader requirements:
+Requirements:
 
-- ELF64
-- little-endian
-- `EM_AARCH64`
-- valid PT_LOAD segments
-- entry point inside loadable range
+* ELF64 format
+* little-endian
+* EM_AARCH64 architecture
+* valid loadable segments
 
-Recommended entry symbol/signature:
+Recommended entry function:
 
-```c
+```
 uint64_t arm_job_entry(void *job_ptr);
 ```
 
-Minimal clang build pattern:
+Example build command:
 
-```bash
+```
 clang --target=aarch64-linux-gnu \
-  -std=c11 -O2 -ffreestanding \
-  -fno-pic -fno-plt -fno-asynchronous-unwind-tables -fno-unwind-tables \
-  -nostdlib -nodefaultlibs -nostartfiles -no-pie \
-  -Wl,-e,arm_job_entry -Wl,--build-id=none -Wl,-Ttext=0x400000 \
-  -Wl,-z,max-page-size=0x1000 -Wl,-z,common-page-size=0x1000 -Wl,-s \
-  -I./src/platforms/amiga/zorro/arm64_accel \
-  -o mypayload.elf mypayload.c
+-std=c11 -O2 -ffreestanding \
+-nostdlib -nodefaultlibs -nostartfiles -no-pie \
+-Wl,-e,arm_job_entry \
+-Wl,-Ttext=0x400000 \
+-o payload.elf payload.c
 ```
 
-If building on an ARM64 Linux host, `--target=aarch64-linux-gnu` is often optional.
-
-Repo example:
-
-```bash
-make -C amiga/zorro-arm64 elf-julia
-```
-
-## ABI v1 Interface (Current)
+## Accelerator ABI Version 1
 
 ### Board Identity
 
-- Manufacturer: `0x07DB`
-- Product: `0x0041`
-- Board magic: `0x41524D41` (`"ARMA"`)
-- ABI version: `1`
+Manufacturer: 0x07DB
 
-### Z2 Window Layout
+Product: 0x0041
 
-- `0x0000-0x0FFF`: register window
-- `0x1000-0x1FFF`: mailbox page
-- `0x2000-...`: shared window
-- Total board window (`ARM64_ACCEL_Z2_SIZE`): 4 MiB
+Magic: ARMA
 
-### Core Registers (big-endian 32-bit)
+ABI Version: 1
 
-- `0x0000` `MAGIC`
-- `0x0004` `ABI_VERSION`
-- `0x0008` `CONTROL`
-- `0x000C` `STATUS`
-- `0x0010` `IRQ_STATUS`
-- `0x0014` `IRQ_ACK`
-- `0x0018` `MAILBOX_OFFSET`
-- `0x001C` `MAILBOX_SIZE`
-- `0x0020` `SHARED_OFFSET`
-- `0x0024` `SHARED_SIZE`
-- `0x0028` `JOBDESC_OFFSET`
-- `0x002C` `JOBDESC_SIZE`
-- `0x0030` `HEARTBEAT`
+### Zorro Window Layout
 
-Control bits:
+0x0000-0x0FFF : register window
 
-- `START=0x1`
-- `STOP=0x2`
-- `RESET=0x4`
-- `IRQ_ENABLE=0x8`
+0x1000-0x1FFF : mailbox
 
-Status bits:
+0x2000-...    : shared memory
 
-- `READY=0x1`
-- `BUSY=0x2`
-- `FAULT=0x4`
+Total size: 4 MiB
 
-IRQ bits:
+### Core Registers
 
-- `JOB_DONE=0x1`
-- `HOST_EVENT=0x2`
+All registers are big-endian 32-bit values.
 
-### Shared Info Block
+MAGIC
 
-At `0x2000` (size `0x20`), includes:
+ABI_VERSION
 
-- signature (`ARMA`)
-- ABI version
-- mailbox offset/size
-- jobdesc offset/size
-- feature bits: mailbox/irq/shared-ram
+CONTROL
 
-### Mailbox (offset `0x1000`)
+STATUS
 
-Fields:
+IRQ_STATUS
 
-- `MAGIC` (`AMB1`)
-- `VERSION`
-- `SEQ`, `ACK_SEQ`
-- `CMD`, `STATUS`
-- `ARG0..ARG3`
-- `RESULT0`, `RESULT1`
+IRQ_ACK
 
-Commands:
+MAILBOX_OFFSET
 
-- `0`: `NONE`
-- `1`: `PING`
-- `2`: `RUN_ELF`
+MAILBOX_SIZE
 
-Statuses:
+SHARED_OFFSET
 
-- `0`: `IDLE`
-- `1`: `BUSY`
-- `2`: `DONE`
-- `3`: `ERR`
+SHARED_SIZE
 
-### Job Descriptor (`AJOB`)
+JOBDESC_OFFSET
 
-At `0x2040` (size `0x100`), big-endian 32-bit fields:
+JOBDESC_SIZE
 
-- `MAGIC` (`AJOB`)
-- `VERSION`
-- `STATE`
-- `FLAGS`
-- `ELF_OFFSET`
-- `ELF_SIZE`
-- `ENTRY_ARG`
-- `RETVAL_LO` / `RETVAL_HI`
-- `RESULT`
+HEARTBEAT
 
-State values:
+### Mailbox Commands
 
-- `0` `IDLE`
-- `1` `QUEUED`
-- `2` `RUNNING`
-- `3` `DONE`
-- `4` `ERROR`
+NONE
 
-Result values:
+PING
 
-- `0` `OK`
-- `1` `ERR_FORMAT`
-- `2` `ERR_RANGE`
-- `3` `ERR_LOAD`
-- `4` `ERR_EXEC`
-- `5` `ERR_INTERNAL`
+RUN_ELF
 
-## Generic Run Flow
+### Mailbox Status
 
-1. Frontend probes board.
-2. Frontend writes payload bytes to shared window.
-3. Frontend fills `AJOB` (`ELF_OFFSET`, `ELF_SIZE`, `ENTRY_ARG`, state).
-4. Frontend sends mailbox `RUN_ELF` (seq/ack handshake).
-5. Worker executes payload entry on Pi ARM64.
-6. Worker updates `AJOB` state/result/retval and mailbox result.
-7. Frontend polls or waits IRQ, then reads completion.
+IDLE
 
-## Size/Transport Notes
+BUSY
 
-Current `armshake --elf` path uploads payload into board shared window, so payload size is currently bounded by available window space.
+DONE
 
-ABI direction is chunked/staged transfer so payload/assets are not permanently limited by visible aperture size.
+ERROR
 
-## For App Authors
+## Job Descriptor
 
-To start building apps now:
+The job descriptor describes the payload execution request.
 
-1. Keep app logic inside ARM64 payload (`arm_job_entry`).
-2. Use an m68k frontend (NDK) for Amiga UI and user interaction.
-3. Exchange data through shared/job memory structures.
-4. Keep launcher logic generic so the same runtime can execute many payload types.
+Fields include:
 
-See also: `docs/armaccel_abi_v1.md` for the v1 contract direction.
+MAGIC
+
+VERSION
+
+STATE
+
+FLAGS
+
+ELF_OFFSET
+
+ELF_SIZE
+
+ENTRY_ARG
+
+RETVAL
+
+RESULT
+
+States:
+
+IDLE
+
+QUEUED
+
+RUNNING
+
+DONE
+
+ERROR
+
+## Execution Flow
+
+Typical runtime flow:
+
+1. `armrun` launches a payload through `armaccel.library`.
+2. Runtime stages payload bytes into shared memory.
+3. Runtime prepares the job descriptor.
+4. Runtime issues mailbox `RUN_ELF`.
+5. Accelerator executes `arm_job_entry`.
+6. Payload performs computation and uses the Service ABI for AmigaOS services.
+7. Runtime reads completion state and results.
+
+## Payload Size Considerations
+
+The current implementation stages payloads through the shared window, which limits payload size to the visible aperture size.
+
+Future versions will support staged or streamed payload loading so applications and data sets are not constrained by the Zorro aperture.
+
+## Future Accelerator Personalities
+
+The architecture is designed to support additional compute accelerators.
+
+Examples:
+
+x86_64accel (remote or local Intel/AMD x86_64 systems via a personality client)
+
+cuda_accel (NVIDIA CUDA GPU systems accessed through a remote or local CUDA personality client)
+
+opencl_accel (OpenCL compute devices exposed through a compatible personality client)
+
+These accelerator personalities may run on many operating systems including macOS, Linux, BSD, and Windows. A personality client running on the remote machine exposes the compute capability to the Amiga host using the common accelerator protocol.
+
+Future personalities may include Apple Silicon systems such as M2, M3, or M4 machines acting as remote compute nodes (for example a Mac Pro acting as a high‑performance accelerator).
+
+Each accelerator personality implements the same transport protocol and Service ABI so applications remain architecture-agnostic.
+
+## Long Term Goal
+
+The long-term vision is for the Amiga to act as a dispatcher for heterogeneous compute engines.
+
+The Amiga remains the operating-system host and user interface environment. Accelerator personalities provide additional compute resources while preserving the native Amiga programming model.
+
+This allows modern compute capability to be integrated into classic Amiga systems without compromising system architecture.

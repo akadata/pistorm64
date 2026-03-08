@@ -178,6 +178,7 @@ AMIGA_P96DEV ?= $(CURDIR)/amiga.dev/Picasso96Develop
 AMIGA_AHI_INC ?= $(AMIGA_TOOLCHAIN)/src/m68k-amigaos-gcc/build-Linux-m68k-amigaos/vbcc_target_m68k-amigaos/targets/m68k-amigaos/include
 AMIGA_HEADERS ?= $(CURDIR)/src/platforms/amiga/headers/include
 AMIGA_SUBMAKE = $(MAKE) AMIGA_TOOLCHAIN=$(AMIGA_TOOLCHAIN) VBCC=$(AMIGA_VBCC) P96DEV=$(AMIGA_P96DEV) AHI_INC=$(AMIGA_AHI_INC) AMIGA_HEADERS=$(AMIGA_HEADERS)
+HDF_SHARED_DIR ?= /opt/pistorm64/data/a314-shared
 
 PISTORM_GPCLK_SRC ?= 5
 PISTORM_GPCLK_DIV ?= 6
@@ -507,6 +508,7 @@ HELP_TARGETS = \
 	"make amiga-pissl"                "Build Amiga PISSL TLS tools" \
 	"make amiga-all"                  "Build all Amiga-side drivers" \
 	"make amiga-clean"                "Clean Amiga-side driver build artifacts" \
+	"make pistorm.hdf"                "Build/update src/platforms/amiga/pistorm.hdf with Tools/Arm/Libs/Devs ARMAccel content" \
 	"make piscsi-remote"              "Build PiSCSI remote export daemon (Linux/Unix)" \
 	"make piscsi-remote-server"       "Build PiSCSI remote export daemon alias (Linux/Unix)" \
 	"make piscsi-remote-client"       "Build PiSCSI remote probe client" \
@@ -853,6 +855,10 @@ amiga-clean:
 	$(AMIGA_SUBMAKE) -C amiga/pissa clean
 	$(AMIGA_SUBMAKE) -C amiga/pissl clean
 
+pistorm.hdf:
+	$(MAKE) -C amiga/zorro-arm64 install install-julia-elf install-abi-smoke-elf INSTALL_DIR=$(HDF_SHARED_DIR)
+	cd src/platforms/amiga && SHARED_DIR="$(HDF_SHARED_DIR)" bash ./build_hdf.sh
+
 full:
 	@if [ "$$(id -u)" -eq 0 ]; then \
 		echo "ERROR: run 'make full' as a normal user (it calls sudo internally)."; \
@@ -896,4 +902,4 @@ help:
 
 -include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d tools/piscsi_remote/piscsi_remote_server.d tools/piscsi_remote/piscsi_remote_client.d $(UAE_OBJS:%.o=%.d)
 
-.PHONY: all clean buptest pistorm_truth_test install install-boot-firmware uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-net64 amiga-piscsi amiga-pirtg64 amiga-ahi amiga-all amiga-clean piscsi-remote piscsi-remote-server piscsi-remote-client
+.PHONY: all clean buptest pistorm_truth_test install install-boot-firmware uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-net64 amiga-piscsi amiga-pirtg64 amiga-ahi amiga-all amiga-clean pistorm.hdf piscsi-remote piscsi-remote-server piscsi-remote-client

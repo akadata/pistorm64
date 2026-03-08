@@ -2,6 +2,8 @@
 
 This repository contains the PiStorm64 emulator, platform glue, and Amiga-side integration assets. The core goals are:
 
+Architecture guardrails (accelerator work): [AGENTS.md](../../AGENTS.md)
+
 - 680x0 emulation with a Pi-side bus backend (Musashi by default, UAE JIT
   optional and still in bring-up).
 - Z2/Z3 memory maps with Pi-side services (PiSCSI, A314, RTG, AHI, networking).

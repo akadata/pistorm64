@@ -22,8 +22,7 @@ Layers:
 
 v1 personality check order:
 
-1. ELF note section `.note.armaccel` (preferred)
-2. Sidecar metadata `<payload>.armmeta` (fallback)
+1. ELF note section `.note.armaccel`
 
 Required metadata fields (v1):
 
@@ -36,9 +35,9 @@ Optional fields:
 
 - `requires`: feature bitmask
 - `preferred_stack`
-- `declared_io`: capabilities (`framebuffer`, `input`, `audio`, `fs`, etc.)
+- `declared_io`: capabilities (`pixel_surface`, `input`, `audio`, `fs`, etc.)
 
-If metadata is absent, runtime may execute only when strict ELF checks pass and policy allows fallback.
+If the ELF note is absent, runtime should classify payload as not ARMAccel personality.
 
 ## ELF Validation Rules (v1)
 
@@ -124,7 +123,7 @@ v1 execution baseline:
 
 Planned generic service channels (next revisions):
 
-- framebuffer
+- pixel surface (shared drawable buffer; presentation stays on Amiga runtime side)
 - input event queue
 - timers
 - filesystem RPC
@@ -132,11 +131,17 @@ Planned generic service channels (next revisions):
 
 All service growth must remain generic and runtime-driven.
 
+Service ABI freeze draft lives at:
+
+- `docs/armaccel_service_abi_v1.md`
+- `src/platforms/amiga/zorro/arm64_accel/armaccel_service_abi.h`
+
 ## Tool Boundaries
 
-- `armshake`: diagnostics + generic execution test only.
-- `armrun`: thin CLI client over `armaccel.library`.
-- No per-application wrapper launchers.
+- `armshake`: diagnostics only (probe/ping/irq/raw contract smoke tests).
+- `armaccel.device`: transport only.
+- `armaccel.library`: single app-facing execution interface.
+- No per-application wrapper launchers and no parallel launcher binaries per payload class.
 
 ## Versioning
 
