@@ -1500,6 +1500,20 @@ static void sigint_handler(int sig_num) {
   emulator_exiting = 1;
 }
 
+static const char* cli_find_config_path(int argc, char* argv[]) {
+  for (int i = 1; i < argc; i++) {
+    if (strcmp(argv[i], "--config-file") == 0 || strcmp(argv[i], "--config") == 0 ||
+        strcmp(argv[i], "-c") == 0) {
+      if (i + 1 < argc) {
+        return argv[i + 1];
+      }
+      break;
+    }
+  }
+
+  return "default.cfg";
+}
+
 int main(int argc, char* argv[]) {
   apply_affinity_from_env("main", CORE_MAIN);
   int g;
@@ -1517,7 +1531,17 @@ int main(int argc, char* argv[]) {
 
   pistorm_selftest_alignment();
 
+  {
+    const char* cfg_hint = cli_find_config_path(argc, argv);
+    (void)preparse_pistorm_backend(cfg_hint);
+  }
+
+  printf("[PS] Selected backend (pre-init): %s\n", ps_get_backend());
   ps_setup_protocol();
+  if (!ps_protocol_is_ready()) {
+    fprintf(stderr, "[PS] backend initialization failed; exiting.\n");
+    return 1;
+  }
 
   log_set_level(LOG_LEVEL_INFO);
   const char* syslog_env = getenv("PISTORM_SYSLOG");
@@ -2038,11 +2062,9 @@ switch_config:
     cfg->platform->shutdown(cfg);
   }
 
-  #ifdef PS_PROTOCOL_HAS_CLEANUP
 #ifdef PS_PROTOCOL_HAS_CLEANUP
   ps_cleanup_protocol();
 #endif
-  #endif
 
   ps_protocol_dump_stats();
 
@@ -2911,7 +2933,7 @@ static void print_about(const char* prog) {
   printf("\n");
   printf("Runtime hints:\n");
   printf("- Kernel module: gpclk_src/gpclk_div, berr_reset_input, run_batch_enable, bus_arb_release\n");
-  printf("- Userspace queue: PISTORM_ENABLE_QUEUE=1 (optional PISTORM_BATCH_BITS=2048)\n");
+  printf("- kmod queue: PISTORM_ENABLE_QUEUE=1 (optional PISTORM_BATCH_BITS=2048)\n");
   printf("\n");
   printf("Project goals:\n");
   printf("- Treat the Pi as a disciplined hardware companion, not just a blunt accelerator\n");

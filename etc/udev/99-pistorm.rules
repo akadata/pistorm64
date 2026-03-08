@@ -6,6 +6,12 @@
 KERNEL=="pistorm", GROUP:="pistorm", MODE:="0660"
 KERNEL=="z3bus", GROUP:="pistorm", MODE:="0660"
 
+# Optional: userspace-mmio backend device access (GPIO + CPRMAN GPCLK setup).
+# /dev/gpiomem is preferred for GPIO; /dev/mem is used only for CPRMAN.
+# Security note: granting /dev/mem access is broad; keep it group-restricted.
+KERNEL=="gpiomem", GROUP:="pistorm", MODE:="0660"
+KERNEL=="mem", GROUP:="pistorm", MODE:="0660"
+
 # Optional: allow non-root PiStorm64 users in group "pistorm" to access block media
 # used as PiSCSI64 backends (disk:/dev/... and cdrom:/dev/...).
 # This covers common Linux block node names:

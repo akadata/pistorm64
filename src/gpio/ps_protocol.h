@@ -59,9 +59,18 @@ uint16_t ps_read_status_reg(void);
 void     ps_write_status_reg(uint16_t value);
 
 void ps_setup_protocol(void);
+void ps_cleanup_protocol(void);
+int  ps_protocol_is_ready(void);
 void ps_reset_state_machine(void);
 void ps_pulse_reset(void);
 void ps_protocol_dump_stats(void);
+
+int ps_select_backend(const char* name);
+const char* ps_get_backend(void);
+int ps_set_userspace_gpclk_src(uint32_t src);
+int ps_set_userspace_gpclk_div(uint32_t div);
+int ps_set_userspace_wr_stretch(uint32_t count);
+int ps_set_userspace_rd_stretch(uint32_t count);
 
 /* Batch/queue support */
 
@@ -72,6 +81,8 @@ static inline void ps_flush_before_read(void) {
     ps_flush_batch_queue();
 #endif
 }
+
+#define PS_PROTOCOL_HAS_CLEANUP 1
 
 /* GPIO / IPL helpers */
 

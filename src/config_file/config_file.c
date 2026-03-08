@@ -55,6 +55,11 @@ const char* config_item_names[CONFITEM_NUM] = {
     "mouse",   
     "keyboard", 
     "platform", 
+    "pistorm",
+    "pistorm-gpclk-src",
+    "pistorm-gpclk-div",
+    "pistorm-mmio-wr-stretch",
+    "pistorm-mmio-rd-stretch",
     "setvar",     
     "kbfile", 
     "affinity",
@@ -597,6 +602,103 @@ mapid[sizeof(mapid) - 1] = '\0';  // Ensure null termination
     cfg->platform = make_platform_config(platform_name, platform_sub);
     break;
   }
+  case CONFITEM_PISTORM:
+    get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+    if (!strlen(cur_cmd)) {
+      printf("[CFG] pistorm command requires one argument: kernel|userspace.\n");
+      break;
+    }
+    if (ps_select_backend(cur_cmd) == 0) {
+      printf("[CFG] PiStorm backend selected: %s.\n", ps_get_backend());
+    } else {
+      printf("[CFG] Invalid or unavailable pistorm backend '%s'. Valid values: kernel|userspace.\n",
+             cur_cmd);
+    }
+    break;
+  case CONFITEM_PISTORM_GPCLK_SRC: {
+    unsigned int src = 0;
+    int ret;
+
+    get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+    if (!strlen(cur_cmd)) {
+      printf("[CFG] pistorm-gpclk-src command requires a value (0..15).\n");
+      break;
+    }
+
+    src = get_int(cur_cmd);
+    ret = ps_set_userspace_gpclk_src((uint32_t)src);
+    if (ret == 0) {
+      printf("[CFG] userspace GPCLK source set to %u.\n", src);
+    } else if (ret == -EBUSY) {
+      printf("[CFG] userspace GPCLK source ignored (backend already initialized).\n");
+    } else {
+      printf("[CFG] invalid pistorm-gpclk-src value '%s' (valid 0..15).\n", cur_cmd);
+    }
+    break;
+  }
+  case CONFITEM_PISTORM_GPCLK_DIV: {
+    unsigned int div = 0;
+    int ret;
+
+    get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+    if (!strlen(cur_cmd)) {
+      printf("[CFG] pistorm-gpclk-div command requires a value (1..4095).\n");
+      break;
+    }
+
+    div = get_int(cur_cmd);
+    ret = ps_set_userspace_gpclk_div((uint32_t)div);
+    if (ret == 0) {
+      printf("[CFG] userspace GPCLK divider set to %u.\n", div);
+    } else if (ret == -EBUSY) {
+      printf("[CFG] userspace GPCLK divider ignored (backend already initialized).\n");
+    } else {
+      printf("[CFG] invalid pistorm-gpclk-div value '%s' (valid 1..4095).\n", cur_cmd);
+    }
+    break;
+  }
+  case CONFITEM_PISTORM_MMIO_WR_STRETCH: {
+    unsigned int count = 0;
+    int ret;
+
+    get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+    if (!strlen(cur_cmd)) {
+      printf("[CFG] pistorm-mmio-wr-stretch command requires a value (1..64).\n");
+      break;
+    }
+
+    count = get_int(cur_cmd);
+    ret = ps_set_userspace_wr_stretch((uint32_t)count);
+    if (ret == 0) {
+      printf("[CFG] userspace WR strobe stretch set to %u.\n", count);
+    } else if (ret == -EBUSY) {
+      printf("[CFG] userspace WR strobe stretch ignored (backend already initialized).\n");
+    } else {
+      printf("[CFG] invalid pistorm-mmio-wr-stretch value '%s' (valid 1..64).\n", cur_cmd);
+    }
+    break;
+  }
+  case CONFITEM_PISTORM_MMIO_RD_STRETCH: {
+    unsigned int count = 0;
+    int ret;
+
+    get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+    if (!strlen(cur_cmd)) {
+      printf("[CFG] pistorm-mmio-rd-stretch command requires a value (1..64).\n");
+      break;
+    }
+
+    count = get_int(cur_cmd);
+    ret = ps_set_userspace_rd_stretch((uint32_t)count);
+    if (ret == 0) {
+      printf("[CFG] userspace RD strobe stretch set to %u.\n", count);
+    } else if (ret == -EBUSY) {
+      printf("[CFG] userspace RD strobe stretch ignored (backend already initialized).\n");
+    } else {
+      printf("[CFG] invalid pistorm-mmio-rd-stretch value '%s' (valid 1..64).\n", cur_cmd);
+    }
+    break;
+  }
   case CONFITEM_SETVAR: {
     if (!cfg->platform) {
       printf("[CFG] Warning: setvar used in config file with no platform specified.\n");
@@ -618,6 +720,132 @@ mapid[sizeof(mapid) - 1] = '\0';  // Ensure null termination
   }
 
   return 0;
+}
+
+int preparse_pistorm_backend(const char* filename) {
+  FILE* in = NULL;
+  char parse_line[512];
+  char cur_cmd[128];
+  int str_pos = 0;
+  int found = 0;
+  int line_no = 0;
+
+  if (!filename || !filename[0]) {
+    return -1;
+  }
+
+  in = fopen(filename, "rb");
+  if (!in) {
+    return -1;
+  }
+
+  while (fgets(parse_line, sizeof(parse_line), in)) {
+    line_no++;
+    str_pos = 0;
+    memset(cur_cmd, 0x00, sizeof(cur_cmd));
+
+    trim_whitespace(parse_line);
+    if (strlen(parse_line) <= 2 || parse_line[0] == '#' || parse_line[0] == '/') {
+      continue;
+    }
+
+    get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+    if (strcasecmp(cur_cmd, "pistorm") == 0) {
+      memset(cur_cmd, 0x00, sizeof(cur_cmd));
+      get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+      if (!strlen(cur_cmd)) {
+        printf("[CFG] pistorm directive missing value on line %d in %s.\n", line_no, filename);
+        continue;
+      }
+
+      if (ps_select_backend(cur_cmd) == 0) {
+        found = 1;
+      } else {
+        printf("[CFG] invalid pistorm backend '%s' on line %d in %s.\n", cur_cmd, line_no, filename);
+      }
+      continue;
+    }
+
+    if (strcasecmp(cur_cmd, "pistorm-gpclk-src") == 0) {
+      unsigned int src = 0;
+      int ret;
+
+      memset(cur_cmd, 0x00, sizeof(cur_cmd));
+      get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+      if (!strlen(cur_cmd)) {
+        printf("[CFG] pistorm-gpclk-src missing value on line %d in %s.\n", line_no, filename);
+        continue;
+      }
+
+      src = get_int(cur_cmd);
+      ret = ps_set_userspace_gpclk_src((uint32_t)src);
+      if (ret < 0) {
+        printf("[CFG] invalid pistorm-gpclk-src '%s' on line %d in %s.\n", cur_cmd, line_no, filename);
+      }
+      continue;
+    }
+
+    if (strcasecmp(cur_cmd, "pistorm-gpclk-div") == 0) {
+      unsigned int div = 0;
+      int ret;
+
+      memset(cur_cmd, 0x00, sizeof(cur_cmd));
+      get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+      if (!strlen(cur_cmd)) {
+        printf("[CFG] pistorm-gpclk-div missing value on line %d in %s.\n", line_no, filename);
+        continue;
+      }
+
+      div = get_int(cur_cmd);
+      ret = ps_set_userspace_gpclk_div((uint32_t)div);
+      if (ret < 0) {
+        printf("[CFG] invalid pistorm-gpclk-div '%s' on line %d in %s.\n", cur_cmd, line_no, filename);
+      }
+      continue;
+    }
+
+    if (strcasecmp(cur_cmd, "pistorm-mmio-wr-stretch") == 0) {
+      unsigned int count = 0;
+      int ret;
+
+      memset(cur_cmd, 0x00, sizeof(cur_cmd));
+      get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+      if (!strlen(cur_cmd)) {
+        printf("[CFG] pistorm-mmio-wr-stretch missing value on line %d in %s.\n", line_no, filename);
+        continue;
+      }
+
+      count = get_int(cur_cmd);
+      ret = ps_set_userspace_wr_stretch((uint32_t)count);
+      if (ret < 0) {
+        printf("[CFG] invalid pistorm-mmio-wr-stretch '%s' on line %d in %s.\n", cur_cmd, line_no,
+               filename);
+      }
+      continue;
+    }
+
+    if (strcasecmp(cur_cmd, "pistorm-mmio-rd-stretch") == 0) {
+      unsigned int count = 0;
+      int ret;
+
+      memset(cur_cmd, 0x00, sizeof(cur_cmd));
+      get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+      if (!strlen(cur_cmd)) {
+        printf("[CFG] pistorm-mmio-rd-stretch missing value on line %d in %s.\n", line_no, filename);
+        continue;
+      }
+
+      count = get_int(cur_cmd);
+      ret = ps_set_userspace_rd_stretch((uint32_t)count);
+      if (ret < 0) {
+        printf("[CFG] invalid pistorm-mmio-rd-stretch '%s' on line %d in %s.\n", cur_cmd, line_no,
+               filename);
+      }
+    }
+  }
+
+  fclose(in);
+  return found ? 0 : 1;
 }
 
 void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int addr,
