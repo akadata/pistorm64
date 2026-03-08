@@ -1,351 +1,274 @@
-# AGENTS.md – PiStorm64 PPC Integration Context
+# AGENTS.md
 
-## Overview
+## Purpose
 
-This repository is integrating QEMU-UAE's PowerPC core into PiStorm64.
+This repository implements a Zorro-visible ARM64 execution path for PiStorm-based Amiga systems.
 
-Goal:
+The goal is to let the Amiga launch ARM64 payloads that execute natively on the Pi side through a stable mailbox/shared-memory contract, while keeping Amiga-side integration clean, minimal, and generic.
 
-* Use Musashi for 68k (already in-tree).
-* Use QEMU-UAE PPC core (via qemu-uae.so).
-* DO NOT use UAE JIT for 68k.
-* Final architecture: Musashi (68k) + QEMU PPC.
+This is **not** a fake CPU replacement, not an emulator inside an emulator, and not a grab bag of app-specific hacks hidden in launcher code.
 
-UAE JIT present in src/ must NOT be used or re-enabled.
+## Core Architecture
 
----
+There are three distinct layers:
 
-## System Environment
+### 1. Zorro ARM64 accelerator device
 
-Host: Raspberry Pi 4 (aarch64)
-User: smalley
+The Zorro device exposes:
 
-Important paths:
+* AutoConfig presence
+* MMIO registers
+* shared memory window
+* mailbox/job control
+* completion/status reporting
+* optional interrupt signalling
 
-Python 2.7 (required to build qemu-uae):
-/home/smalley/src/Python-2.7.18
+This layer is hardware-facing and protocol-facing.
 
-QEMU-UAE source tree:
-/home/smalley/fs-uae-plugin-qemu-uae/qemu-uae
+It must remain generic.
 
-Built shared object:
-/usr/local/lib/qemu-uae.so
+### 2. Launcher / runtime bridge
 
-Firmware directory (manually populated):
-/usr/local/share/qemu
+This begins with `armshake` and later should be complemented or superseded by an Amiga `.library`.
 
-QEMU config directory:
-/usr/local/etc/qemu
+Its job is to:
 
-Minimal target-ppc.conf currently created:
-/usr/local/etc/qemu/target-ppc.conf
+* detect the ARM64 device
+* validate and load a payload
+* upload payload and job data
+* start execution
+* poll or wait for completion
+* provide diagnostics
 
-Runtime hygiene:
+This layer is **not** the application.
 
-* `LD_LIBRARY_PATH` must be unset before running the harness.
-* Do not run harnesses with Python 2.7 library paths injected.
+### 3. ARM64 payload
 
----
+The payload is the application.
 
-## Current Status
+Examples:
 
-* qemu-uae.so builds successfully.
-* It exports PPC and qemu_uae_* symbols.
-* It segfaults or aborts if callbacks/init order are wrong.
-* Stable sequence for this build is:
+* fractal renderer
+* file manager
+* editor
+* game
+* media tool
+* OpenGL-style renderer using exported services
 
-  1. Install `uae_log` + `uae_ppc_io_mem_*` callback pointers.
-  2. `qemu_uae_init()`
-  3. `qemu_uae_ppc_init(model, hid1)` / `ppc_cpu_init(model, hid1)`
-  4. `ppc_cpu_map_memory()`
-  5. `ppc_cpu_reset()`
-  6. `qemu_uae_start()`
-  7. `qemu_uae_mutex_lock()`
-  8. `qemu_uae_wait_until_started()`
-  9. `qemu_uae_mutex_unlock()`
-  10. run control (`ppc_cpu_set_state` RUNNING/PAUSED) and verify RAM counter changes
+The payload owns its own logic, UI semantics, state, and behavior.
 
-The test harness exists at:
+## Non-Negotiable Design Rules
 
-src/ppc/test_ppc_qemuuae.c
+### Rule 1: `armshake` must remain generic
 
-Built with:
+`armshake` is a launcher and diagnostic tool.
 
-cc -O2 -g -Wall -Wextra -Wpedantic -std=c11 
--pthread -Isrc/ppc -o build/ppc/test_ppc_qemuuae 
-src/ppc/test_ppc_qemuuae.c src/ppc/qemu_uae_loader.c -ldl
+It must never become the place where application logic is hidden.
 
-Run with clean runtime:
+`armshake` must never contain:
 
-unset LD_LIBRARY_PATH
-export QEMU_UAE_SO=/usr/local/lib/qemu-uae.so
-export PPC_MODEL=603e
-export PPC_RUN_MS=50
-export PPC_START_TIMEOUT_MS=2000
-./build/ppc/test_ppc_qemuuae
+* app-specific menu IDs
+* fractal type enums
+* Julia/Mandelbrot selectors
+* app-specific default values
+* editor commands
+* file manager logic
+* game logic
+* rendering semantics specific to one payload
+* feature toggles that belong to a payload
 
-The harness dynamically loads qemu-uae.so using dlopen.
+If a new payload requires editing `armshake`, that is a design failure unless the change is purely generic ABI/service support.
 
-Stage 3 mailbox harness:
+### Rule 2: Payload-specific behavior lives in the payload
 
-Build:
+The ARM64 ELF owns:
 
-cc -O2 -g -Wall -Wextra -Wpedantic -std=c11 
--pthread -Isrc/ppc -o build/ppc/test_ppc_mailbox 
-src/ppc/test_ppc_mailbox.c src/ppc/qemu_uae_loader.c -ldl
+* menus
+* view state
+* zoom logic
+* reset logic
+* per-app command handling
+* rendering algorithm
+* document model
+* application state machines
+* app-specific UI
 
-Run:
+A payload must be replaceable without rewriting launcher behavior.
 
-unset LD_LIBRARY_PATH
-export QEMU_UAE_SO=/usr/local/lib/qemu-uae.so
-export PPC_MODEL=603e
-export PPC_START_TIMEOUT_MS=2000
-export PPC_MAILBOX_CMD_TIMEOUT_MS=500
-export PPC_MAILBOX_LOOPS=100
-export PPC_VERBOSE=1
-export PPC_HOST_SERVICE=1
-export PPC_HOST_SERVICE_TEST=1
-./build/ppc/test_ppc_mailbox
-
-Expected Stage 3 markers:
-
-* `mailbox: send seq=... cmd=1` (PING)
-* `mailbox: send seq=... cmd=2` (MEMCPY32)
-* `mailbox: done seq=... status=2 result0=...`
-* `fetch sanity: NIP=0x... instr=0x...`
-* `mailbox test complete: loops=100`
-
-Stage 4 host service proof markers:
-
-* `mailbox: send seq=... cmd=3` (HOST_TIME32 via PPC->host request lane)
-* `mailbox: send seq=... cmd=4` (MEM_CRC32 via PPC->host request lane)
-* `hostsvc proof: time32 ... -> ..., crc32=...`
-
-Stage 3 benchmark mode (mailbox throughput):
-
-unset LD_LIBRARY_PATH
-export QEMU_UAE_SO=/usr/local/lib/qemu-uae.so
-export PPC_MODEL=603e
-export PPC_START_TIMEOUT_MS=2000
-export PPC_MAILBOX_CMD_TIMEOUT_MS=500
-export PPC_BENCH=1
-export PPC_BENCH_MODE=throughput
-export PPC_BENCH_ITERS=100000
-export PPC_BENCH_WARMUP=1000
-export PPC_VERBOSE=0
-export PPC_HOST_SERVICE=0
-export PPC_HOST_SERVICE_TEST=0
-./build/ppc/test_ppc_mailbox
-
-Expected throughput marker:
-
-* `bench: mode=throughput iters=... warmup=... elapsed=...s ops/s=... avg_us=...`
-
-Stage 5A latency benchmark mode (mailbox round-trip percentiles):
-
-unset LD_LIBRARY_PATH
-export QEMU_UAE_SO=/usr/local/lib/qemu-uae.so
-export PPC_MODEL=603e
-export PPC_START_TIMEOUT_MS=2000
-export PPC_MAILBOX_CMD_TIMEOUT_MS=500
-export PPC_BENCH=1
-export PPC_BENCH_MODE=lat
-export PPC_BENCH_SAMPLES=200000
-export PPC_BENCH_WARMUP=1000
-export PPC_BENCH_HISTO=0
-export PPC_VERBOSE=0
-export PPC_HOST_SERVICE=0
-export PPC_HOST_SERVICE_TEST=0
-./build/ppc/test_ppc_mailbox
-
-Expected latency marker:
-
-* `bench-lat: mode=lat samples=... warmup=... elapsed=...s ops/s=... avg_us=... p50_us=... p95_us=... p99_us=... max_us=...`
-* Optional histogram when `PPC_BENCH_HISTO=1`: `bench-histo(us):`
-
-Stage 5B optional doorbell + host thread tuning:
-
-unset LD_LIBRARY_PATH
-export QEMU_UAE_SO=/usr/local/lib/qemu-uae.so
-export PPC_MODEL=603e
-export PPC_BENCH=0
-export PPC_HOST_SERVICE=1
-export PPC_HOST_SERVICE_TEST=1
-export PPC_HOSTSVC_DOORBELL=1
-export PPC_HOST_SERVICE_IDLE_MS=1
-export PPC_HOST_SERVICE_CPU=-1
-export PPC_HOST_SERVICE_SCHED_FIFO=0
-export PPC_HOST_SERVICE_SCHED_PRIO=10
-./build/ppc/test_ppc_mailbox
-
-Doorbell semantics:
-
-* Host writes `host_result*` + `host_status`, then `host_ack_seq`.
-* With `PPC_HOSTSVC_DOORBELL=1`, host pulses `qemu_uae_ppc_external_interrupt(true/false)` after publishing `host_ack_seq`.
-* Polling remains baseline and works when doorbell is disabled or unavailable.
-
-Stage 6A/6B/6C board-model bring-up (Amiga Zorro device, PPC-backed mailbox):
-
-Stage 6C baseline tags:
-
-* `ppc-stage6c-ppc-backend`
-* `ppc-stage6c-ppcshake-lock`
-
-Stage 6C status (frozen summary):
-
-* Real: QEMU-UAE PPC runtime starts from board `CONTROL.START`, mailbox runs on PPC, host service lane is active.
-* Stubbed: no OS4 kernel/platform integration yet; this is still board-level bring-up plus mailbox transport.
-* Known UX issue: rapid AmigaShell re-entry can wedge a CLI line; mitigated by `ppcshake` single-instance lock and busy checks.
-* Stage 7 direction (chosen): `1A` compatibility-first path toward classic PPC accelerator expectations (BlizzardPPC-style baseline, CyberStormPPC-style fallback).
-
-* Enable in Amiga config: `setvar zorro-ppc` (alias: `setvar ppc-accel`)
-* AutoConfig identity: manufacturer `$07DB`, product `$0040`
-* Device map:
-  * `+0x0000-0x0FFF` registers
-  * `+0x1000-0x1FFF` mailbox page
-  * `+0x2000-0xFFFF` shared window
-* Mailbox command path supports `PING` and `HOST_TIME32` for vertical-slice probing from Amiga side.
-* Stage 6C backend: `CONTROL.START` boots QEMU-UAE PPC runtime and runs mailbox firmware on PPC.
-* Mailbox page is single-backed between Zorro-visible window and PPC-visible mapping.
-* Mailbox command lane is single in-flight (`seq!=ack_seq` means busy, submit only when `seq==ack_seq`).
-* Keep runtime clean before launching emulator:
-  * `unset LD_LIBRARY_PATH`
-  * `export QEMU_UAE_SO=/usr/local/lib/qemu-uae.so`
-  * Optional probe tracing: `export PPC_ACCEL_AC_TRACE=1` (logs AutoConfig accesses for PPC board compatibility debugging)
-  * Optional serial tuning: `export PPC_ACCEL_AC_SERIAL=0x00420001` (controls AutoConfig `er_SerialNumber` nibbles for compatibility probing)
-  * Optional diag vector tuning: `export PPC_ACCEL_AC_DIAG_VEC=0x4000` (controls AutoConfig `er_InitDiagVec` for board discovery compatibility probing)
-  * Optional PPC RAM tuning: `export PPC_ACCEL_PPC_RAM_BASE=0x08000000` and `export PPC_ACCEL_PPC_RAM_MB=128` (maps dedicated PPC-visible RAM region for CSPPC-style compatibility probing)
-* Host helper script: `./stage6.sh` (builds emulator + `amiga/zorro-ppc` tool and prints manual test steps)
-* Stage 8 helper script: `./stage8.sh` (builds emulator + tool and prints bootstrap-contract regression flow)
-* Bootstrap contract (frozen Stage 8 reference): `docs/PPC_ACCEL_BOOTSTRAP_CONTRACT.md`
-
-Amiga-side Stage 6A tool:
-
-* Source: `amiga/zorro-ppc/C/ppcshake.c`
-* Build: `make -C amiga/zorro-ppc`
-* Run on Amiga shell: `ppcshake` (or `ppcshake 10`)
-* Stage 7A identity dump: `ppcshake --id`
-* Stage 6B IRQ semantics probe: `ppcshake --irq`
-  * Expected marker: `IRQ test OK: doorbell raise/ack and cmd_done raise/ack.`
-* Stage 8 descriptor branch probe: `ppcshake --boot-test`
-  * Expected markers:
-    * `BOOT test stage1 OK: entry=$00000200 marker=$00000003`
-    * `BOOT test stage2 OK: restored entry=$00000000 marker=$00000002`
-* Concurrent start guard: `ppcshake busy: another instance is running. Try again.`
-* Known AmigaShell UX quirk: rapid cursor-up/enter re-entry can wedge a shell command line; open a fresh shell and retry.
-
----
-
-## Immediate Tasks (Codex Priority)
-
-### Task 1: Stabilize Test Harness
-
-Objective:
-Create a minimal, stable PPC execution test that:
-
-* dlopen()s qemu-uae.so
-* Calls correct qemu_uae runtime init sequence
-* Initializes a PPC CPU (e.g., 603e)
-* Maps a small RAM buffer
-* Sets PC
-* Executes a small number of instructions
-* Exits cleanly without segfault
-
-Must:
-
-* Avoid static linking against qemu-uae.so
-* Use dlopen/dlsym only
-* Clean up pedantic function pointer casts
-
-Must NOT:
-
-* Use any UAE 68k JIT
-* Modify Musashi core
-* Pull in other QEMU subsystems
-
-The test harness is the integration gate.
-No pistorm64 core wiring happens until this works.
-
----
-
-## Architectural Rules
-
-1. Musashi remains the only 68k engine.
-2. QEMU-UAE is PPC only.
-3. No UAE JIT involvement.
-4. No QEMU system emulation beyond what PPC core requires.
-5. Keep PPC isolated in src/ppc/ until stable.
-
----
-
-## Long-Term Goal
-
-When stable:
-
-* Replace any existing PPC emulation in pistorm64 with qemu-uae PPC backend.
-* Wire memory mapping to pistorm shared memory region.
-* Integrate interrupt bridging.
-
-But NONE of that happens until the standalone test harness is stable.
-
----
-
-## Notes
-
-* qemu-uae is not intended to be installed via make install.
-* Firmware manually copied from pc-bios.
-* Runtime init order is critical.
-* Crash observed at NULL dereference before proper init.
-
-Codex must treat the harness as the first deliverable milestone.
-
-## entry points for qemu-uae.so
-
-nm -D /usr/local/lib/qemu-uae.so | rg -n " qemu_uae_| ppc_cpu_|uae_ppc_" | sort
-3256:000000000062ddf0 D ppc_cpu_aliases
-3257:000000000024b5e4 T ppc_cpu_class_by_pvr
-3258:000000000024b9a0 T ppc_cpu_class_by_pvr_mask
-3259:0000000000255f80 T ppc_cpu_do_interrupt
-3260:0000000000256780 T ppc_cpu_do_system_reset
-3261:00000000002380d0 T ppc_cpu_dump_state
-3262:000000000017d3e0 T ppc_cpu_dump_statistics
-3263:0000000000256900 T ppc_cpu_exec_interrupt
-3264:0000000000275020 T ppc_cpu_gdb_read_register
-3265:0000000000275280 T ppc_cpu_gdb_read_register_apple
-3266:00000000002754c0 T ppc_cpu_gdb_write_register
-3267:0000000000275710 T ppc_cpu_gdb_write_register_apple
-3268:000000000024f570 T ppc_cpu_get_phys_page_debug
-3269:000000000039cf28 T ppc_cpu_init
-3270:000000000024ba70 T ppc_cpu_list
-3271:000000000039d120 T ppc_cpu_map_memory
-3272:000000000039d480 T ppc_cpu_reset
-3273:000000000039d428 T ppc_cpu_run_continuous
-3274:000000000039d508 T ppc_cpu_set_state
-3275:000000000039cf24 T ppc_cpu_version
-4362:000000000039d6e0 T qemu_uae_init
-4363:000000000039d3c0 T qemu_uae_lock
-4364:000000000039d860 T qemu_uae_main_loop_should_exit
-4365:000000000012dbac T qemu_uae_mutex_lock
-4366:000000000012dc50 T qemu_uae_mutex_trylock
-4367:000000000012dd20 T qemu_uae_mutex_trylock_cancel
-4368:000000000012dc40 T qemu_uae_mutex_unlock
-4369:000000000039d3a8 T qemu_uae_ppc_external_interrupt
-4370:000000000039d108 T qemu_uae_ppc_in_cpu_thread
-4371:000000000039d104 T qemu_uae_ppc_init
-4372:000000000039d600 T qemu_uae_set_started
-4373:000000000039d880 T qemu_uae_slirp_init
-4374:000000000039d900 T qemu_uae_slirp_input
-4375:000000000039d7e4 T qemu_uae_start
-4376:000000000039d6c4 T qemu_uae_version
-4377:000000000039d680 T qemu_uae_wait_until_started
-5177:0000000000ae32d8 B uae_ppc_io_mem_read
-5178:0000000000ae32c8 B uae_ppc_io_mem_read64
-5179:0000000000ae32d0 B uae_ppc_io_mem_write
-5180:0000000000ae32c0 B uae_ppc_io_mem_write64
-
-
-# Test harness location 
-
-src/ppc/test_ppc_qemuuae.c
- 
-End of AGENTS.md
+### Rule 3: Diagnostics and execution must stay separate
+
+Keep `armshake` as:
+
+* a board probe tool
+* a diagnostics tool
+* a manual launcher
+* a contract validation tool
+
+That keeps it useful even after a `.library` exists.
+
+### Rule 4: The long-term user-facing path is a library, not `armshake`
+
+The intended direction is:
+
+* `armshake` remains for diagnostics and development
+* an Amiga `.library` becomes the normal execution interface
+
+That `.library` should eventually:
+
+* detect ARM payloads
+* load metadata
+* allocate job descriptors and shared buffers
+* launch payloads
+* expose helper APIs to Amiga programs
+* support Workbench/tool integration
+
+### Rule 5: File association belongs in metadata and library logic
+
+Future payload discovery should be metadata-driven.
+
+Preferred direction:
+
+* `something.elf`
+* `something.elf.info` or `something.info`
+* optional payload metadata block or sidecar
+
+The launcher/library should identify that a file is an ARM64 payload without needing per-application switches like `--julia`, `--editor`, or `--game`.
+
+### Rule 6: Stable ABI first, features second
+
+Only two contracts should grow carefully over time:
+
+#### A. Launch ABI
+
+How the Amiga side submits a payload and starts execution.
+
+#### B. Service ABI
+
+How the ARM payload requests generic services such as:
+
+* framebuffer access
+* window creation/update
+* input events
+* timers
+* file services
+* clipboard
+* audio
+* GPU/OpenGL-like services later
+
+Everything else belongs outside the launcher.
+
+### Rule 7: Never bind the system to the visible Zorro window size
+
+The visible board aperture is not the true upper bound of the system.
+
+Large payloads, large assets, large framebuffers, and streamed content must be supported through:
+
+* chunking
+* mailbox-controlled transfers
+* paged/shared buffers
+* host-side staging
+* streaming protocols
+* external file-backed or memory-backed transport
+
+A 64K, 512K, or 4M board window must never define the final ceiling for:
+
+* ELF size
+* asset size
+* framebuffer size
+* package size
+* future shared library size
+
+### Rule 8: Generic service growth is allowed
+
+Changes to launcher/library are valid when they add reusable infrastructure, for example:
+
+* larger transfer support
+* better shared-buffer handling
+* event queue support
+* generic windowing service
+* generic blit/viewport service
+* generic filesystem RPC
+* generic GPU command submission
+
+That is infrastructure.
+
+Adding Julia-specific controls to launcher code is not infrastructure.
+
+## What `armshake` is
+
+`armshake` is:
+
+* a diagnostic tool
+* a launcher
+* a contract exerciser
+* a validation tool
+* a development aid
+
+Typical allowed commands include things such as:
+
+* identify board
+* inspect capabilities
+* load ELF
+* start job
+* wait for completion
+* reset job
+* dump status
+* trace mailbox state
+
+## What `armshake` is never
+
+`armshake` is never:
+
+* an application framework for one demo
+* a place to stash hidden business logic
+* a menu controller for payloads
+* a fractal chooser
+* a file manager frontend
+* an editor UI
+* a game shell
+* a substitute for the future `.library`
+
+## Direction for `.library`
+
+The desired Amiga-side `.library` should:
+
+* auto-detect ARM64 payload files
+* read metadata
+* provide a clean API to launch payloads
+* hide transport/setup details from userland
+* allow Workbench and CLI integration
+* keep payload execution generic
+
+Possible future shape:
+
+* `arm64exec.library`
+* `arm64run.library`
+* `pistormarm.library`
+
+The name matters less than the boundary.
+
+The boundary must remain clean.
+
+## Review Gate for Future Changes
+
+Before merging any change, ask:
+
+1. Does this add generic execution/service infrastructure?
+2. Or does this sneak application behavior into launcher code?
+
+If the answer is the second one, do not merge it in that form.
+
+## Practical Test
+
+A correct design means:
+
+* a new ARM64 `.elf` can be dropped in
+* the same generic launcher/library can run it
+* no new app-specific switch is needed
+* no new app-specific enum is added to launcher code
+* no launcher rewrite is needed for each application
+
+When that is true, the system is real.
+
+When that is not true, the architecture is drifting.
+

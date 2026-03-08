@@ -10,6 +10,7 @@
 #include "zorro/serial_echo/serial_echo.h"
 #include "zorro/z3bus_demo/z3bus_demo.h"
 #include "zorro/ppc_accel/ppc_accel.h"
+#include "zorro/arm64_accel/arm64_accel.h"
 #include "log.h"
 
 #define MAX_ZORRO_DEVICES AC_PIC_LIMIT
@@ -81,6 +82,8 @@ void zorro_setvar(struct emulator_config *cfg, const char *var, const char *val)
     z3bus_demo_register();
   } else if (strcmp(var, "zorro-ppc") == 0 || strcmp(var, "ppc-accel") == 0) {
     z2_ppc_accel_register();
+  } else if (strcmp(var, "zorro-arm64") == 0 || strcmp(var, "arm64-accel") == 0) {
+    z2_arm64_accel_register();
   } else if (strcmp(var, "zorro-serial") == 0) {
     z2_serial_echo_register();
   } else if (strcmp(var, "zorro-rng") == 0) {
