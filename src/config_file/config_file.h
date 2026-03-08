@@ -53,6 +53,11 @@ typedef enum {
   CONFITEM_MOUSE,
   CONFITEM_KEYBOARD,
   CONFITEM_PLATFORM,
+  CONFITEM_PISTORM,
+  CONFITEM_PISTORM_GPCLK_SRC,
+  CONFITEM_PISTORM_GPCLK_DIV,
+  CONFITEM_PISTORM_MMIO_WR_STRETCH,
+  CONFITEM_PISTORM_MMIO_RD_STRETCH,
   CONFITEM_SETVAR,
   CONFITEM_KBFILE,
   CONFITEM_AFFINITY,
@@ -153,6 +158,7 @@ void free_config_file(struct emulator_config* cfg);
 int apply_config_line(struct emulator_config* cfg, 
   const char* line, 
   int line_no);
+int preparse_pistorm_backend(const char* filename);
 
 int handle_mapped_read(struct emulator_config* cfg, 
   unsigned int addr, 

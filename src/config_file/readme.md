@@ -77,6 +77,39 @@ This commands specifies which platform to target with the current emulator confi
 The `SUB_SYSTEM` argument can be used to indicate a specific computer model where mapped register ranges may be different from other systems of the same family, for instance `platform amiga 4000` uses a different address range than other models for the IDE controller.  
 **Note:** The `SUB_SYSTEM` argument is currently not used for much of anything, and there is no point in setting it to anything unless you know you really need it.
 
+# pistorm
+
+SYNTAX: `pistorm kernel|userspace`  
+Example: `pistorm userspace`  
+Selects the PiStorm transport backend.
+
+- `kernel` (default): uses `/dev/pistorm` via `pistorm.ko`.
+- `userspace`: experimental userspace MMIO backend under `src/pistorm/`.
+
+For first-pass userspace testing, unload the kernel module first:
+
+`sudo rmmod pistorm`
+
+## userspace GPCLK tuning
+
+SYNTAX: `pistorm-gpclk-src <0..15>`  
+Example: `pistorm-gpclk-src 5`
+
+SYNTAX: `pistorm-gpclk-div <1..4095>`  
+Example: `pistorm-gpclk-div 6`
+
+These only affect the `pistorm userspace` backend and are applied during early preparse
+before backend init.
+
+SYNTAX: `pistorm-mmio-wr-stretch <1..64>`  
+Example: `pistorm-mmio-wr-stretch 2`
+
+SYNTAX: `pistorm-mmio-rd-stretch <1..64>`  
+Example: `pistorm-mmio-rd-stretch 2`
+
+These stretch GPIO WR/RD strobe pulses in userspace MMIO mode. Increase when you see
+transaction timeouts on faster Pi4 userspace paths.
+
 # keyboard
 
 SYNTAX: `keyboard {grab_key} {grab / nograb} {autoconnect / noautoconnect}`  
