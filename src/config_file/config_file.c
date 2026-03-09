@@ -663,7 +663,7 @@ mapid[sizeof(mapid) - 1] = '\0';  // Ensure null termination
 
     get_next_string(parse_line, cur_cmd, &str_pos, ' ');
     if (!strlen(cur_cmd)) {
-      printf("[CFG] pistorm-mmio-wr-stretch command requires a value (1..64).\n");
+      printf("[CFG] pistorm-mmio-wr-stretch command requires a value (0..64).\n");
       break;
     }
 
@@ -674,7 +674,7 @@ mapid[sizeof(mapid) - 1] = '\0';  // Ensure null termination
     } else if (ret == -EBUSY) {
       printf("[CFG] userspace WR strobe stretch ignored (backend already initialized).\n");
     } else {
-      printf("[CFG] invalid pistorm-mmio-wr-stretch value '%s' (valid 1..64).\n", cur_cmd);
+      printf("[CFG] invalid pistorm-mmio-wr-stretch value '%s' (valid 0..64).\n", cur_cmd);
     }
     break;
   }
@@ -684,7 +684,7 @@ mapid[sizeof(mapid) - 1] = '\0';  // Ensure null termination
 
     get_next_string(parse_line, cur_cmd, &str_pos, ' ');
     if (!strlen(cur_cmd)) {
-      printf("[CFG] pistorm-mmio-rd-stretch command requires a value (1..64).\n");
+      printf("[CFG] pistorm-mmio-rd-stretch command requires a value (0..64).\n");
       break;
     }
 
@@ -695,7 +695,7 @@ mapid[sizeof(mapid) - 1] = '\0';  // Ensure null termination
     } else if (ret == -EBUSY) {
       printf("[CFG] userspace RD strobe stretch ignored (backend already initialized).\n");
     } else {
-      printf("[CFG] invalid pistorm-mmio-rd-stretch value '%s' (valid 1..64).\n", cur_cmd);
+      printf("[CFG] invalid pistorm-mmio-rd-stretch value '%s' (valid 0..64).\n", cur_cmd);
     }
     break;
   }

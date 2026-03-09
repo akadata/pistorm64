@@ -66,6 +66,7 @@
 #define UMIO_GPCLK_DIV_DEFAULT 6u
 #define UMIO_WR_STRETCH_DEFAULT 2u
 #define UMIO_RD_STRETCH_DEFAULT 2u
+#define UMIO_DEADLINE_CHECK_ITERS 256u
 
 struct ps_userspace_mmio_cfg {
   uint32_t gpclk_src;
@@ -100,6 +101,7 @@ struct ps_userspace_mmio_state {
   bool berr_reset_input;
   bool bus_arb_release;
   bool setup_gpclk;
+  bool lwpair_enable;
   uint32_t wr_stretch;
   uint32_t rd_stretch;
 
@@ -138,7 +140,7 @@ int ps_userspace_mmio_set_gpclk_div(uint32_t div) {
 }
 
 int ps_userspace_mmio_set_wr_stretch(uint32_t count) {
-  if (count == 0u || count > 64u) {
+  if (count > 64u) {
     return -EINVAL;
   }
   gu_cfg.wr_stretch = count;
@@ -147,7 +149,7 @@ int ps_userspace_mmio_set_wr_stretch(uint32_t count) {
 }
 
 int ps_userspace_mmio_set_rd_stretch(uint32_t count) {
-  if (count == 0u || count > 64u) {
+  if (count > 64u) {
     return -EINVAL;
   }
   gu_cfg.rd_stretch = count;
@@ -289,6 +291,14 @@ static inline void um_mmio_barrier(void) {
   (void)um_readl_gpio(GPIO_GPLEV0);
 }
 
+static inline uint32_t um_effective_wr_stretch(void) {
+  return gu.wr_stretch == 0u ? 1u : gu.wr_stretch;
+}
+
+static inline uint32_t um_effective_rd_stretch(void) {
+  return gu.rd_stretch == 0u ? 1u : gu.rd_stretch;
+}
+
 static uint32_t um_set_fsel(uint32_t fsel, unsigned int pin, unsigned int func) {
   unsigned int shift = (pin % 10u) * 3u;
   uint32_t mask = 0x7u << shift;
@@ -367,9 +377,11 @@ static uint64_t now_us_monotonic(void) {
 
 static int um_wait_for_txn(const char* op_name) {
   uint64_t deadline = now_us_monotonic() + (uint64_t)UMIO_TIMEOUT_US;
+  uint32_t spins = 0;
 
   while (um_readl_gpio(GPIO_GPLEV0) & (1u << PIN_TXN_IN_PROGRESS)) {
-    if (now_us_monotonic() > deadline) {
+    spins++;
+    if ((spins & (UMIO_DEADLINE_CHECK_ITERS - 1u)) == 0u && now_us_monotonic() > deadline) {
       fprintf(stderr, "[ps_backend:userspace-mmio] txn timeout waiting for %s\n", op_name);
       return -ETIMEDOUT;
     }
@@ -380,10 +392,11 @@ static int um_wait_for_txn(const char* op_name) {
 
 static void um_write_payload(uint32_t payload, uint32_t reg_sel) {
   uint32_t pins = (payload & 0x00FFFF00u) | ((reg_sel & 0x3u) << PIN_A0);
+  uint32_t stretch = um_effective_wr_stretch();
 
   um_write_set(pins);
   um_mmio_barrier();
-  for (uint32_t i = 0; i < gu.wr_stretch; i++) {
+  for (uint32_t i = 0; i < stretch; i++) {
     um_write_set(1u << PIN_WR);
     um_mmio_barrier();
   }
@@ -482,6 +495,7 @@ static int um_write8_fc(uint32_t addr, uint8_t data, uint8_t fc) {
 static int um_read16_fc(uint32_t addr, uint16_t* out, uint8_t fc) {
   int ret;
   uint32_t value;
+  uint32_t stretch = um_effective_rd_stretch();
 
   if (!out) {
     return -EINVAL;
@@ -494,7 +508,7 @@ static int um_read16_fc(uint32_t addr, uint16_t* out, uint8_t fc) {
   um_set_bus_dir(false);
   um_write_set(REG_DATA << PIN_A0);
   um_mmio_barrier();
-  for (uint32_t i = 0; i < gu.rd_stretch; i++) {
+  for (uint32_t i = 0; i < stretch; i++) {
     um_write_set(1u << PIN_RD);
     um_mmio_barrier();
   }
@@ -528,6 +542,37 @@ static int um_read8_fc(uint32_t addr, uint8_t* out, uint8_t fc) {
   return 0;
 }
 
+/*
+ * Helper for a 32-bit write as two legal 16-bit cycles while keeping GPIO
+ * direction stable for the pair. This reduces Pi-side direction churn without
+ * changing Amiga-visible bus semantics.
+ */
+static int um_write32_fc_pair(uint32_t addr, uint32_t value, uint8_t fc) {
+  uint32_t addr1 = addr + 2u;
+  uint16_t hi = (uint16_t)(value >> 16);
+  uint16_t lo = (uint16_t)(value & 0xFFFFu);
+  int ret;
+
+  um_set_bus_dir(true);
+
+  um_write_payload(((uint32_t)hi & 0xFFFFu) << 8, REG_DATA);
+  um_write_payload((addr & 0xFFFFu) << 8, REG_ADDR_LO);
+  um_write_payload(um_addr_hi_payload(addr, 0x0000u, fc) << 8, REG_ADDR_HI);
+  ret = um_wait_for_txn("write32_fc[0]");
+  if (ret < 0) {
+    um_set_bus_dir(false);
+    return ret;
+  }
+
+  um_write_payload(((uint32_t)lo & 0xFFFFu) << 8, REG_DATA);
+  um_write_payload((addr1 & 0xFFFFu) << 8, REG_ADDR_LO);
+  um_write_payload(um_addr_hi_payload(addr1, 0x0000u, fc) << 8, REG_ADDR_HI);
+  ret = um_wait_for_txn("write32_fc[1]");
+
+  um_set_bus_dir(false);
+  return ret;
+}
+
 static int um_write_status(uint16_t value) {
   if (gu.bus_arb_release) {
     value |= STATUS_BIT_BUS_ARB;
@@ -543,6 +588,7 @@ static int um_write_status(uint16_t value) {
 
 static int um_read_status(uint16_t* out) {
   uint32_t value;
+  uint32_t stretch = um_effective_rd_stretch();
 
   if (!out) {
     return -EINVAL;
@@ -551,7 +597,7 @@ static int um_read_status(uint16_t* out) {
   um_set_bus_dir(false);
   um_write_set(REG_STATUS << PIN_A0);
   um_mmio_barrier();
-  for (uint32_t i = 0; i < gu.rd_stretch; i++) {
+  for (uint32_t i = 0; i < stretch; i++) {
     um_write_set(1u << PIN_RD);
     um_mmio_barrier();
   }
@@ -611,6 +657,7 @@ static int um_init(struct ps_ctx* ctx) {
   gu.berr_reset_input = (parse_bool_env("PISTORM_MMIO_BERR_RESET_INPUT", 1) != 0);
   gu.bus_arb_release = (parse_bool_env("PISTORM_MMIO_BUS_ARB_RELEASE", 0) != 0);
   gu.setup_gpclk = (parse_bool_env("PISTORM_MMIO_SETUP_GPCLK", 1) != 0);
+  gu.lwpair_enable = (parse_bool_env("PISTORM_MMIO_LWPAIR", 1) != 0);
   gu.wr_stretch = gu_cfg.wr_stretch;
   gu.rd_stretch = gu_cfg.rd_stretch;
 
@@ -620,13 +667,13 @@ static int um_init(struct ps_ctx* ctx) {
   if (!gu_cfg.rd_stretch_overridden) {
     (void)parse_u32_env("PISTORM_MMIO_RD_STRETCH", &gu.rd_stretch);
   }
-  if (gu.wr_stretch == 0u || gu.wr_stretch > 64u) {
-    fprintf(stderr, "[ps_backend:userspace-mmio] invalid PISTORM_MMIO_WR_STRETCH=%u (valid 1..64)\n",
+  if (gu.wr_stretch > 64u) {
+    fprintf(stderr, "[ps_backend:userspace-mmio] invalid PISTORM_MMIO_WR_STRETCH=%u (valid 0..64)\n",
             gu.wr_stretch);
     gu.wr_stretch = UMIO_WR_STRETCH_DEFAULT;
   }
-  if (gu.rd_stretch == 0u || gu.rd_stretch > 64u) {
-    fprintf(stderr, "[ps_backend:userspace-mmio] invalid PISTORM_MMIO_RD_STRETCH=%u (valid 1..64)\n",
+  if (gu.rd_stretch > 64u) {
+    fprintf(stderr, "[ps_backend:userspace-mmio] invalid PISTORM_MMIO_RD_STRETCH=%u (valid 0..64)\n",
             gu.rd_stretch);
     gu.rd_stretch = UMIO_RD_STRETCH_DEFAULT;
   }
@@ -710,9 +757,10 @@ static int um_init(struct ps_ctx* ctx) {
   }
 
   if (!gu.backend_logged) {
-    printf("[ps_backend] backend=userspace-mmio (gpio=%s, cprman=%s, wr_stretch=%u, rd_stretch=%u)\n",
+    printf("[ps_backend] backend=userspace-mmio (gpio=%s, cprman=%s, wr_stretch=%u, rd_stretch=%u, lwpair=%u)\n",
            using_gpiomem ? "/dev/gpiomem" : "/dev/mem",
-           gu.setup_gpclk ? "/dev/mem" : "not-mapped", gu.wr_stretch, gu.rd_stretch);
+           gu.setup_gpclk ? "/dev/mem" : "not-mapped", gu.wr_stretch, gu.rd_stretch,
+           gu.lwpair_enable ? 1u : 0u);
     gu.backend_logged = 1;
   }
 
@@ -808,6 +856,7 @@ static int um_read16_op(struct ps_ctx* ctx, uint32_t addr, uint8_t fc, uint16_t*
 static int um_read32_op(struct ps_ctx* ctx, uint32_t addr, uint8_t fc, uint32_t* out) {
   uint16_t hi = 0;
   uint16_t lo = 0;
+  uint8_t fc7 = (uint8_t)(fc & 0x7u);
   int ret;
   (void)ctx;
 
@@ -815,12 +864,12 @@ static int um_read32_op(struct ps_ctx* ctx, uint32_t addr, uint8_t fc, uint32_t*
     return -EINVAL;
   }
 
-  ret = um_read16_fc(addr, &hi, fc & 0x7u);
+  ret = um_read16_fc(addr, &hi, fc7);
   if (ret < 0) {
     return ret;
   }
 
-  ret = um_read16_fc(addr + 2u, &lo, fc & 0x7u);
+  ret = um_read16_fc(addr + 2u, &lo, fc7);
   if (ret < 0) {
     return ret;
   }
@@ -843,12 +892,15 @@ static int um_write32_op(struct ps_ctx* ctx, uint32_t addr, uint32_t value, uint
   int ret;
   (void)ctx;
 
-  ret = um_write16_fc(addr, (uint16_t)(value >> 16), fc & 0x7u);
-  if (ret < 0) {
-    return ret;
+  if (!gu.lwpair_enable) {
+    ret = um_write16_fc(addr, (uint16_t)(value >> 16), (uint8_t)(fc & 0x7u));
+    if (ret < 0) {
+      return ret;
+    }
+    return um_write16_fc(addr + 2u, (uint16_t)(value & 0xFFFFu), (uint8_t)(fc & 0x7u));
   }
 
-  return um_write16_fc(addr + 2u, (uint16_t)(value & 0xFFFFu), fc & 0x7u);
+  return um_write32_fc_pair(addr, value, (uint8_t)(fc & 0x7u));
 }
 
 static int um_get_pins(struct ps_ctx* ctx, struct pistorm_pins* pins) {

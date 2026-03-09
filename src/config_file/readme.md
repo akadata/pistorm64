@@ -101,14 +101,14 @@ Example: `pistorm-gpclk-div 6`
 These only affect the `pistorm userspace` backend and are applied during early preparse
 before backend init.
 
-SYNTAX: `pistorm-mmio-wr-stretch <1..64>`  
+SYNTAX: `pistorm-mmio-wr-stretch <0..64>`  
 Example: `pistorm-mmio-wr-stretch 2`
 
-SYNTAX: `pistorm-mmio-rd-stretch <1..64>`  
+SYNTAX: `pistorm-mmio-rd-stretch <0..64>`  
 Example: `pistorm-mmio-rd-stretch 2`
 
 These stretch GPIO WR/RD strobe pulses in userspace MMIO mode. Increase when you see
-transaction timeouts on faster Pi4 userspace paths.
+transaction timeouts on faster Pi4 userspace paths. `0` means minimum pulse (no extra stretch).
 
 # keyboard
 

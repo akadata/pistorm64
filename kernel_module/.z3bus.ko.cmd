@@ -1,0 +1,1 @@
+savedcmd_/home/smalley/pistorm64/kernel_module/z3bus.ko := aarch64-linux-gnu-ld -r -EL  -maarch64elf -z noexecstack --no-warn-rwx-segments --build-id=sha1  -T arch/arm64/module.lds -o /home/smalley/pistorm64/kernel_module/z3bus.ko /home/smalley/pistorm64/kernel_module/z3bus.o /home/smalley/pistorm64/kernel_module/z3bus.mod.o /home/smalley/pistorm64/kernel_module/.module-common.o
