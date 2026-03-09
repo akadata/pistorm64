@@ -54,6 +54,10 @@ int ps_backend_userspace_set_gpclk_src(uint32_t src);
 int ps_backend_userspace_set_gpclk_div(uint32_t div);
 int ps_backend_userspace_set_wr_stretch(uint32_t count);
 int ps_backend_userspace_set_rd_stretch(uint32_t count);
+int ps_backend_userspace_set_lwpair(uint32_t enabled);
+int ps_backend_userspace_set_r32pair(uint32_t enabled);
+int ps_backend_userspace_set_ramseq(uint32_t enabled);
+int ps_backend_userspace_set_wpipe(uint32_t enabled);
 
 int ps_backend_setup_protocol(void);
 void ps_backend_shutdown(void);

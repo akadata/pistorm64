@@ -110,6 +110,37 @@ Example: `pistorm-mmio-rd-stretch 2`
 These stretch GPIO WR/RD strobe pulses in userspace MMIO mode. Increase when you see
 transaction timeouts on faster Pi4 userspace paths. `0` means minimum pulse (no extra stretch).
 
+SYNTAX: `pistorm-mmio-lwpair <0|1>`  
+Example: `pistorm-mmio-lwpair 1`
+
+SYNTAX: `pistorm-mmio-r32pair <0|1>`  
+Example: `pistorm-mmio-r32pair 1`
+
+SYNTAX: `pistorm-mmio-ramseq <0|1>`  
+Example: `pistorm-mmio-ramseq 1`
+
+SYNTAX: `pistorm-mmio-wpipe <0|1>`  
+Example: `pistorm-mmio-wpipe 1`
+
+Userspace defaults:
+- `pistorm-mmio-lwpair 1`
+- `pistorm-mmio-r32pair 1`
+- `pistorm-mmio-ramseq 1`
+- `pistorm-mmio-wpipe 0`
+
+`pistorm-mmio-wpipe` is conservative and only affects non-FC (`fc=0`) chip-RAM writes.
+
+Recommended userspace profile:
+- `pistorm userspace`
+- `pistorm-gpclk-src 5`
+- `pistorm-gpclk-div 6`
+- `pistorm-mmio-wr-stretch 0`
+- `pistorm-mmio-rd-stretch 0`
+- `pistorm-mmio-lwpair 1`
+- `pistorm-mmio-r32pair 1`
+- `pistorm-mmio-ramseq 1`
+- `pistorm-mmio-wpipe 1`
+
 # keyboard
 
 SYNTAX: `keyboard {grab_key} {grab / nograb} {autoconnect / noautoconnect}`  

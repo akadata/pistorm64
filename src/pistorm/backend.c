@@ -169,6 +169,38 @@ int ps_backend_userspace_set_rd_stretch(uint32_t count) {
   return ps_userspace_mmio_set_rd_stretch(count);
 }
 
+int ps_backend_userspace_set_lwpair(uint32_t enabled) {
+  if (g_ctx.ops) {
+    fprintf(stderr, "[ps_backend] userspace lwpair change denied after backend init\n");
+    return -EBUSY;
+  }
+  return ps_userspace_mmio_set_lwpair(enabled);
+}
+
+int ps_backend_userspace_set_r32pair(uint32_t enabled) {
+  if (g_ctx.ops) {
+    fprintf(stderr, "[ps_backend] userspace r32pair change denied after backend init\n");
+    return -EBUSY;
+  }
+  return ps_userspace_mmio_set_r32pair(enabled);
+}
+
+int ps_backend_userspace_set_ramseq(uint32_t enabled) {
+  if (g_ctx.ops) {
+    fprintf(stderr, "[ps_backend] userspace ramseq change denied after backend init\n");
+    return -EBUSY;
+  }
+  return ps_userspace_mmio_set_ramseq(enabled);
+}
+
+int ps_backend_userspace_set_wpipe(uint32_t enabled) {
+  if (g_ctx.ops) {
+    fprintf(stderr, "[ps_backend] userspace wpipe change denied after backend init\n");
+    return -EBUSY;
+  }
+  return ps_userspace_mmio_set_wpipe(enabled);
+}
+
 const char* ps_backend_selected_name(void) {
   return ps_backend_kind_name(g_selected_kind);
 }

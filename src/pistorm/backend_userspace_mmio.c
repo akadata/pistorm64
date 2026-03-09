@@ -74,10 +74,18 @@ struct ps_userspace_mmio_cfg {
   uint32_t gpclk_div;
   uint32_t wr_stretch;
   uint32_t rd_stretch;
+  bool lwpair_enable;
+  bool r32pair_enable;
+  bool ramseq_enable;
+  bool wpipe_enable;
   int gpclk_src_overridden;
   int gpclk_div_overridden;
   int wr_stretch_overridden;
   int rd_stretch_overridden;
+  int lwpair_overridden;
+  int r32pair_overridden;
+  int ramseq_overridden;
+  int wpipe_overridden;
 };
 
 struct ps_userspace_mmio_state {
@@ -124,6 +132,10 @@ static struct ps_userspace_mmio_cfg gu_cfg = {
   .gpclk_div = UMIO_GPCLK_DIV_DEFAULT,
   .wr_stretch = UMIO_WR_STRETCH_DEFAULT,
   .rd_stretch = UMIO_RD_STRETCH_DEFAULT,
+  .lwpair_enable = true,
+  .r32pair_enable = true,
+  .ramseq_enable = true,
+  .wpipe_enable = false,
 };
 
 int ps_userspace_mmio_set_gpclk_src(uint32_t src) {
@@ -162,6 +174,42 @@ int ps_userspace_mmio_set_rd_stretch(uint32_t count) {
   return 0;
 }
 
+int ps_userspace_mmio_set_lwpair(uint32_t enabled) {
+  if (enabled > 1u) {
+    return -EINVAL;
+  }
+  gu_cfg.lwpair_enable = enabled != 0u;
+  gu_cfg.lwpair_overridden = 1;
+  return 0;
+}
+
+int ps_userspace_mmio_set_r32pair(uint32_t enabled) {
+  if (enabled > 1u) {
+    return -EINVAL;
+  }
+  gu_cfg.r32pair_enable = enabled != 0u;
+  gu_cfg.r32pair_overridden = 1;
+  return 0;
+}
+
+int ps_userspace_mmio_set_ramseq(uint32_t enabled) {
+  if (enabled > 1u) {
+    return -EINVAL;
+  }
+  gu_cfg.ramseq_enable = enabled != 0u;
+  gu_cfg.ramseq_overridden = 1;
+  return 0;
+}
+
+int ps_userspace_mmio_set_wpipe(uint32_t enabled) {
+  if (enabled > 1u) {
+    return -EINVAL;
+  }
+  gu_cfg.wpipe_enable = enabled != 0u;
+  gu_cfg.wpipe_overridden = 1;
+  return 0;
+}
+
 static uint32_t read_be32(const uint8_t* p) {
   return ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16) | ((uint32_t)p[2] << 8) | (uint32_t)p[3];
 }
@@ -184,6 +232,28 @@ static int parse_bool_env(const char* name, int default_value) {
   }
 
   return default_value;
+}
+
+static int parse_bool_env_value(const char* name, bool* out) {
+  const char* env = getenv(name);
+
+  if (!env || !*env || !out) {
+    return -1;
+  }
+
+  if (strcmp(env, "1") == 0 || strcasecmp(env, "true") == 0 || strcasecmp(env, "yes") == 0 ||
+      strcasecmp(env, "on") == 0) {
+    *out = true;
+    return 0;
+  }
+
+  if (strcmp(env, "0") == 0 || strcasecmp(env, "false") == 0 || strcasecmp(env, "no") == 0 ||
+      strcasecmp(env, "off") == 0) {
+    *out = false;
+    return 0;
+  }
+
+  return -1;
 }
 
 static int parse_u32_env(const char* name, uint32_t* out) {
@@ -825,11 +895,37 @@ static int um_init(struct ps_ctx* ctx) {
   gu.berr_reset_input = (parse_bool_env("PISTORM_MMIO_BERR_RESET_INPUT", 1) != 0);
   gu.bus_arb_release = (parse_bool_env("PISTORM_MMIO_BUS_ARB_RELEASE", 0) != 0);
   gu.setup_gpclk = (parse_bool_env("PISTORM_MMIO_SETUP_GPCLK", 1) != 0);
-  gu.lwpair_enable = (parse_bool_env("PISTORM_MMIO_LWPAIR", 1) != 0);
-  gu.lrpair_enable = (parse_bool_env("PISTORM_MMIO_R32PAIR", 1) != 0);
-  gu.ramseq_enable = (parse_bool_env("PISTORM_MMIO_RAMSEQ", 1) != 0);
-  gu.wpipe_enable = (parse_bool_env("PISTORM_MMIO_WPIPE", 0) != 0);
+  gu.lwpair_enable = gu_cfg.lwpair_enable;
+  gu.lrpair_enable = gu_cfg.r32pair_enable;
+  gu.ramseq_enable = gu_cfg.ramseq_enable;
+  gu.wpipe_enable = gu_cfg.wpipe_enable;
   gu.write_pending = false;
+
+  if (!gu_cfg.lwpair_overridden) {
+    bool v = false;
+    if (parse_bool_env_value("PISTORM_MMIO_LWPAIR", &v) == 0) {
+      gu.lwpair_enable = v;
+    }
+  }
+  if (!gu_cfg.r32pair_overridden) {
+    bool v = false;
+    if (parse_bool_env_value("PISTORM_MMIO_R32PAIR", &v) == 0) {
+      gu.lrpair_enable = v;
+    }
+  }
+  if (!gu_cfg.ramseq_overridden) {
+    bool v = false;
+    if (parse_bool_env_value("PISTORM_MMIO_RAMSEQ", &v) == 0) {
+      gu.ramseq_enable = v;
+    }
+  }
+  if (!gu_cfg.wpipe_overridden) {
+    bool v = false;
+    if (parse_bool_env_value("PISTORM_MMIO_WPIPE", &v) == 0) {
+      gu.wpipe_enable = v;
+    }
+  }
+
   if (gu.wpipe_enable) {
     fprintf(stderr, "[ps_backend:userspace-mmio] WPIPE enabled in conservative mode "
                     "(non-FC fc=0 chip-ram writes only)\n");

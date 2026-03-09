@@ -45,6 +45,22 @@ int ps_set_userspace_rd_stretch(uint32_t count) {
   return ps_backend_userspace_set_rd_stretch(count);
 }
 
+int ps_set_userspace_lwpair(uint32_t enabled) {
+  return ps_backend_userspace_set_lwpair(enabled);
+}
+
+int ps_set_userspace_r32pair(uint32_t enabled) {
+  return ps_backend_userspace_set_r32pair(enabled);
+}
+
+int ps_set_userspace_ramseq(uint32_t enabled) {
+  return ps_backend_userspace_set_ramseq(enabled);
+}
+
+int ps_set_userspace_wpipe(uint32_t enabled) {
+  return ps_backend_userspace_set_wpipe(enabled);
+}
+
 void ps_setup_protocol(void) {
   if (ps_backend_setup_protocol() < 0) {
     ps_protocol_ready = 0;

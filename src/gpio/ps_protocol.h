@@ -71,6 +71,10 @@ int ps_set_userspace_gpclk_src(uint32_t src);
 int ps_set_userspace_gpclk_div(uint32_t div);
 int ps_set_userspace_wr_stretch(uint32_t count);
 int ps_set_userspace_rd_stretch(uint32_t count);
+int ps_set_userspace_lwpair(uint32_t enabled);
+int ps_set_userspace_r32pair(uint32_t enabled);
+int ps_set_userspace_ramseq(uint32_t enabled);
+int ps_set_userspace_wpipe(uint32_t enabled);
 
 /* Batch/queue support */
 

@@ -60,6 +60,10 @@ const char* config_item_names[CONFITEM_NUM] = {
     "pistorm-gpclk-div",
     "pistorm-mmio-wr-stretch",
     "pistorm-mmio-rd-stretch",
+    "pistorm-mmio-lwpair",
+    "pistorm-mmio-r32pair",
+    "pistorm-mmio-ramseq",
+    "pistorm-mmio-wpipe",
     "setvar",     
     "kbfile", 
     "affinity",
@@ -699,6 +703,106 @@ mapid[sizeof(mapid) - 1] = '\0';  // Ensure null termination
     }
     break;
   }
+  case CONFITEM_PISTORM_MMIO_LWPAIR: {
+    unsigned int enabled = 0;
+    int ret;
+
+    get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+    if (!strlen(cur_cmd)) {
+      printf("[CFG] pistorm-mmio-lwpair command requires a value (0|1).\n");
+      break;
+    }
+
+    if (strcmp(cur_cmd, "0") != 0 && strcmp(cur_cmd, "1") != 0) {
+      printf("[CFG] invalid pistorm-mmio-lwpair value '%s' (valid 0|1).\n", cur_cmd);
+      break;
+    }
+    enabled = (unsigned int)(cur_cmd[0] == '1');
+    ret = ps_set_userspace_lwpair((uint32_t)enabled);
+    if (ret == 0) {
+      printf("[CFG] userspace LWPAIR set to %u.\n", enabled);
+    } else if (ret == -EBUSY) {
+      printf("[CFG] userspace LWPAIR ignored (backend already initialized).\n");
+    } else {
+      printf("[CFG] invalid pistorm-mmio-lwpair value '%s' (valid 0|1).\n", cur_cmd);
+    }
+    break;
+  }
+  case CONFITEM_PISTORM_MMIO_R32PAIR: {
+    unsigned int enabled = 0;
+    int ret;
+
+    get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+    if (!strlen(cur_cmd)) {
+      printf("[CFG] pistorm-mmio-r32pair command requires a value (0|1).\n");
+      break;
+    }
+
+    if (strcmp(cur_cmd, "0") != 0 && strcmp(cur_cmd, "1") != 0) {
+      printf("[CFG] invalid pistorm-mmio-r32pair value '%s' (valid 0|1).\n", cur_cmd);
+      break;
+    }
+    enabled = (unsigned int)(cur_cmd[0] == '1');
+    ret = ps_set_userspace_r32pair((uint32_t)enabled);
+    if (ret == 0) {
+      printf("[CFG] userspace R32PAIR set to %u.\n", enabled);
+    } else if (ret == -EBUSY) {
+      printf("[CFG] userspace R32PAIR ignored (backend already initialized).\n");
+    } else {
+      printf("[CFG] invalid pistorm-mmio-r32pair value '%s' (valid 0|1).\n", cur_cmd);
+    }
+    break;
+  }
+  case CONFITEM_PISTORM_MMIO_RAMSEQ: {
+    unsigned int enabled = 0;
+    int ret;
+
+    get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+    if (!strlen(cur_cmd)) {
+      printf("[CFG] pistorm-mmio-ramseq command requires a value (0|1).\n");
+      break;
+    }
+
+    if (strcmp(cur_cmd, "0") != 0 && strcmp(cur_cmd, "1") != 0) {
+      printf("[CFG] invalid pistorm-mmio-ramseq value '%s' (valid 0|1).\n", cur_cmd);
+      break;
+    }
+    enabled = (unsigned int)(cur_cmd[0] == '1');
+    ret = ps_set_userspace_ramseq((uint32_t)enabled);
+    if (ret == 0) {
+      printf("[CFG] userspace RAMSEQ set to %u.\n", enabled);
+    } else if (ret == -EBUSY) {
+      printf("[CFG] userspace RAMSEQ ignored (backend already initialized).\n");
+    } else {
+      printf("[CFG] invalid pistorm-mmio-ramseq value '%s' (valid 0|1).\n", cur_cmd);
+    }
+    break;
+  }
+  case CONFITEM_PISTORM_MMIO_WPIPE: {
+    unsigned int enabled = 0;
+    int ret;
+
+    get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+    if (!strlen(cur_cmd)) {
+      printf("[CFG] pistorm-mmio-wpipe command requires a value (0|1).\n");
+      break;
+    }
+
+    if (strcmp(cur_cmd, "0") != 0 && strcmp(cur_cmd, "1") != 0) {
+      printf("[CFG] invalid pistorm-mmio-wpipe value '%s' (valid 0|1).\n", cur_cmd);
+      break;
+    }
+    enabled = (unsigned int)(cur_cmd[0] == '1');
+    ret = ps_set_userspace_wpipe((uint32_t)enabled);
+    if (ret == 0) {
+      printf("[CFG] userspace WPIPE set to %u.\n", enabled);
+    } else if (ret == -EBUSY) {
+      printf("[CFG] userspace WPIPE ignored (backend already initialized).\n");
+    } else {
+      printf("[CFG] invalid pistorm-mmio-wpipe value '%s' (valid 0|1).\n", cur_cmd);
+    }
+    break;
+  }
   case CONFITEM_SETVAR: {
     if (!cfg->platform) {
       printf("[CFG] Warning: setvar used in config file with no platform specified.\n");
@@ -839,6 +943,106 @@ int preparse_pistorm_backend(const char* filename) {
       ret = ps_set_userspace_rd_stretch((uint32_t)count);
       if (ret < 0) {
         printf("[CFG] invalid pistorm-mmio-rd-stretch '%s' on line %d in %s.\n", cur_cmd, line_no,
+               filename);
+      }
+      continue;
+    }
+
+    if (strcasecmp(cur_cmd, "pistorm-mmio-lwpair") == 0) {
+      unsigned int enabled = 0;
+      int ret;
+
+      memset(cur_cmd, 0x00, sizeof(cur_cmd));
+      get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+      if (!strlen(cur_cmd)) {
+        printf("[CFG] pistorm-mmio-lwpair missing value on line %d in %s.\n", line_no, filename);
+        continue;
+      }
+
+      if (strcmp(cur_cmd, "0") != 0 && strcmp(cur_cmd, "1") != 0) {
+        printf("[CFG] invalid pistorm-mmio-lwpair '%s' on line %d in %s.\n", cur_cmd, line_no,
+               filename);
+        continue;
+      }
+      enabled = (unsigned int)(cur_cmd[0] == '1');
+      ret = ps_set_userspace_lwpair((uint32_t)enabled);
+      if (ret < 0) {
+        printf("[CFG] invalid pistorm-mmio-lwpair '%s' on line %d in %s.\n", cur_cmd, line_no,
+               filename);
+      }
+      continue;
+    }
+
+    if (strcasecmp(cur_cmd, "pistorm-mmio-r32pair") == 0) {
+      unsigned int enabled = 0;
+      int ret;
+
+      memset(cur_cmd, 0x00, sizeof(cur_cmd));
+      get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+      if (!strlen(cur_cmd)) {
+        printf("[CFG] pistorm-mmio-r32pair missing value on line %d in %s.\n", line_no, filename);
+        continue;
+      }
+
+      if (strcmp(cur_cmd, "0") != 0 && strcmp(cur_cmd, "1") != 0) {
+        printf("[CFG] invalid pistorm-mmio-r32pair '%s' on line %d in %s.\n", cur_cmd, line_no,
+               filename);
+        continue;
+      }
+      enabled = (unsigned int)(cur_cmd[0] == '1');
+      ret = ps_set_userspace_r32pair((uint32_t)enabled);
+      if (ret < 0) {
+        printf("[CFG] invalid pistorm-mmio-r32pair '%s' on line %d in %s.\n", cur_cmd, line_no,
+               filename);
+      }
+      continue;
+    }
+
+    if (strcasecmp(cur_cmd, "pistorm-mmio-ramseq") == 0) {
+      unsigned int enabled = 0;
+      int ret;
+
+      memset(cur_cmd, 0x00, sizeof(cur_cmd));
+      get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+      if (!strlen(cur_cmd)) {
+        printf("[CFG] pistorm-mmio-ramseq missing value on line %d in %s.\n", line_no, filename);
+        continue;
+      }
+
+      if (strcmp(cur_cmd, "0") != 0 && strcmp(cur_cmd, "1") != 0) {
+        printf("[CFG] invalid pistorm-mmio-ramseq '%s' on line %d in %s.\n", cur_cmd, line_no,
+               filename);
+        continue;
+      }
+      enabled = (unsigned int)(cur_cmd[0] == '1');
+      ret = ps_set_userspace_ramseq((uint32_t)enabled);
+      if (ret < 0) {
+        printf("[CFG] invalid pistorm-mmio-ramseq '%s' on line %d in %s.\n", cur_cmd, line_no,
+               filename);
+      }
+      continue;
+    }
+
+    if (strcasecmp(cur_cmd, "pistorm-mmio-wpipe") == 0) {
+      unsigned int enabled = 0;
+      int ret;
+
+      memset(cur_cmd, 0x00, sizeof(cur_cmd));
+      get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+      if (!strlen(cur_cmd)) {
+        printf("[CFG] pistorm-mmio-wpipe missing value on line %d in %s.\n", line_no, filename);
+        continue;
+      }
+
+      if (strcmp(cur_cmd, "0") != 0 && strcmp(cur_cmd, "1") != 0) {
+        printf("[CFG] invalid pistorm-mmio-wpipe '%s' on line %d in %s.\n", cur_cmd, line_no,
+               filename);
+        continue;
+      }
+      enabled = (unsigned int)(cur_cmd[0] == '1');
+      ret = ps_set_userspace_wpipe((uint32_t)enabled);
+      if (ret < 0) {
+        printf("[CFG] invalid pistorm-mmio-wpipe '%s' on line %d in %s.\n", cur_cmd, line_no,
                filename);
       }
     }

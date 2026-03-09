@@ -117,6 +117,26 @@ static void preparse_pistorm_backend_local(const char* filename) {
 
     if (strcasecmp(key, "pistorm-mmio-rd-stretch") == 0) {
       (void)ps_set_userspace_rd_stretch((uint32_t)strtoul(value, NULL, 0));
+      continue;
+    }
+
+    if (strcasecmp(key, "pistorm-mmio-lwpair") == 0) {
+      (void)ps_set_userspace_lwpair((uint32_t)strtoul(value, NULL, 0));
+      continue;
+    }
+
+    if (strcasecmp(key, "pistorm-mmio-r32pair") == 0) {
+      (void)ps_set_userspace_r32pair((uint32_t)strtoul(value, NULL, 0));
+      continue;
+    }
+
+    if (strcasecmp(key, "pistorm-mmio-ramseq") == 0) {
+      (void)ps_set_userspace_ramseq((uint32_t)strtoul(value, NULL, 0));
+      continue;
+    }
+
+    if (strcasecmp(key, "pistorm-mmio-wpipe") == 0) {
+      (void)ps_set_userspace_wpipe((uint32_t)strtoul(value, NULL, 0));
     }
   }
 
