@@ -67,6 +67,7 @@
 #define UMIO_WR_STRETCH_DEFAULT 2u
 #define UMIO_RD_STRETCH_DEFAULT 2u
 #define UMIO_DEADLINE_CHECK_ITERS 256u
+#define UMIO_CHIP_RAM_LIMIT 0x00200000u
 
 struct ps_userspace_mmio_cfg {
   uint32_t gpclk_src;
@@ -103,6 +104,7 @@ struct ps_userspace_mmio_state {
   bool setup_gpclk;
   bool lwpair_enable;
   bool lrpair_enable;
+  bool ramseq_enable;
   uint32_t wr_stretch;
   uint32_t rd_stretch;
 
@@ -300,6 +302,16 @@ static inline uint32_t um_effective_rd_stretch(void) {
   return gu.rd_stretch == 0u ? 1u : gu.rd_stretch;
 }
 
+static inline bool um_addr_is_chip_ram(uint32_t addr, uint32_t bytes) {
+  if (bytes == 0u) {
+    return false;
+  }
+  if (addr >= UMIO_CHIP_RAM_LIMIT) {
+    return false;
+  }
+  return addr <= (UMIO_CHIP_RAM_LIMIT - bytes);
+}
+
 static uint32_t um_set_fsel(uint32_t fsel, unsigned int pin, unsigned int func) {
   unsigned int shift = (pin % 10u) * 3u;
   uint32_t mask = 0x7u << shift;
@@ -474,22 +486,29 @@ static inline uint32_t um_addr_hi_payload(uint32_t addr, uint16_t opbits, uint8_
 }
 
 static int um_write16_fc(uint32_t addr, uint16_t data, uint8_t fc) {
+  bool sticky_ram = gu.ramseq_enable && um_addr_is_chip_ram(addr, 2u);
+
   um_set_bus_dir(true);
   um_write_payload(((uint32_t)data & 0xFFFFu) << 8, REG_DATA);
   um_write_payload((addr & 0xFFFFu) << 8, REG_ADDR_LO);
   um_write_payload(um_addr_hi_payload(addr, 0x0000u, fc) << 8, REG_ADDR_HI);
-  um_set_bus_dir(false);
+  if (!sticky_ram) {
+    um_set_bus_dir(false);
+  }
   return um_wait_for_txn("write16_fc");
 }
 
 static int um_write8_fc(uint32_t addr, uint8_t data, uint8_t fc) {
+  bool sticky_ram = gu.ramseq_enable && um_addr_is_chip_ram(addr, 1u);
   uint16_t payload = (addr & 1u) ? (uint16_t)data : (uint16_t)(data | (uint16_t)(data << 8));
 
   um_set_bus_dir(true);
   um_write_payload(((uint32_t)payload & 0xFFFFu) << 8, REG_DATA);
   um_write_payload((addr & 0xFFFFu) << 8, REG_ADDR_LO);
   um_write_payload(um_addr_hi_payload(addr, 0x0100u, fc) << 8, REG_ADDR_HI);
-  um_set_bus_dir(false);
+  if (!sticky_ram) {
+    um_set_bus_dir(false);
+  }
   return um_wait_for_txn("write8_fc");
 }
 
@@ -607,6 +626,7 @@ static int um_read8_fc(uint32_t addr, uint8_t* out, uint8_t fc) {
  * changing Amiga-visible bus semantics.
  */
 static int um_write32_fc_pair(uint32_t addr, uint32_t value, uint8_t fc) {
+  bool sticky_ram = gu.ramseq_enable && um_addr_is_chip_ram(addr, 4u);
   uint32_t addr1 = addr + 2u;
   uint16_t hi = (uint16_t)(value >> 16);
   uint16_t lo = (uint16_t)(value & 0xFFFFu);
@@ -628,7 +648,9 @@ static int um_write32_fc_pair(uint32_t addr, uint32_t value, uint8_t fc) {
   um_write_payload(um_addr_hi_payload(addr1, 0x0000u, fc) << 8, REG_ADDR_HI);
   ret = um_wait_for_txn("write32_fc[1]");
 
-  um_set_bus_dir(false);
+  if (!sticky_ram || ret < 0) {
+    um_set_bus_dir(false);
+  }
   return ret;
 }
 
@@ -718,6 +740,7 @@ static int um_init(struct ps_ctx* ctx) {
   gu.setup_gpclk = (parse_bool_env("PISTORM_MMIO_SETUP_GPCLK", 1) != 0);
   gu.lwpair_enable = (parse_bool_env("PISTORM_MMIO_LWPAIR", 1) != 0);
   gu.lrpair_enable = (parse_bool_env("PISTORM_MMIO_R32PAIR", 1) != 0);
+  gu.ramseq_enable = (parse_bool_env("PISTORM_MMIO_RAMSEQ", 1) != 0);
   gu.wr_stretch = gu_cfg.wr_stretch;
   gu.rd_stretch = gu_cfg.rd_stretch;
 
@@ -817,10 +840,10 @@ static int um_init(struct ps_ctx* ctx) {
   }
 
   if (!gu.backend_logged) {
-    printf("[ps_backend] backend=userspace-mmio (gpio=%s, cprman=%s, wr_stretch=%u, rd_stretch=%u, lwpair=%u, r32pair=%u)\n",
+    printf("[ps_backend] backend=userspace-mmio (gpio=%s, cprman=%s, wr_stretch=%u, rd_stretch=%u, lwpair=%u, r32pair=%u, ramseq=%u)\n",
            using_gpiomem ? "/dev/gpiomem" : "/dev/mem",
            gu.setup_gpclk ? "/dev/mem" : "not-mapped", gu.wr_stretch, gu.rd_stretch,
-           gu.lwpair_enable ? 1u : 0u, gu.lrpair_enable ? 1u : 0u);
+           gu.lwpair_enable ? 1u : 0u, gu.lrpair_enable ? 1u : 0u, gu.ramseq_enable ? 1u : 0u);
     gu.backend_logged = 1;
   }
 
