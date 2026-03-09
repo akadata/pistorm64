@@ -102,6 +102,7 @@ struct ps_userspace_mmio_state {
   bool bus_arb_release;
   bool setup_gpclk;
   bool lwpair_enable;
+  bool lrpair_enable;
   uint32_t wr_stretch;
   uint32_t rd_stretch;
 
@@ -525,6 +526,64 @@ static int um_read16_fc(uint32_t addr, uint16_t* out, uint8_t fc) {
   return 0;
 }
 
+/*
+ * Helper for a 32-bit read as two legal 16-bit cycles.
+ * This keeps semantics identical while reducing software-side call overhead.
+ */
+static int um_read32_fc_pair(uint32_t addr, uint32_t* out, uint8_t fc) {
+  uint32_t stretch = um_effective_rd_stretch();
+  uint16_t hi = 0;
+  uint16_t lo = 0;
+  uint32_t value;
+  int ret;
+  uint32_t addr1 = addr + 2u;
+
+  if (!out) {
+    return -EINVAL;
+  }
+
+  um_set_bus_dir(true);
+  um_write_payload((addr & 0xFFFFu) << 8, REG_ADDR_LO);
+  um_write_payload(um_addr_hi_payload(addr, 0x0200u, fc) << 8, REG_ADDR_HI);
+
+  um_set_bus_dir(false);
+  um_mmio_barrier();
+  for (uint32_t i = 0; i < stretch; i++) {
+    um_write_set(1u << PIN_RD);
+    um_mmio_barrier();
+  }
+
+  ret = um_wait_for_txn("read32_fc[0]");
+  value = um_readl_gpio(GPIO_GPLEV0);
+  um_clear_lines();
+  if (ret < 0) {
+    return ret;
+  }
+  hi = (uint16_t)((value >> 8) & 0xFFFFu);
+
+  um_set_bus_dir(true);
+  um_write_payload((addr1 & 0xFFFFu) << 8, REG_ADDR_LO);
+  um_write_payload(um_addr_hi_payload(addr1, 0x0200u, fc) << 8, REG_ADDR_HI);
+
+  um_set_bus_dir(false);
+  um_mmio_barrier();
+  for (uint32_t i = 0; i < stretch; i++) {
+    um_write_set(1u << PIN_RD);
+    um_mmio_barrier();
+  }
+
+  ret = um_wait_for_txn("read32_fc[1]");
+  value = um_readl_gpio(GPIO_GPLEV0);
+  um_clear_lines();
+  if (ret < 0) {
+    return ret;
+  }
+  lo = (uint16_t)((value >> 8) & 0xFFFFu);
+
+  *out = ((uint32_t)hi << 16) | (uint32_t)lo;
+  return 0;
+}
+
 static int um_read8_fc(uint32_t addr, uint8_t* out, uint8_t fc) {
   uint16_t value = 0;
   int ret;
@@ -658,6 +717,7 @@ static int um_init(struct ps_ctx* ctx) {
   gu.bus_arb_release = (parse_bool_env("PISTORM_MMIO_BUS_ARB_RELEASE", 0) != 0);
   gu.setup_gpclk = (parse_bool_env("PISTORM_MMIO_SETUP_GPCLK", 1) != 0);
   gu.lwpair_enable = (parse_bool_env("PISTORM_MMIO_LWPAIR", 1) != 0);
+  gu.lrpair_enable = (parse_bool_env("PISTORM_MMIO_R32PAIR", 1) != 0);
   gu.wr_stretch = gu_cfg.wr_stretch;
   gu.rd_stretch = gu_cfg.rd_stretch;
 
@@ -757,10 +817,10 @@ static int um_init(struct ps_ctx* ctx) {
   }
 
   if (!gu.backend_logged) {
-    printf("[ps_backend] backend=userspace-mmio (gpio=%s, cprman=%s, wr_stretch=%u, rd_stretch=%u, lwpair=%u)\n",
+    printf("[ps_backend] backend=userspace-mmio (gpio=%s, cprman=%s, wr_stretch=%u, rd_stretch=%u, lwpair=%u, r32pair=%u)\n",
            using_gpiomem ? "/dev/gpiomem" : "/dev/mem",
            gu.setup_gpclk ? "/dev/mem" : "not-mapped", gu.wr_stretch, gu.rd_stretch,
-           gu.lwpair_enable ? 1u : 0u);
+           gu.lwpair_enable ? 1u : 0u, gu.lrpair_enable ? 1u : 0u);
     gu.backend_logged = 1;
   }
 
@@ -862,6 +922,10 @@ static int um_read32_op(struct ps_ctx* ctx, uint32_t addr, uint8_t fc, uint32_t*
 
   if (!out) {
     return -EINVAL;
+  }
+
+  if (gu.lrpair_enable) {
+    return um_read32_fc_pair(addr, out, fc7);
   }
 
   ret = um_read16_fc(addr, &hi, fc7);
