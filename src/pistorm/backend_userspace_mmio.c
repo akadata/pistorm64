@@ -105,6 +105,8 @@ struct ps_userspace_mmio_state {
   bool lwpair_enable;
   bool lrpair_enable;
   bool ramseq_enable;
+  bool wpipe_enable;
+  bool write_pending;
   uint32_t wr_stretch;
   uint32_t rd_stretch;
 
@@ -312,6 +314,17 @@ static inline bool um_addr_is_chip_ram(uint32_t addr, uint32_t bytes) {
   return addr <= (UMIO_CHIP_RAM_LIMIT - bytes);
 }
 
+static inline bool um_wpipe_allowed(uint32_t addr, uint32_t bytes, uint8_t fc) {
+  /* FC-safe mode: pipeline only non-FC (legacy fc=0) chip-ram writes. */
+  if (!gu.wpipe_enable) {
+    return false;
+  }
+  if ((fc & 0x7u) != 0u) {
+    return false;
+  }
+  return um_addr_is_chip_ram(addr, bytes);
+}
+
 static uint32_t um_set_fsel(uint32_t fsel, unsigned int pin, unsigned int func) {
   unsigned int shift = (pin % 10u) * 3u;
   uint32_t mask = 0x7u << shift;
@@ -403,6 +416,18 @@ static int um_wait_for_txn(const char* op_name) {
   return 0;
 }
 
+static int um_drain_pending_write(const char* op_name) {
+  int ret;
+
+  if (!gu.write_pending) {
+    return 0;
+  }
+
+  ret = um_wait_for_txn(op_name);
+  gu.write_pending = false;
+  return ret;
+}
+
 static void um_write_payload(uint32_t payload, uint32_t reg_sel) {
   uint32_t pins = (payload & 0x00FFFF00u) | ((reg_sel & 0x3u) << PIN_A0);
   uint32_t stretch = um_effective_wr_stretch();
@@ -486,11 +511,28 @@ static inline uint32_t um_addr_hi_payload(uint32_t addr, uint16_t opbits, uint8_
 }
 
 static int um_write16_fc(uint32_t addr, uint16_t data, uint8_t fc) {
+  int ret;
   bool sticky_ram = gu.ramseq_enable && um_addr_is_chip_ram(addr, 2u);
+  bool pipe_ram = um_wpipe_allowed(addr, 2u, fc);
+
+  ret = um_drain_pending_write(pipe_ram ? "write16_fc[pending]" : "write16_fc[drain]");
+  if (ret < 0) {
+    um_set_bus_dir(false);
+    return ret;
+  }
 
   um_set_bus_dir(true);
   um_write_payload(((uint32_t)data & 0xFFFFu) << 8, REG_DATA);
   um_write_payload((addr & 0xFFFFu) << 8, REG_ADDR_LO);
+
+  if (pipe_ram) {
+    um_write_payload(um_addr_hi_payload(addr, 0x0000u, fc) << 8, REG_ADDR_HI);
+    gu.write_pending = true;
+    if (!sticky_ram) {
+      um_set_bus_dir(false);
+    }
+    return 0;
+  }
   um_write_payload(um_addr_hi_payload(addr, 0x0000u, fc) << 8, REG_ADDR_HI);
   if (!sticky_ram) {
     um_set_bus_dir(false);
@@ -499,12 +541,29 @@ static int um_write16_fc(uint32_t addr, uint16_t data, uint8_t fc) {
 }
 
 static int um_write8_fc(uint32_t addr, uint8_t data, uint8_t fc) {
+  int ret;
   bool sticky_ram = gu.ramseq_enable && um_addr_is_chip_ram(addr, 1u);
+  bool pipe_ram = um_wpipe_allowed(addr, 1u, fc);
   uint16_t payload = (addr & 1u) ? (uint16_t)data : (uint16_t)(data | (uint16_t)(data << 8));
+
+  ret = um_drain_pending_write(pipe_ram ? "write8_fc[pending]" : "write8_fc[drain]");
+  if (ret < 0) {
+    um_set_bus_dir(false);
+    return ret;
+  }
 
   um_set_bus_dir(true);
   um_write_payload(((uint32_t)payload & 0xFFFFu) << 8, REG_DATA);
   um_write_payload((addr & 0xFFFFu) << 8, REG_ADDR_LO);
+
+  if (pipe_ram) {
+    um_write_payload(um_addr_hi_payload(addr, 0x0100u, fc) << 8, REG_ADDR_HI);
+    gu.write_pending = true;
+    if (!sticky_ram) {
+      um_set_bus_dir(false);
+    }
+    return 0;
+  }
   um_write_payload(um_addr_hi_payload(addr, 0x0100u, fc) << 8, REG_ADDR_HI);
   if (!sticky_ram) {
     um_set_bus_dir(false);
@@ -519,6 +578,11 @@ static int um_read16_fc(uint32_t addr, uint16_t* out, uint8_t fc) {
 
   if (!out) {
     return -EINVAL;
+  }
+
+  ret = um_drain_pending_write("read16_fc[drain]");
+  if (ret < 0) {
+    return ret;
   }
 
   um_set_bus_dir(true);
@@ -559,6 +623,11 @@ static int um_read32_fc_pair(uint32_t addr, uint32_t* out, uint8_t fc) {
 
   if (!out) {
     return -EINVAL;
+  }
+
+  ret = um_drain_pending_write("read32_fc_pair[drain]");
+  if (ret < 0) {
+    return ret;
   }
 
   um_set_bus_dir(true);
@@ -632,6 +701,11 @@ static int um_write32_fc_pair(uint32_t addr, uint32_t value, uint8_t fc) {
   uint16_t lo = (uint16_t)(value & 0xFFFFu);
   int ret;
 
+  ret = um_drain_pending_write("write32_fc_pair[drain]");
+  if (ret < 0) {
+    return ret;
+  }
+
   um_set_bus_dir(true);
 
   um_write_payload(((uint32_t)hi & 0xFFFFu) << 8, REG_DATA);
@@ -655,6 +729,13 @@ static int um_write32_fc_pair(uint32_t addr, uint32_t value, uint8_t fc) {
 }
 
 static int um_write_status(uint16_t value) {
+  int ret;
+
+  ret = um_drain_pending_write("write_status[drain]");
+  if (ret < 0) {
+    return ret;
+  }
+
   if (gu.bus_arb_release) {
     value |= STATUS_BIT_BUS_ARB;
   } else {
@@ -668,11 +749,17 @@ static int um_write_status(uint16_t value) {
 }
 
 static int um_read_status(uint16_t* out) {
+  int ret;
   uint32_t value;
   uint32_t stretch = um_effective_rd_stretch();
 
   if (!out) {
     return -EINVAL;
+  }
+
+  ret = um_drain_pending_write("read_status[drain]");
+  if (ret < 0) {
+    return ret;
   }
 
   um_set_bus_dir(false);
@@ -741,6 +828,13 @@ static int um_init(struct ps_ctx* ctx) {
   gu.lwpair_enable = (parse_bool_env("PISTORM_MMIO_LWPAIR", 1) != 0);
   gu.lrpair_enable = (parse_bool_env("PISTORM_MMIO_R32PAIR", 1) != 0);
   gu.ramseq_enable = (parse_bool_env("PISTORM_MMIO_RAMSEQ", 1) != 0);
+  gu.wpipe_enable = (parse_bool_env("PISTORM_MMIO_WPIPE", 0) != 0);
+  gu.write_pending = false;
+  if (gu.wpipe_enable) {
+    fprintf(stderr, "[ps_backend:userspace-mmio] WPIPE enabled in conservative mode "
+                    "(non-FC fc=0 chip-ram writes only)\n");
+  }
+
   gu.wr_stretch = gu_cfg.wr_stretch;
   gu.rd_stretch = gu_cfg.rd_stretch;
 
@@ -840,10 +934,11 @@ static int um_init(struct ps_ctx* ctx) {
   }
 
   if (!gu.backend_logged) {
-    printf("[ps_backend] backend=userspace-mmio (gpio=%s, cprman=%s, wr_stretch=%u, rd_stretch=%u, lwpair=%u, r32pair=%u, ramseq=%u)\n",
+    printf("[ps_backend] backend=userspace-mmio (gpio=%s, cprman=%s, wr_stretch=%u, rd_stretch=%u, lwpair=%u, r32pair=%u, ramseq=%u, wpipe=%u)\n",
            using_gpiomem ? "/dev/gpiomem" : "/dev/mem",
            gu.setup_gpclk ? "/dev/mem" : "not-mapped", gu.wr_stretch, gu.rd_stretch,
-           gu.lwpair_enable ? 1u : 0u, gu.lrpair_enable ? 1u : 0u, gu.ramseq_enable ? 1u : 0u);
+           gu.lwpair_enable ? 1u : 0u, gu.lrpair_enable ? 1u : 0u, gu.ramseq_enable ? 1u : 0u,
+           gu.wpipe_enable ? 1u : 0u);
     gu.backend_logged = 1;
   }
 
@@ -852,6 +947,7 @@ static int um_init(struct ps_ctx* ctx) {
 
 static void um_shutdown(struct ps_ctx* ctx) {
   (void)ctx;
+  (void)um_drain_pending_write("shutdown[drain]");
 
   if (gu.cprman_map_base && gu.setup_gpclk) {
     um_writel_cprman(CPRMAN_GP0CTL, CPRMAN_PASSWD | GPCLK_CTL_KILL);
@@ -1056,6 +1152,11 @@ static int um_run_batch(struct ps_ctx* ctx, struct pistorm_busop_v2* ops, size_t
       return 0;
     }
 
+    if (um_drain_pending_write("run_batch[drain]") < 0) {
+      op->status = -ETIMEDOUT;
+      return 0;
+    }
+
     if (gu.berr_reset_input && !(um_readl_gpio(GPIO_GPLEV0) & (1u << PIN_RESET))) {
       op->status |= PISTORM_BUSOP_ST_BERR;
     }
@@ -1066,7 +1167,7 @@ static int um_run_batch(struct ps_ctx* ctx, struct pistorm_busop_v2* ops, size_t
 
 static int um_flush(struct ps_ctx* ctx) {
   (void)ctx;
-  return 0;
+  return um_drain_pending_write("flush[drain]");
 }
 
 static void um_dump_stats(struct ps_ctx* ctx) {
