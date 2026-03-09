@@ -1,0 +1,1322 @@
+sudo env -u PISTORM_FPU_NATIVE_TRANS \
+PISTORM_FPU_NATIVE_FAST=2 \
+PISTORM_FPU_NATIVE_STATS=1 \
+./emulator -c default.cfg
+[AFF] main pinned to core 1
+[SELFTEST] alignment OK (cpu + fpr) | alignof(cpu)=16 offsetof(fpr)=192 sizeof(cpu)=2672
+[PS] Selected backend (pre-init): userspace-mmio
+[ps_backend] selected=userspace-mmio
+[ps_backend] backend=userspace-mmio (gpio=/dev/gpiomem, cprman=/dev/mem, wr_stretch=0,rd_stretch=0, lwpair=1, r32pair=1, ramseq=1, wpipe=0)
+[ps_backend:userspace-mmio] gpclk0 configured (src=5 div=6)
+[ps_protocol] backend=userspace-mmio
+[CFG] Set CPU type to 68040.
+[CFG] Setting platform to amiga (sub: 1200)
+[INFO] [CFG] Creating platform config for amiga...
+[CFG] PiStorm backend selected: userspace-mmio.
+[ps_backend] userspace gpclk_src change denied after backend init
+[CFG] userspace GPCLK source ignored (backend already initialized).
+[ps_backend] userspace gpclk_div change denied after backend init
+[CFG] userspace GPCLK divider ignored (backend already initialized).
+[ps_backend] userspace wr_stretch change denied after backend init
+[CFG] userspace WR strobe stretch ignored (backend already initialized).
+[ps_backend] userspace rd_stretch change denied after backend init
+[CFG] userspace RD strobe stretch ignored (backend already initialized).
+[CFG] Set CPU loop cycles to 2048.
+[CFG] Set thread affinity: cpu=2,ipl=3,keyboard=1,mouse=1.
+[CFG] Set RT priorities: cpu=95,ipl=60,keyboard=50,mouse=50.
+[CFG] ROM identified: Kickstart 3.1.4 (46.143) 512KB
+[MUSASHI] Mapped read range 1: 00F80000-01000000 (0x10000000)
+[CFG] ROM mapping set read-only (mprotect).
+[CFG] [MAP 0] Added rom mapping for range 00F80000-00FFFFFF ID: kickstart
+[CFG] Allocating 268435456 bytes for RAM mapping (256 MB)...
+[CFG] [MAP 1] Added ram mapping for range 08000000-17FFFFFF ID: cpu_slot_ram
+[CFG] Allocating 1048576 bytes for RAM mapping (1 MB)...
+[CFG] [MAP 2] Added ram mapping for range 00100000-001FFFFF ID: chipram_extra
+[CFG] Allocating 4194304 bytes for RAM mapping (4 MB)...
+[CFG] [MAP 3] Added ram mapping for range 00200000-005FFFFF ID: z2_autoconf_fast
+[CFG] Allocating 134217728 bytes for RAM mapping (128 MB)...
+[CFG] [MAP 4] Added ram mapping for range 18000000-1FFFFFFF ID: z3_autoconf_fast
+[CFG] Allocating 134217728 bytes for RAM mapping (128 MB)...
+[CFG] [MAP 5] Added ram mapping for range 20000000-27FFFFFF ID: z3_autoconf_fast
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI] Loaded boot ROM: 16384 bytes from ./src/platforms/amiga/piscsi/piscsi.rom
+[INFO] [PISCSI] Boot ROM driver offset=0x1000, hunks=3
+[PISCSI] Loaded Boot ROM.
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=80000000-8000FFFF (was 00000000-00000000) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8000FFFF (was 80000000-8000FFFF) add=00E80000-00E8FFFF
+[INFO] [AMIGA] PISCSI map request: unit 1 -> ../KernelPiStormBench.hdf
+[INFO] [PISCSI] Map 1: [../KernelPiStormBench.hdf] (disk,rw,file) - 16139354112 bytes.
+[PISCSI] CHS: 31272 16 63
+Finding partitions.
+[INFO] [PISCSI] Partition 0: PDH0 (4)
+[INFO] [PISCSI] Partition 1: PDH1 (4)
+Finding file systems.
+[FSHD] Loaded and set up file system 1: PFS/3
+[FSHD] Loaded and set up file system 2: DOS/1
+Done.
+[PISCSI-SELFTEST] Running HDF integrity validation for drive 1...
+[PISCSI-SELFTEST] INFO: Valid RDB signature found in ../KernelPiStormBench.hdf
+[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 1 (../KernelPiStormBench.hdf)
+[INFO] [AMIGA] PISCSI map request: unit 2 -> ../Amiga-MIMO.hdf
+[INFO] [PISCSI] Map 2: [../Amiga-MIMO.hdf] (disk,rw,file) - 4294967296 bytes.
+[PISCSI] CHS: 8322 16 63
+Finding partitions.
+Finding file systems.
+Done.
+[PISCSI-SELFTEST] Running HDF integrity validation for drive 2...
+[PISCSI-SELFTEST] INFO: No RDB signature found in ../Amiga-MIMO.hdf (may be partitioned drive)
+[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 2 (../Amiga-MIMO.hdf)
+[INFO] [AMIGA] PISCSI map request: unit 5 -> ../AmigaOS_Install.hdf
+[INFO] [PISCSI] Map 5: [../AmigaOS_Install.hdf] (disk,rw,file) - 4294967296 bytes.
+[PISCSI] CHS: 4095 16 128
+Finding partitions.
+[INFO] [PISCSI] Partition 0: DH0 (3)
+Finding file systems.
+[FSHD] Loaded and set up file system 3: DOS/3
+Done.
+[PISCSI-SELFTEST] Running HDF integrity validation for drive 5...
+[PISCSI-SELFTEST] INFO: Valid RDB signature found in ../AmigaOS_Install.hdf
+[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 5 (../AmigaOS_Install.hdf)
+[INFO] [AMIGA] PISCSI map request: unit 3 -> ./src/platforms/amiga/pistorm.hdf
+[INFO] [PISCSI] Map 3: [./src/platforms/amiga/pistorm.hdf] (disk,rw,file) - 2621440 bytes.
+[PISCSI] CHS: 160 1 32
+Finding partitions.
+[INFO] [PISCSI] Partition 0: DH99 (4)
+Finding file systems.
+Done.
+[PISCSI-SELFTEST] Running HDF integrity validation for drive 3...
+[PISCSI-SELFTEST] INFO: Valid RDB signature found in ./src/platforms/amiga/pistorm.hdf
+[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 3 (./src/platforms/amiga/pistorm.hdf)
+[CFG] Unknown config item etvar on line 59.
+[INFO] [FC] enabled (cpld)
+[WARN] [FC] CPLD mode selected; requires FC-enabled CPLD bitstream.
+[WARN] [AMIGA] Failed to set bus_arb_release kernel parameter.
+[INFO] [AMIGA] Queue enabled via setvar.
+[INFO] [AMIGA] Batch bits set to 1024 via setvar.
+[CFG] [MAP 6] Added register mapping for range 00DC0000-00DCFFFF ID: None
+[INFO] [AMIGA] PiRTG64 screen width set to 1920.
+[INFO] [AMIGA] PiRTG64 screen height set to 1080.
+[MUSASHI] Mapped read range 2: 70010000-78010000 (0x36000000)
+[MUSASHI] Mapped write range 1: 70010000-78010000 (0x36000000)
+[CFG] Adding 134217728 byte (128 MB) RAM mapping rtg_mem...
+[CFG] [MAP 7] Added ram_noalloc mapping for range 70010000-7800FFFF ID: rtg_mem
+[INFO] [AMIGA] PiRTG64 Enabled.
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=70000000-8000FFFF (was 70000000-7800FFFF) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8000FFFF (was 70000000-8000FFFF) add=00E80000-00E8FFFF
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=70000000-8000FFFF (was 70000000-7800FFFF) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=70000000-8001FFFF (was 70000000-8000FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8001FFFF (was 70000000-8001FFFF) add=00E80000-00E8FFFF
+[A314] Set A314 config filename to /opt/pistorm64/a314/a314d.conf.
+[INFO] [AMIGA] A314 emulation enabled.
+[CFG] Enabled keyboard event forwarding, toggle key k.
+[CFG] Enabled mouse event forwarding from file /dev/input/mice, toggle key m.
+[CFG] IPL NOP count: 8
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA][ZORRO] Z2 config=$00E80000 size=$00010000 Z2 mem=$00200000-$009FFFFF
+[INFO] [AMIGA][ZORRO] Z3 config=$FF000000 size=$00010000 Z3 mem=$40000000-$5FFFFFFF
+[INFO] [AMIGA] Subsystem is [1200]
+[INFO] [AMIGA] Adjusting Gayle accesses for A600/A1200/CD32 Kickstart.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $200000
+[INFO] [AMIGA] 128MB of Z3 Fast RAM configured at $18000000
+[INFO] [AMIGA] 128MB of Z3 Fast RAM configured at $20000000
+[INFO] [AMIGA] No Mainboard Fast RAM configured.
+[INFO] [AMIGA] CPU slot RAM configured at $08000000 (256 MB)
+[MUSASHI] Mapped read range 3: 08000000-18000000 (0x12000000)
+[MUSASHI] Mapped write range 2: 08000000-18000000 (0x12000000)
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=70000000-8000FFFF (was 70000000-7800FFFF) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=70000000-8001FFFF (was 70000000-8000FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8001FFFF (was 70000000-8001FFFF) add=00E80000-00E8FFFF
+[INFO] [AMIGA][CUSTOM] ac_z3        changed=1 now=00E80000-FF00FFFF (was 00E80000-8001FFFF) add=FF000000-FF00FFFF
+[INFO] [CPU] FC enabled and in use (mode=cpld)
+[INFO] [CPU][BERR] Reset status unknown (kernel param not readable)
+No IDE drives mounted, disabling Gayle IDE component.
+[INFO] [CPU] Active backend: Musashi
+Setting CPU type to 9.
+[INFO] [PISCSI] Refresh drive 1: block_size=512 fs=16139354112 bytes
+[INFO] [PISCSI] Partition 0: PDH0 (4)
+[INFO] [PISCSI] Partition 1: PDH1 (4)
+[INFO] [PISCSI] Drive 1 partitions found: 2
+[FSHD] Loaded and set up file system 1: PFS/3
+[FSHD] Loaded and set up file system 2: DOS/1
+[INFO] [PISCSI] Refresh drive 2: block_size=512 fs=4294967296 bytes
+[INFO] [PISCSI] Drive 2 partitions found: 0
+[INFO] [PISCSI] Refresh drive 3: block_size=512 fs=2621440 bytes
+[INFO] [PISCSI] Partition 0: DH99 (4)
+[INFO] [PISCSI] Drive 3 partitions found: 1
+[INFO] [PISCSI] Refresh drive 5: block_size=512 fs=4294967296 bytes
+[INFO] [PISCSI] Partition 0: DH0 (3)
+[INFO] [PISCSI] Drive 5 partitions found: 1
+[FSHD] Loaded and set up file system 3: DOS/3
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=70000000-8000FFFF (was 70000000-7800FFFF) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=70000000-8001FFFF (was 70000000-8000FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8001FFFF (was 70000000-8001FFFF) add=00E80000-00E8FFFF
+[INFO] [AMIGA][CUSTOM] ac_z3        changed=1 now=00E80000-FF00FFFF (was 00E80000-8001FFFF) add=FF000000-FF00FFFF
+[IPL] Thread created successfully
+[IPL] Thread running
+Amiga Reset is up...
+[AFF] ipl pinned to core 3
+[PRIO] ipl set to SCHED_RR priority 60
+[MAIN] Keyboard thread created successfully
+[AFF] input pinned to core 2
+[KBD] Keyboard thread started
+[AFF] keyboard pinned to core 1
+[PRIO] keyboard set to SCHED_RR priority 50
+[MOUSE] Mouse thread started
+[MAIN] Mouse thread created successfully
+[AFF] mouse pinned to core 1
+[AFF] input pinned to core 2
+[PRIO] mouse set to SCHED_RR priority 50
+[MAIN] CPU thread created successfully
+[AFF] cpu pinned to core 2
+[AFF] cpu pinned to core 2
+[PRIO] cpu set to SCHED_RR priority 95
+OVL:0
+[FPU] first path: op1 main=0
+[FPU] first path: op1 main=1
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00E90000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[MUSASHI] Mapped read range 4: 00200000-00600000 (0x24000000)
+[MUSASHI] Mapped write range 3: 00200000-00600000 (0x24000000)
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=00E90000-7800FFFF (was 70000000-7800FFFF) add=00E90000-00E9FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=00E90000-8001FFFF (was 00E90000-7800FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z3        changed=1 now=00E90000-FF00FFFF (was 00E90000-8001FFFF) add=FF000000-FF00FFFF
+[FPU] first path: op0 main=0
+[FPU] first path: op0 subop=7
+[FPU] first path: fmovem dir=1 mode=0 reglist=0xff
+[FPU] first path: op0 subop=5
+[FPU] first path: fmove_fpcr dir=1 regsel=7 ea_mode=4
+[FPU] first path: op0 subop=4
+[FPU] first path: fmove_fpcr dir=0 regsel=7 ea_mode=3
+[FPU] first path: op0 subop=6
+[FPU] first path: fmovem dir=0 mode=2 reglist=0xff
+[INFO] [PISCSI] GETPART: idx=0 offset=0x08013630
+[INFO] [PISCSI] GETPRIO: idx=0 prio=0
+[INFO] [PISCSI] GETPRIO: idx=0 prio=0
+[INFO] [PISCSI] GETPART: idx=1 offset=0x08013730
+[INFO] [PISCSI] GETPRIO: idx=1 prio=-128
+[INFO] [PISCSI] GETPART: idx=2 offset=0x08013830
+[INFO] [PISCSI] GETPRIO: idx=2 prio=-128
+[INFO] [PISCSI] GETPART: idx=3 offset=0x08013930
+[INFO] [PISCSI] GETPRIO: idx=3 prio=-128
+[INFO] [PISCSI] GETPART: idx=4 offset=0x00000000
+[INFO] [PISCSI] Refresh drive 1: block_size=512 fs=16139354112 bytes
+[INFO] [PISCSI] Partition 0: PDH0 (4)
+[INFO] [PISCSI] Partition 1: PDH1 (4)
+[INFO] [PISCSI] Drive 1 partitions found: 2
+[FSHD] Loaded and set up file system 1: PFS/3
+[FSHD] Loaded and set up file system 2: DOS/1
+[INFO] [PISCSI] Refresh drive 2: block_size=512 fs=4294967296 bytes
+[INFO] [PISCSI] Drive 2 partitions found: 0
+[INFO] [PISCSI] Refresh drive 3: block_size=512 fs=2621440 bytes
+[INFO] [PISCSI] Partition 0: DH99 (4)
+[INFO] [PISCSI] Drive 3 partitions found: 1
+[INFO] [PISCSI] Refresh drive 5: block_size=512 fs=4294967296 bytes
+[INFO] [PISCSI] Partition 0: DH0 (3)
+[INFO] [PISCSI] Drive 5 partitions found: 1
+[FSHD] Loaded and set up file system 3: DOS/3
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=70000000-8000FFFF (was 70000000-7800FFFF) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=70000000-8001FFFF (was 70000000-8000FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8001FFFF (was 70000000-8001FFFF) add=00E80000-00E8FFFF
+[INFO] [AMIGA][CUSTOM] ac_z3        changed=1 now=00E80000-FF00FFFF (was 00E80000-8001FFFF) add=FF000000-FF00FFFF
+OVL:0
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00E90000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=00E90000-7800FFFF (was 70000000-7800FFFF) add=00E90000-00E9FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=00E90000-8001FFFF (was 00E90000-7800FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z3        changed=1 now=00E90000-FF00FFFF (was 00E90000-8001FFFF) add=FF000000-FF00FFFF
+[INFO] [PISCSI] GETPART: idx=0 offset=0x08013638
+[INFO] [PISCSI] GETPRIO: idx=0 prio=0
+[INFO] [PISCSI] GETPRIO: idx=0 prio=0
+[INFO] [PISCSI] GETPART: idx=1 offset=0x08013738
+[INFO] [PISCSI] GETPRIO: idx=1 prio=-128
+[INFO] [PISCSI] GETPART: idx=2 offset=0x08013838
+[INFO] [PISCSI] GETPRIO: idx=2 prio=-128
+[INFO] [PISCSI] GETPART: idx=3 offset=0x08013938
+[INFO] [PISCSI] GETPRIO: idx=3 prio=-128
+[INFO] [PISCSI] GETPART: idx=4 offset=0x00000000
+[ERROR] [CPU] Illegal instruction: PC=$0810B6CE PPC=$0810B6CA SR=$2700 OPCODE=$4E7A
+[ERROR] [CPU] movec A0, VBR; (1+)
+[ERROR] REGA: 0:$00000000 1:$0810B6D6 2:$08115199 3:$0810ADBA 4:$08102398 5:$0810B6A4 6:$08000884 7:$08002278
+[ERROR] REGD: 0:$00000001 1:$02042D01 2:$00000000 3:$00000000 4:$00000000 5:$00000000 6:$00000000 7:$00000000
+[ERROR] [CPU] PC map[1] amiga=$08000000-$17FFFFFF size=$10000000 host=0x12000000 host_span=$10000000 type=2 kind=ram cacheable=1 executable=1 id=cpu_slot_ram
+[FPU] first path: op0 subop=2
+[FPU] first path: fpgen opmode=0x00 (FMOVE) rm=1 src=0 dst=0
+[FPU] first path: op0 subop=0
+[FPU] first path: fpgen opmode=0x22 (FADD-family) rm=0 src=1 dst=0
+[FPU] PISTORM_FPU_NATIVE_FAST=2 enabled (experimental, precision tradeoff)
+[FPU] native-fast first hit: binary opmode=0x22
+[FPU] first path: op0 subop=3
+[FPU] first path: fmove_reg_mem dst=0 src=0
+[FPU] first path: op0 main=2
+[FPU] first path: FBcc16
+[ERROR] [CPU] Illegal instruction: PC=$08117E58 PPC=$08117E54 SR=$2714 OPCODE=$4E7A
+[ERROR] [CPU] moveq   #$1, D0
+[ERROR] REGA: 0:$00000000 1:$08117E62 2:$081203E3 3:$0810ADBA 4:$08120B1C 5:$080FDE70 6:$08120B1C 7:$08002278
+[ERROR] REGD: 0:$00000000 1:$0000FF4F 2:$00000080 3:$00000000 4:$00000000 5:$00000000 6:$00000000 7:$00000000
+[ERROR] [CPU] PC map[1] amiga=$08000000-$17FFFFFF size=$10000000 host=0x12000000 host_span=$10000000 type=2 kind=ram cacheable=1 executable=1 id=cpu_slot_ram
+[FPU] first path: fmove_fpcr dir=0 regsel=4 ea_mode=0
+[INFO] Pixel format switch from: 4BPP PLANAR (0) to 8BPP CLUT (1)
+[INFO] [RTG/DBG] CLUT[0] = AAAAAA
+[INFO] [RTG/DBG] CLUT[1] = 000000
+[INFO] [RTG/DBG] CLUT[2] = FFFFFF
+[INFO] [RTG/DBG] CLUT[3] = 6688BB
+[INFO] [RTG/DBG] CLUT[17] = EE4444
+[INFO] [RTG/DBG] CLUT[18] = 000000
+[INFO] [RTG/DBG] CLUT[19] = EEEECC
+[INFO] RTG Thread created successfully
+[INFO] RTG display enabled.
+[INFO] [RTG] Thread running
+[INFO] [RTG/RAYLIB] Defaulting PISTORM_RTG_CORE to 1.
+[INFO] [RTG/RAYLIB] Thread pinned to core 1 (default).
+[INFO] [RTG/RAYLIB] Defaulting PISTORM_RTG_RT_PRIO to 60.
+[INFO] [RTG/RAYLIB] Thread set to SCHED_RR prio 60 (default).
+[INFO] [RTG/RAYLIB] Defaulting PISTORM_DRM_SWAP_INTERVAL to 0.
+[INFO] [RTG/RAYLIB] Requested output mode: 1920x1080
+[INFO] [RTG/RAYLIB] Auto output mode: 1920x1080 (card1-HDMI-A-1)
+[INFO] [RTG/RAYLIB] Output resolution: 1920x1080
+INFO: Initializing raylib 5.5
+INFO: Platform backend: NATIVE DRM
+INFO: Supported raylib modules:
+INFO:     > rcore:..... loaded (mandatory)
+INFO:     > rlgl:...... loaded (mandatory)
+INFO:     > rshapes:... loaded (optional)
+INFO:     > rtextures:. loaded (optional)
+INFO:     > rtext:..... loaded (optional)
+INFO:     > rmodels:... loaded (optional)
+INFO:     > raudio:.... loaded (optional)
+INFO: DISPLAY: No graphic card set, trying platform-gpu-card
+INFO: DISPLAY: Selected DRM connector mode 1920x1080 (1920x1080p@60)
+INFO: DISPLAY: Device initialized successfully
+INFO:     > Display size: 1920 x 1080
+INFO:     > Screen size:  1920 x 1080
+INFO:     > Render size:  1920 x 1080
+INFO:     > Viewport offsets: 0, 0
+WARNING: GetCurrentMonitor() not implemented on target platform
+WARNING: GetCurrentMonitor() not implemented on target platform
+WARNING: SetWindowPosition() not available on target platform
+INFO: GL: Supported extensions count: 119
+INFO: GL: OpenGL device information:
+INFO:     > Vendor:   Broadcom
+INFO:     > Renderer: V3D 4.2.14.0
+INFO:     > Version:  OpenGL ES 3.1 Mesa 25.0.7-2+rpt3
+INFO:     > GLSL:     OpenGL ES GLSL ES 3.10
+INFO: GL: VAO extension detected, VAO functions loaded successfully
+INFO: GL: NPOT textures extension detected, full NPOT textures supported
+INFO: GL: DXT compressed textures supported
+INFO: GL: ETC1 compressed textures supported
+WARNING: DRM: Failed to change keyboard mode, an SSH keyboard is probably used
+INFO: PLATFORM: DRM: Initialized successfully
+INFO: TEXTURE: [ID 1] Texture loaded successfully (1x1 | R8G8B8A8 | 1 mipmaps)
+INFO: TEXTURE: [ID 1] Default texture loaded successfully
+INFO: SHADER: [ID 1] Vertex shader compiled successfully
+INFO: SHADER: [ID 2] Fragment shader compiled successfully
+INFO: SHADER: [ID 3] Program shader loaded successfully
+INFO: SHADER: [ID 3] Default shader loaded successfully
+INFO: RLGL: Render batch vertex buffers loaded successfully in RAM (CPU)
+INFO: RLGL: Render batch vertex buffers loaded successfully in VRAM (GPU)
+INFO: RLGL: Default OpenGL state initialized successfully
+INFO: TEXTURE: [ID 2] Texture loaded successfully (128x128 | GRAY_ALPHA | 1 mipmaps)
+INFO: FONT: Default font loaded successfully (224 glyphs)
+INFO: SYSTEM: Working Directory: /home/smalley/pistorm64
+[INFO] [RTG/RAYLIB] Defaulting PISTORM_RTG_VSYNC to off.
+WARNING: ClearWindowState() not available on target platform
+[INFO] [RTG/RAYLIB] VSync disabled via PISTORM_RTG_VSYNC=0.
+[INFO] [RTG/RAYLIB] Defaulting PISTORM_RTG_TARGET_FPS to 0 (uncapped).
+INFO: TIMER: Target time per frame: 0.000 milliseconds
+WARNING: GetCurrentMonitor() not implemented on target platform
+[INFO] [RTG/RAYLIB] Monitor=0 mode=1920x1080 refresh=60Hz vsync=off
+[INFO] [RTG/RAYLIB] Target FPS=0 (PISTORM_RTG_TARGET_FPS)
+[INFO] [RTG/RAYLIB] CPU CLUT conversion enabled by default.
+INFO: FILEIO: [/opt/pistorm64/src/platforms/amiga/pirtg64/shaders/clut.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 5] Program shader loaded successfully
+INFO: FILEIO: [/opt/pistorm64/src/platforms/amiga/pirtg64/shaders/bgraswizzle.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 6] Program shader loaded successfully
+INFO: FILEIO: [/opt/pistorm64/src/platforms/amiga/pirtg64/shaders/argbswizzle.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 7] Program shader loaded successfully
+INFO: FILEIO: [/opt/pistorm64/src/platforms/amiga/pirtg64/shaders/abgrswizzle.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 8] Program shader loaded successfully
+INFO: FILEIO: [/opt/pistorm64/src/platforms/amiga/pirtg64/shaders/rgbxswizzle.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 9] Program shader loaded successfully
+INFO: TEXTURE: [ID 3] Texture loaded successfully (256x1 | R8G8B8A8 | 1 mipmaps)
+INFO: TEXTURE: [ID 4] Texture loaded successfully (256x256 | R8G8B8A8 | 1 mipmaps)
+[INFO] Creating 640x480 raylib window...
+INFO: TEXTURE: [ID 5] Texture loaded successfully (640x480 | R8G8B8A8 | 1 mipmaps)
+[INFO] RTG display disabled.
+[INFO] [RTG/DBG] CLUT[4] = 0000FF
+[INFO] RTG display enabled.
+[FPU] first path: fpgen opmode=0x20 (FDIV-family) rm=1 src=5 dst=0
+[FPU] first path: fmove_reg_mem dst=5 src=0
+[FPU] first path: fpgen opmode=0x0f (FTAN) rm=1 src=7 dst=1
+[FPU] first path: fpgen opmode=0x32 (FSINCOS) rm=1 src=7 dst=0
+[FPU] first path: fpgen opmode=0x28 (FSUB-family) rm=1 src=5 dst=2
+[FPU] first path: fpgen opmode=0x23 (FMUL-family) rm=0 src=0 dst=2
+[FPU] first path: fpgen opmode=0x38 (FCMP) rm=0 src=3 dst=2
+[FPU] first path: fpgen opmode=0x04 (FSQRT-family) rm=0 src=0 dst=1
+[FPU] native-fast first hit: sqrt opmode=0x04
+[FPU] first path: fpgen opmode=0x3a (FTST) rm=0 src=0 dst=0
+[FPU] first path: op0 main=1
+[FPU] first path: FScc
+[FPU] first path: fpgen opmode=0x1a (FNEG-family) rm=0 src=1 dst=0
+[FPU] first path: fpgen opmode=0x1c (FACOS) rm=0 src=2 dst=1
+[FPU] first path: fpgen opmode=0x0c (FASIN) rm=0 src=0 dst=2
+[FPU] first path: fpgen opmode=0x1d (FCOS) rm=0 src=1 dst=2
+Killed
+smalley@pi4:~/pistorm64 $ sudo env -u PISTORM_FPU_NATIVE_FAST -u PISTORM_FPU_NATIVE_BIN -u PISTORM_FPU_NATIVE_SQRT -u PISTORM_FPU_NATIVE_TRANS ./emulator -c default.cfg
+[AFF] main pinned to core 1
+[SELFTEST] alignment OK (cpu + fpr) | alignof(cpu)=16 offsetof(fpr)=192 sizeof(cpu)=2672
+[PS] Selected backend (pre-init): userspace-mmio
+[ps_backend] selected=userspace-mmio
+[ps_backend] backend=userspace-mmio (gpio=/dev/gpiomem, cprman=/dev/mem, wr_stretch=0,rd_stretch=0, lwpair=1, r32pair=1, ramseq=1, wpipe=0)
+[ps_backend:userspace-mmio] gpclk0 configured (src=5 div=6)
+[ps_protocol] backend=userspace-mmio
+[CFG] Set CPU type to 68040.
+[CFG] Setting platform to amiga (sub: 1200)
+[INFO] [CFG] Creating platform config for amiga...
+[CFG] PiStorm backend selected: userspace-mmio.
+[ps_backend] userspace gpclk_src change denied after backend init
+[CFG] userspace GPCLK source ignored (backend already initialized).
+[ps_backend] userspace gpclk_div change denied after backend init
+[CFG] userspace GPCLK divider ignored (backend already initialized).
+[ps_backend] userspace wr_stretch change denied after backend init
+[CFG] userspace WR strobe stretch ignored (backend already initialized).
+[ps_backend] userspace rd_stretch change denied after backend init
+[CFG] userspace RD strobe stretch ignored (backend already initialized).
+[CFG] Set CPU loop cycles to 2048.
+[CFG] Set thread affinity: cpu=2,ipl=3,keyboard=1,mouse=1.
+[CFG] Set RT priorities: cpu=95,ipl=60,keyboard=50,mouse=50.
+[CFG] ROM identified: Kickstart 3.1.4 (46.143) 512KB
+[MUSASHI] Mapped read range 1: 00F80000-01000000 (0x10000000)
+[CFG] ROM mapping set read-only (mprotect).
+[CFG] [MAP 0] Added rom mapping for range 00F80000-00FFFFFF ID: kickstart
+[CFG] Allocating 268435456 bytes for RAM mapping (256 MB)...
+[CFG] [MAP 1] Added ram mapping for range 08000000-17FFFFFF ID: cpu_slot_ram
+[CFG] Allocating 1048576 bytes for RAM mapping (1 MB)...
+[CFG] [MAP 2] Added ram mapping for range 00100000-001FFFFF ID: chipram_extra
+[CFG] Allocating 4194304 bytes for RAM mapping (4 MB)...
+[CFG] [MAP 3] Added ram mapping for range 00200000-005FFFFF ID: z2_autoconf_fast
+[CFG] Allocating 134217728 bytes for RAM mapping (128 MB)...
+[CFG] [MAP 4] Added ram mapping for range 18000000-1FFFFFFF ID: z3_autoconf_fast
+[CFG] Allocating 134217728 bytes for RAM mapping (128 MB)...
+[CFG] [MAP 5] Added ram mapping for range 20000000-27FFFFFF ID: z3_autoconf_fast
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI] Loaded boot ROM: 16384 bytes from ./src/platforms/amiga/piscsi/piscsi.rom
+[INFO] [PISCSI] Boot ROM driver offset=0x1000, hunks=3
+[PISCSI] Loaded Boot ROM.
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=80000000-8000FFFF (was 00000000-00000000) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8000FFFF (was 80000000-8000FFFF) add=00E80000-00E8FFFF
+[INFO] [AMIGA] PISCSI map request: unit 1 -> ../KernelPiStormBench.hdf
+[INFO] [PISCSI] Map 1: [../KernelPiStormBench.hdf] (disk,rw,file) - 16139354112 bytes.
+[PISCSI] CHS: 31272 16 63
+Finding partitions.
+[INFO] [PISCSI] Partition 0: PDH0 (4)
+[INFO] [PISCSI] Partition 1: PDH1 (4)
+Finding file systems.
+[FSHD] Loaded and set up file system 1: PFS/3
+[FSHD] Loaded and set up file system 2: DOS/1
+Done.
+[PISCSI-SELFTEST] Running HDF integrity validation for drive 1...
+[PISCSI-SELFTEST] INFO: Valid RDB signature found in ../KernelPiStormBench.hdf
+[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 1 (../KernelPiStormBench.hdf)
+[INFO] [AMIGA] PISCSI map request: unit 2 -> ../Amiga-MIMO.hdf
+[INFO] [PISCSI] Map 2: [../Amiga-MIMO.hdf] (disk,rw,file) - 4294967296 bytes.
+[PISCSI] CHS: 8322 16 63
+Finding partitions.
+Finding file systems.
+Done.
+[PISCSI-SELFTEST] Running HDF integrity validation for drive 2...
+[PISCSI-SELFTEST] INFO: No RDB signature found in ../Amiga-MIMO.hdf (may be partitioned drive)
+[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 2 (../Amiga-MIMO.hdf)
+[INFO] [AMIGA] PISCSI map request: unit 5 -> ../AmigaOS_Install.hdf
+[INFO] [PISCSI] Map 5: [../AmigaOS_Install.hdf] (disk,rw,file) - 4294967296 bytes.
+[PISCSI] CHS: 4095 16 128
+Finding partitions.
+[INFO] [PISCSI] Partition 0: DH0 (3)
+Finding file systems.
+[FSHD] Loaded and set up file system 3: DOS/3
+Done.
+[PISCSI-SELFTEST] Running HDF integrity validation for drive 5...
+[PISCSI-SELFTEST] INFO: Valid RDB signature found in ../AmigaOS_Install.hdf
+[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 5 (../AmigaOS_Install.hdf)
+[INFO] [AMIGA] PISCSI map request: unit 3 -> ./src/platforms/amiga/pistorm.hdf
+[INFO] [PISCSI] Map 3: [./src/platforms/amiga/pistorm.hdf] (disk,rw,file) - 2621440 bytes.
+[PISCSI] CHS: 160 1 32
+Finding partitions.
+[INFO] [PISCSI] Partition 0: DH99 (4)
+Finding file systems.
+Done.
+[PISCSI-SELFTEST] Running HDF integrity validation for drive 3...
+[PISCSI-SELFTEST] INFO: Valid RDB signature found in ./src/platforms/amiga/pistorm.hdf
+[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 3 (./src/platforms/amiga/pistorm.hdf)
+[CFG] Unknown config item etvar on line 59.
+[INFO] [FC] enabled (cpld)
+[WARN] [FC] CPLD mode selected; requires FC-enabled CPLD bitstream.
+[WARN] [AMIGA] Failed to set bus_arb_release kernel parameter.
+[INFO] [AMIGA] Queue enabled via setvar.
+[INFO] [AMIGA] Batch bits set to 1024 via setvar.
+[CFG] [MAP 6] Added register mapping for range 00DC0000-00DCFFFF ID: None
+[INFO] [AMIGA] PiRTG64 screen width set to 1920.
+[INFO] [AMIGA] PiRTG64 screen height set to 1080.
+[MUSASHI] Mapped read range 2: 70010000-78010000 (0x36000000)
+[MUSASHI] Mapped write range 1: 70010000-78010000 (0x36000000)
+[CFG] Adding 134217728 byte (128 MB) RAM mapping rtg_mem...
+[CFG] [MAP 7] Added ram_noalloc mapping for range 70010000-7800FFFF ID: rtg_mem
+[INFO] [AMIGA] PiRTG64 Enabled.
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=70000000-8000FFFF (was 70000000-7800FFFF) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8000FFFF (was 70000000-8000FFFF) add=00E80000-00E8FFFF
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=70000000-8000FFFF (was 70000000-7800FFFF) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=70000000-8001FFFF (was 70000000-8000FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8001FFFF (was 70000000-8001FFFF) add=00E80000-00E8FFFF
+[A314] Set A314 config filename to /opt/pistorm64/a314/a314d.conf.
+[INFO] [AMIGA] A314 emulation enabled.
+[CFG] Enabled keyboard event forwarding, toggle key k.
+[CFG] Enabled mouse event forwarding from file /dev/input/mice, toggle key m.
+[CFG] IPL NOP count: 8
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA][ZORRO] Z2 config=$00E80000 size=$00010000 Z2 mem=$00200000-$009FFFFF
+[INFO] [AMIGA][ZORRO] Z3 config=$FF000000 size=$00010000 Z3 mem=$40000000-$5FFFFFFF
+[INFO] [AMIGA] Subsystem is [1200]
+[INFO] [AMIGA] Adjusting Gayle accesses for A600/A1200/CD32 Kickstart.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $200000
+[INFO] [AMIGA] 128MB of Z3 Fast RAM configured at $18000000
+[INFO] [AMIGA] 128MB of Z3 Fast RAM configured at $20000000
+[INFO] [AMIGA] No Mainboard Fast RAM configured.
+[INFO] [AMIGA] CPU slot RAM configured at $08000000 (256 MB)
+[MUSASHI] Mapped read range 3: 08000000-18000000 (0x12000000)
+[MUSASHI] Mapped write range 2: 08000000-18000000 (0x12000000)
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=70000000-8000FFFF (was 70000000-7800FFFF) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=70000000-8001FFFF (was 70000000-8000FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8001FFFF (was 70000000-8001FFFF) add=00E80000-00E8FFFF
+[INFO] [AMIGA][CUSTOM] ac_z3        changed=1 now=00E80000-FF00FFFF (was 00E80000-8001FFFF) add=FF000000-FF00FFFF
+[INFO] [CPU] FC enabled and in use (mode=cpld)
+[INFO] [CPU][BERR] Reset status unknown (kernel param not readable)
+No IDE drives mounted, disabling Gayle IDE component.
+[INFO] [CPU] Active backend: Musashi
+Setting CPU type to 9.
+[INFO] [PISCSI] Refresh drive 1: block_size=512 fs=16139354112 bytes
+[INFO] [PISCSI] Partition 0: PDH0 (4)
+[INFO] [PISCSI] Partition 1: PDH1 (4)
+[INFO] [PISCSI] Drive 1 partitions found: 2
+[FSHD] Loaded and set up file system 1: PFS/3
+[FSHD] Loaded and set up file system 2: DOS/1
+[INFO] [PISCSI] Refresh drive 2: block_size=512 fs=4294967296 bytes
+[INFO] [PISCSI] Drive 2 partitions found: 0
+[INFO] [PISCSI] Refresh drive 3: block_size=512 fs=2621440 bytes
+[INFO] [PISCSI] Partition 0: DH99 (4)
+[INFO] [PISCSI] Drive 3 partitions found: 1
+[INFO] [PISCSI] Refresh drive 5: block_size=512 fs=4294967296 bytes
+[INFO] [PISCSI] Partition 0: DH0 (3)
+[INFO] [PISCSI] Drive 5 partitions found: 1
+[FSHD] Loaded and set up file system 3: DOS/3
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=70000000-8000FFFF (was 70000000-7800FFFF) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=70000000-8001FFFF (was 70000000-8000FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8001FFFF (was 70000000-8001FFFF) add=00E80000-00E8FFFF
+[INFO] [AMIGA][CUSTOM] ac_z3        changed=1 now=00E80000-FF00FFFF (was 00E80000-8001FFFF) add=FF000000-FF00FFFF
+[IPL] Thread created successfully
+[IPL] Thread running
+Amiga Reset is up...
+[AFF] ipl pinned to core 3
+[PRIO] ipl set to SCHED_RR priority 60
+[MAIN] Keyboard thread created successfully
+[AFF] input pinned to core 2
+[KBD] Keyboard thread started
+[MAIN] Mouse thread created successfully
+[AFF] keyboard pinned to core 1
+[MOUSE] Mouse thread started
+[PRIO] keyboard set to SCHED_RR priority 50
+[AFF] input pinned to core 2
+[AFF] mouse pinned to core 1
+[PRIO] mouse set to SCHED_RR priority 50
+[MAIN] CPU thread created successfully
+[AFF] cpu pinned to core 2
+[AFF] cpu pinned to core 2
+[PRIO] cpu set to SCHED_RR priority 95
+OVL:0
+[FPU] first path: op1 main=0
+[FPU] first path: op1 main=1
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00E90000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[MUSASHI] Mapped read range 4: 00200000-00600000 (0x24000000)
+[MUSASHI] Mapped write range 3: 00200000-00600000 (0x24000000)
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=00E90000-7800FFFF (was 70000000-7800FFFF) add=00E90000-00E9FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=00E90000-8001FFFF (was 00E90000-7800FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z3        changed=1 now=00E90000-FF00FFFF (was 00E90000-8001FFFF) add=FF000000-FF00FFFF
+[FPU] first path: op0 main=0
+[FPU] first path: op0 subop=7
+[FPU] first path: fmovem dir=1 mode=0 reglist=0xff
+[FPU] first path: op0 subop=5
+[FPU] first path: fmove_fpcr dir=1 regsel=7 ea_mode=4
+[FPU] first path: op0 subop=4
+[FPU] first path: fmove_fpcr dir=0 regsel=7 ea_mode=3
+[FPU] first path: op0 subop=6
+[FPU] first path: fmovem dir=0 mode=2 reglist=0xff
+[INFO] [PISCSI] GETPART: idx=0 offset=0x08013630
+[INFO] [PISCSI] GETPRIO: idx=0 prio=0
+[INFO] [PISCSI] GETPRIO: idx=0 prio=0
+[INFO] [PISCSI] GETPART: idx=1 offset=0x08013730
+[INFO] [PISCSI] GETPRIO: idx=1 prio=-128
+[INFO] [PISCSI] GETPART: idx=2 offset=0x08013830
+[INFO] [PISCSI] GETPRIO: idx=2 prio=-128
+[INFO] [PISCSI] GETPART: idx=3 offset=0x08013930
+[INFO] [PISCSI] GETPRIO: idx=3 prio=-128
+[INFO] [PISCSI] GETPART: idx=4 offset=0x00000000
+[INFO] [PISCSI] Refresh drive 1: block_size=512 fs=16139354112 bytes
+[INFO] [PISCSI] Partition 0: PDH0 (4)
+[INFO] [PISCSI] Partition 1: PDH1 (4)
+[INFO] [PISCSI] Drive 1 partitions found: 2
+[FSHD] Loaded and set up file system 1: PFS/3
+[FSHD] Loaded and set up file system 2: DOS/1
+[INFO] [PISCSI] Refresh drive 2: block_size=512 fs=4294967296 bytes
+[INFO] [PISCSI] Drive 2 partitions found: 0
+[INFO] [PISCSI] Refresh drive 3: block_size=512 fs=2621440 bytes
+[INFO] [PISCSI] Partition 0: DH99 (4)
+[INFO] [PISCSI] Drive 3 partitions found: 1
+[INFO] [PISCSI] Refresh drive 5: block_size=512 fs=4294967296 bytes
+[INFO] [PISCSI] Partition 0: DH0 (3)
+[INFO] [PISCSI] Drive 5 partitions found: 1
+[FSHD] Loaded and set up file system 3: DOS/3
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=70000000-8000FFFF (was 70000000-7800FFFF) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=70000000-8001FFFF (was 70000000-8000FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8001FFFF (was 70000000-8001FFFF) add=00E80000-00E8FFFF
+[INFO] [AMIGA][CUSTOM] ac_z3        changed=1 now=00E80000-FF00FFFF (was 00E80000-8001FFFF) add=FF000000-FF00FFFF
+OVL:0
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00E90000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=00E90000-7800FFFF (was 70000000-7800FFFF) add=00E90000-00E9FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=00E90000-8001FFFF (was 00E90000-7800FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z3        changed=1 now=00E90000-FF00FFFF (was 00E90000-8001FFFF) add=FF000000-FF00FFFF
+[INFO] [PISCSI] GETPART: idx=0 offset=0x08013638
+[INFO] [PISCSI] GETPRIO: idx=0 prio=0
+[INFO] [PISCSI] GETPRIO: idx=0 prio=0
+[INFO] [PISCSI] GETPART: idx=1 offset=0x08013738
+[INFO] [PISCSI] GETPRIO: idx=1 prio=-128
+[INFO] [PISCSI] GETPART: idx=2 offset=0x08013838
+[INFO] [PISCSI] GETPRIO: idx=2 prio=-128
+[INFO] [PISCSI] GETPART: idx=3 offset=0x08013938
+[INFO] [PISCSI] GETPRIO: idx=3 prio=-128
+[INFO] [PISCSI] GETPART: idx=4 offset=0x00000000
+[ERROR] [CPU] Illegal instruction: PC=$0810B6CE PPC=$0810B6CA SR=$2700 OPCODE=$4E7A
+[ERROR] [CPU] movec A0, VBR; (1+)
+[ERROR] REGA: 0:$00000000 1:$0810B6D6 2:$08115199 3:$0810ADBA 4:$08102398 5:$0810B6A4 6:$08000884 7:$08002278
+[ERROR] REGD: 0:$00000001 1:$02042D01 2:$00000000 3:$00000000 4:$00000000 5:$00000000 6:$00000000 7:$00000000
+[ERROR] [CPU] PC map[1] amiga=$08000000-$17FFFFFF size=$10000000 host=0x12000000 host_span=$10000000 type=2 kind=ram cacheable=1 executable=1 id=cpu_slot_ram
+[FPU] first path: op0 subop=2
+[FPU] first path: fpgen opmode=0x00 (FMOVE) rm=1 src=0 dst=0
+[FPU] first path: op0 subop=0
+[FPU] first path: fpgen opmode=0x22 (FADD-family) rm=0 src=1 dst=0
+[FPU] first path: op0 subop=3
+[FPU] first path: fmove_reg_mem dst=0 src=0
+[FPU] first path: op0 main=2
+[FPU] first path: FBcc16
+[ERROR] [CPU] Illegal instruction: PC=$08117E58 PPC=$08117E54 SR=$2714 OPCODE=$4E7A
+[ERROR] [CPU] moveq   #$1, D0
+[ERROR] REGA: 0:$00000000 1:$08117E62 2:$081203E3 3:$0810ADBA 4:$08120B1C 5:$080FDE70 6:$08120B1C 7:$08002278
+[ERROR] REGD: 0:$00000000 1:$0000FF4F 2:$00000080 3:$00000000 4:$00000000 5:$00000000 6:$00000000 7:$00000000
+[ERROR] [CPU] PC map[1] amiga=$08000000-$17FFFFFF size=$10000000 host=0x12000000 host_span=$10000000 type=2 kind=ram cacheable=1 executable=1 id=cpu_slot_ram
+[FPU] first path: fmove_fpcr dir=0 regsel=4 ea_mode=0
+[INFO] Pixel format switch from: 4BPP PLANAR (0) to 8BPP CLUT (1)
+[INFO] [RTG/DBG] CLUT[0] = AAAAAA
+[INFO] [RTG/DBG] CLUT[1] = 000000
+[INFO] [RTG/DBG] CLUT[2] = FFFFFF
+[INFO] [RTG/DBG] CLUT[3] = 6688BB
+[INFO] [RTG/DBG] CLUT[17] = EE4444
+[INFO] [RTG/DBG] CLUT[18] = 000000
+[INFO] [RTG/DBG] CLUT[19] = EEEECC
+[INFO] RTG Thread created successfully
+[INFO] RTG display enabled.
+[INFO] [RTG] Thread running
+[INFO] [RTG/RAYLIB] Defaulting PISTORM_RTG_CORE to 1.
+[INFO] [RTG/RAYLIB] Thread pinned to core 1 (default).
+[INFO] [RTG/RAYLIB] Defaulting PISTORM_RTG_RT_PRIO to 60.
+[INFO] [RTG/RAYLIB] Thread set to SCHED_RR prio 60 (default).
+[INFO] [RTG/RAYLIB] Defaulting PISTORM_DRM_SWAP_INTERVAL to 0.
+[INFO] [RTG/RAYLIB] Requested output mode: 1920x1080
+[INFO] [RTG/RAYLIB] Auto output mode: 1920x1080 (card1-HDMI-A-1)
+[INFO] [RTG/RAYLIB] Output resolution: 1920x1080
+INFO: Initializing raylib 5.5
+INFO: Platform backend: NATIVE DRM
+INFO: Supported raylib modules:
+INFO:     > rcore:..... loaded (mandatory)
+INFO:     > rlgl:...... loaded (mandatory)
+INFO:     > rshapes:... loaded (optional)
+INFO:     > rtextures:. loaded (optional)
+INFO:     > rtext:..... loaded (optional)
+INFO:     > rmodels:... loaded (optional)
+INFO:     > raudio:.... loaded (optional)
+INFO: DISPLAY: No graphic card set, trying platform-gpu-card
+INFO: DISPLAY: Selected DRM connector mode 1920x1080 (1920x1080p@60)
+INFO: DISPLAY: Device initialized successfully
+INFO:     > Display size: 1920 x 1080
+INFO:     > Screen size:  1920 x 1080
+INFO:     > Render size:  1920 x 1080
+INFO:     > Viewport offsets: 0, 0
+WARNING: GetCurrentMonitor() not implemented on target platform
+WARNING: GetCurrentMonitor() not implemented on target platform
+WARNING: SetWindowPosition() not available on target platform
+INFO: GL: Supported extensions count: 119
+INFO: GL: OpenGL device information:
+INFO:     > Vendor:   Broadcom
+INFO:     > Renderer: V3D 4.2.14.0
+INFO:     > Version:  OpenGL ES 3.1 Mesa 25.0.7-2+rpt3
+INFO:     > GLSL:     OpenGL ES GLSL ES 3.10
+INFO: GL: VAO extension detected, VAO functions loaded successfully
+INFO: GL: NPOT textures extension detected, full NPOT textures supported
+INFO: GL: DXT compressed textures supported
+INFO: GL: ETC1 compressed textures supported
+WARNING: DRM: Failed to change keyboard mode, an SSH keyboard is probably used
+INFO: PLATFORM: DRM: Initialized successfully
+INFO: TEXTURE: [ID 1] Texture loaded successfully (1x1 | R8G8B8A8 | 1 mipmaps)
+INFO: TEXTURE: [ID 1] Default texture loaded successfully
+INFO: SHADER: [ID 1] Vertex shader compiled successfully
+INFO: SHADER: [ID 2] Fragment shader compiled successfully
+INFO: SHADER: [ID 3] Program shader loaded successfully
+INFO: SHADER: [ID 3] Default shader loaded successfully
+INFO: RLGL: Render batch vertex buffers loaded successfully in RAM (CPU)
+INFO: RLGL: Render batch vertex buffers loaded successfully in VRAM (GPU)
+INFO: RLGL: Default OpenGL state initialized successfully
+INFO: TEXTURE: [ID 2] Texture loaded successfully (128x128 | GRAY_ALPHA | 1 mipmaps)
+INFO: FONT: Default font loaded successfully (224 glyphs)
+INFO: SYSTEM: Working Directory: /home/smalley/pistorm64
+[INFO] [RTG/RAYLIB] Defaulting PISTORM_RTG_VSYNC to off.
+WARNING: ClearWindowState() not available on target platform
+[INFO] [RTG/RAYLIB] VSync disabled via PISTORM_RTG_VSYNC=0.
+[INFO] [RTG/RAYLIB] Defaulting PISTORM_RTG_TARGET_FPS to 0 (uncapped).
+INFO: TIMER: Target time per frame: 0.000 milliseconds
+WARNING: GetCurrentMonitor() not implemented on target platform
+[INFO] [RTG/RAYLIB] Monitor=0 mode=1920x1080 refresh=60Hz vsync=off
+[INFO] [RTG/RAYLIB] Target FPS=0 (PISTORM_RTG_TARGET_FPS)
+[INFO] [RTG/RAYLIB] CPU CLUT conversion enabled by default.
+INFO: FILEIO: [/opt/pistorm64/src/platforms/amiga/pirtg64/shaders/clut.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 5] Program shader loaded successfully
+INFO: FILEIO: [/opt/pistorm64/src/platforms/amiga/pirtg64/shaders/bgraswizzle.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 6] Program shader loaded successfully
+INFO: FILEIO: [/opt/pistorm64/src/platforms/amiga/pirtg64/shaders/argbswizzle.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 7] Program shader loaded successfully
+INFO: FILEIO: [/opt/pistorm64/src/platforms/amiga/pirtg64/shaders/abgrswizzle.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 8] Program shader loaded successfully
+INFO: FILEIO: [/opt/pistorm64/src/platforms/amiga/pirtg64/shaders/rgbxswizzle.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 9] Program shader loaded successfully
+INFO: TEXTURE: [ID 3] Texture loaded successfully (256x1 | R8G8B8A8 | 1 mipmaps)
+INFO: TEXTURE: [ID 4] Texture loaded successfully (256x256 | R8G8B8A8 | 1 mipmaps)
+[INFO] Creating 640x480 raylib window...
+INFO: TEXTURE: [ID 5] Texture loaded successfully (640x480 | R8G8B8A8 | 1 mipmaps)
+[INFO] RTG display disabled.
+[INFO] [RTG/DBG] CLUT[4] = 0000FF
+[INFO] RTG display enabled.
+[FPU] first path: fpgen opmode=0x20 (FDIV-family) rm=1 src=5 dst=0
+[FPU] first path: fmove_reg_mem dst=5 src=0
+[FPU] first path: fpgen opmode=0x0f (FTAN) rm=1 src=7 dst=1
+[FPU] first path: fpgen opmode=0x32 (FSINCOS) rm=1 src=7 dst=0
+[FPU] first path: fpgen opmode=0x28 (FSUB-family) rm=1 src=5 dst=2
+[FPU] first path: fpgen opmode=0x23 (FMUL-family) rm=0 src=0 dst=2
+[FPU] first path: fpgen opmode=0x38 (FCMP) rm=0 src=3 dst=2
+[FPU] first path: fpgen opmode=0x04 (FSQRT-family) rm=0 src=0 dst=1
+[FPU] first path: fpgen opmode=0x3a (FTST) rm=0 src=0 dst=0
+[FPU] first path: op0 main=1
+[FPU] first path: FScc
+[FPU] first path: fpgen opmode=0x1a (FNEG-family) rm=0 src=1 dst=0
+[FPU] first path: fpgen opmode=0x1c (FACOS) rm=0 src=2 dst=1
+[FPU] first path: fpgen opmode=0x0c (FASIN) rm=0 src=0 dst=2
+[FPU] first path: fpgen opmode=0x1d (FCOS) rm=0 src=1 dst=2
+Killed
+smalley@pi4:~/pistorm64 $ sudo killall -9 emulator
+smalley@pi4:~/pistorm64 $ sudo PISTORM_FPU_NATIVE_FAST=2 PISTORM_FPU_NATIVE_BIN=1 PISTORM_FPU_NATIVE_SQRT=0 PISTORM_FPU_NATIVE_TRANS=0 ./emulator -c default.cfg
+[AFF] main pinned to core 1
+[SELFTEST] alignment OK (cpu + fpr) | alignof(cpu)=16 offsetof(fpr)=192 sizeof(cpu)=2672
+[PS] Selected backend (pre-init): userspace-mmio
+[ps_backend] selected=userspace-mmio
+[ps_backend] backend=userspace-mmio (gpio=/dev/gpiomem, cprman=/dev/mem, wr_stretch=0,rd_stretch=0, lwpair=1, r32pair=1, ramseq=1, wpipe=0)
+[ps_backend:userspace-mmio] gpclk0 configured (src=5 div=6)
+[ps_protocol] backend=userspace-mmio
+[CFG] Set CPU type to 68040.
+[CFG] Setting platform to amiga (sub: 1200)
+[INFO] [CFG] Creating platform config for amiga...
+[CFG] PiStorm backend selected: userspace-mmio.
+[ps_backend] userspace gpclk_src change denied after backend init
+[CFG] userspace GPCLK source ignored (backend already initialized).
+[ps_backend] userspace gpclk_div change denied after backend init
+[CFG] userspace GPCLK divider ignored (backend already initialized).
+[ps_backend] userspace wr_stretch change denied after backend init
+[CFG] userspace WR strobe stretch ignored (backend already initialized).
+[ps_backend] userspace rd_stretch change denied after backend init
+[CFG] userspace RD strobe stretch ignored (backend already initialized).
+[CFG] Set CPU loop cycles to 2048.
+[CFG] Set thread affinity: cpu=2,ipl=3,keyboard=1,mouse=1.
+[CFG] Set RT priorities: cpu=95,ipl=60,keyboard=50,mouse=50.
+[CFG] ROM identified: Kickstart 3.1.4 (46.143) 512KB
+[MUSASHI] Mapped read range 1: 00F80000-01000000 (0x10000000)
+[CFG] ROM mapping set read-only (mprotect).
+[CFG] [MAP 0] Added rom mapping for range 00F80000-00FFFFFF ID: kickstart
+[CFG] Allocating 268435456 bytes for RAM mapping (256 MB)...
+[CFG] [MAP 1] Added ram mapping for range 08000000-17FFFFFF ID: cpu_slot_ram
+[CFG] Allocating 1048576 bytes for RAM mapping (1 MB)...
+[CFG] [MAP 2] Added ram mapping for range 00100000-001FFFFF ID: chipram_extra
+[CFG] Allocating 4194304 bytes for RAM mapping (4 MB)...
+[CFG] [MAP 3] Added ram mapping for range 00200000-005FFFFF ID: z2_autoconf_fast
+[CFG] Allocating 134217728 bytes for RAM mapping (128 MB)...
+[CFG] [MAP 4] Added ram mapping for range 18000000-1FFFFFFF ID: z3_autoconf_fast
+[CFG] Allocating 134217728 bytes for RAM mapping (128 MB)...
+[CFG] [MAP 5] Added ram mapping for range 20000000-27FFFFFF ID: z3_autoconf_fast
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI] Loaded boot ROM: 16384 bytes from ./src/platforms/amiga/piscsi/piscsi.rom
+[INFO] [PISCSI] Boot ROM driver offset=0x1000, hunks=3
+[PISCSI] Loaded Boot ROM.
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=80000000-8000FFFF (was 00000000-00000000) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8000FFFF (was 80000000-8000FFFF) add=00E80000-00E8FFFF
+[INFO] [AMIGA] PISCSI map request: unit 1 -> ../KernelPiStormBench.hdf
+[INFO] [PISCSI] Map 1: [../KernelPiStormBench.hdf] (disk,rw,file) - 16139354112 bytes.
+[PISCSI] CHS: 31272 16 63
+Finding partitions.
+[INFO] [PISCSI] Partition 0: PDH0 (4)
+[INFO] [PISCSI] Partition 1: PDH1 (4)
+Finding file systems.
+[FSHD] Loaded and set up file system 1: PFS/3
+[FSHD] Loaded and set up file system 2: DOS/1
+Done.
+[PISCSI-SELFTEST] Running HDF integrity validation for drive 1...
+[PISCSI-SELFTEST] INFO: Valid RDB signature found in ../KernelPiStormBench.hdf
+[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 1 (../KernelPiStormBench.hdf)
+[INFO] [AMIGA] PISCSI map request: unit 2 -> ../Amiga-MIMO.hdf
+[INFO] [PISCSI] Map 2: [../Amiga-MIMO.hdf] (disk,rw,file) - 4294967296 bytes.
+[PISCSI] CHS: 8322 16 63
+Finding partitions.
+Finding file systems.
+Done.
+[PISCSI-SELFTEST] Running HDF integrity validation for drive 2...
+[PISCSI-SELFTEST] INFO: No RDB signature found in ../Amiga-MIMO.hdf (may be partitioned drive)
+[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 2 (../Amiga-MIMO.hdf)
+[INFO] [AMIGA] PISCSI map request: unit 5 -> ../AmigaOS_Install.hdf
+[INFO] [PISCSI] Map 5: [../AmigaOS_Install.hdf] (disk,rw,file) - 4294967296 bytes.
+[PISCSI] CHS: 4095 16 128
+Finding partitions.
+[INFO] [PISCSI] Partition 0: DH0 (3)
+Finding file systems.
+[FSHD] Loaded and set up file system 3: DOS/3
+Done.
+[PISCSI-SELFTEST] Running HDF integrity validation for drive 5...
+[PISCSI-SELFTEST] INFO: Valid RDB signature found in ../AmigaOS_Install.hdf
+[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 5 (../AmigaOS_Install.hdf)
+[INFO] [AMIGA] PISCSI map request: unit 3 -> ./src/platforms/amiga/pistorm.hdf
+[INFO] [PISCSI] Map 3: [./src/platforms/amiga/pistorm.hdf] (disk,rw,file) - 2621440 bytes.
+[PISCSI] CHS: 160 1 32
+Finding partitions.
+[INFO] [PISCSI] Partition 0: DH99 (4)
+Finding file systems.
+Done.
+[PISCSI-SELFTEST] Running HDF integrity validation for drive 3...
+[PISCSI-SELFTEST] INFO: Valid RDB signature found in ./src/platforms/amiga/pistorm.hdf
+[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 3 (./src/platforms/amiga/pistorm.hdf)
+[CFG] Unknown config item etvar on line 59.
+[INFO] [FC] enabled (cpld)
+[WARN] [FC] CPLD mode selected; requires FC-enabled CPLD bitstream.
+[WARN] [AMIGA] Failed to set bus_arb_release kernel parameter.
+[INFO] [AMIGA] Queue enabled via setvar.
+[INFO] [AMIGA] Batch bits set to 1024 via setvar.
+[CFG] [MAP 6] Added register mapping for range 00DC0000-00DCFFFF ID: None
+[INFO] [AMIGA] PiRTG64 screen width set to 1920.
+[INFO] [AMIGA] PiRTG64 screen height set to 1080.
+[MUSASHI] Mapped read range 2: 70010000-78010000 (0x36000000)
+[MUSASHI] Mapped write range 1: 70010000-78010000 (0x36000000)
+[CFG] Adding 134217728 byte (128 MB) RAM mapping rtg_mem...
+[CFG] [MAP 7] Added ram_noalloc mapping for range 70010000-7800FFFF ID: rtg_mem
+[INFO] [AMIGA] PiRTG64 Enabled.
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=70000000-8000FFFF (was 70000000-7800FFFF) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8000FFFF (was 70000000-8000FFFF) add=00E80000-00E8FFFF
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=70000000-8000FFFF (was 70000000-7800FFFF) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=70000000-8001FFFF (was 70000000-8000FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8001FFFF (was 70000000-8001FFFF) add=00E80000-00E8FFFF
+[A314] Set A314 config filename to /opt/pistorm64/a314/a314d.conf.
+[INFO] [AMIGA] A314 emulation enabled.
+[CFG] Enabled keyboard event forwarding, toggle key k.
+[CFG] Enabled mouse event forwarding from file /dev/input/mice, toggle key m.
+[CFG] IPL NOP count: 8
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA][ZORRO] Z2 config=$00E80000 size=$00010000 Z2 mem=$00200000-$009FFFFF
+[INFO] [AMIGA][ZORRO] Z3 config=$FF000000 size=$00010000 Z3 mem=$40000000-$5FFFFFFF
+[INFO] [AMIGA] Subsystem is [1200]
+[INFO] [AMIGA] Adjusting Gayle accesses for A600/A1200/CD32 Kickstart.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $200000
+[INFO] [AMIGA] 128MB of Z3 Fast RAM configured at $18000000
+[INFO] [AMIGA] 128MB of Z3 Fast RAM configured at $20000000
+[INFO] [AMIGA] No Mainboard Fast RAM configured.
+[INFO] [AMIGA] CPU slot RAM configured at $08000000 (256 MB)
+[MUSASHI] Mapped read range 3: 08000000-18000000 (0x12000000)
+[MUSASHI] Mapped write range 2: 08000000-18000000 (0x12000000)
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=70000000-8000FFFF (was 70000000-7800FFFF) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=70000000-8001FFFF (was 70000000-8000FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8001FFFF (was 70000000-8001FFFF) add=00E80000-00E8FFFF
+[INFO] [AMIGA][CUSTOM] ac_z3        changed=1 now=00E80000-FF00FFFF (was 00E80000-8001FFFF) add=FF000000-FF00FFFF
+[INFO] [CPU] FC enabled and in use (mode=cpld)
+[INFO] [CPU][BERR] Reset status unknown (kernel param not readable)
+No IDE drives mounted, disabling Gayle IDE component.
+[INFO] [CPU] Active backend: Musashi
+Setting CPU type to 9.
+[INFO] [PISCSI] Refresh drive 1: block_size=512 fs=16139354112 bytes
+[INFO] [PISCSI] Partition 0: PDH0 (4)
+[INFO] [PISCSI] Partition 1: PDH1 (4)
+[INFO] [PISCSI] Drive 1 partitions found: 2
+[FSHD] Loaded and set up file system 1: PFS/3
+[FSHD] Loaded and set up file system 2: DOS/1
+[INFO] [PISCSI] Refresh drive 2: block_size=512 fs=4294967296 bytes
+[INFO] [PISCSI] Drive 2 partitions found: 0
+[INFO] [PISCSI] Refresh drive 3: block_size=512 fs=2621440 bytes
+[INFO] [PISCSI] Partition 0: DH99 (4)
+[INFO] [PISCSI] Drive 3 partitions found: 1
+[INFO] [PISCSI] Refresh drive 5: block_size=512 fs=4294967296 bytes
+[INFO] [PISCSI] Partition 0: DH0 (3)
+[INFO] [PISCSI] Drive 5 partitions found: 1
+[FSHD] Loaded and set up file system 3: DOS/3
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=70000000-8000FFFF (was 70000000-7800FFFF) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=70000000-8001FFFF (was 70000000-8000FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8001FFFF (was 70000000-8001FFFF) add=00E80000-00E8FFFF
+[INFO] [AMIGA][CUSTOM] ac_z3        changed=1 now=00E80000-FF00FFFF (was 00E80000-8001FFFF) add=FF000000-FF00FFFF
+[IPL] Thread created successfully
+[AFF] ipl pinned to core 3
+[PRIO] ipl set to SCHED_RR priority 60
+[IPL] Thread running
+Amiga Reset is up...
+[MAIN] Keyboard thread created successfully
+[KBD] Keyboard thread started
+[AFF] input pinned to core 2
+[MAIN] Mouse thread created successfully
+[AFF] keyboard pinned to core 1
+[MOUSE] Mouse thread started
+[PRIO] keyboard set to SCHED_RR priority 50
+[AFF] input pinned to core 2
+[AFF] mouse pinned to core 1
+[PRIO] mouse set to SCHED_RR priority 50
+[MAIN] CPU thread created successfully
+[AFF] cpu pinned to core 2
+[AFF] cpu pinned to core 2
+[PRIO] cpu set to SCHED_RR priority 95
+OVL:0
+[FPU] first path: op1 main=0
+[FPU] first path: op1 main=1
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00E90000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[MUSASHI] Mapped read range 4: 00200000-00600000 (0x24000000)
+[MUSASHI] Mapped write range 3: 00200000-00600000 (0x24000000)
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=00E90000-7800FFFF (was 70000000-7800FFFF) add=00E90000-00E9FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=00E90000-8001FFFF (was 00E90000-7800FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z3        changed=1 now=00E90000-FF00FFFF (was 00E90000-8001FFFF) add=FF000000-FF00FFFF
+[FPU] first path: op0 main=0
+[FPU] first path: op0 subop=7
+[FPU] first path: fmovem dir=1 mode=0 reglist=0xff
+[FPU] first path: op0 subop=5
+[FPU] first path: fmove_fpcr dir=1 regsel=7 ea_mode=4
+[FPU] first path: op0 subop=4
+[FPU] first path: fmove_fpcr dir=0 regsel=7 ea_mode=3
+[FPU] first path: op0 subop=6
+[FPU] first path: fmovem dir=0 mode=2 reglist=0xff
+[INFO] [PISCSI] GETPART: idx=0 offset=0x08013630
+[INFO] [PISCSI] GETPRIO: idx=0 prio=0
+[INFO] [PISCSI] GETPRIO: idx=0 prio=0
+[INFO] [PISCSI] GETPART: idx=1 offset=0x08013730
+[INFO] [PISCSI] GETPRIO: idx=1 prio=-128
+[INFO] [PISCSI] GETPART: idx=2 offset=0x08013830
+[INFO] [PISCSI] GETPRIO: idx=2 prio=-128
+[INFO] [PISCSI] GETPART: idx=3 offset=0x08013930
+[INFO] [PISCSI] GETPRIO: idx=3 prio=-128
+[INFO] [PISCSI] GETPART: idx=4 offset=0x00000000
+[INFO] [PISCSI] Refresh drive 1: block_size=512 fs=16139354112 bytes
+[INFO] [PISCSI] Partition 0: PDH0 (4)
+[INFO] [PISCSI] Partition 1: PDH1 (4)
+[INFO] [PISCSI] Drive 1 partitions found: 2
+[FSHD] Loaded and set up file system 1: PFS/3
+[FSHD] Loaded and set up file system 2: DOS/1
+[INFO] [PISCSI] Refresh drive 2: block_size=512 fs=4294967296 bytes
+[INFO] [PISCSI] Drive 2 partitions found: 0
+[INFO] [PISCSI] Refresh drive 3: block_size=512 fs=2621440 bytes
+[INFO] [PISCSI] Partition 0: DH99 (4)
+[INFO] [PISCSI] Drive 3 partitions found: 1
+[INFO] [PISCSI] Refresh drive 5: block_size=512 fs=4294967296 bytes
+[INFO] [PISCSI] Partition 0: DH0 (3)
+[INFO] [PISCSI] Drive 5 partitions found: 1
+[FSHD] Loaded and set up file system 3: DOS/3
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=70000000-8000FFFF (was 70000000-7800FFFF) add=80000000-8000FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=70000000-8001FFFF (was 70000000-8000FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z2        changed=1 now=00E80000-8001FFFF (was 70000000-8001FFFF) add=00E80000-00E8FFFF
+[INFO] [AMIGA][CUSTOM] ac_z3        changed=1 now=00E80000-FF00FFFF (was 00E80000-8001FFFF) add=FF000000-FF00FFFF
+OVL:0
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00E90000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA][MAP] i=00 type=1 amiga_base=00F80000 size=00080000 amiga_end=00FFFFFF host=0x10000000 kind=rom cacheable=1 executable=1 mapped=1 lochg=1 hichg=1 now=00F80000-00FFFFFF (was 00000000-00000000)
+[INFO] [AMIGA][MAP] i=01 type=2 amiga_base=08000000 size=10000000 amiga_end=17FFFFFF host=0x12000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00F80000-17FFFFFF (was 00F80000-00FFFFFF)
+[INFO] [AMIGA][MAP] i=02 type=2 amiga_base=00100000 size=00100000 amiga_end=001FFFFF host=0x22000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=1 hichg=0 now=00100000-17FFFFFF (was 00F80000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=03 type=2 amiga_base=00200000 size=00400000 amiga_end=005FFFFF host=0x24000000 kind=z2 cacheable=1 executable=1 mapped=0 lochg=0 hichg=0 now=00100000-17FFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=04 type=2 amiga_base=18000000 size=08000000 amiga_end=1FFFFFFF host=0x26000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-1FFFFFFF (was 00100000-17FFFFFF)
+[INFO] [AMIGA][MAP] i=05 type=2 amiga_base=20000000 size=08000000 amiga_end=27FFFFFF host=0x2e000000 kind=ram cacheable=1 executable=1 mapped=1 lochg=0 hichg=1 now=00100000-27FFFFFF (was 00100000-1FFFFFFF)
+[INFO] [AMIGA][MAP] i=06 type=3 amiga_base=00DC0000 size=00010000 amiga_end=00DCFFFF host=(nil) kind=io cacheable=0 executable=0 mapped=0 lochg=0 hichg=0 now=00100000-27FFFFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][MAP] i=07 type=4 amiga_base=70010000 size=08000000 amiga_end=7800FFFF host=0x36000000 kind=rtg cacheable=0 executable=0 mapped=1 lochg=0 hichg=1 now=00100000-7800FFFF (was 00100000-27FFFFFF)
+[INFO] [AMIGA][CUSTOM] rtg          changed=1 now=70000000-7800FFFF (was 00000000-00000000) add=70000000-7800FFFF
+[INFO] [AMIGA][CUSTOM] piscsi       changed=1 now=00E90000-7800FFFF (was 70000000-7800FFFF) add=00E90000-00E9FFFF
+[INFO] [AMIGA][CUSTOM] pinet        changed=1 now=00E90000-8001FFFF (was 00E90000-7800FFFF) add=80010000-8001FFFF
+[INFO] [AMIGA][CUSTOM] ac_z3        changed=1 now=00E90000-FF00FFFF (was 00E90000-8001FFFF) add=FF000000-FF00FFFF
+[INFO] [PISCSI] GETPART: idx=0 offset=0x08013638
+[INFO] [PISCSI] GETPRIO: idx=0 prio=0
+[INFO] [PISCSI] GETPRIO: idx=0 prio=0
+[INFO] [PISCSI] GETPART: idx=1 offset=0x08013738
+[INFO] [PISCSI] GETPRIO: idx=1 prio=-128
+[INFO] [PISCSI] GETPART: idx=2 offset=0x08013838
+[INFO] [PISCSI] GETPRIO: idx=2 prio=-128
+[INFO] [PISCSI] GETPART: idx=3 offset=0x08013938
+[INFO] [PISCSI] GETPRIO: idx=3 prio=-128
+[INFO] [PISCSI] GETPART: idx=4 offset=0x00000000
+[ERROR] [CPU] Illegal instruction: PC=$0810B6CE PPC=$0810B6CA SR=$2700 OPCODE=$4E7A
+[ERROR] [CPU] movec A0, VBR; (1+)
+[ERROR] REGA: 0:$00000000 1:$0810B6D6 2:$08115199 3:$0810ADBA 4:$08102398 5:$0810B6A4 6:$08000884 7:$08002278
+[ERROR] REGD: 0:$00000001 1:$02042D01 2:$00000000 3:$00000000 4:$00000000 5:$00000000 6:$00000000 7:$00000000
+[ERROR] [CPU] PC map[1] amiga=$08000000-$17FFFFFF size=$10000000 host=0x12000000 host_span=$10000000 type=2 kind=ram cacheable=1 executable=1 id=cpu_slot_ram
+[FPU] first path: op0 subop=2
+[FPU] first path: fpgen opmode=0x00 (FMOVE) rm=1 src=0 dst=0
+[FPU] first path: op0 subop=0
+[FPU] first path: fpgen opmode=0x22 (FADD-family) rm=0 src=1 dst=0
+[FPU] PISTORM_FPU_NATIVE_FAST=2 enabled (experimental, precision tradeoff)
+[FPU] PISTORM_FPU_NATIVE_BIN=1 enabled
+[FPU] first path: op0 subop=3
+[FPU] first path: fmove_reg_mem dst=0 src=0
+[FPU] first path: op0 main=2
+[FPU] first path: FBcc16
+[ERROR] [CPU] Illegal instruction: PC=$08117E58 PPC=$08117E54 SR=$2714 OPCODE=$4E7A
+[ERROR] [CPU] moveq   #$1, D0
+[ERROR] REGA: 0:$00000000 1:$08117E62 2:$081203E3 3:$0810ADBA 4:$08120B1C 5:$080FDE70 6:$08120B1C 7:$08002278
+[ERROR] REGD: 0:$00000000 1:$0000FF4F 2:$00000080 3:$00000000 4:$00000000 5:$00000000 6:$00000000 7:$00000000
+[ERROR] [CPU] PC map[1] amiga=$08000000-$17FFFFFF size=$10000000 host=0x12000000 host_span=$10000000 type=2 kind=ram cacheable=1 executable=1 id=cpu_slot_ram
+[FPU] first path: fmove_fpcr dir=0 regsel=4 ea_mode=0
+[INFO] Pixel format switch from: 4BPP PLANAR (0) to 8BPP CLUT (1)
+[INFO] [RTG/DBG] CLUT[0] = AAAAAA
+[INFO] [RTG/DBG] CLUT[1] = 000000
+[INFO] [RTG/DBG] CLUT[2] = FFFFFF
+[INFO] [RTG/DBG] CLUT[3] = 6688BB
+[INFO] [RTG/DBG] CLUT[17] = EE4444
+[INFO] [RTG/DBG] CLUT[18] = 000000
+[INFO] [RTG/DBG] CLUT[19] = EEEECC
+[INFO] RTG Thread created successfully
+[INFO] RTG display enabled.
+[INFO] [RTG] Thread running
+[INFO] [RTG/RAYLIB] Defaulting PISTORM_RTG_CORE to 1.
+[INFO] [RTG/RAYLIB] Thread pinned to core 1 (default).
+[INFO] [RTG/RAYLIB] Defaulting PISTORM_RTG_RT_PRIO to 60.
+[INFO] [RTG/RAYLIB] Thread set to SCHED_RR prio 60 (default).
+[INFO] [RTG/RAYLIB] Defaulting PISTORM_DRM_SWAP_INTERVAL to 0.
+[INFO] [RTG/RAYLIB] Requested output mode: 1920x1080
+[INFO] [RTG/RAYLIB] Auto output mode: 1920x1080 (card1-HDMI-A-1)
+[INFO] [RTG/RAYLIB] Output resolution: 1920x1080
+INFO: Initializing raylib 5.5
+INFO: Platform backend: NATIVE DRM
+INFO: Supported raylib modules:
+INFO:     > rcore:..... loaded (mandatory)
+INFO:     > rlgl:...... loaded (mandatory)
+INFO:     > rshapes:... loaded (optional)
+INFO:     > rtextures:. loaded (optional)
+INFO:     > rtext:..... loaded (optional)
+INFO:     > rmodels:... loaded (optional)
+INFO:     > raudio:.... loaded (optional)
+INFO: DISPLAY: No graphic card set, trying platform-gpu-card
+INFO: DISPLAY: Selected DRM connector mode 1920x1080 (1920x1080p@60)
+INFO: DISPLAY: Device initialized successfully
+INFO:     > Display size: 1920 x 1080
+INFO:     > Screen size:  1920 x 1080
+INFO:     > Render size:  1920 x 1080
+INFO:     > Viewport offsets: 0, 0
+WARNING: GetCurrentMonitor() not implemented on target platform
+WARNING: GetCurrentMonitor() not implemented on target platform
+WARNING: SetWindowPosition() not available on target platform
+INFO: GL: Supported extensions count: 119
+INFO: GL: OpenGL device information:
+INFO:     > Vendor:   Broadcom
+INFO:     > Renderer: V3D 4.2.14.0
+INFO:     > Version:  OpenGL ES 3.1 Mesa 25.0.7-2+rpt3
+INFO:     > GLSL:     OpenGL ES GLSL ES 3.10
+INFO: GL: VAO extension detected, VAO functions loaded successfully
+INFO: GL: NPOT textures extension detected, full NPOT textures supported
+INFO: GL: DXT compressed textures supported
+INFO: GL: ETC1 compressed textures supported
+WARNING: DRM: Failed to change keyboard mode, an SSH keyboard is probably used
+INFO: PLATFORM: DRM: Initialized successfully
+INFO: TEXTURE: [ID 1] Texture loaded successfully (1x1 | R8G8B8A8 | 1 mipmaps)
+INFO: TEXTURE: [ID 1] Default texture loaded successfully
+INFO: SHADER: [ID 1] Vertex shader compiled successfully
+INFO: SHADER: [ID 2] Fragment shader compiled successfully
+INFO: SHADER: [ID 3] Program shader loaded successfully
+INFO: SHADER: [ID 3] Default shader loaded successfully
+INFO: RLGL: Render batch vertex buffers loaded successfully in RAM (CPU)
+INFO: RLGL: Render batch vertex buffers loaded successfully in VRAM (GPU)
+INFO: RLGL: Default OpenGL state initialized successfully
+INFO: TEXTURE: [ID 2] Texture loaded successfully (128x128 | GRAY_ALPHA | 1 mipmaps)
+INFO: FONT: Default font loaded successfully (224 glyphs)
+INFO: SYSTEM: Working Directory: /home/smalley/pistorm64
+[INFO] [RTG/RAYLIB] Defaulting PISTORM_RTG_VSYNC to off.
+WARNING: ClearWindowState() not available on target platform
+[INFO] [RTG/RAYLIB] VSync disabled via PISTORM_RTG_VSYNC=0.
+[INFO] [RTG/RAYLIB] Defaulting PISTORM_RTG_TARGET_FPS to 0 (uncapped).
+INFO: TIMER: Target time per frame: 0.000 milliseconds
+WARNING: GetCurrentMonitor() not implemented on target platform
+[INFO] [RTG/RAYLIB] Monitor=0 mode=1920x1080 refresh=60Hz vsync=off
+[INFO] [RTG/RAYLIB] Target FPS=0 (PISTORM_RTG_TARGET_FPS)
+[INFO] [RTG/RAYLIB] CPU CLUT conversion enabled by default.
+INFO: FILEIO: [/opt/pistorm64/src/platforms/amiga/pirtg64/shaders/clut.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 5] Program shader loaded successfully
+INFO: FILEIO: [/opt/pistorm64/src/platforms/amiga/pirtg64/shaders/bgraswizzle.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 6] Program shader loaded successfully
+INFO: FILEIO: [/opt/pistorm64/src/platforms/amiga/pirtg64/shaders/argbswizzle.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 7] Program shader loaded successfully
+INFO: FILEIO: [/opt/pistorm64/src/platforms/amiga/pirtg64/shaders/abgrswizzle.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 8] Program shader loaded successfully
+INFO: FILEIO: [/opt/pistorm64/src/platforms/amiga/pirtg64/shaders/rgbxswizzle.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 9] Program shader loaded successfully
+INFO: TEXTURE: [ID 3] Texture loaded successfully (256x1 | R8G8B8A8 | 1 mipmaps)
+INFO: TEXTURE: [ID 4] Texture loaded successfully (256x256 | R8G8B8A8 | 1 mipmaps)
+[INFO] Creating 640x480 raylib window...
+INFO: TEXTURE: [ID 5] Texture loaded successfully (640x480 | R8G8B8A8 | 1 mipmaps)
+[INFO] RTG display disabled.
+[INFO] [RTG/DBG] CLUT[4] = 0000FF
+[INFO] RTG display enabled.
+[FPU] first path: fpgen opmode=0x20 (FDIV-family) rm=1 src=5 dst=0
+[FPU] first path: fmove_reg_mem dst=5 src=0
+[FPU] first path: fpgen opmode=0x0f (FTAN) rm=1 src=7 dst=1
+[FPU] first path: fpgen opmode=0x32 (FSINCOS) rm=1 src=7 dst=0
+[FPU] first path: fpgen opmode=0x28 (FSUB-family) rm=1 src=5 dst=2
+[FPU] first path: fpgen opmode=0x23 (FMUL-family) rm=0 src=0 dst=2
+[FPU] first path: fpgen opmode=0x38 (FCMP) rm=0 src=3 dst=2
+[FPU] first path: fpgen opmode=0x04 (FSQRT-family) rm=0 src=0 dst=1
+[FPU] first path: fpgen opmode=0x3a (FTST) rm=0 src=0 dst=0
+[FPU] first path: op0 main=1
+[FPU] first path: FScc
+[FPU] first path: fpgen opmode=0x1a (FNEG-family) rm=0 src=1 dst=0
+[FPU] first path: fpgen opmode=0x1c (FACOS) rm=0 src=2 dst=1
+[FPU] first path: fpgen opmode=0x0c (FASIN) rm=0 src=0 dst=2
+[FPU] first path: fpgen opmode=0x1d (FCOS) rm=0 src=1 dst=2

@@ -41,6 +41,18 @@ CC  := gcc
 CXX := g++
 endif
 
+# Keep C/C++ compilers aligned when CC is explicitly clang and CXX was not
+# explicitly provided by the user.
+ifneq ($(findstring clang,$(CC)),)
+ifneq ($(origin CXX),command line)
+ifneq ($(origin CXX),environment)
+ifneq ($(origin CXX),environment override)
+CXX := clang++
+endif
+endif
+endif
+endif
+
 
 EXTRA_CFLAGS ?= -O3 
 #-g -O0
@@ -192,6 +204,8 @@ MAINFILES += src/platforms/platforms.c
 MAINFILES += src/z3bus_iface.c
 MAINFILES += src/platforms/amiga/amiga_zorro.c
 MAINFILES += src/platforms/amiga/zorro/z3bus_demo/z3bus_demo.c
+MAINFILES += src/platforms/amiga/zorro/ppc_accel/ppc_accel.c
+MAINFILES += src/ppc/qemu_uae_loader.c
 MAINFILES += src/platforms/amiga/zorro/serial_echo/serial_echo.c
 MAINFILES += src/platforms/amiga/zorro/z2_rng/z2_rng.c
 MAINFILES += src/platforms/amiga/zorro/z2_pissa/z2_pissa.c
@@ -209,6 +223,7 @@ MAINFILES += src/platforms/dummy/dummy-registers.c
 
 MAINFILES += src/platforms/amiga/Gayle.c
 MAINFILES += src/platforms/amiga/hunk-reloc.c
+MAINFILES += src/platforms/amiga/fsid.c
 MAINFILES += src/platforms/amiga/cdtv-dmac.c
 
 MAINFILES += src/platforms/amiga/pirtg64/pirtg64.c
@@ -217,6 +232,10 @@ MAINFILES += src/platforms/amiga/pirtg64/pirtg64-gfx.c
 
 MAINFILES += src/platforms/amiga/piscsi/piscsi.c
 MAINFILES += src/platforms/amiga/net/pi-net.c
+MAINFILES += src/platforms/amiga/net64/net64_config.c
+MAINFILES += src/platforms/amiga/net64/net64_device.c
+MAINFILES += src/platforms/amiga/net64/net64_bus.c
+MAINFILES += src/platforms/amiga/net64/net64_autoconfig.c
 MAINFILES += src/leds/osd_leds.c
 
 MAINFILES += src/platforms/shared/rtc.c
@@ -273,7 +292,7 @@ M68KFILES = $(MUSASHIFILES) $(MUSASHIGENCFILES)
 CC  ?= gcc
 CXX ?= g++
 
-DEFINES  += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1
+DEFINES  += -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1
 # Allow command-line override of batching and rate limiting for performance tuning
 PISTORM_ENABLE_BATCH ?= 0
 PISTORM_IPL_RATELIMIT_US ?= 0
@@ -472,6 +491,7 @@ HELP_TARGETS = \
 	"make kernel_clean"               "Clean kernel module build outputs" \
 	"make profile"                    "Build emulator with PGO instrumentation" \
 	"make runprofile"                 "Run emulator to generate PGO profile data" \
+	"make runprofile-only"            "Run emulator for PGO data without rebuilding first" \
 	"make buildprofile"               "Rebuild emulator using PGO profile data + compile trace" \
 	"make "            "Build interactive bus monitor" \
 	"make full"         "Stop emulator, rebuild kmod+userland, install"
@@ -676,22 +696,73 @@ full:
 
 PROFILE_RUN  ?= ./$(TARGET)
 PROFILE_ARGS ?=
+PROFILE_TIMEOUT ?=
+CLANG_PROFILE_FILE ?= $(PGO_DIR)/pgo_%p.profraw
+PROFILE_SIGNAL ?= INT
+PROFILE_KILL_AFTER ?= 30s
+PGO_BUILD_KMOD ?= 0
+PGO_RESET ?= 1
 
 profile:
 	@mkdir -p $(PGO_DIR)
+	@if [ "$(PGO_RESET)" = "1" ]; then \
+		echo "[PGO] Resetting old profile data in $(PGO_DIR)"; \
+		rm -f $(PGO_DIR)/*.profraw $(PGO_DIR)/*.profdata $(PGO_DIR)/*.gcda; \
+	fi
 	$(MAKE) -f Makefile.profile clean
 	$(MAKE) -f Makefile.profile PGO_MODE=gen
-	@echo "[PGO] Building Pi kernel modules"
-	$(MAKE) -f Makefile.profile kernel_module
+	@if [ "$(PGO_BUILD_KMOD)" = "1" ]; then \
+		echo "[PGO] Building Pi kernel modules"; \
+		$(MAKE) -f Makefile.profile kernel_module; \
+	else \
+		echo "[PGO] Skipping kernel module build (PGO_BUILD_KMOD=$(PGO_BUILD_KMOD))"; \
+	fi
 
 runprofile: profile
 	@mkdir -p $(PGO_DIR)
-	@echo "[PGO] Running $(PROFILE_RUN) $(PROFILE_ARGS)"
-	@if [ "$(findstring clang,$(CC))" != "" ]; then \
-		LLVM_PROFILE_FILE="$(PGO_DIR)/pgo_%p.profraw" $(PROFILE_RUN) $(PROFILE_ARGS); \
+	@echo "[PGO] Running $(PROFILE_RUN) timeout=$(PROFILE_TIMEOUT)"
+	@set +e; \
+	if [ "$(findstring clang,$(CC))" != "" ]; then \
+		if [ -n "$(PROFILE_TIMEOUT)" ]; then \
+			LLVM_PROFILE_FILE="$(CLANG_PROFILE_FILE)" timeout -k $(PROFILE_KILL_AFTER) -s $(PROFILE_SIGNAL) $(PROFILE_TIMEOUT) $(PROFILE_RUN) $(PROFILE_ARGS); rc=$$?; \
+		else \
+			LLVM_PROFILE_FILE="$(CLANG_PROFILE_FILE)" $(PROFILE_RUN) $(PROFILE_ARGS); rc=$$?; \
+		fi; \
 	else \
-		$(PROFILE_RUN) $(PROFILE_ARGS); \
-	fi
+		if [ -n "$(PROFILE_TIMEOUT)" ]; then \
+			timeout -k $(PROFILE_KILL_AFTER) -s $(PROFILE_SIGNAL) $(PROFILE_TIMEOUT) $(PROFILE_RUN) $(PROFILE_ARGS); rc=$$?; \
+		else \
+			$(PROFILE_RUN) $(PROFILE_ARGS); rc=$$?; \
+		fi; \
+	fi; \
+	if [ $$rc -eq 124 ] || [ $$rc -eq 137 ] || [ $$rc -eq 143 ]; then \
+		echo "[PGO] Run ended by timeout/signal (exit=$$rc); continuing."; \
+		exit 0; \
+	fi; \
+	exit $$rc
+
+runprofile-only:
+	@mkdir -p $(PGO_DIR)
+	@echo "[PGO] Running (no rebuild) $(PROFILE_RUN) timeout=$(PROFILE_TIMEOUT)"
+	@set +e; \
+	if [ "$(findstring clang,$(CC))" != "" ]; then \
+		if [ -n "$(PROFILE_TIMEOUT)" ]; then \
+			LLVM_PROFILE_FILE="$(CLANG_PROFILE_FILE)" timeout -k $(PROFILE_KILL_AFTER) -s $(PROFILE_SIGNAL) $(PROFILE_TIMEOUT) $(PROFILE_RUN) $(PROFILE_ARGS); rc=$$?; \
+		else \
+			LLVM_PROFILE_FILE="$(CLANG_PROFILE_FILE)" $(PROFILE_RUN) $(PROFILE_ARGS); rc=$$?; \
+		fi; \
+	else \
+		if [ -n "$(PROFILE_TIMEOUT)" ]; then \
+			timeout -k $(PROFILE_KILL_AFTER) -s $(PROFILE_SIGNAL) $(PROFILE_TIMEOUT) $(PROFILE_RUN) $(PROFILE_ARGS); rc=$$?; \
+		else \
+			$(PROFILE_RUN) $(PROFILE_ARGS); rc=$$?; \
+		fi; \
+	fi; \
+	if [ $$rc -eq 124 ] || [ $$rc -eq 137 ] || [ $$rc -eq 143 ]; then \
+		echo "[PGO] Run ended by timeout/signal (exit=$$rc); continuing."; \
+		exit 0; \
+	fi; \
+	exit $$rc
 
 buildprofile:
 	@mkdir -p $(PGO_DIR)
@@ -703,8 +774,12 @@ buildprofile:
 	fi
 	$(MAKE) -f Makefile.profile clean
 	$(MAKE) -f Makefile.profile PGO_MODE=use BUILD_TRACE=1
-	@echo "[PGO] Building Pi kernel modules"
-	$(MAKE) -f Makefile.profile kernel_module
+	@if [ "$(PGO_BUILD_KMOD)" = "1" ]; then \
+		echo "[PGO] Building Pi kernel modules"; \
+		$(MAKE) -f Makefile.profile kernel_module; \
+	else \
+		echo "[PGO] Skipping kernel module build (PGO_BUILD_KMOD=$(PGO_BUILD_KMOD))"; \
+	fi
 
 help:
 	@printf "Available targets:\n"
@@ -716,4 +791,4 @@ help:
 	kernel_module kernel_module_pistorm kernel_module_z3bus \
 	kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean \
 	amiga-net amiga-piscsi amiga-rtg amiga-ahi amiga-all amiga-clean \
-	profile runprofile buildprofile help full
+	profile runprofile runprofile-only buildprofile help full

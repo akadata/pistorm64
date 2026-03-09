@@ -73,7 +73,7 @@ const char *const m68ki_cpu_names[] = {
 #endif /* M68K_LOG_ENABLE */
 
 /* The CPU core */
-m68ki_cpu_core m68ki_cpu = {0};
+m68ki_cpu_core m68ki_cpu __attribute__((aligned(64))) = {0};
 
 /* Used by shift & rotate instructions */
 const uint8 m68ki_shift_8_table[65] = {

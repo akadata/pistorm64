@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: MIT
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #include "emulator.h"
 #include <stdio.h>
 #include <stdint.h>

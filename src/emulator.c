@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: MIT
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #include "m68k.h"
 #include "emulator.h"
 #include "platforms/platforms.h"
@@ -84,6 +88,190 @@ static int fc_boot_log_inited = 0;
 static int use_uae_jit = 0;
 static int reset_trace_setting = -1;
 static uint64_t reset_last_edge_ns = 0;
+
+static int op_hist_mode = -1;
+static int op_hist_topn = -1;
+static uint64_t op_hist_total = 0;
+static uint64_t op_hist_fline_total = 0;
+static uint64_t op_hist_counts[65536];
+static uint64_t op_hist_group_counts[4];
+static uint64_t op_hist_group_cycles[4];
+static uint64_t op_hist_total_cycles = 0;
+
+enum op_hist_group {
+  OPHIST_G_BRANCH = 0,
+  OPHIST_G_MOVE = 1,
+  OPHIST_G_ALU = 2,
+  OPHIST_G_FLINE = 3,
+  OPHIST_G_COUNT = 4
+};
+
+static inline const char* op_hist_group_name(enum op_hist_group g) {
+  switch (g) {
+  case OPHIST_G_BRANCH:
+    return "branch";
+  case OPHIST_G_MOVE:
+    return "move";
+  case OPHIST_G_ALU:
+    return "alu";
+  case OPHIST_G_FLINE:
+    return "fline";
+  default:
+    return "unknown";
+  }
+}
+
+static inline int op_hist_is_dbcc(uint16_t op) {
+  return ((op & 0xF0F8u) == 0x50C8u);
+}
+
+static inline int op_hist_is_jmp_jsr(uint16_t op) {
+  return ((op & 0xFFC0u) == 0x4EC0u) || ((op & 0xFFC0u) == 0x4E80u);
+}
+
+static inline int op_hist_is_ctrl_misc(uint16_t op) {
+  switch (op) {
+  case 0x4E73: /* RTE */
+  case 0x4E74: /* RTD */
+  case 0x4E75: /* RTS */
+  case 0x4E76: /* TRAPV */
+  case 0x4E77: /* RTR */
+  case 0x4E72: /* STOP */
+  case 0x4E71: /* NOP */
+  case 0x4E70: /* RESET */
+    return 1;
+  default:
+    return 0;
+  }
+}
+
+static inline enum op_hist_group op_hist_group_for_opcode(uint16_t op) {
+  uint16_t top = (uint16_t)(op >> 12);
+
+  if (top == 0xFu) {
+    return OPHIST_G_FLINE;
+  }
+  if (top == 0x1u || top == 0x2u || top == 0x3u) {
+    return OPHIST_G_MOVE;
+  }
+  if (top == 0x6u || op_hist_is_dbcc(op) || op_hist_is_jmp_jsr(op) || op_hist_is_ctrl_misc(op)) {
+    return OPHIST_G_BRANCH;
+  }
+  return OPHIST_G_ALU;
+}
+
+static inline int op_hist_enabled(void) {
+  if (op_hist_mode == -1) {
+    const char* e = getenv("PISTORM_OP_HIST");
+    op_hist_mode = (e && atoi(e) != 0) ? 1 : 0;
+    if (op_hist_mode) {
+      memset(op_hist_counts, 0, sizeof(op_hist_counts));
+      memset(op_hist_group_counts, 0, sizeof(op_hist_group_counts));
+      memset(op_hist_group_cycles, 0, sizeof(op_hist_group_cycles));
+      op_hist_total = 0;
+      op_hist_fline_total = 0;
+      op_hist_total_cycles = 0;
+    }
+  }
+  return op_hist_mode;
+}
+
+static inline int op_hist_get_topn(void) {
+  if (op_hist_topn == -1) {
+    const char* e = getenv("PISTORM_OP_HIST_TOP");
+    int v = e ? atoi(e) : 32;
+    if (v < 1) v = 1;
+    if (v > 256) v = 256;
+    op_hist_topn = v;
+  }
+  return op_hist_topn;
+}
+
+static inline void op_hist_record(uint16_t opcode, uint32_t consumed_cycles) {
+  enum op_hist_group g;
+  if (!op_hist_enabled()) {
+    return;
+  }
+  g = op_hist_group_for_opcode(opcode);
+  op_hist_counts[opcode]++;
+  op_hist_total++;
+  op_hist_group_counts[g]++;
+  op_hist_group_cycles[g] += (uint64_t)consumed_cycles;
+  op_hist_total_cycles += (uint64_t)consumed_cycles;
+  if ((opcode & 0xF000u) == 0xF000u) {
+    op_hist_fline_total++;
+  }
+}
+
+static void op_hist_dump(void) {
+  uint64_t unique = 0;
+  int topn;
+  int selected_count = 0;
+  int selected[256];
+
+  if (!op_hist_enabled() || op_hist_total == 0) {
+    return;
+  }
+
+  for (int i = 0; i < 65536; i++) {
+    if (op_hist_counts[i] != 0) {
+      unique++;
+    }
+  }
+
+  topn = op_hist_get_topn();
+  if ((uint64_t)topn > unique) {
+    topn = (int)unique;
+  }
+
+  printf("[OPHIST] total=%" PRIu64 " unique=%" PRIu64 " fline=%" PRIu64 " (%.2f%%)\n",
+         op_hist_total, unique, op_hist_fline_total,
+         op_hist_total ? (100.0 * (double)op_hist_fline_total / (double)op_hist_total) : 0.0);
+  printf("[OPHIST] top=%d\n", topn);
+
+  for (int rank = 0; rank < topn; rank++) {
+    uint64_t best_count = 0;
+    int best_opcode = -1;
+    for (int opcode = 0; opcode < 65536; opcode++) {
+      int already_selected = 0;
+      if (op_hist_counts[opcode] == 0) {
+        continue;
+      }
+      for (int j = 0; j < selected_count; j++) {
+        if (selected[j] == opcode) {
+          already_selected = 1;
+          break;
+        }
+      }
+      if (already_selected) {
+        continue;
+      }
+      if (op_hist_counts[opcode] > best_count) {
+        best_count = op_hist_counts[opcode];
+        best_opcode = opcode;
+      }
+    }
+    if (best_opcode < 0) {
+      break;
+    }
+    selected[selected_count++] = best_opcode;
+    printf("[OPHIST] #%02d opcode=%04X count=%" PRIu64 " (%.2f%%)\n",
+           rank + 1,
+           (unsigned int)best_opcode,
+           best_count,
+           op_hist_total ? (100.0 * (double)best_count / (double)op_hist_total) : 0.0);
+  }
+
+  printf("[OPHIST] groups (count / cyc_est)\n");
+  for (int g = 0; g < OPHIST_G_COUNT; g++) {
+    printf("[OPHIST] group=%s count=%" PRIu64 " (%.2f%%) cyc_est=%" PRIu64 " (%.2f%%)\n",
+           op_hist_group_name((enum op_hist_group)g),
+           op_hist_group_counts[g],
+           op_hist_total ? (100.0 * (double)op_hist_group_counts[g] / (double)op_hist_total) : 0.0,
+           op_hist_group_cycles[g],
+           op_hist_total_cycles ? (100.0 * (double)op_hist_group_cycles[g] / (double)op_hist_total_cycles) : 0.0);
+  }
+}
 
 #if USE_UAE_JIT
 
@@ -545,6 +733,7 @@ int gayleirq;
 
 // Forward declarations for helpers used before their definitions.
 static inline uint8_t opcode_is_fpu(uint16_t opcode);
+typedef void (*m68k_opcode_handler_t)(m68ki_cpu_core* state);
 static void apply_affinity_from_env(const char* role, int default_core);
 static void set_realtime_priority(const char* name, int prio);
 static void apply_realtime_from_env(const char* role, int default_prio);
@@ -556,6 +745,47 @@ static void amiga_warmup_bus(void);
 static void configure_ipl_nops(void);
 static void print_help(const char* prog);
 static void print_about(const char* prog);
+
+#define HOT_OPCODE_COUNT 12
+static const uint16_t g_hot_opcodes[HOT_OPCODE_COUNT] = {
+  0x51CA, 0x4ED4, 0x4ED3, 0x1E1A, 0x22F0, 0x51C8,
+  0xD2C3, 0x1298, 0x4E75, 0x2444, 0x1831, 0x6100,
+};
+static m68k_opcode_handler_t g_hot_handlers[HOT_OPCODE_COUNT];
+static int g_hot_dispatch_mode = -1;
+
+static inline int hot_dispatch_enabled(void) {
+  if (g_hot_dispatch_mode == -1) {
+    const char* e = getenv("PISTORM_HOT_DISPATCH");
+    g_hot_dispatch_mode = (e && atoi(e) != 0) ? 1 : 0;
+  }
+  return g_hot_dispatch_mode;
+}
+
+static inline void hot_dispatch_refresh(void) {
+  for (int i = 0; i < HOT_OPCODE_COUNT; i++) {
+    g_hot_handlers[i] = m68ki_instruction_jump_table[g_hot_opcodes[i]];
+  }
+}
+
+static inline int hot_dispatch_try(m68ki_cpu_core* state, uint16_t opcode) {
+  switch (opcode) {
+  case 0x51CA: g_hot_handlers[0](state); return 1;
+  case 0x4ED4: g_hot_handlers[1](state); return 1;
+  case 0x4ED3: g_hot_handlers[2](state); return 1;
+  case 0x1E1A: g_hot_handlers[3](state); return 1;
+  case 0x22F0: g_hot_handlers[4](state); return 1;
+  case 0x51C8: g_hot_handlers[5](state); return 1;
+  case 0xD2C3: g_hot_handlers[6](state); return 1;
+  case 0x1298: g_hot_handlers[7](state); return 1;
+  case 0x4E75: g_hot_handlers[8](state); return 1;
+  case 0x2444: g_hot_handlers[9](state); return 1;
+  case 0x1831: g_hot_handlers[10](state); return 1;
+  case 0x6100: g_hot_handlers[11](state); return 1;
+  default:
+    return 0;
+  }
+}
 
 extern unsigned int cpu_type;
 extern struct emulator_config* cfg;
@@ -1054,6 +1284,15 @@ static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
 
   /* Make sure we're not stopped */
   if (!CPU_STOPPED) {
+    int ophist_on = op_hist_enabled();
+    int has_fpu_hook = (fpu_exec_hook != NULL);
+    int hot_dispatch_on = hot_dispatch_enabled();
+    const uint8* cyc_instruction = state->cyc_instruction;
+
+    if (hot_dispatch_on) {
+      hot_dispatch_refresh();
+    }
+
     /* Return point if we had an address error */
 
 #if M68K_EMULATE_ADDRESS_ERROR
@@ -1089,13 +1328,26 @@ static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
 #endif
 
       /* Read an instruction and call its handler */
-      REG_IR = (uint16_t)m68ki_read_imm_16(state);
-      if (fpu_exec_hook && opcode_is_fpu((uint16_t)REG_IR)) {
-        fpu_exec_hook(state, (uint16_t)REG_IR);
-      } else {
-        m68ki_instruction_jump_table[REG_IR](state);
+      int cycles_before = 0;
+      uint16_t op;
+      if (ophist_on) {
+        cycles_before = GET_CYCLES();
       }
-      USE_CYCLES(CYC_INSTRUCTION[REG_IR]);
+      REG_IR = (uint16_t)m68ki_read_imm_16(state);
+      op = (uint16_t)REG_IR;
+      if (hot_dispatch_on && hot_dispatch_try(state, op)) {
+        /* handled in hot path */
+      } else if (has_fpu_hook && __builtin_expect(opcode_is_fpu(op), 0)) {
+        fpu_exec_hook(state, op);
+      } else {
+        m68ki_instruction_jump_table[op](state);
+      }
+      USE_CYCLES(cyc_instruction[op]);
+      if (ophist_on) {
+        int cycles_after = GET_CYCLES();
+        int consumed = cycles_before - cycles_after;
+        op_hist_record(op, (uint32_t)(consumed > 0 ? consumed : 0));
+      }
 
       /* Trace m68k_exception, if necessary */
       m68ki_exception_if_trace(state); /* auto-disable ( see m68kcpu.h ) */
@@ -1292,6 +1544,7 @@ cpu_loop:
   goto cpu_loop;
 
 stop_cpu_emulation:
+  op_hist_dump();
   printf("[CPU] End of CPU thread\n");
   return (void*)NULL;
 }

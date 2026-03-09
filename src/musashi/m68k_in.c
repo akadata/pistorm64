@@ -138,8 +138,8 @@ M68KMAKE_TABLE_HEADER
 
 #define NUM_CPU_TYPES 5
 
-void  (*m68ki_instruction_jump_table[0x10000])(m68ki_cpu_core *state); /* opcode handler jump table */
-unsigned char m68ki_cycles[NUM_CPU_TYPES][0x10000]; /* Cycles used by CPU type */
+void  (*m68ki_instruction_jump_table[0x10000])(m68ki_cpu_core *state) __attribute__((aligned(64))); /* opcode handler jump table */
+unsigned char m68ki_cycles[NUM_CPU_TYPES][0x10000] __attribute__((aligned(64))); /* Cycles used by CPU type */
 
 /* This is used to generate the opcode handler jump table */
 typedef struct

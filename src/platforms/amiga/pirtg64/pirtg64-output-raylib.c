@@ -8,6 +8,10 @@
 // Developed by AKADATA, with help and support from Codex.
 // PiRTG64 stub to allow builds without raylib/SDL backends.
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 
 #include "config_file/config_file.h"
 #include "platforms/amiga/pistorm-dev/pistorm-dev-enums.h"
@@ -528,6 +532,9 @@ static void rtg_autodetect_screen_size(void) {
   if(pi_screen_width_set && pi_screen_height_set) {
     req_w = pi_screen_width;
     req_h = pi_screen_height;
+    LOG_INFO("[RTG/RAYLIB] Requested output mode: %dx%d\n", req_w, req_h);
+  } else {
+    LOG_INFO("[RTG/RAYLIB] Requested output mode: auto\n");
   }
   int auto_w = 0;
   int auto_h = 0;
@@ -537,7 +544,7 @@ static void rtg_autodetect_screen_size(void) {
     return;
   }
   if(req_w > 0 && req_h > 0 && !req_supported) {
-    LOG_DEBUG("[RTG/RAYLIB] Output mode %dx%d not available; falling back to %dx%d\n", req_w, req_h,
+    LOG_INFO("[RTG/RAYLIB] Requested mode %dx%d not available; falling back to %dx%d\n", req_w, req_h,
              auto_w, auto_h);
   }
   pi_screen_width = auto_w;

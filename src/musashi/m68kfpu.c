@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
 #include "softfloat/softfloat.h"
 #include "m68kcpu.h"
@@ -62,23 +63,541 @@ static uint32 pkmask3[18] =
 
 static inline double fx80_to_double(floatx80 fx)
 {
-	uint64 d;
-	double *foo;
-
-	foo = (double *)&d;
-
-	d = floatx80_to_float64(fx, &status);
-
-	return *foo;
+	union {
+		uint64 u;
+		double d;
+	} bits;
+	bits.u = floatx80_to_float64(fx, &status);
+	return bits.d;
 }
 
 static inline floatx80 double_to_fx80(double in)
 {
-	uint64 *d;
+	union {
+		uint64 u;
+		double d;
+	} bits;
+	bits.d = in;
+	return float64_to_floatx80(bits.u, &status);
+}
 
-	d = (uint64 *)&in;
+static int fpu_native_fast_mode = -1;
+static int fpu_native_fast_logged = 0;
+static int fpu_native_fast_trans = -1;
+static int fpu_native_fast_trans_logged = 0;
+static int fpu_native_fast_stats = -1;
+static int fpu_trace_paths = -1;
+static int fpu_native_fast_atexit_registered = 0;
+static int fpu_native_fast_bin = -1;
+static int fpu_native_fast_bin_logged = 0;
+static int fpu_native_fast_sqrt = -1;
+static int fpu_native_fast_sqrt_logged = 0;
+static unsigned long long fpu_fast_attempt_bin = 0;
+static unsigned long long fpu_fast_hit_bin = 0;
+static unsigned long long fpu_fast_reject_mode_bin = 0;
+static unsigned long long fpu_fast_reject_op_bin = 0;
+static unsigned long long fpu_fast_reject_nonfinite_bin = 0;
+static unsigned long long fpu_fast_attempt_sqrt = 0;
+static unsigned long long fpu_fast_hit_sqrt = 0;
+static unsigned long long fpu_fast_reject_mode_sqrt = 0;
+static unsigned long long fpu_fast_reject_nonfinite_sqrt = 0;
+static unsigned long long fpu_fast_attempt_unary = 0;
+static unsigned long long fpu_fast_hit_unary = 0;
+static unsigned long long fpu_fast_reject_mode_unary = 0;
+static unsigned long long fpu_fast_reject_nonfinite_unary = 0;
+static unsigned long long fpu_fast_reject_op_unary = 0;
+static unsigned long long fpu_fast_attempt_sincos = 0;
+static unsigned long long fpu_fast_hit_sincos = 0;
+static unsigned long long fpu_fast_reject_mode_sincos = 0;
+static unsigned long long fpu_fast_reject_nonfinite_sincos = 0;
+static unsigned long long fpu_fast_reject_op_sincos = 0;
+static int fpu_fast_logged_first_bin = 0;
+static int fpu_fast_logged_first_sqrt = 0;
+static int fpu_fast_logged_first_unary = 0;
+static int fpu_fast_logged_first_sincos = 0;
+static unsigned char fpu_seen_fpgen_opmode[128];
+static unsigned char fpu_seen_op0_main[4];
+static unsigned char fpu_seen_op0_subop[8];
+static unsigned char fpu_seen_op1_main[4];
+static unsigned char fpu_seen_fmove_dst[8];
+static unsigned char fpu_seen_fmove_fpcr[16];
+static unsigned char fpu_seen_fmovem_mode[8];
+static unsigned char fpu_seen_misc[8];
 
-	return float64_to_floatx80(*d, &status);
+static inline int fpu_trace_enabled(void)
+{
+	if (fpu_trace_paths < 0) {
+		const char *env = getenv("PISTORM_FPU_TRACE");
+		fpu_trace_paths = (env && atoi(env) != 0) ? 1 : 0;
+	}
+	return fpu_trace_paths;
+}
+
+static void fpu_log_once(unsigned char *seen, unsigned int size, unsigned int index, const char *fmt, ...)
+{
+	va_list ap;
+	if (!fpu_trace_enabled()) {
+		return;
+	}
+	if (index >= size || seen[index]) {
+		return;
+	}
+	seen[index] = 1;
+	va_start(ap, fmt);
+	vfprintf(stderr, fmt, ap);
+	va_end(ap);
+}
+
+static const char *fpu_opmode_name(uint16 opmode)
+{
+	switch (opmode) {
+	case 0x00: return "FMOVE";
+	case 0x01: return "FINT";
+	case 0x02: return "FSINH";
+	case 0x03: return "FINTRZ";
+	case 0x04: case 0x05: case 0x41: case 0x45: return "FSQRT-family";
+	case 0x06: case 0x07: return "FLOGNP1";
+	case 0x08: return "FETOXM1";
+	case 0x09: return "FTANH";
+	case 0x0a: case 0x0b: return "FATAN";
+	case 0x0c: return "FASIN";
+	case 0x0d: return "FATANH";
+	case 0x0e: return "FSIN";
+	case 0x0f: return "FTAN";
+	case 0x10: return "FETOX";
+	case 0x11: return "FTWOTOX";
+	case 0x12: case 0x13: return "FTENTOX";
+	case 0x14: return "FLOGN";
+	case 0x15: return "FLOG10";
+	case 0x16: case 0x17: return "FLOG2";
+	case 0x18: case 0x58: case 0x5c: return "FABS-family";
+	case 0x19: return "FCOSH";
+	case 0x1a: case 0x1b: case 0x5a: case 0x5e: return "FNEG-family";
+	case 0x1c: return "FACOS";
+	case 0x1d: return "FCOS";
+	case 0x1e: return "FGETEXP";
+	case 0x1f: return "FGETMAN";
+	case 0x20: case 0x60: case 0x64: return "FDIV-family";
+	case 0x21: return "FMOD";
+	case 0x22: case 0x62: case 0x66: return "FADD-family";
+	case 0x23: case 0x63: case 0x67: return "FMUL-family";
+	case 0x24: return "FSGLDIV";
+	case 0x25: return "FREM";
+	case 0x26: return "FSCALE";
+	case 0x27: return "FSGLMUL";
+	case 0x38: case 0x39: case 0x3c: case 0x3d: return "FCMP";
+	case 0x3a: case 0x3b: case 0x3e: case 0x3f: return "FTST";
+	default:
+		if (opmode >= 0x28 && opmode <= 0x2f) return "FSUB-family";
+		if (opmode >= 0x30 && opmode <= 0x37) return "FSINCOS";
+		return "UNKNOWN";
+	}
+}
+
+static void fpu_native_fast_report(void)
+{
+	if (fpu_native_fast_stats <= 0) {
+		return;
+	}
+	fprintf(stderr,
+	        "[FPU] native-fast stats: bin %llu/%llu sqrt %llu/%llu unary %llu/%llu sincos %llu/%llu\n",
+	        fpu_fast_hit_bin, fpu_fast_attempt_bin, fpu_fast_hit_sqrt, fpu_fast_attempt_sqrt,
+	        fpu_fast_hit_unary, fpu_fast_attempt_unary, fpu_fast_hit_sincos, fpu_fast_attempt_sincos);
+	fprintf(stderr,
+	        "[FPU] native-fast reject: bin(mode=%llu op=%llu nonfinite=%llu) "
+	        "sqrt(mode=%llu nonfinite=%llu) unary(mode=%llu op=%llu nonfinite=%llu) "
+	        "sincos(mode=%llu op=%llu nonfinite=%llu)\n",
+	        fpu_fast_reject_mode_bin, fpu_fast_reject_op_bin, fpu_fast_reject_nonfinite_bin,
+	        fpu_fast_reject_mode_sqrt, fpu_fast_reject_nonfinite_sqrt,
+	        fpu_fast_reject_mode_unary, fpu_fast_reject_op_unary, fpu_fast_reject_nonfinite_unary,
+	        fpu_fast_reject_mode_sincos, fpu_fast_reject_op_sincos, fpu_fast_reject_nonfinite_sincos);
+}
+
+static inline int fpu_get_native_fast_mode(void)
+{
+	if (fpu_native_fast_mode < 0) {
+		const char *env = getenv("PISTORM_FPU_NATIVE_FAST");
+		int mode = env ? atoi(env) : 0;
+		if (mode < 0) mode = 0;
+		if (mode > 2) mode = 2;
+		fpu_native_fast_mode = mode;
+	}
+	if (fpu_native_fast_stats < 0) {
+		const char *env = getenv("PISTORM_FPU_NATIVE_STATS");
+		fpu_native_fast_stats = (env && atoi(env) != 0) ? 1 : 0;
+	}
+	if (!fpu_native_fast_atexit_registered) {
+		atexit(fpu_native_fast_report);
+		fpu_native_fast_atexit_registered = 1;
+	}
+	if (fpu_native_fast_mode > 0 && !fpu_native_fast_logged) {
+		fprintf(stderr,
+		        "[FPU] PISTORM_FPU_NATIVE_FAST=%d enabled (experimental, precision tradeoff)\n",
+		        fpu_native_fast_mode);
+		fpu_native_fast_logged = 1;
+	}
+	return fpu_native_fast_mode;
+}
+
+static inline int fpu_fast_scalar_ok(floatx80 a)
+{
+	/* Reject NaN/Inf to preserve edge-case behavior in softfloat. */
+	return ((a.high & 0x7FFF) != 0x7FFF);
+}
+
+static inline int fpu_fast_allow_bin(void)
+{
+	int mode = fpu_get_native_fast_mode();
+	if (mode <= 0) {
+		return 0;
+	}
+	if (fpu_native_fast_bin < 0) {
+		const char *env = getenv("PISTORM_FPU_NATIVE_BIN");
+		fpu_native_fast_bin = env ? (atoi(env) != 0) : (mode >= 2);
+	}
+	if (fpu_native_fast_bin > 0 && !fpu_native_fast_bin_logged) {
+		fprintf(stderr, "[FPU] PISTORM_FPU_NATIVE_BIN=1 enabled\n");
+		fpu_native_fast_bin_logged = 1;
+	}
+	return fpu_native_fast_bin;
+}
+
+static inline int fpu_fast_allow_sqrt(void)
+{
+	int mode = fpu_get_native_fast_mode();
+	if (mode <= 0) {
+		return 0;
+	}
+	if (fpu_native_fast_sqrt < 0) {
+		const char *env = getenv("PISTORM_FPU_NATIVE_SQRT");
+		fpu_native_fast_sqrt = env ? (atoi(env) != 0) : 1;
+	}
+	if (fpu_native_fast_sqrt > 0 && !fpu_native_fast_sqrt_logged) {
+		fprintf(stderr, "[FPU] PISTORM_FPU_NATIVE_SQRT=1 enabled\n");
+		fpu_native_fast_sqrt_logged = 1;
+	}
+	return fpu_native_fast_sqrt;
+}
+
+static inline int fpu_fast_allow_transcendentals(void)
+{
+	if (fpu_get_native_fast_mode() < 2) {
+		return 0;
+	}
+	if (fpu_native_fast_trans < 0) {
+		const char *env = getenv("PISTORM_FPU_NATIVE_TRANS");
+		fpu_native_fast_trans = (env && atoi(env) != 0) ? 1 : 0;
+	}
+	if (fpu_native_fast_trans > 0 && !fpu_native_fast_trans_logged) {
+		fprintf(stderr, "[FPU] PISTORM_FPU_NATIVE_TRANS=1 enabled (transcendental fast path)\n");
+		fpu_native_fast_trans_logged = 1;
+	}
+	return fpu_native_fast_trans;
+}
+
+static inline int fpu_fast_mode_ok(void)
+{
+	int mode = fpu_get_native_fast_mode();
+	if (mode <= 0) {
+		return 0;
+	}
+	/* Keep semantics tighter for mode=1 (double-like control state only). */
+	if (mode == 1) {
+		if (status.float_rounding_mode != float_round_nearest_even) {
+			return 0;
+		}
+		if (status.floatx80_rounding_precision != 64) {
+			return 0;
+		}
+	}
+	return 1;
+}
+
+enum {
+	FPU_FAST_OP_INVALID = 0,
+	FPU_FAST_OP_ADD,
+	FPU_FAST_OP_SUB,
+	FPU_FAST_OP_MUL,
+	FPU_FAST_OP_DIV,
+	FPU_FAST_OP_SQRT,
+	FPU_FAST_OP_SIN,
+	FPU_FAST_OP_COS,
+	FPU_FAST_OP_TAN,
+	FPU_FAST_OP_ASIN,
+	FPU_FAST_OP_ACOS,
+	FPU_FAST_OP_ATAN,
+	FPU_FAST_OP_SINH,
+	FPU_FAST_OP_COSH,
+	FPU_FAST_OP_TANH,
+	FPU_FAST_OP_LOGN,
+	FPU_FAST_OP_LOG10,
+	FPU_FAST_OP_LOG2,
+	FPU_FAST_OP_LOGNP1,
+	FPU_FAST_OP_ETOX,
+	FPU_FAST_OP_ETOXM1,
+	FPU_FAST_OP_TWOTOX,
+	FPU_FAST_OP_TENTOX,
+};
+
+static inline int fpu_fast_decode_op(uint16 opmode)
+{
+	switch (opmode) {
+	case 0x66: /* FDADD */
+	case 0x62: /* FSADD */
+	case 0x22: /* FADD */
+		return FPU_FAST_OP_ADD;
+	case 0x6c: /* FDSUB */
+	case 0x68: /* FSSUB */
+	case 0x28: /* FSUB */
+	case 0x29:
+	case 0x2a:
+	case 0x2b:
+	case 0x2c:
+	case 0x2d:
+	case 0x2e:
+	case 0x2f:
+		return FPU_FAST_OP_SUB;
+	case 0x67: /* FDMUL */
+	case 0x63: /* FSMUL */
+	case 0x23: /* FMUL */
+		return FPU_FAST_OP_MUL;
+	case 0x64: /* FDDIV */
+	case 0x60: /* FSDIV */
+	case 0x20: /* FDIV */
+		return FPU_FAST_OP_DIV;
+	case 0x45: /* FDSQRT */
+	case 0x41: /* FSSQRT */
+	case 0x04: /* FSQRT */
+	case 0x05:
+		return FPU_FAST_OP_SQRT;
+	case 0x02:
+		return FPU_FAST_OP_SINH;
+	case 0x06:
+	case 0x07:
+		return FPU_FAST_OP_LOGNP1;
+	case 0x08:
+		return FPU_FAST_OP_ETOXM1;
+	case 0x09:
+		return FPU_FAST_OP_TANH;
+	case 0x0a:
+	case 0x0b:
+		return FPU_FAST_OP_ATAN;
+	case 0x0c:
+		return FPU_FAST_OP_ASIN;
+	case 0x0e:
+		return FPU_FAST_OP_SIN;
+	case 0x0f:
+		return FPU_FAST_OP_TAN;
+	case 0x10:
+		return FPU_FAST_OP_ETOX;
+	case 0x11:
+		return FPU_FAST_OP_TWOTOX;
+	case 0x12:
+	case 0x13:
+		return FPU_FAST_OP_TENTOX;
+	case 0x14:
+		return FPU_FAST_OP_LOGN;
+	case 0x15:
+		return FPU_FAST_OP_LOG10;
+	case 0x16:
+	case 0x17:
+		return FPU_FAST_OP_LOG2;
+	case 0x19:
+		return FPU_FAST_OP_COSH;
+	case 0x1c:
+		return FPU_FAST_OP_ACOS;
+	case 0x1d:
+		return FPU_FAST_OP_COS;
+	default:
+		return FPU_FAST_OP_INVALID;
+	}
+}
+
+static inline int fpu_try_native_fast_binary(uint16 opmode, floatx80 a, floatx80 b, floatx80 *out)
+{
+	double da, db, dr;
+	int op = fpu_fast_decode_op(opmode);
+
+	if (!fpu_fast_allow_bin()) {
+		return 0;
+	}
+	fpu_fast_attempt_bin++;
+
+	if (!fpu_fast_mode_ok()) {
+		fpu_fast_reject_mode_bin++;
+		return 0;
+	}
+	if (op != FPU_FAST_OP_ADD && op != FPU_FAST_OP_SUB && op != FPU_FAST_OP_MUL && op != FPU_FAST_OP_DIV) {
+		fpu_fast_reject_op_bin++;
+		return 0;
+	}
+	if (!fpu_fast_scalar_ok(a) || !fpu_fast_scalar_ok(b)) {
+		fpu_fast_reject_nonfinite_bin++;
+		return 0;
+	}
+
+	da = fx80_to_double(a);
+	db = fx80_to_double(b);
+	switch (op) {
+	case FPU_FAST_OP_ADD:
+		dr = da + db;
+		break;
+	case FPU_FAST_OP_SUB:
+		dr = da - db;
+		break;
+	case FPU_FAST_OP_MUL:
+		dr = da * db;
+		break;
+	case FPU_FAST_OP_DIV:
+		dr = da / db;
+		break;
+	default:
+		return 0;
+	}
+	*out = double_to_fx80(dr);
+	fpu_fast_hit_bin++;
+	if (fpu_native_fast_stats > 0 && !fpu_fast_logged_first_bin) {
+		fprintf(stderr, "[FPU] native-fast first hit: binary opmode=0x%02x\n", opmode);
+		fpu_fast_logged_first_bin = 1;
+	}
+	return 1;
+}
+
+static inline int fpu_try_native_fast_sqrt(uint16 opmode, floatx80 in, floatx80 *out)
+{
+	double d;
+
+	if (!fpu_fast_allow_sqrt()) {
+		return 0;
+	}
+	fpu_fast_attempt_sqrt++;
+	if (!fpu_fast_mode_ok()) {
+		fpu_fast_reject_mode_sqrt++;
+		return 0;
+	}
+	if (fpu_fast_decode_op(opmode) != FPU_FAST_OP_SQRT) {
+		return 0;
+	}
+	if (!fpu_fast_scalar_ok(in)) {
+		fpu_fast_reject_nonfinite_sqrt++;
+		return 0;
+	}
+	d = fx80_to_double(in);
+	*out = double_to_fx80(sqrt(d));
+	fpu_fast_hit_sqrt++;
+	if (fpu_native_fast_stats > 0 && !fpu_fast_logged_first_sqrt) {
+		fprintf(stderr, "[FPU] native-fast first hit: sqrt opmode=0x%02x\n", opmode);
+		fpu_fast_logged_first_sqrt = 1;
+	}
+	return 1;
+}
+
+static inline int fpu_try_native_fast_unary(uint16 opmode, floatx80 in, floatx80 *out)
+{
+	double d, r;
+	int op = fpu_fast_decode_op(opmode);
+
+	if (!fpu_fast_allow_transcendentals()) {
+		return 0;
+	}
+	fpu_fast_attempt_unary++;
+	if (!fpu_fast_scalar_ok(in)) {
+		fpu_fast_reject_nonfinite_unary++;
+		return 0;
+	}
+
+	d = fx80_to_double(in);
+	switch (op) {
+	case FPU_FAST_OP_SIN:
+		r = sin(d);
+		break;
+	case FPU_FAST_OP_COS:
+		r = cos(d);
+		break;
+	case FPU_FAST_OP_TAN:
+		r = tan(d);
+		break;
+	case FPU_FAST_OP_ASIN:
+		r = asin(d);
+		break;
+	case FPU_FAST_OP_ACOS:
+		r = acos(d);
+		break;
+	case FPU_FAST_OP_ATAN:
+		r = atan(d);
+		break;
+	case FPU_FAST_OP_SINH:
+		r = sinh(d);
+		break;
+	case FPU_FAST_OP_COSH:
+		r = cosh(d);
+		break;
+	case FPU_FAST_OP_TANH:
+		r = tanh(d);
+		break;
+	case FPU_FAST_OP_LOGN:
+		r = log(d);
+		break;
+	case FPU_FAST_OP_LOG10:
+		r = log10(d);
+		break;
+	case FPU_FAST_OP_LOG2:
+		r = log2(d);
+		break;
+	case FPU_FAST_OP_LOGNP1:
+		r = log1p(d);
+		break;
+	case FPU_FAST_OP_ETOX:
+		r = exp(d);
+		break;
+	case FPU_FAST_OP_ETOXM1:
+		r = expm1(d);
+		break;
+	case FPU_FAST_OP_TWOTOX:
+		r = exp2(d);
+		break;
+	case FPU_FAST_OP_TENTOX:
+		r = pow(10.0, d);
+		break;
+	default:
+		fpu_fast_reject_op_unary++;
+		return 0;
+	}
+
+	*out = double_to_fx80(r);
+	fpu_fast_hit_unary++;
+	if (fpu_native_fast_stats > 0 && !fpu_fast_logged_first_unary) {
+		fprintf(stderr, "[FPU] native-fast first hit: unary opmode=0x%02x\n", opmode);
+		fpu_fast_logged_first_unary = 1;
+	}
+	return 1;
+}
+
+static inline int fpu_try_native_fast_sincos(uint16 opmode, floatx80 in, floatx80 *out_cos, floatx80 *out_sin)
+{
+	double d;
+	if (!fpu_fast_allow_transcendentals()) {
+		return 0;
+	}
+	fpu_fast_attempt_sincos++;
+	/* FSINCOS opmode range */
+	if (opmode < 0x30 || opmode > 0x37) {
+		fpu_fast_reject_op_sincos++;
+		return 0;
+	}
+	if (!fpu_fast_scalar_ok(in)) {
+		fpu_fast_reject_nonfinite_sincos++;
+		return 0;
+	}
+	d = fx80_to_double(in);
+	*out_cos = double_to_fx80(cos(d));
+	*out_sin = double_to_fx80(sin(d));
+	fpu_fast_hit_sincos++;
+	if (fpu_native_fast_stats > 0 && !fpu_fast_logged_first_sincos) {
+		fprintf(stderr, "[FPU] native-fast first hit: sincos opmode=0x%02x\n", opmode);
+		fpu_fast_logged_first_sincos = 1;
+	}
+	return 1;
 }
 
 static inline floatx80 load_extended_float80(m68ki_cpu_core *state, uint32 ea)
@@ -1233,6 +1752,10 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 	int opmode = w2 & 0x7f;
 	floatx80 source = (floatx80){ .high = 0, .low = 0 };
 
+	fpu_log_once(fpu_seen_fpgen_opmode, sizeof(fpu_seen_fpgen_opmode), (unsigned int)opmode,
+	             "[FPU] first path: fpgen opmode=0x%02x (%s) rm=%d src=%d dst=%d\n",
+	             opmode, fpu_opmode_name((uint16)opmode), rm, src, dst);
+
 //	floatx80 source;
 
 	// fmovecr #$f, fp0	f200 5c0f
@@ -1436,7 +1959,12 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 		}
 		case 0x02:		// FSINH
 		{
-			REG_FP[dst] = floatx80_sinh(source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_unary(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_sinh(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
@@ -1455,7 +1983,12 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 		case 0x04:		// FSQRT
 		case 0x05:		// FSQRT
 		{
-			REG_FP[dst] = floatx80_sqrt(source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_sqrt(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_sqrt(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(109);
 			break;
@@ -1463,21 +1996,36 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 		case 0x06:      // FLOGNP1
 		case 0x07:      // FLOGNP1
 		{
-			REG_FP[dst] = floatx80_lognp1 (source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_unary(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_lognp1(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(594); // for MC68881
 			break;
 		}
 		case 0x08:      // FETOXM1
 		{
-			REG_FP[dst] = floatx80_etoxm1(source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_unary(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_etoxm1(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(6);
 			break;
 		}
 		case 0x09:      // FTANH
 		{
-			REG_FP[dst] = floatx80_tanh(source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_unary(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_tanh(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
@@ -1485,14 +2033,24 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 		case 0x0a:      // FATAN
 		case 0x0b:      // FATAN
 		{
-			REG_FP[dst] = floatx80_atan(source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_unary(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_atan(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
 		}
 		case 0x0c:      // FASIN
 		{
-			REG_FP[dst] = floatx80_asin(source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_unary(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_asin(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
@@ -1506,28 +2064,48 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 		}
 		case 0x0e:      // FSIN
 		{
-			REG_FP[dst] = floatx80_sin(source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_unary(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_sin(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
 		}
 		case 0x0f:      // FTAN
 		{
-			REG_FP[dst] = floatx80_tan(source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_unary(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_tan(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
 		}
 		case 0x10:      // FETOX
 		{
-			REG_FP[dst] = floatx80_etox(source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_unary(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_etox(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
 		}
 		case 0x11:      // FTWOTOX
 		{
-			REG_FP[dst] = floatx80_twotox(source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_unary(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_twotox(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
@@ -1535,21 +2113,36 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 		case 0x12:      // FTENTOX
 		case 0x13:      // FTENTOX
 		{
-			REG_FP[dst] = floatx80_tentox(source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_unary(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_tentox(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
 		}
 		case 0x14:      // FLOGN
 		{
-			REG_FP[dst] = floatx80_logn(source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_unary(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_logn(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(548); // for MC68881
 			break;
 		}
 		case 0x15:      // FLOG10
 		{
-			REG_FP[dst] = floatx80_log10(source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_unary(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_log10(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(604); // for MC68881
 			break;
@@ -1557,7 +2150,12 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 		case 0x16:      // FLOG2
 		case 0x17:      // FLOG2
 		{
-			REG_FP[dst] = floatx80_log2(source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_unary(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_log2(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(604); // for MC68881
 			break;
@@ -1574,7 +2172,12 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 		}
 		case 0x19:      // FCOSH
 		{
-			REG_FP[dst] = floatx80_cosh(source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_unary(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_cosh(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(64);
 			break;
@@ -1592,7 +2195,12 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 		}
 		case 0x1c:      // FACOS
 		{
-			REG_FP[dst] = floatx80_acos(source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_unary(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_acos(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(604); // for MC68881
 			break;
@@ -1600,7 +2208,12 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 		}
 		case 0x1d:      // FCOS
 		{
-			REG_FP[dst] = floatx80_cos(source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_unary(opmode, source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_cos(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 			break;
@@ -1623,7 +2236,12 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 		case 0x60:		// FSDIV
 		case 0x20:		// FDIV
 		{
-			REG_FP[dst] = floatx80_div(REG_FP[dst], source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_binary(opmode, REG_FP[dst], source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_div(REG_FP[dst], source, &status);
+			}
 			//FIXME mame doesn't use SET_CONDITION_CODES here
 			SET_CONDITION_CODES(state, REG_FP[dst]); // JFF
 			USE_CYCLES(43);
@@ -1645,7 +2263,12 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 		case 0x62:		// FSADD
 		case 0x22:		// FADD
 		{
-			REG_FP[dst] = floatx80_add(REG_FP[dst], source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_binary(opmode, REG_FP[dst], source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_add(REG_FP[dst], source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(9);
 			break;
@@ -1654,7 +2277,12 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 		case 0x63:		// FSMUL
 		case 0x23:		// FMUL
 		{
-			REG_FP[dst] = floatx80_mul(REG_FP[dst], source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_binary(opmode, REG_FP[dst], source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_mul(REG_FP[dst], source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(11);
 			break;
@@ -1702,7 +2330,12 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 		case 0x2e:		// FSUB
 		case 0x2f:		// FSUB
 		{
-			REG_FP[dst] = floatx80_sub(REG_FP[dst], source, &status);
+			floatx80 fast_res;
+			if (fpu_try_native_fast_binary(opmode, REG_FP[dst], source, &fast_res)) {
+				REG_FP[dst] = fast_res;
+			} else {
+				REG_FP[dst] = floatx80_sub(REG_FP[dst], source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(9);
 			break;
@@ -1716,8 +2349,15 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 		case 0x36:      // FSINCOS
 		case 0x37:      // FSINCOS
 		{
-			REG_FP[dst] = floatx80_cos(source, &status);
-			REG_FP[w2&7] = floatx80_sin(source, &status);
+			floatx80 fast_cos;
+			floatx80 fast_sin;
+			if (fpu_try_native_fast_sincos(opmode, source, &fast_cos, &fast_sin)) {
+				REG_FP[dst] = fast_cos;
+				REG_FP[w2&7] = fast_sin;
+			} else {
+				REG_FP[dst] = floatx80_cos(source, &status);
+				REG_FP[w2&7] = floatx80_sin(source, &status);
+			}
 			SET_CONDITION_CODES(state, REG_FP[dst]);
 			USE_CYCLES(75);
 
@@ -1729,7 +2369,8 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 		case 0x3d:		// FCMP
 		{
 			floatx80 res;
-			res = floatx80_sub(REG_FP[dst], source, &status);
+			/* FCMP only needs condition codes; avoid full subtract pipeline. */
+			res = floatx80_cmp(REG_FP[dst], source, &status);
 			SET_CONDITION_CODES(state, res);
 			USE_CYCLES(7);
 			break;
@@ -1740,7 +2381,8 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 		case 0x3f:		// FTST
 		{
 			floatx80 res;
-			res = source;
+			/* FTST updates flags based on classification (incl. NaN handling). */
+			res = floatx80_tst(source, &status);
 			SET_CONDITION_CODES(state, res);
 			USE_CYCLES(7);
 			break;
@@ -1756,6 +2398,9 @@ static void fmove_reg_mem(m68ki_cpu_core *state, uint16 w2)
 	int src = (w2 >>  7) & 0x7;
 	int dst = (w2 >> 10) & 0x7;
 	int k = (w2 & 0x7f);
+
+	fpu_log_once(fpu_seen_fmove_dst, sizeof(fpu_seen_fmove_dst), (unsigned int)dst,
+	             "[FPU] first path: fmove_reg_mem dst=%d src=%d\n", dst, src);
 
 	switch (dst)
 	{
@@ -1828,6 +2473,9 @@ static void fmove_fpcr(m68ki_cpu_core *state, uint16 w2)
 	int dir = (w2 >> 13) & 0x1;
 	int regsel = (w2 >> 10) & 0x7;
 	int mode = (ea >> 3) & 0x7;
+
+	fpu_log_once(fpu_seen_fmove_fpcr, sizeof(fpu_seen_fmove_fpcr), (unsigned int)((dir << 3) | regsel),
+	             "[FPU] first path: fmove_fpcr dir=%d regsel=%d ea_mode=%d\n", dir, regsel, mode);
 
 	if ((mode == 5) || (mode == 6))
 	{
@@ -1929,6 +2577,9 @@ static void fmovem(m68ki_cpu_core *state, uint16 w2)
 	int dir = (w2 >> 13) & 0x1;
 	int mode = (w2 >> 11) & 0x3;
 	int reglist = w2 & 0xff;
+
+	fpu_log_once(fpu_seen_fmovem_mode, sizeof(fpu_seen_fmovem_mode), (unsigned int)((dir << 2) | mode),
+	             "[FPU] first path: fmovem dir=%d mode=%d reglist=0x%02x\n", dir, mode, reglist & 0xff);
 
 	uint32 mem_addr = 0;
 	switch (ea >> 3)
@@ -2043,6 +2694,8 @@ static void fscc(m68ki_cpu_core *state)
 	int ea = REG_IR & 0x3f;
 	int condition = (sint16)(OPER_I_16(state));
 
+	fpu_log_once(fpu_seen_misc, sizeof(fpu_seen_misc), 0, "[FPU] first path: FScc\n");
+
 	WRITE_EA_8(state, ea, TEST_CONDITION(state, condition) ? 0xff : 0);
 	USE_CYCLES(7);  // ???
 }
@@ -2050,6 +2703,8 @@ static void fbcc16(m68ki_cpu_core *state)
 {
 	sint32 offset;
 	int condition = REG_IR & 0x3f;
+
+	fpu_log_once(fpu_seen_misc, sizeof(fpu_seen_misc), 1, "[FPU] first path: FBcc16\n");
 
 	offset = (sint16)(OPER_I_16(state));
 
@@ -2068,6 +2723,8 @@ static void fbcc32(m68ki_cpu_core *state)
 	sint32 offset;
 	int condition = REG_IR & 0x3f;
 
+	fpu_log_once(fpu_seen_misc, sizeof(fpu_seen_misc), 2, "[FPU] first path: FBcc32\n");
+
 	offset = OPER_I_32(state);
 
 	// TODO: condition and jump!!!
@@ -2083,13 +2740,19 @@ static void fbcc32(m68ki_cpu_core *state)
 
 void m68040_fpu_op0(m68ki_cpu_core *state)
 {
+	int mainop = (REG_IR >> 6) & 0x3;
 	state->fpu_just_reset = 0;
+	fpu_log_once(fpu_seen_op0_main, sizeof(fpu_seen_op0_main), (unsigned int)mainop,
+	             "[FPU] first path: op0 main=%d\n", mainop);
 
-	switch ((REG_IR >> 6) & 0x3)
+	switch (mainop)
 	{
 		case 0:
 		{
 			uint16 w2 = OPER_I_16(state);
+			unsigned int subop = (unsigned int)((w2 >> 13) & 0x7);
+			fpu_log_once(fpu_seen_op0_subop, sizeof(fpu_seen_op0_subop), subop,
+			             "[FPU] first path: op0 subop=%u\n", subop);
 			switch ((w2 >> 13) & 0x7)
 			{
 				case 0x0:	// FPU ALU FP, FP
@@ -2271,8 +2934,12 @@ void m68040_fpu_op1(m68ki_cpu_core *state)
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
 	uint32 addr;
+	int mainop = (REG_IR >> 6) & 0x3;
 
-	switch ((REG_IR >> 6) & 0x3)
+	fpu_log_once(fpu_seen_op1_main, sizeof(fpu_seen_op1_main), (unsigned int)mainop,
+	             "[FPU] first path: op1 main=%d\n", mainop);
+
+	switch (mainop)
 	{
 		case 0:		// FSAVE <ea>
 		{
