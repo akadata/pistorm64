@@ -21,7 +21,6 @@
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <limits.h>
 #include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -40,8 +39,6 @@
 // Silence stupid warning
 #undef _GNU_SOURCE
 #include "config_file/config_file.h"
-
-extern "C" void m68k_set_irq(unsigned int irq);
 
 extern "C" emulator_config *cfg;
 
@@ -114,11 +111,9 @@ static int epfd = -1;
 static int irq_fds[2];
 
 extern "C" unsigned int ps_read_8(unsigned int address);
-extern "C" unsigned int ps_read_16(unsigned int address);
-extern "C" unsigned int ps_read_32(unsigned int address);
 extern "C" void ps_write_8(unsigned int address, unsigned int value);
 extern "C" void ps_write_16(unsigned int address, unsigned int value);
-extern "C" void ps_write_32(unsigned int address, unsigned int value);
+extern "C" void m68k_set_irq(unsigned int int_level);
 
 unsigned int a314_base;
 int a314_base_configured;
@@ -159,34 +154,39 @@ struct LogicalChannel;
 struct ClientConnection;
 
 #pragma pack(push, 1)
-struct MessageHeader {
+struct MessageHeader
+{
     uint32_t length;
     uint32_t stream_id;
     uint8_t type;
 }; //} __attribute__((packed));
 #pragma pack(pop)
 
-struct MessageBuffer {
+struct MessageBuffer
+{
     size_t pos;
     std::vector<uint8_t> data;
 };
 
-struct RegisteredService {
+struct RegisteredService
+{
     std::string name;
     ClientConnection *cc;
 };
 
-struct PacketBuffer {
+struct PacketBuffer
+{
     int type;
     std::vector<uint8_t> data;
 };
 
-struct ClientConnection {
+struct ClientConnection
+{
     int fd;
 
-    uint32_t next_stream_id;
+    int next_stream_id;
 
-    size_t bytes_read;
+    int bytes_read;
     MessageHeader header;
     std::vector<uint8_t> payload;
 
@@ -195,11 +195,12 @@ struct ClientConnection {
     std::list<LogicalChannel*> associations;
 };
 
-struct LogicalChannel {
+struct LogicalChannel
+{
     int channel_id;
 
     ClientConnection *association;
-    uint32_t stream_id;
+    int stream_id;
 
     bool got_eos_from_ami;
     bool got_eos_from_client;
@@ -209,7 +210,7 @@ struct LogicalChannel {
 
 static void remove_association(LogicalChannel *ch);
 static void clear_packet_queue(LogicalChannel *ch);
-static void create_and_enqueue_packet(LogicalChannel *ch, uint8_t type, const uint8_t *data, size_t length);
+static void create_and_enqueue_packet(LogicalChannel *ch, uint8_t type, const uint8_t *data, uint8_t length);
 static void close_and_remove_connection(ClientConnection *cc);
 
 static std::list<ClientConnection> connections;
@@ -217,7 +218,8 @@ static std::list<RegisteredService> services;
 static std::list<LogicalChannel> channels;
 static std::list<LogicalChannel*> send_queue;
 
-struct OnDemandStart {
+struct OnDemandStart
+{
     std::string service_name;
     std::string program;
     std::vector<std::string> arguments;
@@ -225,185 +227,11 @@ struct OnDemandStart {
 
 std::vector<OnDemandStart> on_demand_services;
 
-static std::string pistorm_root;
-static std::string a314_root;
-static std::string a314_config_file;
-static std::string home_env;
-static bool a314_paths_initialized = false;
-static bool a314_mem_fallback_warned = false;
+std::string a314_config_file = "./a314/files_pi/a314d.conf";
+std::string home_env = "HOME=./";
 
-static void a314_manual_read_from_bus(uint32_t address, uint8_t *dst, size_t length) {
-    while (length > 0) {
-        if ((address & 3u) == 0u && length >= 4u) {
-            const uint32_t v = ps_read_32(address);
-            dst[0] = static_cast<uint8_t>((v >> 24) & 0xFFu);
-            dst[1] = static_cast<uint8_t>((v >> 16) & 0xFFu);
-            dst[2] = static_cast<uint8_t>((v >> 8) & 0xFFu);
-            dst[3] = static_cast<uint8_t>(v & 0xFFu);
-            address += 4u;
-            dst += 4;
-            length -= 4u;
-            continue;
-        }
-
-        if ((address & 1u) == 0u && length >= 2u) {
-            const uint16_t v = static_cast<uint16_t>(ps_read_16(address));
-            dst[0] = static_cast<uint8_t>((v >> 8) & 0xFFu);
-            dst[1] = static_cast<uint8_t>(v & 0xFFu);
-            address += 2u;
-            dst += 2;
-            length -= 2u;
-            continue;
-        }
-
-        dst[0] = static_cast<uint8_t>(ps_read_8(address) & 0xFFu);
-        address += 1u;
-        dst += 1;
-        length -= 1u;
-    }
-}
-
-static void a314_manual_write_to_bus(uint32_t address, const uint8_t *src, size_t length) {
-    while (length > 0) {
-        if ((address & 3u) == 0u && length >= 4u) {
-            const uint32_t v = ((uint32_t)src[0] << 24) |
-                               ((uint32_t)src[1] << 16) |
-                               ((uint32_t)src[2] << 8)  |
-                               ((uint32_t)src[3]);
-            ps_write_32(address, v);
-            address += 4u;
-            src += 4;
-            length -= 4u;
-            continue;
-        }
-
-        if ((address & 1u) == 0u && length >= 2u) {
-            const uint16_t v = (uint16_t)(((uint16_t)src[0] << 8) | (uint16_t)src[1]);
-            ps_write_16(address, v);
-            address += 2u;
-            src += 2;
-            length -= 2u;
-            continue;
-        }
-
-        ps_write_8(address, src[0]);
-        address += 1u;
-        src += 1;
-        length -= 1u;
-    }
-}
-
-static bool path_exists(const std::string &path) {
-    struct stat st;
-    return stat(path.c_str(), &st) == 0;
-}
-
-static std::string expand_env_vars(const std::string &input) {
-    std::string out;
-    out.reserve(input.size());
-
-    for (size_t i = 0; i < input.size(); ++i) {
-        if (input[i] != '$') {
-            out.push_back(input[i]);
-            continue;
-        }
-
-        size_t start = i + 1;
-        std::string var;
-        if (start < input.size() && input[start] == '{') {
-            size_t end = input.find('}', start + 1);
-            if (end == std::string::npos) {
-                out.push_back(input[i]);
-                continue;
-            }
-            var = input.substr(start + 1, end - start - 1);
-            i = end;
-        } else {
-            size_t end = start;
-            while (end < input.size() && (isalnum(input[end]) || input[end] == '_')) {
-                end++;
-            }
-            if (end == start) {
-                out.push_back(input[i]);
-                continue;
-            }
-            var = input.substr(start, end - start);
-            i = end - 1;
-        }
-
-        const char *val = getenv(var.c_str());
-        if (val) {
-            out.append(val);
-        }
-    }
-
-    return out;
-}
-
-static void ensure_env_var(const char *key, const std::string &value) {
-    if (getenv(key) == nullptr) {
-        setenv(key, value.c_str(), 1);
-    }
-}
-
-static void init_a314_paths(void) {
-    if (a314_paths_initialized) {
-        return;
-    }
-
-    const char *root_env = getenv("PISTORM_ROOT");
-    if (root_env && *root_env) {
-        pistorm_root = root_env;
-    } else {
-        char cwd_buf[PATH_MAX];
-        if (getcwd(cwd_buf, sizeof(cwd_buf))) {
-            pistorm_root = cwd_buf;
-        } else {
-            pistorm_root = ".";
-        }
-    }
-
-    const char *a314_env = getenv("PISTORM_A314");
-    if (a314_env && *a314_env) {
-        a314_root = a314_env;
-    } else {
-        a314_root = pistorm_root + "/a314";
-        if (!path_exists(a314_root)) {
-            std::string dev_root = pistorm_root + "/src/a314/files_pi";
-            if (path_exists(dev_root)) {
-                a314_root = dev_root;
-            }
-        }
-    }
-
-    const char *data_env = getenv("PISTORM_DATA");
-    std::string pistorm_data = data_env && *data_env ? data_env : pistorm_root + "/data";
-
-    const char *shared_env = getenv("A314_SHARED");
-    std::string a314_shared = shared_env && *shared_env ? shared_env : pistorm_data + "/a314-shared";
-
-    ensure_env_var("PISTORM_ROOT", pistorm_root);
-    ensure_env_var("PISTORM_A314", a314_root);
-    ensure_env_var("PISTORM_DATA", pistorm_data);
-    ensure_env_var("A314_SHARED", a314_shared);
-
-    if (a314_config_file.empty()) {
-        const char *conf_env = getenv("A314_CONF");
-        if (conf_env && *conf_env) {
-            a314_config_file = expand_env_vars(conf_env);
-        } else {
-            a314_config_file = a314_root + "/a314d.conf";
-        }
-    }
-
-    ensure_env_var("A314_CONF", a314_config_file);
-    ensure_env_var("A314_FS_CONF", a314_root + "/a314fs.conf");
-
-    home_env = "HOME=" + pistorm_root;
-    a314_paths_initialized = true;
-}
-    
-static void load_a314_service_config(const char *filename) {
+static void load_a314_config_file(const char *filename)
+{
     FILE *f = fopen(filename, "rt");
     if (f == nullptr) {
         return;
@@ -412,61 +240,65 @@ static void load_a314_service_config(const char *filename) {
     char line[256];
     std::vector<char *> parts;
 
-    while (fgets(line, 256, f) != nullptr) {
+    while (fgets(line, 256, f) != nullptr)
+    {
         char org_line[256];
         strcpy(org_line, line);
 
         bool in_quotes = false;
 
         int start = 0;
-        for (int i = 0; i < 256; i++) {
-            if (line[i] == 0) {
-                if (start < i) {
+        for (int i = 0; i < 256; i++)
+        {
+            if (line[i] == 0)
+            {
+                if (start < i)
                     parts.push_back(&line[start]);
-                }
                 break;
             }
-            else if (line[i] == '"') {
+            else if (line[i] == '"')
+            {
                 line[i] = 0;
-                if (in_quotes) {
+                if (in_quotes)
                     parts.push_back(&line[start]);
-                }
                 in_quotes = !in_quotes;
                 start = i + 1;
-            } else if (isspace(line[i]) && !in_quotes) {
+            }
+            else if (isspace(line[i]) && !in_quotes)
+            {
                 line[i] = 0;
-                if (start < i) {
+                if (start < i)
                     parts.push_back(&line[start]);
-                }
                 start = i + 1;
             }
         }
 
-        if (parts.size() >= 2) {
+        if (parts.size() >= 2)
+        {
             on_demand_services.emplace_back();
             auto &e = on_demand_services.back();
             e.service_name = parts[0];
-            e.program = expand_env_vars(parts[1]);
-            for (size_t i = 1; i < parts.size(); i++) {
-                e.arguments.push_back(expand_env_vars(parts[i]));
-            }
-        } else if (parts.size() != 0) {
-            logger_warn("Invalid number of columns in configuration file line: %s\n", org_line);
+            e.program = parts[1];
+            for (size_t i = 1; i < parts.size(); i++)
+                e.arguments.push_back(std::string(parts[i]));
         }
+        else if (parts.size() != 0)
+            logger_warn("Invalid number of columns in configuration file line: %s\n", org_line);
 
         parts.clear();
     }
 
     fclose(f);
 
-    if (on_demand_services.empty()) {
+    if (on_demand_services.empty())
         logger_warn("No registered services\n");
-    }
 }
 
-static int init_server_socket(void) {
+static int init_server_socket()
+{
     server_socket = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
-    if (server_socket == -1) {
+    if (server_socket == -1)
+    {
         logger_error("Failed to create server socket\n");
         return -1;
     }
@@ -477,7 +309,8 @@ static int init_server_socket(void) {
     address.sin_port = htons(7110);
 
     int res = bind(server_socket, (struct sockaddr *)&address, sizeof(address));
-    if (res < 0) {
+    if (res < 0)
+    {
         logger_error("Bind to localhost:7110 failed\n");
         return -1;
     }
@@ -487,21 +320,24 @@ static int init_server_socket(void) {
     return 0;
 }
 
-static void shutdown_server_socket(void) {
-    if (server_socket != -1) {
+static void shutdown_server_socket()
+{
+    if (server_socket != -1)
         close(server_socket);
-    }
     server_socket = -1;
 }
 
-static void create_and_send_msg(ClientConnection *cc, int type, uint32_t stream_id, const uint8_t *data, size_t length) {
-    if (length > MAX_MESSAGE_SIZE) {
+void create_and_send_msg(ClientConnection *cc, int type, int stream_id, const uint8_t *data, size_t length)
+{
+    if (length > MAX_MESSAGE_SIZE)
+    {
         logger_warn("Refusing to send message with length %zu (max %zu)\n", length, MAX_MESSAGE_SIZE);
         return;
     }
 
     const size_t total_size = sizeof(MessageHeader) + length;
-    if (total_size < sizeof(MessageHeader) || total_size > (sizeof(MessageHeader) + MAX_MESSAGE_SIZE)) {
+    if (total_size < sizeof(MessageHeader) || total_size > (sizeof(MessageHeader) + MAX_MESSAGE_SIZE))
+    {
         logger_warn("Refusing to send message with total size %zu\n", total_size);
         return;
     }
@@ -510,56 +346,64 @@ static void create_and_send_msg(ClientConnection *cc, int type, uint32_t stream_
     mb.pos = 0;
     mb.data.resize(total_size);
 
-    MessageHeader *mh = (MessageHeader *)&mb.data[0];
+    MessageHeader *mh = reinterpret_cast<MessageHeader *>(mb.data.data());
     mh->length = htole32(static_cast<uint32_t>(length));
     mh->stream_id = htole32(static_cast<uint32_t>(stream_id));
     mh->type = static_cast<uint8_t>(type);
-    if (length && data) {
+    if (length && data)
         memcpy(&mb.data[sizeof(MessageHeader)], data, length);
-    }
 
-    if (!cc->message_queue.empty()) {
+    if (!cc->message_queue.empty())
+    {
         cc->message_queue.push_back(std::move(mb));
         return;
     }
 
-    while (1) {
+    while (1)
+    {
         size_t left = mb.data.size() - mb.pos;
         uint8_t *src = &mb.data[mb.pos];
         ssize_t r = write(cc->fd, src, left);
-        if (r == -1) {
-            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+        if (r == -1)
+        {
+            if (errno == EAGAIN || errno == EWOULDBLOCK)
+            {
                 cc->message_queue.push_back(std::move(mb));
                 return;
-            } else if (errno == ECONNRESET) {
+            }
+            else if (errno == ECONNRESET)
+            {
                 // Do not close connection here; it will get done at some other place.
                 return;
-            } else {
+            }
+            else
+            {
                 logger_error("Write failed unexpectedly with errno = %d\n", errno);
                 exit(-1);
             }
         }
 
         mb.pos += static_cast<size_t>(r);
-        if (static_cast<size_t>(r) == left) {
+        if (static_cast<size_t>(r) == left)
+        {
             return;
         }
     }
 }
 
-static void handle_msg_register_req(ClientConnection *cc) {
+static void handle_msg_register_req(ClientConnection *cc)
+{
     uint8_t result = MSG_FAIL;
 
-    std::string service_name((char *)&cc->payload[0], cc->payload.size());
+    std::string service_name(reinterpret_cast<const char *>(cc->payload.data()), cc->payload.size());
 
     auto it = services.begin();
-    for (; it != services.end(); it++) {
-        if (it->name == service_name) {
+    for (; it != services.end(); it++)
+        if (it->name == service_name)
             break;
-        }
-    }
 
-    if (it == services.end()) {
+    if (it == services.end())
+    {
         services.emplace_back();
 
         RegisteredService &srv = services.back();
@@ -572,13 +416,16 @@ static void handle_msg_register_req(ClientConnection *cc) {
     create_and_send_msg(cc, MSG_REGISTER_RES, 0, &result, 1);
 }
 
-static void handle_msg_deregister_req(ClientConnection *cc) {
+static void handle_msg_deregister_req(ClientConnection *cc)
+{
     uint8_t result = MSG_FAIL;
 
-    std::string service_name((char *)&cc->payload[0], cc->payload.size());
+    std::string service_name(reinterpret_cast<const char *>(cc->payload.data()), cc->payload.size());
 
-    for (auto it = services.begin(); it != services.end(); it++) {
-        if (it->name == service_name && it->cc == cc) {
+    for (auto it = services.begin(); it != services.end(); it++)
+    {
+        if (it->name == service_name && it->cc == cc)
+        {
             services.erase(it);
             result = MSG_SUCCESS;
             break;
@@ -590,36 +437,37 @@ static void handle_msg_deregister_req(ClientConnection *cc) {
 
 static std::vector<uint8_t> manual_read_buf;
 
-static void handle_msg_read_mem_req(ClientConnection *cc) {
-    if (cc->payload.size() != 8) {
+static void handle_msg_read_mem_req(ClientConnection *cc)
+{
+    if (cc->payload.size() != 8)
+    {
         logger_warn("Invalid READ_MEM payload size (%zu bytes)\n", cc->payload.size());
-        create_and_send_msg(cc, MSG_READ_MEM_RES, 0, nullptr, 0);
+        close_and_remove_connection(cc);
         return;
     }
 
     uint32_t address_le = 0;
     uint32_t length_le = 0;
 
-    memcpy(&address_le, &(cc->payload[0]), sizeof(address_le));
-    memcpy(&length_le, &(cc->payload[4]), sizeof(length_le));
+    memcpy(&address_le, cc->payload.data(), sizeof(address_le));
+    memcpy(&length_le, cc->payload.data() + 4, sizeof(length_le));
     const uint32_t address = le32toh(address_le);
     const size_t length = le32toh(length_le);
 
-    if (length == 0 || length > MAX_MEM_RW_LENGTH) {
+    if (length == 0 || length > MAX_MEM_RW_LENGTH)
+    {
         logger_warn("Rejecting READ_MEM length %zu for address 0x%08x\n", length, address);
-        create_and_send_msg(cc, MSG_READ_MEM_RES, 0, nullptr, 0);
+        close_and_remove_connection(cc);
         return;
     }
 
     const int32_t index = get_mapped_item_by_address(cfg, address);
-    if (index != -1 && cfg->map_data[index] != nullptr) {
+    if (index != -1) {
         const size_t available = cfg->map_high[index] - address;
-        if (length > available) {
-            logger_warn("READ_MEM span crosses mapping at 0x%08x (len %zu, max %zu), using bus fallback\n",
-                        address, length, available);
-            manual_read_buf.resize(length);
-            a314_manual_read_from_bus(address, manual_read_buf.data(), length);
-            create_and_send_msg(cc, MSG_READ_MEM_RES, 0, manual_read_buf.data(), length);
+        if (length > available)
+        {
+            logger_warn("Rejecting READ_MEM past mapped region at 0x%08x (len %zu, max %zu)\n", address, length, available);
+            close_and_remove_connection(cc);
             return;
         }
 
@@ -627,116 +475,121 @@ static void handle_msg_read_mem_req(ClientConnection *cc) {
         create_and_send_msg(cc, MSG_READ_MEM_RES, 0, map, length);
     } else {
         manual_read_buf.resize(length);
-        a314_manual_read_from_bus(address, manual_read_buf.data(), length);
-        if (!a314_mem_fallback_warned) {
-            logger_warn("READ_MEM using slow bus fallback at 0x%08x len=%zu (address not in mapped RAM/ROM)\n",
-                        address, length);
-            a314_mem_fallback_warned = true;
+        for (size_t i = 0; i < length; i++) {
+            manual_read_buf[i] = static_cast<unsigned char>(ps_read_8(address + static_cast<uint32_t>(i)));
         }
         create_and_send_msg(cc, MSG_READ_MEM_RES, 0, manual_read_buf.data(), length);
     }
 }
 
-static void handle_msg_write_mem_req(ClientConnection *cc) {
-    if (cc->payload.size() < 4) {
+static void handle_msg_write_mem_req(ClientConnection *cc)
+{
+    if (cc->payload.size() < 4)
+    {
         logger_warn("Invalid WRITE_MEM payload size (%zu bytes)\n", cc->payload.size());
-        create_and_send_msg(cc, MSG_WRITE_MEM_RES, 0, nullptr, 0);
+        close_and_remove_connection(cc);
         return;
     }
 
     uint32_t address_le = 0;
 
-    memcpy(&address_le, &(cc->payload[0]), sizeof(address_le));
+    memcpy(&address_le, cc->payload.data(), sizeof(address_le));
     const uint32_t address = le32toh(address_le);
     const size_t length = cc->payload.size() - 4;
 
-    if (length == 0 || length > MAX_MEM_RW_LENGTH) {
+    if (length == 0 || length > MAX_MEM_RW_LENGTH)
+    {
         logger_warn("Rejecting WRITE_MEM length %zu for address 0x%08x\n", length, address);
-        create_and_send_msg(cc, MSG_WRITE_MEM_RES, 0, nullptr, 0);
+        close_and_remove_connection(cc);
         return;
     }
 
     const int32_t index = get_mapped_item_by_address(cfg, address);
-    if (index != -1 && cfg->map_data[index] != nullptr) {
+    if (index != -1) {
         const size_t available = cfg->map_high[index] - address;
-        if (length > available) {
-            logger_warn("WRITE_MEM span crosses mapping at 0x%08x (len %zu, max %zu), using bus fallback\n",
-                        address, length, available);
-            a314_manual_write_to_bus(address, &(cc->payload[4]), length);
-            create_and_send_msg(cc, MSG_WRITE_MEM_RES, 0, nullptr, 0);
+        if (length > available)
+        {
+            logger_warn("Rejecting WRITE_MEM past mapped region at 0x%08x (len %zu, max %zu)\n", address, length, available);
+            close_and_remove_connection(cc);
             return;
         }
 
         uint8_t *map = &cfg->map_data[index][address - cfg->map_offset[index]];
-        memcpy(map, &(cc->payload[4]), length);
+        memcpy(map, cc->payload.data() + 4, length);
     } else {
-        a314_manual_write_to_bus(address, &(cc->payload[4]), length);
-        if (!a314_mem_fallback_warned) {
-            logger_warn("WRITE_MEM using slow bus fallback at 0x%08x len=%zu (address not in mapped RAM/ROM)\n",
-                        address, length);
-            a314_mem_fallback_warned = true;
+        // No idea if this actually works.
+        for (size_t i = 0; i < length; i++) {
+            ps_write_8(address + static_cast<uint32_t>(i), cc->payload[4 + i]);
         }
     }
 
     create_and_send_msg(cc, MSG_WRITE_MEM_RES, 0, nullptr, 0);
 }
 
-static LogicalChannel *get_associated_channel_by_stream_id(ClientConnection *cc, uint32_t stream_id) {
-    for (auto ch : cc->associations) {
-        if (ch->stream_id == stream_id) {
+static LogicalChannel *get_associated_channel_by_stream_id(ClientConnection *cc, int stream_id)
+{
+    for (auto ch : cc->associations)
+    {
+        if (ch->stream_id == stream_id)
             return ch;
-        }
     }
     return nullptr;
 }
 
-static void handle_msg_connect(ClientConnection *cc) {
+static void handle_msg_connect(ClientConnection *cc)
+{
     (void)cc;  // Parameter intentionally unused
     // We currently don't handle that a client tries to connect to a service on the Amiga.
 }
 
-static void handle_msg_connect_response(ClientConnection *cc) {
+static void handle_msg_connect_response(ClientConnection *cc)
+{
     LogicalChannel *ch = get_associated_channel_by_stream_id(cc, cc->header.stream_id);
-    if (!ch) {
+    if (!ch)
+        return;
+
+    if (cc->payload.size() != 1)
+    {
+        logger_warn("Invalid CONNECT_RESPONSE payload size (%zu bytes)\n", cc->payload.size());
+        close_and_remove_connection(cc);
         return;
     }
 
-    create_and_enqueue_packet(ch, PKT_CONNECT_RESPONSE, &cc->payload[0], cc->payload.size());
+    create_and_enqueue_packet(ch, PKT_CONNECT_RESPONSE, cc->payload.data(), cc->payload.size());
 
-    if (cc->payload[0] != CONNECT_OK) {
+    if (cc->payload[0] != CONNECT_OK)
         remove_association(ch);
-    }
 }
 
-static void handle_msg_data(ClientConnection *cc) {
+static void handle_msg_data(ClientConnection *cc)
+{
     LogicalChannel *ch = get_associated_channel_by_stream_id(cc, cc->header.stream_id);
-    if (!ch) {
+    if (!ch)
         return;
-    }
 
-    create_and_enqueue_packet(ch, PKT_DATA, &cc->payload[0], cc->header.length);
+    const uint8_t *payload = cc->payload.empty() ? nullptr : cc->payload.data();
+    create_and_enqueue_packet(ch, PKT_DATA, payload, cc->header.length);
 }
 
-static void handle_msg_eos(ClientConnection *cc) {
+static void handle_msg_eos(ClientConnection *cc)
+{
     LogicalChannel *ch = get_associated_channel_by_stream_id(cc, cc->header.stream_id);
-    if (!ch || ch->got_eos_from_client) {
+    if (!ch || ch->got_eos_from_client)
         return;
-    }
 
     ch->got_eos_from_client = true;
 
     create_and_enqueue_packet(ch, PKT_EOS, nullptr, 0);
 
-    if (ch->got_eos_from_ami) {
+    if (ch->got_eos_from_ami)
         remove_association(ch);
-    }
 }
 
-static void handle_msg_reset(ClientConnection *cc) {
+static void handle_msg_reset(ClientConnection *cc)
+{
     LogicalChannel *ch = get_associated_channel_by_stream_id(cc, cc->header.stream_id);
-    if (!ch) {
+    if (!ch)
         return;
-    }
 
     remove_association(ch);
 
@@ -744,8 +597,10 @@ static void handle_msg_reset(ClientConnection *cc) {
     create_and_enqueue_packet(ch, PKT_RESET, nullptr, 0);
 }
 
-static void handle_received_message(ClientConnection *cc) {
-    switch (cc->header.type) {
+static void handle_received_message(ClientConnection *cc)
+{
+    switch (cc->header.type)
+    {
     case MSG_REGISTER_REQ:
         handle_msg_register_req(cc);
         break;
@@ -780,24 +635,26 @@ static void handle_received_message(ClientConnection *cc) {
     }
 }
 
-static void close_and_remove_connection(ClientConnection *cc) {
+static void close_and_remove_connection(ClientConnection *cc)
+{
     shutdown(cc->fd, SHUT_WR);
     close(cc->fd);
 
     {
         auto it = services.begin();
-        while (it != services.end()) {
-            if (it->cc == cc)  {
+        while (it != services.end())
+        {
+            if (it->cc == cc)
                 it = services.erase(it);
-            }            else {
+            else
                 it++;
-            }
         }
     }
 
     {
         auto it = cc->associations.begin();
-        while (it != cc->associations.end()) {
+        while (it != cc->associations.end())
+        {
             auto ch = *it;
 
             clear_packet_queue(ch);
@@ -810,47 +667,56 @@ static void close_and_remove_connection(ClientConnection *cc) {
         }
     }
 
-    for (auto it = connections.begin(); it != connections.end(); it++) {
-        if (&(*it) == cc) {
+    for (auto it = connections.begin(); it != connections.end(); it++)
+    {
+        if (&(*it) == cc)
+        {
             connections.erase(it);
             break;
         }
     }
 }
 
-static void remove_association(LogicalChannel *ch) {
+static void remove_association(LogicalChannel *ch)
+{
     auto &ass = ch->association->associations;
-    ass.erase(std::find(ass.begin(), ass.end(), ch));
+    auto it = std::find(ass.begin(), ass.end(), ch);
+    if (it != ass.end())
+        ass.erase(it);
 
     ch->association = nullptr;
     ch->stream_id = 0;
 }
 
-static void clear_packet_queue(LogicalChannel *ch) {
-    if (!ch->packet_queue.empty()) {
+static void clear_packet_queue(LogicalChannel *ch)
+{
+    if (!ch->packet_queue.empty())
+    {
         ch->packet_queue.clear();
-        send_queue.erase(std::find(send_queue.begin(), send_queue.end(), ch));
+        send_queue.remove(ch);
     }
 }
 
-static void create_and_enqueue_packet(LogicalChannel *ch, uint8_t type, const uint8_t *data, size_t length) {
-    if (ch->packet_queue.empty()) {
+static void create_and_enqueue_packet(LogicalChannel *ch, uint8_t type, const uint8_t *data, uint8_t length)
+{
+    if (ch->packet_queue.empty())
         send_queue.push_back(ch);
-    }
 
     ch->packet_queue.emplace_back();
 
     PacketBuffer &pb = ch->packet_queue.back();
     pb.type = type;
     pb.data.resize(length);
-    if (data && length) {
+    if (data && length)
         memcpy(&pb.data[0], data, length);
-    }
 }
 
-static void handle_pkt_connect(int channel_id, uint8_t *data, size_t plen) {
-    for (auto &ch : channels) {
-        if (ch.channel_id == channel_id) {
+static void handle_pkt_connect(int channel_id, uint8_t *data, int plen)
+{
+    for (auto &ch : channels)
+    {
+        if (ch.channel_id == channel_id)
+        {
             // We should handle this in some constructive way.
             // This signals that should reset all logical channels.
             logger_error("Received a CONNECT packet on a channel that was believed to be previously allocated\n");
@@ -868,10 +734,12 @@ static void handle_pkt_connect(int channel_id, uint8_t *data, size_t plen) {
     ch.got_eos_from_ami = false;
     ch.got_eos_from_client = false;
 
-    std::string service_name(reinterpret_cast<const char *>(data), plen);
+    std::string service_name((char *)data, plen);
 
-    for (auto &srv : services) {
-        if (srv.name == service_name) {
+    for (auto &srv : services)
+    {
+        if (srv.name == service_name)
+        {
             ClientConnection *cc = srv.cc;
 
             ch.association = cc;
@@ -885,60 +753,59 @@ static void handle_pkt_connect(int channel_id, uint8_t *data, size_t plen) {
         }
     }
 
-    for (auto &on_demand : on_demand_services) {
-        if (on_demand.service_name == service_name) {
+    for (auto &on_demand : on_demand_services)
+    {
+        if (on_demand.service_name == service_name)
+        {
             int fds[2];
             int status = socketpair(AF_UNIX, SOCK_STREAM, 0, fds);
-            if (status != 0) {
+            if (status != 0)
+            {
                 logger_error("Unexpectedly not able to create socket pair.\n");
                 exit(-1);
             }
 
             pid_t child = fork();
-            if (child == -1) {
+            if (child == -1)
+            {
                 logger_error("Unexpectedly was not able to fork.\n");
                 exit(-1);
-            } else if (child == 0) {
+            }
+            else if (child == 0)
+            {
                 close(fds[0]);
                 int fd = fds[1];
 
                 // FIXE: The user should be configurable.
                 setgid(1000);
                 setuid(1000);
-                char *env = strdup(home_env.c_str());
-                if (env) {
-                    putenv(env);
-                }
+                putenv((char *)home_env.c_str());
 
                 std::vector<std::string> args(on_demand.arguments);
                 args.push_back("-ondemand");
                 args.push_back(std::to_string(fd));
-                std::vector<char *> args_arr;
-                args_arr.reserve(args.size() + 1);
-                for (auto &arg : args) {
-                    args_arr.push_back(strdup(arg.c_str()));
-                }
+                std::vector<const char *> args_arr;
+                for (auto &arg : args)
+                    args_arr.push_back(arg.c_str());
                 args_arr.push_back(nullptr);
 
-                execvp(on_demand.program.c_str(), args_arr.data());
-                for (auto ptr : args_arr) {
-                    free(ptr);
-                }
-                if (env) {
-                    free(env);
-                }
-            } else {
+                execvp(on_demand.program.c_str(), (char* const*) &args_arr[0]);
+            }
+            else
+            {
                 close(fds[1]);
                 int fd = fds[0];
 
-                int flag_status = fcntl(fd, F_SETFD, fcntl(fd, F_GETFD, 0) | FD_CLOEXEC);
-                if (flag_status == -1) {
+                int status = fcntl(fd, F_SETFD, fcntl(fd, F_GETFD, 0) | FD_CLOEXEC);
+                if (status == -1)
+                {
                     logger_error("Unexpectedly unable to set close-on-exec flag on client socket descriptor; errno = %d\n", errno);
                     exit(-1);
                 }
 
-                int nonblock_status = fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
-                if (nonblock_status == -1) {
+                status = fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
+                if (status == -1)
+                {
                     logger_error("Unexpectedly unable to set client socket to non blocking; errno = %d\n", errno);
                     exit(-1);
                 }
@@ -956,7 +823,8 @@ static void handle_pkt_connect(int channel_id, uint8_t *data, size_t plen) {
                 struct epoll_event ev;
                 ev.events = EPOLLIN | EPOLLOUT | EPOLLET;
                 ev.data.fd = fd;
-                if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) != 0) {
+                if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) != 0)
+                {
                     logger_error("epoll_ctl() failed unexpectedly with errno = %d\n", errno);
                     exit(-1);
                 }
@@ -983,41 +851,50 @@ static void handle_pkt_connect(int channel_id, uint8_t *data, size_t plen) {
     create_and_enqueue_packet(&ch, PKT_CONNECT_RESPONSE, &response, 1);
 }
 
-static void handle_pkt_data(int channel_id, uint8_t *data, size_t plen) {
-    for (auto &ch : channels) {
-        if (ch.channel_id == channel_id) {
-            if (ch.association != nullptr && !ch.got_eos_from_ami) {
+static void handle_pkt_data(int channel_id, uint8_t *data, int plen)
+{
+    for (auto &ch : channels)
+    {
+        if (ch.channel_id == channel_id)
+        {
+            if (ch.association != nullptr && !ch.got_eos_from_ami)
                 create_and_send_msg(ch.association, MSG_DATA, ch.stream_id, data, plen);
-            }
 
             break;
         }
     }
 }
 
-static void handle_pkt_eos(int channel_id) {
-    for (auto &ch : channels) {
-        if (ch.channel_id == channel_id) {
-            if (ch.association != nullptr && !ch.got_eos_from_ami) {
+static void handle_pkt_eos(int channel_id)
+{
+    for (auto &ch : channels)
+    {
+        if (ch.channel_id == channel_id)
+        {
+            if (ch.association != nullptr && !ch.got_eos_from_ami)
+            {
                 ch.got_eos_from_ami = true;
 
                 create_and_send_msg(ch.association, MSG_EOS, ch.stream_id, nullptr, 0);
 
-                if (ch.got_eos_from_client) {
+                if (ch.got_eos_from_client)
                     remove_association(&ch);
-                }
             }
             break;
         }
     }
 }
 
-static void handle_pkt_reset(int channel_id) {
-    for (auto &ch : channels) {
-        if (ch.channel_id == channel_id) {
+static void handle_pkt_reset(int channel_id)
+{
+    for (auto &ch : channels)
+    {
+        if (ch.channel_id == channel_id)
+        {
             clear_packet_queue(&ch);
 
-            if (ch.association != nullptr) {
+            if (ch.association != nullptr)
+            {
                 create_and_send_msg(ch.association, MSG_RESET, ch.stream_id, nullptr, 0);
                 remove_association(&ch);
             }
@@ -1027,10 +904,15 @@ static void handle_pkt_reset(int channel_id) {
     }
 }
 
-static void remove_channel_if_not_associated_and_empty_pq(int channel_id) {
-    for (auto it = channels.begin(); it != channels.end(); it++) {
-        if (it->channel_id == channel_id) {
-            if (it->association == nullptr && it->packet_queue.empty()) {
+static void remove_channel_if_not_associated_and_empty_pq(int channel_id)
+{
+    for (auto it = channels.begin(); it != channels.end(); it++)
+    {
+        if (it->channel_id == channel_id)
+        {
+            if (it->association == nullptr && it->packet_queue.empty())
+            {
+                send_queue.remove(&(*it));
                 channels.erase(it);
             }
 
@@ -1039,41 +921,45 @@ static void remove_channel_if_not_associated_and_empty_pq(int channel_id) {
     }
 }
 
-static void handle_received_pkt(int ptype, int channel_id, uint8_t *data, int plen) {
-    if (ptype == PKT_CONNECT) {
-        handle_pkt_connect(channel_id, data, static_cast<size_t>(plen));
-    } else if (ptype == PKT_DATA) {
-        handle_pkt_data(channel_id, data, static_cast<size_t>(plen));
-    } else if (ptype == PKT_EOS) {
+static void handle_received_pkt(int ptype, int channel_id, uint8_t *data, int plen)
+{
+    if (ptype == PKT_CONNECT)
+        handle_pkt_connect(channel_id, data, plen);
+    else if (ptype == PKT_DATA)
+        handle_pkt_data(channel_id, data, plen);
+    else if (ptype == PKT_EOS)
         handle_pkt_eos(channel_id);
-    } else if (ptype == PKT_RESET) {
+    else if (ptype == PKT_RESET)
         handle_pkt_reset(channel_id);
-    }
 
     remove_channel_if_not_associated_and_empty_pq(channel_id);
 }
 
-static bool receive_from_a2r(void) {
-    size_t head = channel_status[A2R_HEAD_OFFSET];
-    size_t tail = channel_status[A2R_TAIL_OFFSET];
-    size_t len = (tail - head) & 255;
-    if (len == 0) {
+static bool receive_from_a2r()
+{
+    int head = channel_status[A2R_HEAD_OFFSET];
+    int tail = channel_status[A2R_TAIL_OFFSET];
+    int len = (tail - head) & 255;
+    if (len == 0)
         return false;
-    }
 
-    if (head < tail) {
+    if (head < tail)
+    {
         memcpy(recv_buf, &ca.a2r_buffer[head], len);
-    } else {
-        size_t first = std::min(len, 256 - head);
-        memcpy(recv_buf, &ca.a2r_buffer[head], first);
+    }
+    else
+    {
+        memcpy(recv_buf, &ca.a2r_buffer[head], 256 - head);
 
-        if (len > first) {
-            memcpy(&recv_buf[first], &ca.a2r_buffer[0], len - first);
+        if (tail != 0)
+        {
+            memcpy(&recv_buf[len - tail], &ca.a2r_buffer[0], tail);
         }
     }
 
     uint8_t *p = recv_buf;
-    while (p < recv_buf + len) {
+    while (p < recv_buf + len)
+    {
         uint8_t plen = *p++;
         uint8_t ptype = *p++;
         uint8_t channel_id = *p++;
@@ -1086,52 +972,53 @@ static bool receive_from_a2r(void) {
     return true;
 }
 
-static bool flush_send_queue(void) {
-    size_t tail = channel_status[R2A_TAIL_OFFSET];
-    size_t head = channel_status[R2A_HEAD_OFFSET];
-    size_t len = (tail - head) & 255;
-    size_t left = 255 - len;
+static bool flush_send_queue()
+{
+    int tail = channel_status[R2A_TAIL_OFFSET];
+    int head = channel_status[R2A_HEAD_OFFSET];
+    int len = (tail - head) & 255;
+    int left = 255 - len;
 
-    size_t pos = 0;
+    int pos = 0;
 
-    while (!send_queue.empty()) {
+    while (!send_queue.empty())
+    {
         LogicalChannel *ch = send_queue.front();
         PacketBuffer &pb = ch->packet_queue.front();
 
-        uint8_t ptype = static_cast<uint8_t>(pb.type);
-        size_t plen = 3 + pb.data.size();
+        int ptype = pb.type;
+        int plen = 3 + pb.data.size();
 
-        if (left < plen) {
+        if (left < plen)
             break;
-        }
 
-        send_buf[pos++] = static_cast<uint8_t>(pb.data.size());
+        send_buf[pos++] = pb.data.size();
         send_buf[pos++] = ptype;
-        send_buf[pos++] = static_cast<uint8_t>(ch->channel_id);
-        memcpy(&send_buf[pos], &pb.data[0], pb.data.size());
+        send_buf[pos++] = ch->channel_id;
+        if (!pb.data.empty())
+            memcpy(&send_buf[pos], pb.data.data(), pb.data.size());
         pos += pb.data.size();
 
         ch->packet_queue.pop_front();
 
         send_queue.pop_front();
 
-        if (!ch->packet_queue.empty()) {
+        if (!ch->packet_queue.empty())
             send_queue.push_back(ch);
-        } else {
+        else
             remove_channel_if_not_associated_and_empty_pq(ch->channel_id);
-        }
 
         left -= plen;
     }
 
-    size_t to_write = pos;
-    if (!to_write) {
+    int to_write = pos;
+    if (!to_write)
         return false;
-    }
 
     uint8_t *p = send_buf;
-    size_t at_end = 256 - tail;
-    if (at_end < to_write) {
+    int at_end = 256 - tail;
+    if (at_end < to_write)
+    {
         memcpy(&ca.r2a_buffer[tail], p, at_end);
         p += at_end;
         to_write -= at_end;
@@ -1141,12 +1028,13 @@ static bool flush_send_queue(void) {
     memcpy(&ca.r2a_buffer[tail], p, to_write);
     tail = (tail + to_write) & 255;
 
-    channel_status[R2A_TAIL_OFFSET] = static_cast<uint8_t>(tail);
+    channel_status[R2A_TAIL_OFFSET] = tail;
     channel_status_updated |= A_EVENT_R2A_TAIL;
     return true;
 }
 
-static void read_channel_status(void) {
+static void read_channel_status()
+{
     channel_status[A2R_TAIL_OFFSET] = ca.a2r_tail;
     channel_status[R2A_HEAD_OFFSET] = ca.r2a_head;
     channel_status[R2A_TAIL_OFFSET] = ca.r2a_tail;
@@ -1154,8 +1042,10 @@ static void read_channel_status(void) {
     channel_status_updated = 0;
 }
 
-static void write_channel_status(void) {
-    if (channel_status_updated != 0) {
+static void write_channel_status()
+{
+    if (channel_status_updated != 0)
+    {
         ca.r2a_tail = channel_status[R2A_TAIL_OFFSET];
         ca.a2r_head = channel_status[A2R_HEAD_OFFSET];
 
@@ -1167,14 +1057,17 @@ static void write_channel_status(void) {
     }
 }
 
-static void close_all_logical_channels(void) {
+static void close_all_logical_channels()
+{
     send_queue.clear();
 
     auto it = channels.begin();
-    while (it != channels.end()) {
+    while (it != channels.end())
+    {
         LogicalChannel &ch = *it;
 
-        if (ch.association != nullptr) {
+        if (ch.association != nullptr)
+        {
             create_and_send_msg(ch.association, MSG_RESET, ch.stream_id, nullptr, 0);
             remove_association(&ch);
         }
@@ -1183,97 +1076,105 @@ static void close_all_logical_channels(void) {
     }
 }
 
-static void handle_a314_irq(uint8_t events) {
-    if (events == 0) {
+static void handle_a314_irq(uint8_t events)
+{
+    if (events == 0)
         return;
-    }
 
-    if (events & R_EVENT_STARTED) {
-        if (!channels.empty()) {
+    if (events & R_EVENT_STARTED)
+    {
+        if (!channels.empty())
             logger_info("Received STARTED event while logical channels are open -- closing channels\n");
-        }
 
         close_all_logical_channels();
         a314_device_started = true;
     }
 
-    if (!a314_device_started) {
+    if (!a314_device_started)
         return;
-    }
 
     read_channel_status();
 
     bool any_rcvd = receive_from_a2r();
     bool any_sent = flush_send_queue();
 
-    if (any_rcvd || any_sent) {
+    if (any_rcvd || any_sent)
         write_channel_status();
-    }
 }
 
-static void handle_client_connection_event(ClientConnection *cc, struct epoll_event *ev) {
-    if (ev->events & EPOLLERR) {
+static void handle_client_connection_event(ClientConnection *cc, struct epoll_event *ev)
+{
+    if (ev->events & EPOLLERR)
+    {
         logger_warn("Received EPOLLERR for client connection\n");
         close_and_remove_connection(cc);
         return;
     }
 
-    if (ev->events & EPOLLIN) {
-        while (1) {
+    if (ev->events & EPOLLIN)
+    {
+        while (1)
+        {
             size_t left;
             uint8_t *dst;
 
-            if (cc->payload.empty()) {
-                size_t diff = sizeof(MessageHeader) - cc->bytes_read;
-                if (diff == 0) {
-                    break;
-                }
-                left = diff;
-                dst = reinterpret_cast<uint8_t *>(&(cc->header)) + cc->bytes_read;
-            } else {
-                size_t total_len = static_cast<size_t>(cc->header.length);
-                if (cc->bytes_read >= total_len) {
-                    break;
-                }
-                left = total_len - cc->bytes_read;
+            if (cc->payload.empty())
+            {
+                left = sizeof(MessageHeader) - cc->bytes_read;
+                dst = (uint8_t *)&(cc->header) + cc->bytes_read;
+            }
+            else
+            {
+                left = static_cast<size_t>(cc->header.length) - cc->bytes_read;
                 dst = &cc->payload[cc->bytes_read];
             }
 
             ssize_t r = read(cc->fd, dst, left);
-            if (r == -1) {
-                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            if (r == -1)
+            {
+                if (errno == EAGAIN || errno == EWOULDBLOCK)
                     break;
-                }
 
                 logger_error("Read failed unexpectedly with errno = %d\n", errno);
                 exit(-1);
             }
 
-            if (r == 0) {
+            if (r == 0)
+            {
                 logger_info("Received End-of-File on client connection\n");
                 close_and_remove_connection(cc);
                 return;
-            } else {
-                cc->bytes_read += static_cast<size_t>(r);
+            }
+            else
+            {
+                cc->bytes_read += r;
                 left -= static_cast<size_t>(r);
-                if (!left) {
-                    if (cc->payload.empty()) {
+                if (!left)
+                {
+                    if (cc->payload.empty())
+                    {
                         cc->header.length = le32toh(cc->header.length);
                         cc->header.stream_id = le32toh(cc->header.stream_id);
 
-                        if (cc->header.length > MAX_MESSAGE_SIZE) {
+                        if (cc->header.length > MAX_MESSAGE_SIZE)
+                        {
                             logger_warn("Rejecting message length %u (max %zu)\n", cc->header.length, MAX_MESSAGE_SIZE);
                             close_and_remove_connection(cc);
                             return;
                         }
 
-                        if (cc->header.length == 0) {
+                        if (cc->header.length == 0)
+                        {
                             logger_trace("header: length=%u, stream_id=%u, type=%d\n", cc->header.length, cc->header.stream_id, cc->header.type);
                             handle_received_message(cc);
-                        } else {
+                        }
+                        else
+                        {
                             cc->payload.resize(cc->header.length);
                         }
-                    } else {
+                    }
+                    else
+                    {
                         logger_trace("header: length=%u, stream_id=%u, type=%d\n", cc->header.length, cc->header.stream_id, cc->header.type);
                         handle_received_message(cc);
                         cc->payload.clear();
@@ -1284,51 +1185,60 @@ static void handle_client_connection_event(ClientConnection *cc, struct epoll_ev
         }
     }
 
-    if (ev->events & EPOLLOUT) {
-        while (!cc->message_queue.empty()) {
+    if (ev->events & EPOLLOUT)
+    {
+        while (!cc->message_queue.empty())
+        {
             MessageBuffer &mb = cc->message_queue.front();
 
             size_t left = mb.data.size() - mb.pos;
             uint8_t *src = &mb.data[mb.pos];
             ssize_t r = write(cc->fd, src, left);
-            if (r == -1) {
-                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            if (r == -1)
+            {
+                if (errno == EAGAIN || errno == EWOULDBLOCK)
                     break;
-                } else if (errno == ECONNRESET) {
+                else if (errno == ECONNRESET)
+                {
                     close_and_remove_connection(cc);
                     return;
-                } else {
+                }
+                else
+                {
                     logger_error("Write failed unexpectedly with errno = %d\n", errno);
                     exit(-1);
                 }
             }
 
             mb.pos += static_cast<size_t>(r);
-            if (static_cast<size_t>(r) == left) {
+            if (static_cast<size_t>(r) == left)
                 cc->message_queue.pop_front();
-            }
         }
     }
 }
 
-static void handle_server_socket_ready(void) {
+static void handle_server_socket_ready()
+{
     struct sockaddr_in address;
     int alen = sizeof(struct sockaddr_in);
 
     int fd = accept(server_socket, (struct sockaddr *)&address, (socklen_t *)&alen);
-    if (fd < 0) {
+    if (fd < 0)
+    {
         logger_error("Accept failed unexpectedly with errno = %d\n", errno);
         exit(-1);
     }
 
     int status = fcntl(fd, F_SETFD, fcntl(fd, F_GETFD, 0) | FD_CLOEXEC);
-    if (status == -1) {
+    if (status == -1)
+    {
         logger_error("Unexpectedly unable to set close-on-exec flag on client socket descriptor; errno = %d\n", errno);
         exit(-1);
     }
 
     status = fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
-    if (status == -1) {
+    if (status == -1)
+    {
         logger_error("Unexpectedly unable to set client socket to non blocking; errno = %d\n", errno);
         exit(-1);
     }
@@ -1346,73 +1256,89 @@ static void handle_server_socket_ready(void) {
     struct epoll_event ev;
     ev.events = EPOLLIN | EPOLLOUT | EPOLLET;
     ev.data.fd = fd;
-    if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) != 0) {
+    if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) != 0)
+    {
         logger_error("epoll_ctl() failed unexpectedly with errno = %d\n", errno);
         exit(-1);
     }
 }
 
-static void main_loop(void) {
+static void main_loop()
+{
     bool shutting_down = false;
     bool done = false;
 
-    while (!done) {
+    while (!done)
+    {
         struct epoll_event ev;
         int timeout = shutting_down ? 10000 : -1;
         int n = epoll_pwait(epfd, &ev, 1, timeout, &original_sigset);
-        if (n == -1) {
-            if (errno == EINTR) {
+        if (n == -1)
+        {
+            if (errno == EINTR)
+            {
                 logger_info("Received SIGTERM\n");
 
                 shutdown_server_socket();
 
-                while (!connections.empty()) {
+                while (!connections.empty())
                     close_and_remove_connection(&connections.front());
-                }
 
-                if (flush_send_queue()) {
+                if (flush_send_queue())
                     write_channel_status();
-                }
 
-                if (!channels.empty()) {
-                    shutting_down = true; 
-                } else {
+                if (!channels.empty())
+                    shutting_down = true;
+                else
                     done = true;
-                }
-            } else {
+            }
+            else
+            {
                 logger_error("epoll_pwait failed with unexpected errno = %d\n", errno);
                 exit(-1);
             }
-        } else if (n == 0) {
-            if (shutting_down) {
+        }
+        else if (n == 0)
+        {
+            if (shutting_down)
                 done = true;
-            } else {
+            else
+            {
                 logger_error("epoll_pwait returned 0 which is unexpected since no timeout was set\n");
                 exit(-1);
             }
-        } else {
-            if (ev.data.fd == irq_fds[1]) {
+        }
+        else
+        {
+            if (ev.data.fd == irq_fds[1])
+            {
                 uint8_t events;
-                if (read(irq_fds[1], &events, 1) != 1) {
+                if (read(irq_fds[1], &events, 1) != 1)
+                {
                     logger_error("Read from interrupt socket pair, and unexpectedly didn't return 1 byte\n");
                     exit(-1);
                 }
 
                 handle_a314_irq(events);
-            } else if (ev.data.fd == server_socket) {
+            }
+            else if (ev.data.fd == server_socket)
+            {
                 logger_trace("Epoll event: server socket is ready, events = %d\n", ev.events);
                 handle_server_socket_ready();
-            } else {
+            }
+            else
+            {
                 logger_trace("Epoll event: client socket is ready, events = %d\n", ev.events);
 
                 auto it = connections.begin();
-                for (; it != connections.end(); it++) {
-                    if (it->fd == ev.data.fd) {
+                for (; it != connections.end(); it++)
+                {
+                    if (it->fd == ev.data.fd)
                         break;
-                    }
                 }
 
-                if (it == connections.end()) {
+                if (it == connections.end())
+                {
                     logger_error("Got notified about an event on a client connection that supposedly isn't currently open\n");
                     exit(-1);
                 }
@@ -1420,81 +1346,79 @@ static void main_loop(void) {
                 ClientConnection *cc = &(*it);
                 handle_client_connection_event(cc, &ev);
 
-                if (flush_send_queue()) {
+                if (flush_send_queue())
                     write_channel_status();
-                }
             }
         }
     }
 }
 
-static int init_driver(void) {
-    if (init_server_socket() != 0) {
+static int init_driver()
+{
+    if (init_server_socket() != 0)
         return -1;
-    }
 
     int err = socketpair(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, irq_fds);
-    if (err != 0) {
+    if (err != 0)
+    {
         logger_error("Unable to create socket pair, errno = %d\n", errno);
         return -1;
     }
 
     epfd = epoll_create1(EPOLL_CLOEXEC);
-    if (epfd == -1) {
+    if (epfd == -1)
         return -1;
-    }
 
     struct epoll_event ev;
     ev.events = EPOLLIN;
     ev.data.fd = irq_fds[1];
-    if (epoll_ctl(epfd, EPOLL_CTL_ADD, irq_fds[1], &ev) != 0) {
+    if (epoll_ctl(epfd, EPOLL_CTL_ADD, irq_fds[1], &ev) != 0)
         return -1;
-    }
 
     ev.events = EPOLLIN;
     ev.data.fd = server_socket;
-    if (epoll_ctl(epfd, EPOLL_CTL_ADD, server_socket, &ev) != 0) {
+    if (epoll_ctl(epfd, EPOLL_CTL_ADD, server_socket, &ev) != 0)
         return -1;
-    }
 
     return 0;
 }
 
-
-
-static void shutdown_driver(void) {
-    if (epfd != -1) {
+static void shutdown_driver()
+{
+    if (epfd != -1)
         close(epfd);
-    }
 
     shutdown_server_socket();
 }
 
-static void *thread_start(void *arg) {
+static void *thread_start(void *arg)
+{
     (void)arg;  // Parameter intentionally unused
     main_loop();
     shutdown_driver();
     return NULL;
 }
 
-static void write_r_events(uint8_t events) {
-    if (write(irq_fds[0], &events, 1) != 1) {
+static void write_r_events(uint8_t events)
+{
+    if (write(irq_fds[0], &events, 1) != 1)
         logger_error("Write to interrupt socket pair did not return 1\n");
-    }
 }
 
-int a314_init(void) {
-    init_a314_paths();
-    load_a314_service_config(a314_config_file.c_str());
+int a314_init()
+{
+    load_a314_config_file(a314_config_file.c_str());
 
     int err = init_driver();
-    if (err < 0) {
+    if (err < 0)
+    {
         shutdown_driver();
         return -1;
     }
 
     err = pthread_create(&thread_id, NULL, thread_start, NULL);
-    if (err < 0) {
+    if (err < 0)
+    {
         logger_error("pthread_create failed with err = %d\n", err);
         return -2;
     }
@@ -1502,30 +1426,36 @@ int a314_init(void) {
     return 0;
 }
 
-void a314_set_mem_base_size(unsigned int base, unsigned int size) {
+void a314_set_mem_base_size(unsigned int base, unsigned int size)
+{
     ca.mem_base = htobe32(base);
     ca.mem_size = htobe32(size);
 }
 
-void a314_process_events(void) {
-    if (ca.a_events & ca.a_enable) {
+void a314_process_events()
+{
+    if (ca.a_events & ca.a_enable)
+    {
         ps_write_16(0xdff09c, 0x8008);
         m68k_set_irq(2);
     }
 }
 
-unsigned int a314_read_memory_8(unsigned int address) {
-    if (address >= sizeof(ca)) {
+unsigned int a314_read_memory_8(unsigned int address)
+{
+    if (address >= sizeof(ca))
         return 0;
-    }
 
     uint8_t val;
-    if (address == offsetof(ComArea, a_events)) {
+    if (address == offsetof(ComArea, a_events))
+    {
         pthread_mutex_lock(&mutex);
         val = ca.a_events;
         ca.a_events = 0;
         pthread_mutex_unlock(&mutex);
-    } else {
+    }
+    else
+    {
         uint8_t *p = (uint8_t *)&ca;
         val = p[address];
     }
@@ -1533,41 +1463,42 @@ unsigned int a314_read_memory_8(unsigned int address) {
     return val;
 }
 
-unsigned int a314_read_memory_16(unsigned int address) {
-    if (address >= sizeof(ca)) {
+unsigned int a314_read_memory_16(unsigned int address)
+{
+    if (address >= sizeof(ca))
         return 0;
-    }
 
     uint16_t *p = (uint16_t *)&ca;
     return be16toh(p[address >> 1]);
 }
 
-unsigned int a314_read_memory_32(unsigned int address) {
-    if (address >= sizeof(ca)) {
+unsigned int a314_read_memory_32(unsigned int address)
+{
+    if (address >= sizeof(ca))
         return 0;
-    }
 
     uint32_t *p = (uint32_t *)&ca;
     return be32toh(p[address >> 2]);
 }
 
-void a314_write_memory_8(unsigned int address, unsigned int value) {
-    if (address >= sizeof(ca)) {
+void a314_write_memory_8(unsigned int address, unsigned int value)
+{
+    if (address >= sizeof(ca))
         return;
-    }
 
-    switch (address) {
+    switch (address)
+    {
         case offsetof(ComArea, a_events):
             // a_events is not writable.
             break;
 
         case offsetof(ComArea, r_events):
-            if (value != 0) {
+            if (value != 0)
                 write_r_events((uint8_t)value);
-            }
             break;
 
-        default: {
+        default:
+        {
             uint8_t *p = (uint8_t *)&ca;
             p[address] = (uint8_t)value;
             break;
@@ -1575,86 +1506,22 @@ void a314_write_memory_8(unsigned int address, unsigned int value) {
     }
 }
 
-static inline bool a314_range_touches_special(unsigned int address, unsigned int width) {
-    const unsigned int last = address + width - 1u;
-    const unsigned int a_events_off = (unsigned int)offsetof(ComArea, a_events);
-    const unsigned int r_events_off = (unsigned int)offsetof(ComArea, r_events);
-
-    if ((address <= a_events_off && last >= a_events_off) ||
-        (address <= r_events_off && last >= r_events_off)) {
-        return true;
-    }
-
-    return false;
-}
-/*
-void a314_write_memory_16(unsigned int address, unsigned int value) {
+void a314_write_memory_16(unsigned int address, unsigned int value)
+{
     (void)address;  // Parameter intentionally unused
     (void)value;    // Parameter intentionally unused
     // Not implemented.
 }
 
-void a314_write_memory_32(unsigned int address, unsigned int value) {
+void a314_write_memory_32(unsigned int address, unsigned int value)
+{
     (void)address;  // Parameter intentionally unused
     (void)value;    // Parameter intentionally unused
     // Not implemented.
 }
-*/
-void a314_write_memory_16(unsigned int address, unsigned int value) {
-    // Refuse the whole write when it would touch outside the com area.
-    if (address + 1u >= sizeof(ca)) {
-        return;
-    }
 
-    const uint16_t v = (uint16_t)value;
-
-    // Preserve register side effects for writes touching special bytes.
-    if (a314_range_touches_special(address, 2u)) {
-        // Big-endian: high byte at lowest address.
-        a314_write_memory_8(address + 0u, (unsigned int)((v >> 8) & 0xFFu));
-        a314_write_memory_8(address + 1u, (unsigned int)( v       & 0xFFu));
-        return;
-    }
-
-    // Fast path for normal data fields: store big-endian value directly.
-    const uint16_t be = htobe16(v);
-    memcpy(((uint8_t *)&ca) + address, &be, sizeof(be));
-}
-
-void a314_write_memory_32(unsigned int address, unsigned int value) {
-    // Refuse the whole write when it would touch outside the com area.
-    if (address + 3u >= sizeof(ca)) {
-        return;
-    }
-
-    const uint32_t v = (uint32_t)value;
-
-    // Preserve register side effects for writes touching special bytes.
-    if (a314_range_touches_special(address, 4u)) {
-        // Big-endian: most-significant byte at lowest address.
-        a314_write_memory_8(address + 0u, (unsigned int)((v >> 24) & 0xFFu));
-        a314_write_memory_8(address + 1u, (unsigned int)((v >> 16) & 0xFFu));
-        a314_write_memory_8(address + 2u, (unsigned int)((v >>  8) & 0xFFu));
-        a314_write_memory_8(address + 3u, (unsigned int)( v        & 0xFFu));
-        return;
-    }
-
-    // Fast path for normal data fields: store big-endian value directly.
-    const uint32_t be = htobe32(v);
-    memcpy(((uint8_t *)&ca) + address, &be, sizeof(be));
-}
-
-void a314_set_config_file(const char *filename) {
-    init_a314_paths();
-    std::string expanded = expand_env_vars(filename ? filename : "");
-    printf ("[A314] Set A314 config filename to %s.\n", expanded.c_str());
-    a314_config_file = expanded;
-    setenv("A314_CONF", a314_config_file.c_str(), 1);
-}
-
-
-void a314_shutdown(void) {
-    shutdown_driver();
-    // optional: reset globals so re-init works cleanly
-    epfd = -1;
+void a314_set_config_file(char *filename)
+{
+    printf ("[A314] Set A314 config filename to %s.\n", filename);
+    a314_config_file = std::string(filename);
 }

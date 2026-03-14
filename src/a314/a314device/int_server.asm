@@ -6,7 +6,7 @@
 	CODE
 
 SIGB_INT	equ	14
-SIGF_INT	equ	$00004000
+SIGF_INT	equ	(1 << SIGB_INT)
 
 		; a1 points to interrupt_data
 _IntServer:	move.l	4(a1),a5	; interrupt_data.ca

@@ -59,7 +59,8 @@ struct MsgPort *id_mp;
 struct IOStdReq *id_req;
 struct InputEvent generated_event;
 
-struct VBlankData {
+struct VBlankData
+{
 	struct Task *task;
 	ULONG signal;
 };
@@ -68,11 +69,11 @@ struct VBlankData vblank_data;
 extern void VBlankServer();
 struct Interrupt vblank_interrupt;
 
-static ULONG next_socket_id(void) {
+static ULONG next_socket_id(void)
+{
 	struct DosLibrary *DOSBase = (struct DosLibrary *)OpenLibrary(DOSNAME, 0);
-	if(!DOSBase) {
+	if (!DOSBase)
 		return 1;
-	}
 
 	struct DateStamp ds;
 	DateStamp(&ds);
@@ -81,7 +82,8 @@ static ULONG next_socket_id(void) {
 	return (ds.ds_Minute * 60 * TICKS_PER_SECOND) + ds.ds_Tick;
 }
 
-void start_a314_cmd(struct A314_IORequest *msg, UWORD command, char *buffer, int length) {
+void start_a314_cmd(struct A314_IORequest *msg, UWORD command, char *buffer, int length)
+{
 	msg->a314_Request.io_Command = command;
 	msg->a314_Request.io_Error = 0;
 
@@ -92,45 +94,52 @@ void start_a314_cmd(struct A314_IORequest *msg, UWORD command, char *buffer, int
 	SendIO((struct IORequest *)msg);
 }
 
-LONG a314_connect(char *name) {
+LONG a314_connect(char *name)
+{
 	socket = next_socket_id();
 	start_a314_cmd(cmsg, A314_CONNECT, name, strlen(name));
 	return WaitIO((struct IORequest *)cmsg);
 }
 
-void start_a314_read() {
+void start_a314_read()
+{
 	start_a314_cmd(rmsg, A314_READ, arbuf, 255);
 	pending_a314_read = TRUE;
 }
 
-void start_a314_write(int length) {
+void start_a314_write(int length)
+{
 	start_a314_cmd(wmsg, A314_WRITE, awbuf, length);
 	pending_a314_write = TRUE;
 }
 
-LONG sync_a314_write(int length) {
+LONG sync_a314_write(int length)
+{
 	start_a314_write(length);
 	pending_a314_write = FALSE;
 	return WaitIO((struct IORequest *)wmsg);
 }
 
-void start_a314_reset() {
+void start_a314_reset()
+{
 	start_a314_cmd(cmsg, A314_RESET, NULL, 0);
 	pending_a314_reset = TRUE;
 }
 
-LONG sync_a314_reset() {
+LONG sync_a314_reset()
+{
 	start_a314_reset();
 	pending_a314_reset = FALSE;
 	return WaitIO((struct IORequest *)cmsg);
 }
 
-struct Screen *find_wb_screen() {
+struct Screen *find_wb_screen()
+{
 	struct Screen *screen = IntuitionBase->FirstScreen;
-	while(screen) {
-		if((screen->Flags & SCREENTYPE) == WBENCHSCREEN) {
+	while (screen)
+	{
+		if ((screen->Flags & SCREENTYPE) == WBENCHSCREEN)
 			return screen;
-		}
 		screen = screen->NextScreen;
 	}
 	return NULL;
@@ -138,12 +147,14 @@ struct Screen *find_wb_screen() {
 
 int blen = 0;
 
-void append_ulong(ULONG x) {
+void append_ulong(ULONG x)
+{
 	*((ULONG *)&awbuf[blen]) = x;
 	blen += 4;
 }
 
-void append_uword(UWORD x) {
+void append_uword(UWORD x)
+{
 	*((UWORD *)&awbuf[blen]) = x;
 	blen += 2;
 }
@@ -151,30 +162,28 @@ void append_uword(UWORD x) {
 WORD last_b = 0;
 WORD kbd_qual = 0;
 
-void send_generated_mouse_event(WORD dx, WORD dy, WORD b) {
+void send_generated_mouse_event(WORD dx, WORD dy, WORD b)
+{
 	generated_event.ie_NextEvent = NULL;
 	generated_event.ie_Class = IECLASS_RAWMOUSE;
 	generated_event.ie_SubClass = 0;
 
 	UWORD code = IECODE_NOBUTTON;
-	if(!(last_b & 1) && (b & 1)) {
+	if (!(last_b & 1) && (b & 1))
 		code = IECODE_LBUTTON;
-	} else if((last_b & 1) && !(b & 1)) {
+	else if ((last_b & 1) && !(b & 1))
 		code = IECODE_UP_PREFIX | IECODE_LBUTTON;
-	} else if(!(last_b & 2) && (b & 2)) {
+	else if (!(last_b & 2) && (b & 2))
 		code = IECODE_RBUTTON;
-	} else if((last_b & 2) && !(b & 2)) {
+	else if ((last_b & 2) && !(b & 2))
 		code = IECODE_UP_PREFIX | IECODE_RBUTTON;
-	}
 	generated_event.ie_Code = code;
 
 	UWORD qual = IEQUALIFIER_RELATIVEMOUSE | kbd_qual;
-	if(b & 1) {
+	if (b & 1)
 		qual |= IEQUALIFIER_LEFTBUTTON;
-	}
-	if(b & 2) {
+	if (b & 2)
 		qual |= IEQUALIFIER_RBUTTON;
-	}
 	generated_event.ie_Qualifier = qual;
 
 	generated_event.ie_X = dx;
@@ -187,20 +196,20 @@ void send_generated_mouse_event(WORD dx, WORD dy, WORD b) {
 	DoIO((struct IORequest *)id_req);
 }
 
-void send_generated_keyboard_event(UBYTE up, UBYTE kc) {
+void send_generated_keyboard_event(UBYTE up, UBYTE kc)
+{
 	generated_event.ie_NextEvent = NULL;
 	generated_event.ie_Class = IECLASS_RAWKEY;
 	generated_event.ie_SubClass = 0;
 	generated_event.ie_Code = up | kc;
 
 	UWORD qual = kbd_qual;
-	if(last_b & 1) {
+	if (last_b & 1)
 		qual |= IEQUALIFIER_LEFTBUTTON;
-	}
-	if(last_b & 2) {
+	if (last_b & 2)
 		qual |= IEQUALIFIER_RBUTTON;
-	}
-	switch (kc) {
+	switch (kc)
+	{
 	case 0x5a:
 	case 0x5b:
 	case 0x5c:
@@ -234,15 +243,16 @@ void send_generated_keyboard_event(UBYTE up, UBYTE kc) {
 	DoIO((struct IORequest *)id_req);
 }
 
-void handle_a314_read_completed() {
+void handle_a314_read_completed()
+{
 	pending_a314_read = FALSE;
 
-	if(stream_closed) {
+	if (stream_closed)
 		return;
-	}
 
 	int res = rmsg->a314_Request.io_Error;
-	if(res == A314_READ_OK) {
+	if (res == A314_READ_OK)
+	{
 		int length = rmsg->a314_Length;
 
 		WORD *p = (WORD *)&arbuf[0];
@@ -250,35 +260,43 @@ void handle_a314_read_completed() {
 		WORD cx = IntuitionBase->MouseX;
 		WORD cy = IntuitionBase->MouseY;
 
-		while(length > 0) {
+		while (length > 0)
+		{
 			WORD x = *p++;
 
-			if(x & 0x4000) {
+			if (x & 0x4000)
+			{
 				UBYTE up = (x & 0x2000) ? 0x80 : 0;
 				UBYTE kc = x & 0x7f;
 
-				if(kc >= 0x60 && kc <= 0x67) {
+				if (kc >= 0x60 && kc <= 0x67)
+				{
 					UWORD qual = 1 << (kc - 0x60);
-					if(up) {
+					if (up)
 						kbd_qual &= ~qual;
-					} else {
+					else
 						kbd_qual |= qual;
-					}
 				}
 
 				send_generated_keyboard_event(up, kc);
 
 				length -= 2;
-			} else	{
+			}
+			else
+			{
 				WORD y = *p++;
 				WORD b = *p++;
 
-				if(b == last_b) {
+				if (b == last_b)
+				{
 					send_generated_mouse_event(x - cx, y - cy, last_b);
 					cx = x;
 					cy = y;
-				} else {
-					if(cx != x || cy != y) {
+				}
+				else
+				{
+					if (cx != x || cy != y)
+					{
 						send_generated_mouse_event(x - cx, y - cy, last_b);
 						cx = x;
 						cy = y;
@@ -293,30 +311,32 @@ void handle_a314_read_completed() {
 
 		start_a314_read();
 	}
-	else if(res == A314_READ_EOS) {
+	else if (res == A314_READ_EOS)
+	{
 		start_a314_reset();
 		stream_closed = TRUE;
 	}
-	else if(res == A314_READ_RESET) {
+	else if (res == A314_READ_RESET)
 		stream_closed = TRUE;
-	}
 }
 
-void handle_vblank_signal() {
+void handle_vblank_signal()
+{
 	blen = 0;
 	append_uword(IntuitionBase->MouseX);
 	append_uword(IntuitionBase->MouseY);
 	
-	if(!pending_a314_write) {
+	if (!pending_a314_write)
 		start_a314_write(blen);
-	}
 }
 
-int main() {
+int main()
+{
 	mp = CreatePort(NULL, 0);
 	cmsg = (struct A314_IORequest *)CreateExtIO(mp, sizeof(struct A314_IORequest));
 
-	if(OpenDevice(A314_NAME, 0, (struct IORequest *)cmsg, 0) != 0) {
+	if (OpenDevice(A314_NAME, 0, (struct IORequest *)cmsg, 0) != 0)
+	{
 		printf("Unable to open a314.device\n");
 		goto fail_out1;
 	}
@@ -328,7 +348,8 @@ int main() {
 	memcpy(wmsg, cmsg, sizeof(struct A314_IORequest));
 	memcpy(rmsg, cmsg, sizeof(struct A314_IORequest));
 
-	if(a314_connect("remotewb") != A314_CONNECT_OK) {
+	if (a314_connect("remotewb") != A314_CONNECT_OK)
+	{
 		printf("Unable to connect to remotewb service\n");
 		goto fail_out2;
 	}
@@ -339,7 +360,8 @@ int main() {
 	Forbid();
 
 	struct Screen *screen = find_wb_screen();
-	if(!screen) {
+	if (!screen)
+	{
 		Permit();
 		printf("Unable to find workbench screen\n");
 		sync_a314_reset();
@@ -348,7 +370,8 @@ int main() {
 
 	struct BitMap *bm = &(screen->BitMap);
 
-	if(screen->Width != 640 || screen->Height != 256 || bm->Depth != 3 || (bm->BytesPerRow != 80 && bm->BytesPerRow != 240)) {
+	if (screen->Width != 640 || screen->Height != 256 || bm->Depth != 3 || (bm->BytesPerRow != 80 && bm->BytesPerRow != 240))
+	{
 		Permit();
 		printf("Wrong screen resolution; it is %hdx%hdx%hhu but must be 640x256x3\n", screen->Width, screen->Height, bm->Depth);
 		sync_a314_reset();
@@ -362,22 +385,26 @@ int main() {
 
 	ULONG ptr = TranslateAddressA314(bm->Planes[0]);
 
-	if(ptr == -1) {
+	if (ptr == -1)
+	{
 		int depth = bm->Depth;
 		int size = 80 * 256;
 
 		UBYTE *p = AllocMem(size * depth, MEMF_A314 | MEMF_CHIP);
-		if(!p) {
+		if (!p)
+		{
 			Permit();
 			printf("Unable to allocate enough A314 chip memory\n");
 			sync_a314_reset();
 			goto fail_out3;
 		}
 
-		if(bm->BytesPerRow == 80) {
+		if (bm->BytesPerRow == 80)
+		{
 			UBYTE *old_planes[8];
 
-			for (int i = 0; i < depth; i++) {
+			for (int i = 0; i < depth; i++)
+			{
 				UBYTE *op = bm->Planes[i];
 				UBYTE *np = p + (i * size);
 				memcpy(np, op, size);
@@ -387,19 +414,19 @@ int main() {
 
 			RemakeDisplay();
 
-			for (int i = 0; i < depth; i++) {
+			for (int i = 0; i < depth; i++)
 				FreeMem(old_planes[i], size);
-			}
 
 			ptr = TranslateAddressA314(bm->Planes[0]);
-		} else if(bm->BytesPerRow == 240) {
+		}
+		else if (bm->BytesPerRow == 240)
+		{
 			UBYTE *old_ptr = bm->Planes[0];
 
 			memcpy(p, old_ptr, size * depth);
 
-			for (int i = 0; i < depth; i++) {
+			for (int i = 0; i < depth; i++)
 				bm->Planes[i] = p + (i * 80);
-			}
 
 			RemakeDisplay();
 
@@ -444,33 +471,36 @@ int main() {
 
 	printf("Press ctrl-c to exit...\n");
 
-	while(TRUE) {
+	while (TRUE)
+	{
 		ULONG signal = Wait(vblanksig | portsig | SIGBREAKF_CTRL_C);
-		if(signal & vblanksig) {
+		if (signal & vblanksig)
+		{
 			handle_vblank_signal();
 		}
 
-		if(signal & portsig) {
+		if (signal & portsig)
+		{
 			struct Message *msg;
-			while(msg = GetMsg(mp)) {
-				if(msg == (struct Message *)rmsg) {
+			while (msg = GetMsg(mp))
+			{
+				if (msg == (struct Message *)rmsg)
 					handle_a314_read_completed();
-				} else if(msg == (struct Message *)wmsg) {
+				else if (msg == (struct Message *)wmsg)
 					pending_a314_write = FALSE;
-				} else if(msg == (struct Message *)cmsg) {
+				else if (msg == (struct Message *)cmsg)
 					pending_a314_reset = FALSE;
-				}
 			}
 		}
 
-		if(signal & SIGBREAKF_CTRL_C) {
+		if (signal & SIGBREAKF_CTRL_C)
+		{
 			start_a314_reset();
 			stream_closed = TRUE;
 		}
 
-		if(stream_closed && !pending_a314_read && !pending_a314_write && !pending_a314_reset) {
+		if (stream_closed && !pending_a314_read && !pending_a314_write && !pending_a314_reset)
 			break;
-		}
 	}
 
 	RemIntServer(INTB_VERTB, &vblank_interrupt);

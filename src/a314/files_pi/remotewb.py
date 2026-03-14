@@ -7,15 +7,18 @@ import asyncio
 import json
 import struct
 import time
-import websockets
 import socket
 import os
 import sys
 import importlib.util
 import importlib.util
 
-PISTORM_ROOT = os.environ["PISTORM_ROOT"]
-A314_ROOT = os.environ.get("PISTORM_A314", os.path.join(PISTORM_ROOT, "a314"))
+try:
+    import websockets
+    _websockets_import_error = None
+except Exception as exc:
+    websockets = None
+    _websockets_import_error = exc
 
 MSG_REGISTER_REQ		= 1
 MSG_REGISTER_RES		= 2
@@ -96,6 +99,13 @@ class MyProtocol(asyncio.Protocol):
             if self.active_stream_id is not None:
                 msg = struct.pack('<IIB', 0, self.active_stream_id, MSG_RESET)
                 self.transport.write(msg)
+
+            if websockets is None:
+                print(f"remotewb unavailable: missing python module 'websockets' ({_websockets_import_error})")
+                msg = struct.pack('<IIB', 1, stream_id, MSG_CONNECT_RESPONSE) + b'\x03'
+                self.transport.write(msg)
+                return
+
             self.active_stream_id = stream_id
             msg = struct.pack('<IIB', 1, self.active_stream_id, MSG_CONNECT_RESPONSE) + b'\x00'
             self.transport.write(msg)
@@ -104,8 +114,33 @@ class MyProtocol(asyncio.Protocol):
         elif mtype == MSG_DATA:
             if self.active_stream_id == stream_id:
                 if self.first_msg:
+                    if len(msg) < 14:
+                        print(f'RemoteWB short mode packet ({len(msg)} bytes), resetting stream')
+                        self.transport.write(struct.pack('<IIB', 0, self.active_stream_id, MSG_RESET))
+                        self.active_stream_id = None
+                        return
                     w, h, d, bpr, ptr, count = struct.unpack('>HHHHIH', msg[:14])
-                    cmap = struct.unpack('>' + ('H' * count), msg[14:14 + 2*count])
+                    cmap_end = 14 + 2 * count
+                    if cmap_end > len(msg):
+                        print(f'RemoteWB bad colormap payload ({len(msg)} bytes), resetting stream')
+                        self.transport.write(struct.pack('<IIB', 0, self.active_stream_id, MSG_RESET))
+                        self.active_stream_id = None
+                        return
+                    cmap = struct.unpack('>' + ('H' * count), msg[14:cmap_end])
+
+                    # RemoteWB currently supports the classic 640x256 3-plane Workbench path.
+                    # RTG/P96 screens (e.g. 1920x1080x8) are not supported here.
+                    if not (w == 640 and h == 256 and d == 3 and bpr in (80, 240)):
+                        print(
+                            f'RemoteWB unsupported mode {w}x{h}x{d} bpr={bpr}. '
+                            'Expected 640x256x3 planar. Disable RTG/P96 for RemoteWB.'
+                        )
+                        self.transport.write(struct.pack('<IIB', 0, self.active_stream_id, MSG_RESET))
+                        self.active_stream_id = None
+                        self.ptr = None
+                        self.first_msg = True
+                        return
+
                     self.w = w
                     self.h = h
                     self.d = d
@@ -204,7 +239,7 @@ else:
         if mod and hasattr(mod, 'set_palette') and hasattr(mod, 'encode'):
             return mod
 
-        base_dir = os.path.join(A314_ROOT, 'bpls2gif')
+        base_dir = os.path.join(os.path.dirname(__file__), 'bpls2gif')
         if os.path.isdir(base_dir):
             for name in os.listdir(base_dir):
                 if name.startswith('bpls2gif') and name.endswith(('.so', '.pyd')):
@@ -355,7 +390,7 @@ async def browser_handler(websocket, path=None):
             if is_active and ami_present:
                 e = json.loads(msg)
                 got_browser_event(e)
-    except websockets.exceptions.ConnectionClosed:
+    except (websockets.exceptions.ConnectionClosed if websockets else Exception):
         pass
     finally:
         print('Connection to ', path, ' was closed')
@@ -365,6 +400,9 @@ async def browser_handler(websocket, path=None):
 
 async def create_websockets_server():
     global ws_server
+    if websockets is None:
+        print(f"Unable to start RemoteWB websocket server: missing python module 'websockets' ({_websockets_import_error})")
+        return
     ws_server = await websockets.serve(browser_handler, '0.0.0.0', 6789)
     print('Websocket server created')
 

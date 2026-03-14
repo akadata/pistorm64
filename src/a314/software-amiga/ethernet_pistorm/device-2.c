@@ -82,25 +82,217 @@ int __attribute__((no_reorder)) _start() {
   return -1;
 }
 
-asm(
-    "romtag:\n"
-    "\tdc.w   " XSTR(RTC_MATCHWORD) "\n"
-    "\tdc.l   romtag\n"
-    "\tdc.l   endcode\n"
-    "\tdc.b   " XSTR(RTF_AUTOINIT) "\n"
-    "\tdc.b   " XSTR(DEVICE_VERSION) "\n"
-    "\tdc.b   " XSTR(NT_DEVICE) "\n"
-    "\tdc.b   " XSTR(DEVICE_PRIORITY) "\n"
-    "\tdc.l   _device_name\n"
-    "\tdc.l   _device_id_string\n"
-    "\tdc.l   _auto_init_tables\n"
-    "endcode:\n"
-    "\t.align 4\n"
-    "\tdc.l   16\n"
-    "_device_process_seglist:\n"
-    "\tdc.l   0\n"
-    "\tjmp    _device_process_run\n"
-);
+asm("romtag:                                \n"
+    "       dc.w    " XSTR(
+        RTC_MATCHWORD) "   \n"
+                       "       dc.l    romtag                  \n"
+                       "       dc.l    endcode                 \n"
+                       "       dc.b    " XSTR(
+                           RTF_AUTOINIT) "    \n"
+                                         "       dc.b    " XSTR(
+                                             DEVICE_VERSION) "  \n"
+                                                             "       dc.b    " XSTR(
+                                                                 NT_DEVICE) "       \n"
+                                                                            "       dc.b    " XSTR(
+                                                                                DEVICE_PRIORITY) " "
+                                                                                                 "\n"
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 "d"
+                                                                                                 "c"
+                                                                                                 "."
+                                                                                                 "l"
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 "_"
+                                                                                                 "d"
+                                                                                                 "e"
+                                                                                                 "v"
+                                                                                                 "i"
+                                                                                                 "c"
+                                                                                                 "e"
+                                                                                                 "_"
+                                                                                                 "n"
+                                                                                                 "a"
+                                                                                                 "m"
+                                                                                                 "e"
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 "\n"
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 "d"
+                                                                                                 "c"
+                                                                                                 "."
+                                                                                                 "l"
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 "_"
+                                                                                                 "d"
+                                                                                                 "e"
+                                                                                                 "v"
+                                                                                                 "i"
+                                                                                                 "c"
+                                                                                                 "e"
+                                                                                                 "_"
+                                                                                                 "i"
+                                                                                                 "d"
+                                                                                                 "_"
+                                                                                                 "s"
+                                                                                                 "t"
+                                                                                                 "r"
+                                                                                                 "i"
+                                                                                                 "n"
+                                                                                                 "g"
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 "\n"
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 "d"
+                                                                                                 "c"
+                                                                                                 "."
+                                                                                                 "l"
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 "_"
+                                                                                                 "a"
+                                                                                                 "u"
+                                                                                                 "t"
+                                                                                                 "o"
+                                                                                                 "_"
+                                                                                                 "i"
+                                                                                                 "n"
+                                                                                                 "i"
+                                                                                                 "t"
+                                                                                                 "_"
+                                                                                                 "t"
+                                                                                                 "a"
+                                                                                                 "b"
+                                                                                                 "l"
+                                                                                                 "e"
+                                                                                                 "s"
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 "\n"
+                                                                                                 "e"
+                                                                                                 "n"
+                                                                                                 "d"
+                                                                                                 "c"
+                                                                                                 "o"
+                                                                                                 "d"
+                                                                                                 "e"
+                                                                                                 ":"
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 " "
+                                                                                                 "\n"
+                                                                                                 "."
+                                                                                                 "a"
+                                                                                                 "l"
+                                                                                                 "i"
+                                                                                                 "g"
+                                                                                                 "n"
+                                                                                                 " "
+                                                                                                 "4"
+                                                                                                 "\n"
+                                                                                                 "	dc.l	16\n"
+                                                                                                 "_"
+                                                                                                 "d"
+                                                                                                 "e"
+                                                                                                 "v"
+                                                                                                 "i"
+                                                                                                 "c"
+                                                                                                 "e"
+                                                                                                 "_"
+                                                                                                 "p"
+                                                                                                 "r"
+                                                                                                 "o"
+                                                                                                 "c"
+                                                                                                 "e"
+                                                                                                 "s"
+                                                                                                 "s"
+                                                                                                 "_"
+                                                                                                 "s"
+                                                                                                 "e"
+                                                                                                 "g"
+                                                                                                 "l"
+                                                                                                 "i"
+                                                                                                 "s"
+                                                                                                 "t"
+                                                                                                 ":"
+                                                                                                 "\n"
+                                                                                                 "	dc.l	0\n"
+                                                                                                 "	jmp	_device_process_run\n");
 
 char device_name[] = DEVICE_NAME;
 char device_id_string[] = DEVICE_ID_STRING;
@@ -268,9 +460,8 @@ static void copy_from_bd_and_reply(struct IOSana2Req* ios2, struct BufDesc* bd) 
     }
   }
 
-  if (bcast) {
+  if (bcast)
     ios2->ios2_Req.io_Flags |= SANA2IOF_BCAST;
-  }
 
   ios2->ios2_PacketType = eh->eh_Type;
 
@@ -302,8 +493,8 @@ static void handle_a314_reply(struct A314_IORequest* ior) {
 
     if (ior->a314_Request.io_Error == A314_WRITE_OK) {
       // Start new write later.
-    } else {
-      // A314_WRITE_RESET
+    } else // A314_WRITE_RESET
+    {
       // TODO: Handle. What if pi-side is shutting down.
     }
   } else if (ior == &read_ior) {
@@ -313,8 +504,8 @@ static void handle_a314_reply(struct A314_IORequest* ior) {
       if (a314_read_buf.sm_Kind == WRITE_FRAME_RES) {
         struct BufDesc* bd = (struct BufDesc*)RemHead(&et_wbuf_pending_list);
         AddTail(&et_wbuf_free_list, (struct Node*)bd);
-      } else {
-        // READ_FRAME_RES
+      } else // READ_FRAME_RES
+      {
         struct BufDesc* bd = (struct BufDesc*)RemHead(&et_rbuf_pending_list);
         bd->bd_Length = a314_read_buf.sm_Length;
         AddTail(&et_rbuf_has_data_list, (struct Node*)bd);
@@ -322,8 +513,8 @@ static void handle_a314_reply(struct A314_IORequest* ior) {
 
       send_a314_cmd(&read_ior, A314_READ, (void*)&a314_read_buf, sizeof(a314_read_buf));
       pending_a314_read = TRUE;
-    } else {
-      // A314_READ_RESET
+    } else // A314_READ_RESET
+    {
       // TODO: Handle. What if pi-side is shutting down.
     }
   } else if (ior == &reset_ior) {
@@ -346,9 +537,8 @@ static struct IOSana2Req* remove_matching_rbuf(ULONG type) {
 
 static void complete_read_reqs() {
   struct Node* node = et_rbuf_has_data_list.lh_Head;
-  if (!node->ln_Succ) {    
+  if (!node->ln_Succ)
     return;
-  }
 
   Forbid();
   while (node->ln_Succ) {
@@ -369,9 +559,8 @@ static void complete_read_reqs() {
 }
 
 static void maybe_write_req() {
-  if (pending_a314_write) {
+  if (pending_a314_write)
     return;
-  }
 
   BOOL free_et_wbuf = et_wbuf_free_list.lh_Head->ln_Succ != NULL;
   BOOL idle_et_rbuf = et_rbuf_free_list.lh_Head->ln_Succ != NULL;
@@ -390,16 +579,14 @@ static void maybe_write_req() {
 
   short next_req_kind = 0;
 
-  if (last_req_kind == WRITE_FRAME_REQ) {
+  if (last_req_kind == WRITE_FRAME_REQ)
     next_req_kind = want_rbuf ? READ_FRAME_REQ : WRITE_FRAME_REQ;
-  } else {
+  else
     next_req_kind = want_wbuf ? WRITE_FRAME_REQ : READ_FRAME_REQ;
-  }
 
   struct IOSana2Req* ios2 = NULL;
-  if (next_req_kind == WRITE_FRAME_REQ) {
+  if (next_req_kind == WRITE_FRAME_REQ)
     ios2 = (struct IOSana2Req*)RemHead((struct List*)&ut_wbuf_list);
-  }
 
   Permit();
 
@@ -409,8 +596,8 @@ static void maybe_write_req() {
     bd = (struct BufDesc*)RemHead(&et_rbuf_free_list);
     bd->bd_Length = RAW_MTU;
     AddTail(&et_rbuf_pending_list, (struct Node*)&bd->bd_Node);
-  } else  {
-    // WRITE_FRAME_REQ
+  } else // WRITE_FRAME_REQ
+  {
     bd = (struct BufDesc*)RemHead(&et_wbuf_free_list);
     copy_to_bd_and_reply(bd, ios2);
     AddTail(&et_wbuf_pending_list, (struct Node*)bd);
@@ -441,9 +628,8 @@ void device_process_run() {
 
   Signal((struct Task*)init_task, SIGF_SINGLE);
 
-  if (device_start_error) {
+  if (device_start_error)
     return;
-  }
 
   ULONG a314_sigmask = 1UL << a314_mp.mp_SigBit;
 
@@ -456,9 +642,8 @@ void device_process_run() {
     complete_read_reqs();
     maybe_write_req();
 
-    if (shutting_down && !pending_a314_read && !pending_a314_write && !pending_a314_reset) {
+    if (shutting_down && !pending_a314_read && !pending_a314_write && !pending_a314_reset)
       break;
-    }
 
     ULONG sigs = Wait(a314_sigmask | sana2_sigmask | shutdown_sigmask);
 
@@ -470,9 +655,8 @@ void device_process_run() {
 
     if (sigs & a314_sigmask) {
       struct A314_IORequest* ior;
-      while ((ior = (struct A314_IORequest*)GetMsg(&a314_mp))) {
+      while ((ior = (struct A314_IORequest*)GetMsg(&a314_mp)))
         handle_a314_reply(ior);
-      }
     }
   }
 
@@ -512,15 +696,16 @@ open(struct Library* dev asm("a6"), struct IOSana2Req* ios2 asm("a1"), uint32_t 
   ios2->ios2_Req.io_Error = IOERR_OPENFAIL;
   ios2->ios2_Req.io_Message.mn_Node.ln_Type = NT_REPLYMSG;
 
-  if (unitnum != 0 || dev->lib_OpenCnt) {
+  if (unitnum != 0 || dev->lib_OpenCnt)
     return;
-  }
 
   dev->lib_OpenCnt++;
 
   kprintf("Try the copyfrom crap.\n");
-  copyfrom = (buf_copy_func_t)GetTagData(S2_CopyFromBuff, 0, (struct TagItem*)ios2->ios2_BufferManagement);
-  copyto =(buf_copy_func_t)GetTagData(S2_CopyToBuff, 0, (struct TagItem*)ios2->ios2_BufferManagement);
+  copyfrom =
+      (buf_copy_func_t)GetTagData(S2_CopyFromBuff, 0, (struct TagItem*)ios2->ios2_BufferManagement);
+  copyto =
+      (buf_copy_func_t)GetTagData(S2_CopyToBuff, 0, (struct TagItem*)ios2->ios2_BufferManagement);
   ios2->ios2_BufferManagement = (void*)0xdeadbeefUL;
 
   kprintf("Memsetting some shit.\n");
@@ -539,9 +724,8 @@ open(struct Library* dev asm("a6"), struct IOSana2Req* ios2 asm("a1"), uint32_t 
 
   kprintf("Opendevice.\n");
   A314Base = NULL;
-  if (OpenDevice((STRPTR)a314_device_name, 0, (struct IORequest*)&write_ior, 0)) {
+  if (OpenDevice((STRPTR)a314_device_name, 0, (struct IORequest*)&write_ior, 0))
     goto error;
-  }
 
   A314Base = &(write_ior.a314_Request.io_Device->dd_Library);
 
@@ -576,25 +760,23 @@ open(struct Library* dev asm("a6"), struct IOSana2Req* ios2 asm("a1"), uint32_t 
     struct BufDesc* bd = &et_bufs[i];
 
     bd->bd_Buffer = AllocMem(RAW_MTU, MEMF_FAST);
-    if (!bd->bd_Buffer) {
+    if (!bd->bd_Buffer)
       goto error;
-    }
 
-    if (i < ET_RBUF_CNT) {
+    if (i < ET_RBUF_CNT)
       AddTail(&et_rbuf_free_list, (struct Node*)&bd->bd_Node);
-    } else {
+    else
       AddTail(&et_wbuf_free_list, (struct Node*)&bd->bd_Node);
-    }
   }
 
   kprintf("Find task.\n");
   init_task = FindTask(NULL);
 
   kprintf("Do msgport.\n");
-  struct MsgPort* device_mp = CreateProc((STRPTR)device_name, TASK_PRIO, ((ULONG)&device_process_seglist) >> 2, 2048);
-  if (!device_mp) {
+  struct MsgPort* device_mp =
+      CreateProc((STRPTR)device_name, TASK_PRIO, ((ULONG)&device_process_seglist) >> 2, 2048);
+  if (!device_mp)
     goto error;
-  }
 
   kprintf("Process thing.\n");
   device_process = (struct Process*)((char*)device_mp - sizeof(struct Task));
@@ -615,9 +797,8 @@ open(struct Library* dev asm("a6"), struct IOSana2Req* ios2 asm("a1"), uint32_t 
 error:
   kprintf("Error small farts.\n");
   for (int i = ET_BUF_CNT - 1; i >= 0; i--)
-    if (et_bufs[i].bd_Buffer) {
+    if (et_bufs[i].bd_Buffer)
       FreeMem(et_bufs[i].bd_Buffer, RAW_MTU);
-    }
 
   if (A314Base) {
     CloseDevice((struct IORequest*)&write_ior);
@@ -634,9 +815,8 @@ close(struct Library* dev asm("a6"), struct IOSana2Req* ios2 asm("a1")) {
   Signal(&device_process->pr_Task, shutdown_sigmask);
   Wait(SIGF_SINGLE);
 
-  for (int i = ET_BUF_CNT - 1; i >= 0; i--) {
+  for (int i = ET_BUF_CNT - 1; i >= 0; i--)
     FreeMem(et_bufs[i].bd_Buffer, RAW_MTU);
-  }
 
   CloseDevice((struct IORequest*)&write_ior);
   A314Base = NULL;
@@ -646,9 +826,8 @@ close(struct Library* dev asm("a6"), struct IOSana2Req* ios2 asm("a1")) {
 
   dev->lib_OpenCnt--;
 
-  if (dev->lib_OpenCnt == 0 && (dev->lib_Flags & LIBF_DELEXP)) {
+  if (dev->lib_OpenCnt == 0 && (dev->lib_Flags & LIBF_DELEXP))
     return expunge(dev);
-  }
 
   return 0;
 }
@@ -660,21 +839,17 @@ static void device_query(struct IOSana2Req* req) {
   query->DevQueryFormat = 0;
   query->DeviceLevel = 0;
 
-  if (query->SizeAvailable >= 18) {
+  if (query->SizeAvailable >= 18)
     query->AddrFieldSize = MACADDR_SIZE * 8;
-  }
 
-  if (query->SizeAvailable >= 22) {
+  if (query->SizeAvailable >= 22)
     query->MTU = ETH_MTU;
-  }
 
-  if (query->SizeAvailable >= 26) {
+  if (query->SizeAvailable >= 26)
     query->BPS = NIC_BPS;
-  }
 
-  if (query->SizeAvailable >= 30) {
+  if (query->SizeAvailable >= 30)
     query->HardwareType = S2WireType_Ethernet;
-  }
 
   query->SizeSupplied = query->SizeAvailable < 30 ? query->SizeAvailable : 30;
 }
@@ -758,11 +933,10 @@ begin_io(struct Library* dev asm("a6"), struct IOSana2Req* ios2 asm("a1")) {
   }
 
   if (ios2) {
-    if (ios2->ios2_Req.io_Flags & SANA2IOF_QUICK) {
+    if (ios2->ios2_Req.io_Flags & SANA2IOF_QUICK)
       ios2->ios2_Req.io_Message.mn_Node.ln_Type = NT_MESSAGE;
-    } else {
+    else
       ReplyMsg(&ios2->ios2_Req.io_Message);
-    }
   }
 }
 

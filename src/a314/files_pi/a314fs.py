@@ -17,29 +17,20 @@ logging.basicConfig(format = '%(levelname)s, %(asctime)s, %(name)s, line %(linen
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-PISTORM_ROOT = os.environ["PISTORM_ROOT"]
-A314_ROOT = os.environ.get("PISTORM_A314", os.path.join(PISTORM_ROOT, "a314"))
-A314_SHARED = os.environ.get("A314_SHARED", os.path.join(PISTORM_ROOT, "data", "a314-shared"))
-
-def _expand_vars(value):
-    if isinstance(value, str):
-        return os.path.expandvars(value)
-    return value
-
 try:
     idx = sys.argv.index('-conf-file')
     CONFIG_FILE_PATH = sys.argv[idx + 1]
 except (ValueError, IndexError):
-    CONFIG_FILE_PATH = os.environ.get("A314_FS_CONF", os.path.join(A314_ROOT, "a314fs.conf"))
+    CONFIG_FILE_PATH = '/home/smalley/pistorm64/src/a314/files_pi/a314fs.conf'
 
-SHARED_DIRECTORY = A314_SHARED
+SHARED_DIRECTORY = '/home/smalley/pistorm64/data/a314shared'
 METAFILE_EXTENSION = ':a314'
 
 with open(CONFIG_FILE_PATH, encoding='utf-8') as f:
     cfg = json.load(f)
     devs = cfg['devices']
     dev = devs['PI0']
-    SHARED_DIRECTORY = _expand_vars(dev.get('path', SHARED_DIRECTORY))
+    SHARED_DIRECTORY = dev['path']
 
 MSG_REGISTER_REQ        = 1
 MSG_REGISTER_RES        = 2
@@ -812,7 +803,6 @@ if idx != -1:
 else:
     drv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     drv.connect(('localhost', 7110))
-    drv.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
     send_register_req(b'a314fs')
     stream_id, ptype, payload = wait_for_msg()

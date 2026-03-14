@@ -150,9 +150,8 @@ void handle_con_wait_completed() {
   DEBUG("handling con wait completed.\n");
   pending_con_wait = FALSE;
 
-  if (stream_closed) {
+  if (stream_closed)
     return;
-  }
 
   if (wait_sp.sp_Pkt.dp_Res1 == DOSFALSE) {
     start_con_wait();
@@ -174,9 +173,8 @@ void handle_a314_read_completed() {
   DEBUG("handling read completed.\n");
   pending_a314_read = FALSE;
 
-  if (stream_closed) {
+  if (stream_closed)
     return;
-  }
 
   int res = read_ior->a314_Request.io_Error;
   if (res == A314_READ_OK) {
@@ -234,9 +232,8 @@ UBYTE* create_and_send_start_msg(int* buffer_len, BPTR current_dir, int argc, ch
   }
 
   DEBUG("casmm: Stage 2\n");
-  for (int i = 1; i < argc; i++) {
+  for (int i = 1; i < argc; i++)
     buf_len += strlen(argv[i]) + 1;
-  }
 
   UBYTE* buffer = AllocMem(buf_len, MEMF_FAST);
 
@@ -290,9 +287,9 @@ int main(int argc, char** argv) {
   } else {
     struct ConfigDev* cd = NULL;
     cd = (struct ConfigDev*)FindConfigDev(cd, 2011, 0xA3);
-    if (cd != NULL) {
+    if (cd != NULL)
       board_addr = (unsigned int)cd->cd_BoardAddr;
-    } else {
+    else {
       printf("Failed to find A314 emulation device.\n");
       CloseLibrary((struct Library*)ExpansionBase);
       return 0;
@@ -391,16 +388,14 @@ int main(int argc, char** argv) {
 
   int start = 5;
   int ind = start;
-  while (arbuf[ind] != ';') {
+  while (arbuf[ind] != ';')
     ind++;
-  }
   arbuf[ind] = 0;
   int rows = atoi(arbuf + start);
   ind++;
   start = ind;
-  while (arbuf[ind] != ' ') {
+  while (arbuf[ind] != ' ')
     ind++;
-  }
   arbuf[ind] = 0;
   int cols = atoi(arbuf + start);
 
@@ -424,17 +419,15 @@ int main(int argc, char** argv) {
     if (signal & portsig) {
       struct Message* msg;
       while (msg = GetMsg(async_mp)) {
-        if (msg == (struct Message*)&wait_sp) {
+        if (msg == (struct Message*)&wait_sp)
           handle_con_wait_completed();
-        } else if (msg == (struct Message*)read_ior) {
+        else if (msg == (struct Message*)read_ior)
           handle_a314_read_completed();
-        }
       }
     }
 
-    if (stream_closed && !pending_a314_read && !pending_con_wait) {
+    if (stream_closed && !pending_a314_read && !pending_con_wait)
       break;
-    }
   }
 
   set_screen_mode(DOSFALSE);
