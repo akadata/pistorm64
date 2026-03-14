@@ -433,6 +433,39 @@ static int read_kernel_param_bool(const char* name) {
   return (buf[0] == '1' || buf[0] == 'Y' || buf[0] == 'y');
 }
 
+typedef enum berr_status_source_e {
+  BERR_STATUS_UNKNOWN = 0,
+  BERR_STATUS_KERNEL_PARAM,
+  BERR_STATUS_USERSPACE_ENV
+} berr_status_source_t;
+
+static int read_berr_reset_status(berr_status_source_t* source_out) {
+  const char* backend = ps_get_backend();
+
+  if (backend && strcasecmp(backend, "userspace-mmio") == 0) {
+    if (source_out) {
+      *source_out = BERR_STATUS_USERSPACE_ENV;
+    }
+    /* userspace-mmio backend uses this env var; default is enabled (1). */
+    return mem_trace_parse_bool("PISTORM_MMIO_BERR_RESET_INPUT", 1);
+  }
+
+  {
+    int v = read_kernel_param_bool("berr_reset_input");
+    if (v >= 0) {
+      if (source_out) {
+        *source_out = BERR_STATUS_KERNEL_PARAM;
+      }
+      return v;
+    }
+  }
+
+  if (source_out) {
+    *source_out = BERR_STATUS_UNKNOWN;
+  }
+  return -1;
+}
+
 static inline uint32_t cpu_backend_get_pc(void) {
 #ifdef USE_UAE_JIT
   if (use_uae_jit) {
@@ -561,6 +594,11 @@ static void dump_cpu_state(const char *reason, int opcode) {
   unsigned int pc = m68k_get_reg(NULL, M68K_REG_PC);
   unsigned int ppc = m68k_get_reg(NULL, M68K_REG_PPC);
   unsigned int sr = m68k_get_reg(NULL, M68K_REG_SR);
+  uint32_t fault_pc = pc;
+  if (opcode >= 0 && ppc != 0) {
+    /* Illegal/decoded opcode callbacks report the faulting word at PPC. */
+    fault_pc = ppc;
+  }
   if (reason) {
     LOG_ERROR("[CPU] %s: PC=$%.8X PPC=$%.8X SR=$%.4X OPCODE=$%.4X\n",
               reason, pc, ppc, sr, (unsigned int)(opcode & 0xFFFF));
@@ -604,8 +642,12 @@ static void dump_cpu_state(const char *reason, int opcode) {
     }
   }
 
-  m68k_disassemble(disasm_buf, pc, cpu_type);
-  LOG_ERROR("[CPU] %s\n", disasm_buf);
+  m68k_disassemble(disasm_buf, fault_pc, cpu_type);
+  LOG_ERROR("[CPU] fault@%.8X %s\n", fault_pc, disasm_buf);
+  if (pc != fault_pc) {
+    m68k_disassemble(disasm_buf, pc, cpu_type);
+    LOG_ERROR("[CPU] next @%.8X %s\n", pc, disasm_buf);
+  }
   LOG_ERROR("REGA: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",
             m68k_get_reg(NULL, M68K_REG_A0), m68k_get_reg(NULL, M68K_REG_A1),
             m68k_get_reg(NULL, M68K_REG_A2), m68k_get_reg(NULL, M68K_REG_A3),
@@ -623,29 +665,57 @@ static void dump_cpu_state(const char *reason, int opcode) {
 
   if (cfg) {
     mem_map_entry_info_t map_info;
-    if (memmap_lookup(cfg, pc, &map_info) >= 0) {
+    if (memmap_lookup(cfg, fault_pc, &map_info) >= 0) {
       uint32_t amiga_end = map_info.amiga_end_exclusive ? (map_info.amiga_end_exclusive - 1u)
                                                         : map_info.amiga_end_exclusive;
-      LOG_ERROR("[CPU] PC map[%d] amiga=$%.8X-$%.8X size=$%.8X host=%p host_span=$%.8X "
+      LOG_ERROR("[CPU] Fault map[%d] amiga=$%.8X-$%.8X size=$%.8X host=%p host_span=$%.8X "
                 "type=%u kind=%s cacheable=%u executable=%u id=%s\n",
                 map_info.index, map_info.amiga_base, amiga_end, map_info.size,
                 map_info.host_ptr, map_info.host_span,
                 (unsigned int)map_info.map_type, memmap_kind_name(map_info.kind),
                 (unsigned int)map_info.cacheable, (unsigned int)map_info.executable, map_info.map_id);
-      if (map_info.map_type == MAPTYPE_ROM && map_info.host_ptr) {
-        uint32_t off = pc - map_info.amiga_base;
+      if (map_info.host_ptr) {
+        uint32_t off = fault_pc - map_info.amiga_base;
         unsigned char *base = (unsigned char*)map_info.host_ptr;
-        char line[128];
-        int pos = snprintf(line, sizeof(line), "[CPU] ROM bytes:");
-        for (int i = -8; i < 10; i++) {
-          uint32_t idx = off + (uint32_t)i;
-          unsigned char b = base[idx % (uint32_t)cfg->rom_size[map_info.index]];
-          pos += snprintf(line + pos, sizeof(line) - (size_t)pos, " %.2X", b);
+        uint32_t span = map_info.host_span;
+        int wrap = 0;
+        if (map_info.map_type == MAPTYPE_ROM && cfg->rom_size[map_info.index] > 0) {
+          span = (uint32_t)cfg->rom_size[map_info.index];
+          wrap = 1;
         }
-        LOG_ERROR("%s\n", line);
+        if (span > 0) {
+          char line[192];
+          int pos = snprintf(line, sizeof(line), "[CPU] Host bytes @fault:");
+          for (int i = -8; i < 10; i++) {
+            int64_t raw_idx = (int64_t)off + (int64_t)i;
+            int valid = 1;
+            uint32_t idx = 0;
+            if (wrap) {
+              int64_t m = raw_idx % (int64_t)span;
+              if (m < 0) {
+                m += span;
+              }
+              idx = (uint32_t)m;
+            } else {
+              if (raw_idx < 0 || raw_idx >= (int64_t)span) {
+                valid = 0;
+              } else {
+                idx = (uint32_t)raw_idx;
+              }
+            }
+            if (!valid) {
+              pos += snprintf(line + pos, sizeof(line) - (size_t)pos, " ??");
+            } else if (i == 0) {
+              pos += snprintf(line + pos, sizeof(line) - (size_t)pos, " [%.2X]", base[idx]);
+            } else {
+              pos += snprintf(line + pos, sizeof(line) - (size_t)pos, " %.2X", base[idx]);
+            }
+          }
+          LOG_ERROR("%s\n", line);
+        }
       }
     } else {
-      LOG_ERROR("[CPU] PC map: unmapped\n");
+      LOG_ERROR("[CPU] Fault map: unmapped\n");
     }
   }
 }
@@ -654,7 +724,38 @@ static void instr_hook_callback(unsigned int pc) {
   last_pc_seen = pc;
 }
 
+static int should_suppress_illegal_log(int opcode) {
+  /* 040 library / startup probes can intentionally execute MOVEC forms that are
+   * illegal on lower CPU classes (e.g. 68020 JIT mode). Keep the trap behavior,
+   * but avoid spamming full error dumps by default.
+   *
+   * Set PISTORM_LOG_ILLEGAL_MOVEC=1 to force full logging.
+   */
+  if (opcode != 0x4E7A && opcode != 0x4E7B) {
+    return 0;
+  }
+
+  const char *env = getenv("PISTORM_LOG_ILLEGAL_MOVEC");
+  if (env && *env) {
+    if (!strcmp(env, "1") || !strcasecmp(env, "true") || !strcasecmp(env, "yes") || !strcasecmp(env, "on")) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
 static int illg_instr_callback(int opcode) {
+  if (should_suppress_illegal_log(opcode)) {
+    static uint32_t movec_probe_count = 0;
+    movec_probe_count++;
+    if (movec_probe_count <= 3 || (movec_probe_count % 64) == 0) {
+      uint32_t pc = m68k_get_reg(NULL, M68K_REG_PC);
+      uint32_t ppc = m68k_get_reg(NULL, M68K_REG_PPC);
+      LOG_DEBUG("[CPU] Suppressing expected MOVEC probe trap #%u: PC=$%.8X PPC=$%.8X OPCODE=$%.4X\n",
+                movec_probe_count, pc, ppc, (uint16_t)opcode);
+    }
+    return 0; // keep normal illegal-instruction exception flow
+  }
   dump_cpu_state("Illegal instruction", opcode);
   return 0; // let Musashi raise the exception normally
 }
@@ -1645,13 +1746,22 @@ switch_config:
   }
 
   {
-    int berr_enabled = read_kernel_param_bool("berr_reset_input");
+    berr_status_source_t berr_src = BERR_STATUS_UNKNOWN;
+    int berr_enabled = read_berr_reset_status(&berr_src);
     if (berr_enabled == 1) {
-      LOG_INFO("[CPU][BERR] Reset enabled (berr_reset_input=1)\n");
+      if (berr_src == BERR_STATUS_USERSPACE_ENV) {
+        LOG_INFO("[CPU][BERR] Reset enabled (userspace-mmio env: PISTORM_MMIO_BERR_RESET_INPUT=1)\n");
+      } else {
+        LOG_INFO("[CPU][BERR] Reset enabled (berr_reset_input=1)\n");
+      }
     } else if (berr_enabled == 0) {
-      LOG_INFO("[CPU][BERR] Reset disabled (berr_reset_input=0)\n");
+      if (berr_src == BERR_STATUS_USERSPACE_ENV) {
+        LOG_INFO("[CPU][BERR] Reset disabled (userspace-mmio env: PISTORM_MMIO_BERR_RESET_INPUT=0)\n");
+      } else {
+        LOG_INFO("[CPU][BERR] Reset disabled (berr_reset_input=0)\n");
+      }
     } else {
-      LOG_INFO("[CPU][BERR] Reset status unknown (kernel param not readable)\n");
+      LOG_INFO("[CPU][BERR] Reset status unknown (no kernel param/env source)\n");
     }
   }
 

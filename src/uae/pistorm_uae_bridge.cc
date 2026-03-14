@@ -1163,3 +1163,21 @@ extern "C" uint32_t uae_pistorm_get_regs_pc(void) {
 extern "C" uint32_t uae_pistorm_get_regs_pc_p(void) {
   return (uint32_t)(uintptr_t)regs.pc_p;
 }
+
+extern "C" int uae_pistorm_is_jit_active(void) {
+  return currprefs.cachesize > 0 ? 1 : 0;
+}
+
+extern "C" void uae_pistorm_notify_ram_write(uint32_t addr, uint32_t len) {
+  (void)addr;
+  (void)len;
+#ifdef JIT
+  if (currprefs.cachesize > 0) {
+    /* External host writes (PiSCSI/loader memcpy) bypass normal CPU write paths.
+     * Force JIT cache coherence before execution resumes.
+     */
+    flush_icache(3);
+    set_special(SPCFLAG_END_COMPILE | SPCFLAG_CHECK);
+  }
+#endif
+}

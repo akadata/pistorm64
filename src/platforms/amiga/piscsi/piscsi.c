@@ -32,6 +32,9 @@
 #include "piscsi.h"
 #include "platforms/amiga/fsid.h"
 #include "platforms/amiga/hunk-reloc.h"
+#if defined(USE_UAE_JIT) && USE_UAE_JIT
+#include "uae/pistorm_uae_bridge.h"
+#endif
 
 /* Legacy PiSCSI backend: maintenance mode compatibility path. */
 
@@ -1210,6 +1213,125 @@ static int fs_handler_valid(const struct piscsi_fs *fs, uint32_t handler_addr, u
     return 1;
 }
 
+static int piscsi_map_is_host_ram(const struct emulator_config *cfg_local, int32_t map_idx) {
+    if (!cfg_local || map_idx < 0 || map_idx >= MAX_NUM_MAPPED_ITEMS) {
+        return 0;
+    }
+    if (!cfg_local->map_data[map_idx]) {
+        return 0;
+    }
+    switch (cfg_local->map_type[map_idx]) {
+        case MAPTYPE_RAM:
+        case MAPTYPE_RAM_WTC:
+        case MAPTYPE_RAM_NOALLOC:
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+static void piscsi_notify_guest_ram_write(uint32_t addr, uint32_t len) {
+#if defined(USE_UAE_JIT) && USE_UAE_JIT
+    if (len == 0) {
+        return;
+    }
+    if (uae_pistorm_is_jit_active()) {
+        uae_pistorm_notify_ram_write(addr, len);
+    }
+#else
+    (void)addr;
+    (void)len;
+#endif
+}
+
+static int piscsi_reg32_contains(uint16_t cmd, uint16_t base)
+{
+    return (cmd >= base) && (cmd < (uint16_t)(base + 4));
+}
+
+static void piscsi_reg32_write_lane(uint32_t *reg, uint16_t cmd, uint16_t base, uint32_t val, uint8_t type)
+{
+    uint8_t lane = (uint8_t)(cmd - base);
+    switch (type) {
+        case OP_TYPE_LONGWORD:
+            if (lane == 0) {
+                *reg = val;
+            }
+            break;
+        case OP_TYPE_WORD: {
+            uint16_t w = (uint16_t)val;
+            if (lane == 0) {
+                *reg = (*reg & 0x0000FFFFu) | ((uint32_t)w << 16);
+            } else if (lane == 2) {
+                *reg = (*reg & 0xFFFF0000u) | (uint32_t)w;
+            }
+            break;
+        }
+        case OP_TYPE_BYTE: {
+            uint8_t b = (uint8_t)val;
+            if (lane < 4) {
+                uint32_t shift = (uint32_t)(3u - lane) * 8u;
+                *reg = (*reg & ~(0xFFu << shift)) | ((uint32_t)b << shift);
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+static uint32_t piscsi_reg32_read_lane(uint32_t reg, uint16_t cmd, uint16_t base, uint8_t type)
+{
+    uint8_t lane = (uint8_t)(cmd - base);
+    switch (type) {
+        case OP_TYPE_LONGWORD:
+            return (lane == 0) ? reg : 0;
+        case OP_TYPE_WORD:
+            if (lane == 0) {
+                return (reg >> 16) & 0xFFFFu;
+            }
+            if (lane == 2) {
+                return reg & 0xFFFFu;
+            }
+            return 0;
+        case OP_TYPE_BYTE:
+            if (lane < 4) {
+                uint32_t shift = (uint32_t)(3u - lane) * 8u;
+                return (reg >> shift) & 0xFFu;
+            }
+            return 0;
+        default:
+            return 0;
+    }
+}
+
+static int piscsi_transfer_target_valid(const char *op, uint32_t unit, uint32_t addr, uint32_t len)
+{
+    if (len == 0) {
+        return 1;
+    }
+
+    if (addr < 0x00001000u && len >= 4) {
+        LOG_ERROR("[PISCSI] Refusing %s: suspicious low target addr=0x%08X len=%u (unit=%u)\n",
+                  op, addr, len, unit);
+        return 0;
+    }
+
+    if (addr >= PISCSI_OFFSET && addr < PISCSI_UPPER) {
+        LOG_ERROR("[PISCSI] Refusing %s: target points into PiSCSI MMIO addr=0x%08X len=%u (unit=%u)\n",
+                  op, addr, len, unit);
+        return 0;
+    }
+
+    if (addr + len < addr) {
+        LOG_ERROR("[PISCSI] Refusing %s: guest address overflow addr=0x%08X len=%u (unit=%u)\n",
+                  op, addr, len, unit);
+        return 0;
+    }
+
+    return 1;
+}
+
 static int piscsi_get_map_bounds(struct emulator_config *cfg_local, uint32_t addr, uint32_t len,
                                  uint8_t **map_out, uint32_t *avail_out) {
     int32_t map_idx = get_mapped_item_by_address(cfg_local, addr);
@@ -1232,6 +1354,18 @@ static int piscsi_get_map_bounds(struct emulator_config *cfg_local, uint32_t add
         }
         LOG_ERROR("[PISCSI] Refusing DMA into ROM map %d at 0x%08X\n", map_idx, addr);
         return -2;
+    }
+
+    if (!piscsi_map_is_host_ram(cfg_local, map_idx)) {
+        if (map_out) {
+            *map_out = NULL;
+        }
+        if (avail_out) {
+            *avail_out = 0;
+        }
+        DEBUG("[PISCSI] No host-backed RAM map for DMA at 0x%08X (map=%d type=%u)\n",
+              addr, map_idx, (unsigned int)cfg_local->map_type[map_idx]);
+        return -1;
     }
 
     uint32_t high = (uint32_t)cfg_local->map_high[map_idx];
@@ -1297,6 +1431,9 @@ uint32_t rom_partition_prio[128];
 uint32_t rom_partition_dostype[128];
 uint32_t rom_cur_partition = 0, rom_cur_fs = 0;
 
+#define PISCSI_ROM_PARTITION_SLOTS ((uint32_t)(sizeof(rom_partitions) / sizeof(rom_partitions[0])))
+#define PISCSI_DRIVE_PARTITION_SLOTS ((uint32_t)(sizeof(devs[0].pb) / sizeof(devs[0].pb[0])))
+
 extern unsigned char ac_piscsi_rom[];
 
 char partition_names[128][32];
@@ -1305,6 +1442,11 @@ unsigned int num_partition_names = 0;
 
 struct hunk_info piscsi_hinfo;
 struct hunk_reloc piscsi_hreloc[256];
+
+static int piscsi_unit_index_valid(uint32_t unit)
+{
+    return unit < NUM_UNITS;
+}
 
 void piscsi_init(void) {
     for (int i = 0; i < 8; i++) {
@@ -1415,6 +1557,10 @@ static void piscsi_find_partitions(struct piscsi_dev *d) {
     }
 
     char *block = malloc(d->block_size);
+    if (!block) {
+        LOG_ERROR("[PISCSI] Failed to allocate %u-byte partition block buffer\n", d->block_size);
+        return;
+    }
 
     piscsi_dev_seek(d, (off64_t)BE(d->rdb->rdb_PartitionList) * d->block_size, SEEK_SET);
 next_partition:;
@@ -1425,6 +1571,16 @@ next_partition:;
     uint32_t first = be32toh(first_temp);
     if (first != PART_IDENTIFIER) {
         DEBUG("Entry at block %d is not a valid partition. Aborting.\n", BE(d->rdb->rdb_PartitionList));
+        free(block);
+        return;
+    }
+
+    if ((uint32_t)cur_partition >= PISCSI_DRIVE_PARTITION_SLOTS) {
+        LOG_ERROR("[PISCSI] Too many partitions on disk (max %u). Ignoring extra entries.\n",
+                  PISCSI_DRIVE_PARTITION_SLOTS);
+        free(block);
+        d->num_partitions = (uint32_t)cur_partition;
+        d->fshd_offs = (uint32_t)piscsi_dev_seek(d, 0, SEEK_CUR);
         return;
     }
 
@@ -1439,6 +1595,12 @@ next_partition:;
     struct PartitionBlock *pb = (struct PartitionBlock *)((char *)block);
 #pragma GCC diagnostic pop
     tmp = pb->pb_DriveName[0];
+    if (tmp > 31) {
+        LOG_ERROR("[PISCSI] Partition %d has invalid drive name length %u, clamping to 31.\n",
+                  cur_partition, tmp);
+        tmp = 31;
+        pb->pb_DriveName[0] = 31;
+    }
     pb->pb_DriveName[tmp + 1] = 0x00;
     LOG_INFO("[PISCSI] Partition %d: %s (%d)\n", cur_partition, pb->pb_DriveName + 1, pb->pb_DriveName[0]);
     DEBUG("Checksum: %.8X HostID: %d\n", BE(pb->pb_ChkSum), BE(pb->pb_HostID));
@@ -1449,20 +1611,43 @@ next_partition:;
         if (strcmp((char *)pb->pb_DriveName + 1, partition_names[i]) == 0) {
             DEBUG("[PISCSI] Duplicate partition name %s. Temporarily renaming to %s_%d.\n", pb->pb_DriveName + 1, pb->pb_DriveName + 1, times_used[i] + 1);
             times_used[i]++;
-            sprintf((char *)pb->pb_DriveName + 1 + pb->pb_DriveName[0], "_%d", times_used[i]);
-            pb->pb_DriveName[0] += 2;
-            if (times_used[i] > 9)
-                pb->pb_DriveName[0]++;
+            char suffix[8];
+            snprintf(suffix, sizeof(suffix), "_%u", times_used[i]);
+            size_t suffix_len = strnlen(suffix, sizeof(suffix));
+            size_t name_len = pb->pb_DriveName[0];
+            if (name_len > 31) {
+                name_len = 31;
+            }
+            if ((name_len + suffix_len) > 31) {
+                name_len = 31 - suffix_len;
+            }
+            memcpy((char *)pb->pb_DriveName + 1 + name_len, suffix, suffix_len + 1);
+            pb->pb_DriveName[0] = (uint8_t)(name_len + suffix_len);
             goto partition_renamed;
         }
     }
-    sprintf(partition_names[num_partition_names], "%s", pb->pb_DriveName + 1);
-    num_partition_names++;
+    if (num_partition_names < 128) {
+        snprintf(partition_names[num_partition_names], sizeof(partition_names[num_partition_names]), "%s", pb->pb_DriveName + 1);
+        num_partition_names++;
+    }
 
 partition_renamed:
     if (d->pb[cur_partition]->pb_Next != 0xFFFFFFFF) {
         uint64_t next = be32toh(pb->pb_Next);
+        if ((uint32_t)(cur_partition + 1) >= PISCSI_DRIVE_PARTITION_SLOTS) {
+            LOG_ERROR("[PISCSI] Reached partition slot limit (%u) while parsing linked list.\n",
+                      PISCSI_DRIVE_PARTITION_SLOTS);
+            d->num_partitions = (uint32_t)(cur_partition + 1);
+            d->fshd_offs = (uint32_t)piscsi_dev_seek(d, 0, SEEK_CUR);
+            return;
+        }
         block = malloc(d->block_size);
+        if (!block) {
+            LOG_ERROR("[PISCSI] Failed to allocate %u-byte partition buffer for next link\n", d->block_size);
+            d->num_partitions = (uint32_t)(cur_partition + 1);
+            d->fshd_offs = (uint32_t)piscsi_dev_seek(d, 0, SEEK_CUR);
+            return;
+        }
         piscsi_dev_seek(d, (off64_t)(next * d->block_size), SEEK_SET);
         cur_partition++;
         DEBUG("[PISCSI] Next partition at block %d.\n", be32toh(pb->pb_Next));
@@ -1609,6 +1794,15 @@ void piscsi_find_filesystems(struct piscsi_dev *d) {
 
                 goto skip_fs_load_lseg;
             }
+        }
+
+        if (piscsi_num_fs >= NUM_FILESYSTEMS) {
+            LOG_ERROR("[FSHD] Filesystem table full (%u). Skipping %c%c%c/%d.\n",
+                      NUM_FILESYSTEMS, dosID[0], dosID[1], dosID[2], dosID[3]);
+            if (BE(fhb->fhb_Next) == 0xFFFFFFFF) {
+                goto fs_done;
+            }
+            goto skip_fs_load_lseg;
         }
 
         if (load_lseg(d->fd, &filesystems[piscsi_num_fs].binary_data, &filesystems[piscsi_num_fs].h_info, filesystems[piscsi_num_fs].relocs, d->block_size) != -1) {
@@ -2228,24 +2422,61 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
 #ifndef PISCSI_DEBUG
     if (type) {}
 #endif
-
-    struct piscsi_dev *d = &devs[piscsi_cur_drive];
+    struct piscsi_dev *d = NULL;
 
     uint16_t cmd = (addr & 0xFFFF);
+
+    if (piscsi_reg32_contains(cmd, PISCSI_CMD_ADDR1) ||
+        piscsi_reg32_contains(cmd, PISCSI_CMD_ADDR2) ||
+        piscsi_reg32_contains(cmd, PISCSI_CMD_ADDR3) ||
+        piscsi_reg32_contains(cmd, PISCSI_CMD_ADDR4)) {
+        int addr_idx = (cmd - PISCSI_CMD_ADDR1) / 4;
+        uint16_t base = (uint16_t)(PISCSI_CMD_ADDR1 + (addr_idx * 4));
+        if (addr_idx >= 0 && addr_idx < 4) {
+            piscsi_reg32_write_lane(&piscsi_u32[addr_idx], cmd, base, val, type);
+        }
+        return;
+    }
+
+    if (piscsi_reg32_contains(cmd, PISCSI_DBG_VAL1) ||
+        piscsi_reg32_contains(cmd, PISCSI_DBG_VAL2) ||
+        piscsi_reg32_contains(cmd, PISCSI_DBG_VAL3) ||
+        piscsi_reg32_contains(cmd, PISCSI_DBG_VAL4) ||
+        piscsi_reg32_contains(cmd, PISCSI_DBG_VAL5) ||
+        piscsi_reg32_contains(cmd, PISCSI_DBG_VAL6) ||
+        piscsi_reg32_contains(cmd, PISCSI_DBG_VAL7) ||
+        piscsi_reg32_contains(cmd, PISCSI_DBG_VAL8)) {
+        int dbg_idx = (cmd - PISCSI_DBG_VAL1) / 4;
+        uint16_t base = (uint16_t)(PISCSI_DBG_VAL1 + (dbg_idx * 4));
+        if (dbg_idx >= 0 && dbg_idx < 8) {
+            piscsi_reg32_write_lane(&piscsi_dbg[dbg_idx], cmd, base, val, type);
+        }
+        return;
+    }
 
     switch (cmd) {
         case PISCSI_CMD_READ64:
         case PISCSI_CMD_READ:
         case PISCSI_CMD_READBYTES:
             osd_led_piscsi_host_pulse();
+            if (!piscsi_unit_index_valid(val)) {
+                LOG_ERROR("[PISCSI] Refusing READ from invalid drive index %u (max=%u)\n",
+                          val, NUM_UNITS - 1);
+                break;
+            }
             d = &devs[val];
             if (d->fd == -1) {
                 DEBUG("[!!!PISCSI] BUG: Attempted read from unmapped drive %d.\n", val);
                 break;
             }
-            if ((int)val >= 0 && (int)val < NUM_UNITS) {
-                osd_led_piscsi_unit_pulse_read((int)val);
+            if (d->block_size == 0) {
+                LOG_ERROR("[PISCSI] Refusing READ from drive %u with block_size=0\n", val);
+                break;
             }
+            if (!piscsi_transfer_target_valid("READ", val, piscsi_u32[2], piscsi_u32[1])) {
+                break;
+            }
+            osd_led_piscsi_unit_pulse_read((int)val);
 
             if (cmd == PISCSI_CMD_READBYTES) {
                 uint32_t src = piscsi_u32[0];
@@ -2309,6 +2540,9 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                             break;
                         }
                         memcpy(dst, dma_buf, (size_t)bytes_read);
+                        if (bytes_read > 0) {
+                            piscsi_notify_guest_ram_write(dst_addr, (uint32_t)bytes_read);
+                        }
                         total_read += bytes_read;
                         if ((uint32_t)bytes_read != chunk) {
                             DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL READ: requested=%u, actual=%zd\n",
@@ -2327,8 +2561,14 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                         DEBUG("[PISCSI-IO-ERROR] Unit:%d READ failed: bytes_requested=%d, bytes_read=%zd, errno=%d\n", val, piscsi_u32[1], bytes_read, errno);
                     } else if (bytes_read != (ssize_t)piscsi_u32[1]) {
                         DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL READ: requested=%d, actual=%zd\n", val, piscsi_u32[1], bytes_read);
+                        if (bytes_read > 0) {
+                            piscsi_notify_guest_ram_write(piscsi_u32[2], (uint32_t)bytes_read);
+                        }
                     } else {
                         DEBUG("[PISCSI-IO-SUCCESS] Unit:%d READ: %zd bytes OK\n", val, bytes_read);
+                        if (bytes_read > 0) {
+                            piscsi_notify_guest_ram_write(piscsi_u32[2], (uint32_t)bytes_read);
+                        }
                     }
                 }
             }
@@ -2375,6 +2615,11 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
         case PISCSI_CMD_WRITE:
         case PISCSI_CMD_WRITEBYTES:
             osd_led_piscsi_host_pulse();
+            if (!piscsi_unit_index_valid(val)) {
+                LOG_ERROR("[PISCSI] Refusing WRITE to invalid drive index %u (max=%u)\n",
+                          val, NUM_UNITS - 1);
+                break;
+            }
             d = &devs[val];
             if (d->fd == -1) {
                 DEBUG ("[PISCSI] BUG: Attempted write to unmapped drive %d.\n", val);
@@ -2384,9 +2629,14 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 DEBUG("[PISCSI] Refusing write to read-only drive %d.\n", val);
                 break;
             }
-            if ((int)val >= 0 && (int)val < NUM_UNITS) {
-                osd_led_piscsi_unit_pulse_write((int)val);
+            if (d->block_size == 0) {
+                LOG_ERROR("[PISCSI] Refusing WRITE to drive %u with block_size=0\n", val);
+                break;
             }
+            if (!piscsi_transfer_target_valid("WRITE", val, piscsi_u32[2], piscsi_u32[1])) {
+                break;
+            }
+            osd_led_piscsi_unit_pulse_write((int)val);
 
             if (cmd == PISCSI_CMD_WRITEBYTES) {
                 uint32_t src = piscsi_u32[0];
@@ -2512,13 +2762,8 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 }
             }
             break;
-        case PISCSI_CMD_ADDR1: case PISCSI_CMD_ADDR2: case PISCSI_CMD_ADDR3: case PISCSI_CMD_ADDR4: {
-            int addr_idx = ((addr & 0xFFFF) - PISCSI_CMD_ADDR1) / 4;
-            piscsi_u32[addr_idx] = val;
-            break;
-        }
         case PISCSI_CMD_DRVNUM:
-            if (val > 6) {
+            if (!piscsi_unit_index_valid(val)) {
                 piscsi_cur_drive = 255;
             }
             else {
@@ -2529,8 +2774,14 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
             }
             break;
         case PISCSI_CMD_DRVNUMX:
-            piscsi_cur_drive = (uint8_t)val;
-            DEBUG("[PISCSI] DRVNUMX: %d.\n", val);
+            if (piscsi_unit_index_valid(val)) {
+                piscsi_cur_drive = (uint8_t)val;
+                DEBUG("[PISCSI] DRVNUMX: %d.\n", val);
+            } else {
+                piscsi_cur_drive = 255;
+                LOG_ERROR("[PISCSI] DRVNUMX invalid drive index %u (max=%u)\n",
+                          val, NUM_UNITS - 1);
+            }
             break;
         case PISCSI_CMD_DEBUGME:
             piscsi_debugme(val);
@@ -2540,10 +2791,22 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
             DEBUG("[PISCSI] Driver copy/patch called, destination address %.8X.\n", val);
             int32_t driver_r = get_mapped_item_by_address(cfg, val);
             if (driver_r != -1) {
+                if (!piscsi_map_is_host_ram(cfg, driver_r)) {
+                    LOG_ERROR("[PISCSI] Driver install target is not host RAM (map=%d type=%u)\n",
+                              driver_r, (unsigned int)cfg->map_type[driver_r]);
+                    break;
+                }
                 uint32_t driver_base_addr = (uint32_t)(val - cfg->map_offset[driver_r]);
                 uint8_t *dst_data = cfg->map_data[driver_r];
-                uint8_t cur_partition = 0;
+                uint32_t cur_partition = 0;
+                uint32_t map_size = (uint32_t)(cfg->map_high[driver_r] - cfg->map_offset[driver_r]);
+                if ((driver_base_addr + 0x4000) > map_size) {
+                    LOG_ERROR("[PISCSI] Driver install would exceed map bounds (base=0x%X map=0x%X)\n",
+                              driver_base_addr, map_size);
+                    break;
+                }
                 memcpy(dst_data + driver_base_addr, piscsi_rom_ptr + PISCSI_DRIVER_OFFSET, 0x4000 - PISCSI_DRIVER_OFFSET);
+                piscsi_notify_guest_ram_write(val, (uint32_t)(0x4000 - PISCSI_DRIVER_OFFSET));
 
                 piscsi_hinfo.base_offset = val;
 
@@ -2571,16 +2834,46 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
 
                     if (devs[i].num_partitions) {
                         uint32_t p_offs = driver_addr2;
-                        DEBUG("[PISCSI] Adding %d partitions for unit %d\n", devs[i].num_partitions, i);
-                        for (uint32_t j = 0; j < devs[i].num_partitions; j++) {
+                        uint32_t max_partitions = devs[i].num_partitions;
+                        if (max_partitions > PISCSI_DRIVE_PARTITION_SLOTS) {
+                            LOG_ERROR("[PISCSI] Drive %d reports %u partitions, clamping to %u\n",
+                                      i, max_partitions, PISCSI_DRIVE_PARTITION_SLOTS);
+                            max_partitions = PISCSI_DRIVE_PARTITION_SLOTS;
+                        }
+                        DEBUG("[PISCSI] Adding %u partitions for unit %d\n", max_partitions, i);
+                        for (uint32_t j = 0; j < max_partitions; j++) {
+                            if (cur_partition >= PISCSI_ROM_PARTITION_SLOTS) {
+                                LOG_ERROR("[PISCSI] ROM partition table full (%u). Ignoring remaining partitions.\n",
+                                          PISCSI_ROM_PARTITION_SLOTS);
+                                goto skip_disk;
+                            }
+                            if (!devs[i].pb[j]) {
+                                LOG_ERROR("[PISCSI] Null partition pointer for unit %d partition %u, skipping.\n", i, j);
+                                continue;
+                            }
+                            if ((p_offs + 0x20 + 16) > map_size) {
+                                LOG_ERROR("[PISCSI] Partition descriptor header exceeds map bounds (offs=0x%X map=0x%X)\n",
+                                          p_offs, map_size);
+                                goto skip_disk;
+                            }
                             DEBUG("Partition %d: %s\n", j, devs[i].pb[j]->pb_DriveName + 1);
-                            sprintf((char *)dst_data + p_offs, "%s", devs[i].pb[j]->pb_DriveName + 1);
+                            snprintf((char *)dst_data + p_offs, 0x20, "%s", devs[i].pb[j]->pb_DriveName + 1);
                             p_offs += 0x20;
                             PUTNODELONG(driver_addr2 + cfg->map_offset[driver_r]);
                             PUTNODELONG(driver_data_addr + cfg->map_offset[driver_r]);
                             PUTNODELONG(i);
                             PUTNODELONG(0);
                             uint32_t nodesize = (be32toh(devs[i].pb[j]->pb_Environment[0]) + 1) * 4;
+                            if (nodesize > sizeof(devs[i].pb[j]->pb_Environment)) {
+                                LOG_ERROR("[PISCSI] Partition node size %u too large for unit %d partition %u, clamping to %zu\n",
+                                          nodesize, i, j, sizeof(devs[i].pb[j]->pb_Environment));
+                                nodesize = sizeof(devs[i].pb[j]->pb_Environment);
+                            }
+                            if ((p_offs + nodesize) > map_size) {
+                                LOG_ERROR("[PISCSI] Partition node write exceeds map bounds (offs=0x%X size=0x%X map=0x%X)\n",
+                                          p_offs, nodesize, map_size);
+                                goto skip_disk;
+                            }
                             memcpy(dst_data + p_offs, devs[i].pb[j]->pb_Environment, nodesize);
 
 #pragma GCC diagnostic push
@@ -2639,6 +2932,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
 
                             rom_partitions[cur_partition] = (uint32_t)(driver_addr2 + 0x20 + cfg->map_offset[driver_r]);
                             rom_partition_dostype[cur_partition] = dat->dostype;
+                            piscsi_notify_guest_ram_write((uint32_t)(cfg->map_offset[driver_r] + driver_addr2), 0x100);
                             cur_partition++;
                             driver_addr2 += 0x100;
                             p_offs = driver_addr2;
@@ -2652,20 +2946,40 @@ skip_disk:;
         case PISCSI_CMD_NEXTPART:
             osd_led_piscsi_host_pulse();
             DEBUG("[PISCSI] Switch partition %d -> %d\n", rom_cur_partition, rom_cur_partition + 1);
-            rom_cur_partition++;
+            if ((rom_cur_partition + 1) < PISCSI_ROM_PARTITION_SLOTS) {
+                rom_cur_partition++;
+            }
             break;
         case PISCSI_CMD_NEXTFS:
             osd_led_piscsi_host_pulse();
             DEBUG("[PISCSI] Switch file file system %d -> %d\n", rom_cur_fs, rom_cur_fs + 1);
-            rom_cur_fs++;
+            if ((rom_cur_fs + 1) < NUM_FILESYSTEMS) {
+                rom_cur_fs++;
+            }
             break;
         case PISCSI_CMD_COPYFS:
             osd_led_piscsi_host_pulse();
             DEBUG("[PISCSI] Copy file system %d to %.8X and reloc.\n", rom_cur_fs, piscsi_u32[2]);
+            if (rom_cur_fs >= NUM_FILESYSTEMS) {
+                LOG_ERROR("[PISCSI] COPYFS with invalid fs index %u\n", rom_cur_fs);
+                break;
+            }
             int32_t copy_r = get_mapped_item_by_address(cfg, piscsi_u32[2]);
             if (copy_r != -1) {
+                if (!piscsi_map_is_host_ram(cfg, copy_r)) {
+                    LOG_ERROR("[PISCSI] COPYFS target is not host RAM (map=%d type=%u)\n",
+                              copy_r, (unsigned int)cfg->map_type[copy_r]);
+                    break;
+                }
                 uint32_t copy_base_addr = (uint32_t)(piscsi_u32[2] - cfg->map_offset[copy_r]);
+                uint32_t copy_map_size = (uint32_t)(cfg->map_high[copy_r] - cfg->map_offset[copy_r]);
+                if (filesystems[rom_cur_fs].h_info.byte_size > (copy_map_size - copy_base_addr)) {
+                    LOG_ERROR("[PISCSI] COPYFS exceeds map bounds (offs=0x%X size=0x%X map=0x%X)\n",
+                              copy_base_addr, filesystems[rom_cur_fs].h_info.byte_size, copy_map_size);
+                    break;
+                }
                 memcpy(cfg->map_data[copy_r] + copy_base_addr, filesystems[rom_cur_fs].binary_data, filesystems[rom_cur_fs].h_info.byte_size);
+                piscsi_notify_guest_ram_write(piscsi_u32[2], filesystems[rom_cur_fs].h_info.byte_size);
                 filesystems[rom_cur_fs].h_info.base_offset = piscsi_u32[2];
                 if (reloc_hunks(filesystems[rom_cur_fs].relocs, cfg->map_data[copy_r] + copy_base_addr,
                                 &filesystems[rom_cur_fs].h_info) != 0) {
@@ -2692,9 +3006,24 @@ skip_disk:;
             osd_led_piscsi_host_pulse();
             int fs_idx = 0;
             DEBUG("[PISCSI] Set handler for partition %d (DeviceNode: %.8X)\n", rom_cur_partition, val);
+            if (rom_cur_partition >= PISCSI_ROM_PARTITION_SLOTS) {
+                LOG_ERROR("[PISCSI] SETFSH with invalid partition index %u\n", rom_cur_partition);
+                break;
+            }
             int32_t setfsh_r = get_mapped_item_by_address(cfg, val);
             if (setfsh_r != -1) {
+                if (!piscsi_map_is_host_ram(cfg, setfsh_r)) {
+                    LOG_ERROR("[PISCSI] SETFSH target is not host RAM (map=%d type=%u)\n",
+                              setfsh_r, (unsigned int)cfg->map_type[setfsh_r]);
+                    break;
+                }
                 uint32_t setfsh_base_addr = (uint32_t)(val - cfg->map_offset[setfsh_r]);
+                uint32_t setfsh_map_size = (uint32_t)(cfg->map_high[setfsh_r] - cfg->map_offset[setfsh_r]);
+                if ((setfsh_base_addr + sizeof(struct DeviceNode)) > setfsh_map_size) {
+                    LOG_ERROR("[PISCSI] SETFSH node write exceeds map bounds (offs=0x%X need=0x%zX map=0x%X)\n",
+                              setfsh_base_addr, sizeof(struct DeviceNode), setfsh_map_size);
+                    break;
+                }
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-align"
                 /*
@@ -2759,13 +3088,30 @@ fs_found:;
                 DEBUG("[FS-HANDLER] Handler: %d Stacksize: %d\n", BE(node->dn_Handler), BE(node->dn_StackSize));
                 DEBUG("[FS-HANDLER] Priority: %d Startup: %d (%.8X)\n", BE(node->dn_Priority), BE(node->dn_Startup), BE(node->dn_Startup));
                 DEBUG("[FS-HANDLER] SegList: %.8X GlobalVec: %d\n", BE((uint32_t)node->dn_SegList), (int)BE(node->dn_GlobalVec));
-                DEBUG("[PISCSI] Handler for partition %.8X set to %.8X (%.8X).\n", (uint32_t)BE(node->dn_Name), filesystems[fs_idx].FS_ID, filesystems[fs_idx].handler);
+                if (fs_idx >= 0 && fs_idx < piscsi_num_fs && fs_idx < NUM_FILESYSTEMS) {
+                    DEBUG("[PISCSI] Handler for partition %.8X set to %.8X (%.8X).\n",
+                          (uint32_t)BE(node->dn_Name), filesystems[fs_idx].FS_ID, filesystems[fs_idx].handler);
+                } else {
+                    DEBUG("[PISCSI] Handler for partition %.8X not set (no filesystem index match).\n",
+                          (uint32_t)BE(node->dn_Name));
+                }
+                piscsi_notify_guest_ram_write(val, sizeof(struct DeviceNode));
             }
             break;
         }
         case PISCSI_CMD_LOADFS: {
             osd_led_piscsi_host_pulse();
             DEBUG("[PISCSI] Attempt to load file system for partition %d from disk.\n", rom_cur_partition);
+            if (rom_cur_partition >= PISCSI_ROM_PARTITION_SLOTS) {
+                LOG_ERROR("[PISCSI] LOADFS with invalid partition index %u\n", rom_cur_partition);
+                piscsi_u32[3] = 0xFFFFFFFF;
+                break;
+            }
+            if (piscsi_num_fs >= NUM_FILESYSTEMS) {
+                LOG_ERROR("[PISCSI] LOADFS table full (%u), cannot add new filesystem.\n", NUM_FILESYSTEMS);
+                piscsi_u32[3] = 0xFFFFFFFF;
+                break;
+            }
             int32_t mapped_r = get_mapped_item_by_address(cfg, val);
             if (mapped_r != -1) {
                 char dosID[4];
@@ -2795,12 +3141,6 @@ fs_found:;
             }
             break;
         }
-        case PISCSI_DBG_VAL1: case PISCSI_DBG_VAL2: case PISCSI_DBG_VAL3: case PISCSI_DBG_VAL4:
-        case PISCSI_DBG_VAL5: case PISCSI_DBG_VAL6: case PISCSI_DBG_VAL7: case PISCSI_DBG_VAL8: {
-            int i = ((addr & 0xFFFF) - PISCSI_DBG_VAL1) / 4;
-            piscsi_dbg[i] = val;
-            break;
-        }
         case PISCSI_DBG_MSG:
 #ifdef PISCSI_DEBUG
             print_piscsi_debug_message((int)val);
@@ -2816,9 +3156,10 @@ fs_found:;
 
 uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
     if (type) {}
+    uint16_t cmd = (uint16_t)(addr & 0xFFFF);
 
-    if ((addr & 0xFFFF) >= PISCSI_CMD_ROM) {
-        uint32_t romoffs = (addr & 0xFFFF) - PISCSI_CMD_ROM;
+    if (cmd >= PISCSI_CMD_ROM) {
+        uint32_t romoffs = cmd - PISCSI_CMD_ROM;
         if (romoffs < (piscsi_rom_size + PIB)) {
             //DEBUG("[PISCSI] %s read from Boot ROM @$%.4X (%.8X): ", op_type_names[type], romoffs, addr);
             uint32_t v = 0;
@@ -2847,13 +3188,24 @@ uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
         return 0;
     }
 
-    switch (addr & 0xFFFF) {
-        case PISCSI_CMD_ADDR1: case PISCSI_CMD_ADDR2: case PISCSI_CMD_ADDR3: case PISCSI_CMD_ADDR4: {
-            int i = ((addr & 0xFFFF) - PISCSI_CMD_ADDR1) / 4;
-            return piscsi_u32[i];
-            break;
+    if (piscsi_reg32_contains(cmd, PISCSI_CMD_ADDR1) ||
+        piscsi_reg32_contains(cmd, PISCSI_CMD_ADDR2) ||
+        piscsi_reg32_contains(cmd, PISCSI_CMD_ADDR3) ||
+        piscsi_reg32_contains(cmd, PISCSI_CMD_ADDR4)) {
+        int addr_idx = (cmd - PISCSI_CMD_ADDR1) / 4;
+        uint16_t base = (uint16_t)(PISCSI_CMD_ADDR1 + (addr_idx * 4));
+        if (addr_idx >= 0 && addr_idx < 4) {
+            return piscsi_reg32_read_lane(piscsi_u32[addr_idx], cmd, base, type);
         }
+        return 0;
+    }
+
+    switch (cmd) {
         case PISCSI_CMD_DRVTYPE:
+            if (!piscsi_unit_index_valid(piscsi_cur_drive)) {
+                LOG_ERROR("[PISCSI] DRVTYPE read with invalid current drive index %u\n", piscsi_cur_drive);
+                return 0;
+            }
             if (devs[piscsi_cur_drive].fd == -1) {
                 DEBUG("[PISCSI] %s Read from DRVTYPE %d, drive not attached.\n", op_type_names[type], piscsi_cur_drive);
                 return 0;
@@ -2871,18 +3223,34 @@ uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
             return piscsi_cur_drive;
             break;
         case PISCSI_CMD_CYLS:
+            if (!piscsi_unit_index_valid(piscsi_cur_drive)) {
+                LOG_ERROR("[PISCSI] CYLS read with invalid current drive index %u\n", piscsi_cur_drive);
+                return 0;
+            }
             DEBUG("[PISCSI] %s Read from CYLS %d: %d\n", op_type_names[type], piscsi_cur_drive, devs[piscsi_cur_drive].c);
             return devs[piscsi_cur_drive].c;
             break;
         case PISCSI_CMD_HEADS:
+            if (!piscsi_unit_index_valid(piscsi_cur_drive)) {
+                LOG_ERROR("[PISCSI] HEADS read with invalid current drive index %u\n", piscsi_cur_drive);
+                return 0;
+            }
             DEBUG("[PISCSI] %s Read from HEADS %d: %d\n", op_type_names[type], piscsi_cur_drive, devs[piscsi_cur_drive].h);
             return devs[piscsi_cur_drive].h;
             break;
         case PISCSI_CMD_SECS:
+            if (!piscsi_unit_index_valid(piscsi_cur_drive)) {
+                LOG_ERROR("[PISCSI] SECS read with invalid current drive index %u\n", piscsi_cur_drive);
+                return 0;
+            }
             DEBUG("[PISCSI] %s Read from SECS %d: %d\n", op_type_names[type], piscsi_cur_drive, devs[piscsi_cur_drive].s);
             return devs[piscsi_cur_drive].s;
             break;
         case PISCSI_CMD_BLOCKS: {
+            if (!piscsi_unit_index_valid(piscsi_cur_drive)) {
+                LOG_ERROR("[PISCSI] BLOCKS read with invalid current drive index %u\n", piscsi_cur_drive);
+                return 0;
+            }
             uint32_t blox = 0;
             uint64_t blocks64 = 0;
             if (devs[piscsi_cur_drive].block_size == 0) {
@@ -2896,26 +3264,50 @@ uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
             break;
         }
         case PISCSI_CMD_GETPART: {
+            if (rom_cur_partition >= PISCSI_ROM_PARTITION_SLOTS) {
+                LOG_ERROR("[PISCSI] GETPART with invalid index %u\n", rom_cur_partition);
+                return 0;
+            }
             LOG_INFO("[PISCSI] GETPART: idx=%u offset=0x%08X\n",
                      rom_cur_partition, rom_partitions[rom_cur_partition]);
             return rom_partitions[rom_cur_partition];
             break;
         }
         case PISCSI_CMD_GETPRIO:
+            if (rom_cur_partition >= PISCSI_ROM_PARTITION_SLOTS) {
+                LOG_ERROR("[PISCSI] GETPRIO with invalid index %u\n", rom_cur_partition);
+                return (uint32_t)-128;
+            }
             LOG_INFO("[PISCSI] GETPRIO: idx=%u prio=%d\n",
                      rom_cur_partition, (int32_t)rom_partition_prio[rom_cur_partition]);
             return rom_partition_prio[rom_cur_partition];
             break;
         case PISCSI_CMD_CHECKFS:
+            if (rom_cur_fs >= NUM_FILESYSTEMS) {
+                LOG_ERROR("[PISCSI] CHECKFS with invalid fs index %u\n", rom_cur_fs);
+                return 0;
+            }
             DEBUG("[PISCSI] Get current loaded file system: %.8X\n", filesystems[rom_cur_fs].FS_ID);
             return filesystems[rom_cur_fs].FS_ID;
         case PISCSI_CMD_FSSIZE:
+            if (rom_cur_fs >= NUM_FILESYSTEMS) {
+                LOG_ERROR("[PISCSI] FSSIZE with invalid fs index %u\n", rom_cur_fs);
+                return 0;
+            }
             DEBUG("[PISCSI] Get alloc size of loaded file system: %d\n", filesystems[rom_cur_fs].h_info.alloc_size);
             return filesystems[rom_cur_fs].h_info.alloc_size;
         case PISCSI_CMD_BLOCKSIZE:
+            if (!piscsi_unit_index_valid(piscsi_cur_drive)) {
+                LOG_ERROR("[PISCSI] BLOCKSIZE read with invalid current drive index %u\n", piscsi_cur_drive);
+                return 0;
+            }
             DEBUG("[PISCSI] Get block size of drive %d: %d\n", piscsi_cur_drive, devs[piscsi_cur_drive].block_size);
             return devs[piscsi_cur_drive].block_size;
         case PISCSI_CMD_BACKEND_INFO: {
+            if (!piscsi_unit_index_valid(piscsi_cur_drive)) {
+                LOG_ERROR("[PISCSI] BACKEND_INFO read with invalid current drive index %u\n", piscsi_cur_drive);
+                return 0;
+            }
             const struct piscsi_dev *d = &devs[piscsi_cur_drive];
             uint32_t info = 0;
             uint32_t backend = (uint32_t)d->backend_type & PISCSI_BACKEND_INFO_TYPE_MASK;
@@ -2932,6 +3324,10 @@ uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
             uint32_t val = piscsi_u32[1];
             int32_t r = get_mapped_item_by_address(cfg, val);
             if (r != -1) {
+                if (rom_cur_partition >= PISCSI_ROM_PARTITION_SLOTS) {
+                    LOG_ERROR("[PISCSI] GET_FS_INFO with invalid partition index %u\n", rom_cur_partition);
+                    return 1;
+                }
 #ifdef PISCSI_DEBUG
                 char *dosID = (char *)&rom_partition_dostype[rom_cur_partition];
                 DEBUG("[PISCSI-GET-FS-INFO] Partition DOSType is %c%c%c/%d\n", dosID[0], dosID[1], dosID[2], dosID[3]);

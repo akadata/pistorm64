@@ -17,6 +17,8 @@ void uae_pistorm_get_last_reset_vectors(uint32_t* sp, uint32_t* pc, int* ovl_sta
 uint32_t uae_pistorm_get_pc(void);
 uint32_t uae_pistorm_get_regs_pc(void);
 uint32_t uae_pistorm_get_regs_pc_p(void);
+int uae_pistorm_is_jit_active(void);
+void uae_pistorm_notify_ram_write(uint32_t addr, uint32_t len);
 
 
 #ifdef __cplusplus

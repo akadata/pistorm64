@@ -346,7 +346,7 @@ int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned 
   }
 
   if (piscsi_enabled && addr >= piscsi_base && addr < piscsi_base + (64 * SIZE_KILO)) {
-    printf("[Amiga-Custom] %s write to PISCSI base @$%.8x: %.8X\n", op_type_names[type], addr, val);
+    LOG_DEBUG("[Amiga-Custom] %s write to PISCSI base @$%.8x: %.8X\n", op_type_names[type], addr, val);
     handle_piscsi_write(addr, val, type);
     return 1;
   }
