@@ -923,7 +923,9 @@ void build_cpufunctbl (void)
       m68k_pc_indirect = mode != 0 ? 1 : 0;
    } else {
       mode = 1;
-      m68k_pc_indirect = 1;
+      // JIT mode expects direct PC pointers for block history/compile paths.
+      // Forcing indirect PC mode here makes pc_hist[].location invalid.
+      m68k_pc_indirect = 0;
    }
    printf("[Core1] Emulation mode %d m68k_pc_indirect %d\n",mode,m68k_pc_indirect);
    lvl = (currprefs.cpu_model - 68000) / 10;
@@ -3718,6 +3720,7 @@ void execute_normal(void)
    struct regstruct *r = &regs;
    int blocklen;
    cpu_history pc_hist[MAXRUN];
+   uaecptr pc_ea_hist[MAXRUN];
    int total_cycles;
 
    if (check_for_cache_miss ())
@@ -3729,6 +3732,7 @@ void execute_normal(void)
    start_pc = r->pc;
    for (;;) {
       /* Take note: This is the do-it-normal loop */
+      pc_ea_hist[blocklen] = m68k_getpc();
       r->opcode = get_jit_opcode();
 
       // PiStorm64 UAE-JIT uses banked callbacks for memory; avoid emitting
@@ -3748,7 +3752,17 @@ void execute_normal(void)
       pc_hist[blocklen].specmem = special_mem;
       blocklen++;
       if (end_block (r->opcode) || blocklen >= MAXRUN || r->spcflags || uae_int_requested) {
-         compile_block (pc_hist, blocklen, total_cycles);
+         int bad_hist = 0;
+         for (int i = 0; i < blocklen; i++) {
+            uintptr loc = (uintptr)pc_hist[i].location;
+            if (loc < 0x10000u || !memory_valid_address(pc_ea_hist[i], 2)) {
+               bad_hist = 1;
+               break;
+            }
+         }
+         if (!bad_hist) {
+            compile_block (pc_hist, blocklen, total_cycles);
+         }
          return; /* We will deal with the spcflags in the caller */
       }
       /* No need to check regs.spcflags, because if they were set,

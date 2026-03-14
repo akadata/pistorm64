@@ -394,7 +394,10 @@ static inline int mapped_write_at_index(struct emulator_config* cfg, int i, unsi
   }
   switch (cfg->map_type[i]) {
   case MAPTYPE_ROM:
-    if (rom_write_passthrough_enabled() && cfg->map_data[i] && cfg->rom_size[i] > 0) {
+    // Kickstart write probes during early boot can occur with UAE JIT paths.
+    // Allow writes to the Kickstart backing map so overlay handoff remains stable.
+    if ((map_is_kickstart(cfg, i) || rom_write_passthrough_enabled()) &&
+        cfg->map_data[i] && cfg->rom_size[i] > 0) {
       if (!range_contains_size((uint32_t)addr, (uint32_t)cfg->map_offset[i], (uint32_t)cfg->map_size[i], width)) {
         return -1;
       }

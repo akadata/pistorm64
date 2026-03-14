@@ -530,10 +530,8 @@ int gayleirq;
 #define CORE_CPU 3
 #define CORE_IO 1
 #define CORE_INPUT 2
-#define CORE_IPL 2
-
-#define PI_AFFINITY_ENV "PISTORM_AFFINITY" // e.g. "cpu=1, ipl=2, input=3, keyboard=3, mouse=3"
-#define PI_RT_ENV "PISTORM_RT"             // e.g. "cpu=60, ipl=40, input=80, keyboard=90"
+#define PI_AFFINITY_ENV "PISTORM_AFFINITY" // e.g. "cpu=1, input=3, keyboard=3, mouse=3"
+#define PI_RT_ENV "PISTORM_RT"             // e.g. "cpu=60, input=80, keyboard=90"
 
 #define PISTORM64_NAME "KERNEL PiStorm64"
 #define PISTORM64_TAGLINE "JANUS BUS ENGINE"
@@ -541,7 +539,6 @@ int gayleirq;
 #define RT_DEFAULT_CPU 80
 #define RT_DEFAULT_IO 60
 #define RT_DEFAULT_INPUT 80
-#define RT_DEFAULT_IPL 70
 
 // Forward declarations for helpers used before their definitions.
 static inline uint8_t opcode_is_fpu(uint16_t opcode);
@@ -848,191 +845,83 @@ static void configure_ipl_nops(void) {
   printf("[CFG] IPL NOP count: %u\n", ipl_nop_count);
 }
 
-// Compile-time toggle for IPL rate limiting - default to disabled to ensure stability
-#ifndef PISTORM_IPL_RATELIMIT_US
-#define PISTORM_IPL_RATELIMIT_US 0
-#endif
-
-#if PISTORM_IPL_RATELIMIT_US > 0
-// Helper function for rate limiting
-static inline uint64_t now_ns(void) {
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return (uint64_t)ts.tv_sec * 1000000000ull + (uint64_t)ts.tv_nsec;
-}
-#endif
-
-static void* ipl_task(void* args) {
-  printf("[IPL] Thread running\n");
-  uint16_t old_irq = 0;
-  uint32_t value;
-
-#if PISTORM_IPL_RATELIMIT_US > 0
-  // Rate limiting variables for GPIO/status polling
-  static uint64_t last_ns = 0;
-  static const uint64_t poll_interval_ns = (uint64_t)PISTORM_IPL_RATELIMIT_US * 1000ull; // Convert us to ns
-#endif
-
-  while (1) {
-    if (emulator_exiting || end_signal) {
-      break;
-    }
-
-#if PISTORM_IPL_RATELIMIT_US > 0
-    // Check if enough time has passed since last poll
-    uint64_t t = now_ns();
-    if (t - last_ns >= poll_interval_ns) {
-        value = ps_gpio_lev();
-        last_ns = t;
-    } else {
-        // Use cached value if not enough time has passed
-        continue;
-    }
-#else
-    // Original behavior - always poll
-    value = ps_gpio_lev();
-#endif
-
-    if (value & (1 << PIN_TXN_IN_PROGRESS)) {
-      goto noppers;
-    }
-
+static inline void cpu_apply_irq_level(int level) {
 #if USE_UAE_JIT
-    if (use_uae_jit) {
-      if (!(value & (1 << PIN_IPL_ZERO)) || ipl_enabled[amiga_emulated_ipl()]) {
-        if (!irq) {
-          irq = 1;
-        }
-        last_irq = (uint32_t)((ps_read_status_reg() & 0xe000) >> 13);
-        uint8_t amiga_irq = amiga_emulated_ipl();
-        if (amiga_irq >= last_irq) {
-          last_irq = amiga_irq;
-        }
-        if (last_irq != 0 && last_irq != last_last_irq) {
-          last_last_irq = last_irq;
-#ifdef USE_UAE_JIT
-          if (use_uae_jit) {
-            uae_pistorm_set_irq((int)last_irq);
-          } else {
-            M68K_SET_IRQ((int)last_irq);
-          }
-#else
-          M68K_SET_IRQ((int)last_irq);
+  if (use_uae_jit) {
+    uae_pistorm_set_irq(level);
+    return;
+  }
 #endif
-        }
-      } else {
-        if (irq) {
-          irq = 0;
-        }
-        if (last_last_irq != 0) {
-#ifdef USE_UAE_JIT
-          if (use_uae_jit) {
-            uae_pistorm_set_irq(0);
-          } else {
-            M68K_SET_IRQ(0);
-          }
-#else
-          M68K_SET_IRQ(0);
-#endif
-          last_last_irq = 0;
-        }
-      }
+  M68K_SET_IRQ(level);
+}
 
-      if (do_reset == 0) {
-        amiga_reset = (value & (1 << PIN_RESET));
-        if (amiga_reset != amiga_reset_last) {
-          amiga_reset_last = amiga_reset;
-          reset_trace_log_edge(value, amiga_reset);
-          if (amiga_reset == 0) {
-            printf("Amiga Reset is down...\n");
-            do_reset = 1;
-          } else {
-            printf("Amiga Reset is up...\n");
-          }
-        }
-      }
+static inline void cpu_poll_ipl_reset(void) {
+  uint32_t value = ps_gpio_lev();
 
-      if (do_reset) {
-#ifdef USE_UAE_JIT
-        if (use_uae_jit) {
-          uae_pistorm_pulse_reset();
-        } else {
-          m68k_pulse_reset(NULL);
-        }
-#else
-        m68k_pulse_reset(NULL);
-#endif
-        do_reset = 0;
-        rtg_on = 0;
-      }
+  if (value & (1u << PIN_TXN_IN_PROGRESS)) {
+    return;
+  }
 
-      ps_flush_batch_queue();
-      goto noppers;
+  if (!(value & (1u << PIN_IPL_ZERO)) || ipl_enabled[amiga_emulated_ipl()]) {
+    if (!irq) {
+      irq = 1;
+      M68K_END_TIMESLICE;
     }
-#endif /* USE_UAE_JIT */
-
-    if (!(value & (1 << PIN_IPL_ZERO)) || ipl_enabled[amiga_emulated_ipl()]) {
-      old_irq = irq_delay;
-      // NOP
-      if (!irq) {
-        M68K_END_TIMESLICE;
-        NOP;
-        irq = 1;
-      }
-      // usleep( 0 );
-    } else {
-      if (irq) {
-        if (old_irq) {
-          old_irq--;
-        } else {
-          irq = 0;
-        }
-        M68K_END_TIMESLICE;
-        NOP;
-        // usleep( 0 );
+    last_irq = (uint32_t)((ps_read_status_reg() & 0xe000) >> 13);
+    {
+      uint8_t amiga_irq = amiga_emulated_ipl();
+      if (amiga_irq >= last_irq) {
+        last_irq = amiga_irq;
       }
     }
-    if (do_reset == 0) {
-      amiga_reset = (value & (1 << PIN_RESET));
-      if (amiga_reset != amiga_reset_last) {
-        amiga_reset_last = amiga_reset;
-        reset_trace_log_edge(value, amiga_reset);
-        if (amiga_reset == 0) {
-          printf("Amiga Reset is down...\n");
-          do_reset = 1;
-          M68K_END_TIMESLICE;
-        } else {
-          printf("Amiga Reset is up...\n");
-        }
-      }
+    if (last_irq != 0 && last_irq != last_last_irq) {
+      last_last_irq = last_irq;
+      cpu_apply_irq_level((int)last_irq);
     }
-
-    /*if ( gayle_ide_enabled ) {
-      if ( ( ( gayle_int & 0x80 ) || gayle_a4k_int ) && ( get_ide( 0 )->drive[0].intrq || get_ide( 0
-    )->drive[1].intrq ) ) {
-        //get_ide( 0 )->drive[0].intrq = 0;
-        gayleirq = 1;
-        M68K_END_TIMESLICE;
-      }
-      else
-        gayleirq = 0;
-    }*/
-    // usleep( 0 );
-    // NOP NOP
-  noppers:
-    /*
-      Deterministic, low-jitter pacing for the IPL/status polling path.
-      This prevents hammering TXN_IN_PROGRESS, gives the CPLD state machine
-      time to advance, and avoids scheduler noise vs usleep(). It also reduces
-      contention with the main emulation loop. Removing or reducing this can
-      destabilize polling and steal time from the main emulation loop.
-    */
-    for (unsigned int i = 0; i < ipl_nop_count; i++) {
-      NOP;
+  } else {
+    if (irq) {
+      irq = 0;
+      M68K_END_TIMESLICE;
+    }
+    if (last_last_irq != 0) {
+      cpu_apply_irq_level(0);
+      last_last_irq = 0;
     }
   }
-  printf("[IPL] Thread exiting\n");
-  return args;
+
+  if (do_reset == 0) {
+    amiga_reset = (value & (1u << PIN_RESET));
+    if (amiga_reset != amiga_reset_last) {
+      amiga_reset_last = amiga_reset;
+      reset_trace_log_edge(value, amiga_reset);
+      if (amiga_reset == 0) {
+        printf("Amiga Reset is down...\n");
+        do_reset = 1;
+        M68K_END_TIMESLICE;
+      } else {
+        printf("Amiga Reset is up...\n");
+      }
+    }
+  }
+}
+
+static inline void cpu_handle_pending_reset(void) {
+  if (!do_reset) {
+    return;
+  }
+#if USE_UAE_JIT
+  if (use_uae_jit) {
+    uae_pistorm_pulse_reset();
+  } else {
+    cpu_pulse_reset();
+    usleep(1000000); // 1sec
+  }
+#else
+  cpu_pulse_reset();
+  usleep(1000000); // 1sec
+#endif
+  do_reset = 0;
+  rtg_on = 0;
 }
 
 static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
@@ -1157,14 +1046,6 @@ static inline void cpu_backend_execute(m68ki_cpu_core* state, int cycles) {
   }
 }
 
-static inline void cpu_backend_set_irq(int level) {
-  if (enable_jit_backend) {
-    jit_backend_set_irq(level);
-  } else {
-    musashi_backend_set_irq(level);
-  }
-}
-
 static void* cpu_task(void *arg) {
   (void)arg;
   m68ki_cpu_core* state = &m68ki_cpu;
@@ -1187,11 +1068,17 @@ cpu_loop:
 #ifdef USE_UAE_JIT
   if (use_uae_jit) {
     while (!end_signal && !emulator_exiting) {
+      cpu_poll_ipl_reset();
+      cpu_handle_pending_reset();
       uae_pistorm_run();
+      ps_flush_batch_queue();
     }
     goto stop_cpu_emulation;
   }
 #endif
+  cpu_poll_ipl_reset();
+  cpu_handle_pending_reset();
+
   if (realtime_disassembly && (do_disasm || cpu_emulation_running)) {
     m68k_disassemble(disasm_buf, m68k_get_reg(NULL, M68K_REG_PC), cpu_type);
     printf("REGA: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",
@@ -1232,32 +1119,6 @@ cpu_loop:
 
   // Flush any pending batched operations before checking status
   ps_flush_batch_queue();
-
-  if (irq) {
-    last_irq = (uint32_t)((ps_read_status_reg() & 0xe000) >> 13);
-    uint8_t amiga_irq = amiga_emulated_ipl();
-    if (amiga_irq >= last_irq) {
-      last_irq = amiga_irq;
-    }
-    if (last_irq != 0 && last_irq != last_last_irq) {
-      last_last_irq = last_irq;
-      cpu_backend_set_irq((int)last_irq);
-    }
-  }
-
-  if (!irq && last_last_irq != 0) {
-    cpu_backend_set_irq(0);
-    last_last_irq = 0;
-  }
-
-  if (do_reset) {
-    cpu_pulse_reset();
-    do_reset = 0;
-    usleep(1000000); // 1sec
-    rtg_on = 0;
-    //    while( amiga_reset==0 );
-    //    printf( "CPU emulation reset.\n" );
-  }
 
   // Flush any pending batched operations at the end of each CPU loop iteration
   ps_flush_batch_queue();
@@ -1912,7 +1773,7 @@ switch_config:
     cpu_pulse_reset();
   }
 
-  pthread_t ipl_tid = 0, cpu_tid, kbd_tid, mouse_tid = 0;
+  pthread_t cpu_tid = 0, kbd_tid = 0, mouse_tid = 0;
   int err;
 
   // When UAE JIT is enabled, keep CPU execution in the main thread.
@@ -1920,18 +1781,6 @@ switch_config:
   // forever in keyboard/mouse polling before the CPU loop starts.
   if (use_uae_jit) {
     printf("[CPU] UAE JIT enabled: running in single-threaded mode\n");
-
-    if (ipl_tid == 0) {
-      err = pthread_create(&ipl_tid, NULL, &ipl_task, NULL);
-      if (err != 0) {
-        printf("[ERROR] Cannot create IPL thread: [%s]", strerror(err));
-      } else {
-        pthread_setname_np(ipl_tid, "pistorm64: ipl");
-        printf("[IPL] Thread created successfully\n");
-        apply_affinity_from_env("ipl", CORE_IPL);
-        apply_realtime_from_env("ipl", RT_DEFAULT_IPL);
-      }
-    }
 
     err = pthread_create(&kbd_tid, NULL, &keyboard_task, NULL);
     if (err != 0) {
@@ -1956,18 +1805,6 @@ switch_config:
     // Run CPU task in main thread (this will be the only thread doing CPU emulation)
     cpu_task(NULL);
   } else {
-    if (ipl_tid == 0) {
-      err = pthread_create(&ipl_tid, NULL, &ipl_task, NULL);
-      if (err != 0) {
-        printf("[ERROR] Cannot create IPL thread: [%s]", strerror(err));
-      } else {
-        pthread_setname_np(ipl_tid, "pistorm64: ipl");
-        printf("[IPL] Thread created successfully\n");
-        apply_affinity_from_env("ipl", CORE_IPL);
-        apply_realtime_from_env("ipl", RT_DEFAULT_IPL);
-      }
-    }
-
     // create keyboard task
     err = pthread_create(&kbd_tid, NULL, &keyboard_task, NULL);
     if (err != 0) {
@@ -2032,6 +1869,38 @@ switch_config:
     printf("[MAIN] All threads appear to have concluded; ending process\n");
   }
 
+  // Join worker threads before platform teardown to avoid map/device use-after-free
+  // races during shutdown.
+  int cpu_join_rc = 0;
+  bool cpu_joined = true;
+  struct timespec other_timeout;
+  clock_gettime(CLOCK_MONOTONIC, &other_timeout);
+  other_timeout.tv_sec += 5; // 5 second timeout
+
+  if (cpu_tid) {
+    // Nudge the CPU loop out of any long slice and request shutdown once more.
+    stop_cpu_emulation(0);
+    end_signal = 1;
+    emulator_exiting = 1;
+    cpu_join_rc = pthread_timedjoin_np(cpu_tid, NULL, &other_timeout);
+    if (cpu_join_rc == ETIMEDOUT) {
+      clock_gettime(CLOCK_MONOTONIC, &other_timeout);
+      other_timeout.tv_sec += 5;
+      cpu_join_rc = pthread_timedjoin_np(cpu_tid, NULL, &other_timeout);
+    }
+    if (cpu_join_rc != 0) {
+      cpu_joined = false;
+      printf("[WARN] CPU thread did not terminate cleanly (rc=%d)\n", cpu_join_rc);
+    }
+  }
+
+  if (kbd_tid) {
+    pthread_timedjoin_np(kbd_tid, NULL, &other_timeout);
+  }
+  if (mouse_tid && mouse_fd != -1) {
+    pthread_timedjoin_np(mouse_tid, NULL, &other_timeout);
+  }
+
   if (mouse_fd != -1) {
     close(mouse_fd);
   }
@@ -2043,19 +1912,9 @@ switch_config:
     goto switch_config;
   }
 
-  // Join other threads with timeouts
-  struct timespec other_timeout;
-  clock_gettime(CLOCK_MONOTONIC, &other_timeout);
-  other_timeout.tv_sec += 2; // 2 second timeout
-
-  if (kbd_tid) {
-    pthread_timedjoin_np(kbd_tid, NULL, &other_timeout);
-  }
-  if (mouse_tid && mouse_fd != -1) {
-    pthread_timedjoin_np(mouse_tid, NULL, &other_timeout);
-  }
-  if (ipl_tid) {
-    pthread_timedjoin_np(ipl_tid, NULL, &other_timeout);
+  if (!cpu_joined) {
+    printf("[ERROR] Skipping platform teardown because CPU thread is still active.\n");
+    return 1;
   }
 
   if (cfg->platform->shutdown) {
@@ -2965,8 +2824,8 @@ static void print_help(const char* prog) {
   printf("  --syslog                   Send log output to syslog/systemd\n");
   printf("  -l, --log-level <level>    Set log level (error|warn|info|debug|verbose)\n");
   printf("  --debug-level <level>      Alias for --log-level\n");
-  printf("  --affinity <spec>          Thread affinity (e.g., cpu=3,ipl=2,keyboard=1,mouse=1)\n");
-  printf("  --rtprio <spec>            RT priorities (SCHED_RR, e.g., cpu=80,ipl=70,keyboard=90)\n");
+  printf("  --affinity <spec>          Thread affinity (e.g., cpu=3,keyboard=1,mouse=1)\n");
+  printf("  --rtprio <spec>            RT priorities (SCHED_RR, e.g., cpu=80,keyboard=90)\n");
   printf("\n");
   printf("Config (.cfg equivalents):\n");
   printf("  -c, --config <file>        Load config file\n");

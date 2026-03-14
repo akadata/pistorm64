@@ -452,8 +452,15 @@ void adjust_ranges_amiga(struct emulator_config* cfg) {
     CUSTOM_RANGE_STEP("rtg",   RTG_BASE, RTG_UPPER);
   }
   if (piscsi_enabled) {
-    uint32_t pbase = piscsi_base ? piscsi_base : PISCSI_OFFSET;
-    CUSTOM_RANGE_STEP("piscsi", pbase, pbase + PISCSI_REGSIZE);
+    /*
+     * Keep PiSCSI's fixed high register window alive at $8000_0000.
+     * The boot ROM command constants use this window directly.
+     * Also expose the AutoConfig-assigned mirror (if different) for visibility.
+     */
+    CUSTOM_RANGE_STEP("piscsi", PISCSI_OFFSET, PISCSI_UPPER);
+    if (piscsi_base && piscsi_base != PISCSI_OFFSET) {
+      CUSTOM_RANGE_STEP("piscsi-ac", piscsi_base, piscsi_base + PISCSI_REGSIZE);
+    }
   }
   if (pinet_enabled) {
    CUSTOM_RANGE_STEP("pinet", PINET_OFFSET, PINET_UPPER);

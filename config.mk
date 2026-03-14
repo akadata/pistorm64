@@ -5,7 +5,7 @@ EXENAME ?= emulator
 PLATFORM ?= PI4_64BIT_NATIVE
 
 # Build JIT
-USE_UAE_JIT = 0
+USE_UAE_JIT = 1
 
 # Kernel backend is default; legacy userspace GPIO is optional
 PISTORM_KMOD = 1
