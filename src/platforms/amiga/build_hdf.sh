@@ -40,6 +40,7 @@ write_if_exists piscsi/device_driver_amiga/pi-scsi.device scsi/pi-scsi.device
 xdftool pistorm.hdf open part=DH99 + makedir rtg
 write_if_exists "pirtg64/Amiga/PiRTG64/PiRTG64 Installer" "rtg/PiRTG64 Install"
 write_if_exists "pirtg64/Amiga/PiRTG64/PiRTG64 Installer.info" "rtg/PiRTG64 Install.info"
-xdftool pistorm.hdf open part=DH99 + makedir "rtg/PiRTG64 Install/Files"
-write_if_exists pirtg64/Amiga/rtg_driver_amiga/pirtg64.card "rtg/PiRTG64 Install/Files/pirtg64.card"
-write_if_exists pirtg64/Amiga/rtg_driver_amiga/PiRTG64.info "rtg/PiRTG64 Install/Files/PiRTG64.info"
+# NOTE: Newer amitools on Python 3.13 can fail on nested makedir paths here.
+# Keep RTG assets in rtg/ to avoid build aborts while still shipping installer files.
+write_if_exists pirtg64/Amiga/rtg_driver_amiga/pirtg64.card "rtg/pirtg64.card"
+write_if_exists pirtg64/Amiga/rtg_driver_amiga/PiRTG64.info "rtg/PiRTG64.info"

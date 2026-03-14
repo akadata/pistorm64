@@ -17,20 +17,28 @@ logging.basicConfig(format = '%(levelname)s, %(asctime)s, %(name)s, line %(linen
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-try:
-    idx = sys.argv.index('-conf-file')
-    CONFIG_FILE_PATH = sys.argv[idx + 1]
-except (ValueError, IndexError):
-    CONFIG_FILE_PATH = '/home/smalley/pistorm64/src/a314/files_pi/a314fs.conf'
+CONFIG_FILE_PATH = os.getenv('A314_FS_CONF', '/opt/pistorm64/a314/a314fs.conf')
+for arg in ('-conf-file', '--config-file'):
+    try:
+        idx = sys.argv.index(arg)
+        CONFIG_FILE_PATH = sys.argv[idx + 1]
+        break
+    except (ValueError, IndexError):
+        pass
 
-SHARED_DIRECTORY = '/home/smalley/pistorm64/data/a314shared'
+SHARED_DIRECTORY = os.getenv('A314_SHARED', '/opt/pistorm64/data/a314-shared')
 METAFILE_EXTENSION = ':a314'
 
-with open(CONFIG_FILE_PATH, encoding='utf-8') as f:
-    cfg = json.load(f)
-    devs = cfg['devices']
-    dev = devs['PI0']
-    SHARED_DIRECTORY = dev['path']
+try:
+    with open(CONFIG_FILE_PATH, encoding='utf-8') as f:
+        cfg = json.load(f)
+        devs = cfg['devices']
+        dev = devs['PI0']
+        SHARED_DIRECTORY = dev['path']
+except FileNotFoundError:
+    logger.warning('Config file not found: %s, using shared directory fallback %s', CONFIG_FILE_PATH, SHARED_DIRECTORY)
+except Exception as exc:
+    logger.warning('Failed to load config file %s (%s), using shared directory fallback %s', CONFIG_FILE_PATH, exc, SHARED_DIRECTORY)
 
 MSG_REGISTER_REQ        = 1
 MSG_REGISTER_RES        = 2
@@ -148,7 +156,12 @@ ACTION_END              = 1007
 ACTION_SEEK             = 1008
 ACTION_TRUNCATE         = 1022
 ACTION_WRITE_PROTECT    = 1023
+ACTION_IS_FILESYSTEM    = 1027
+ACTION_COPY_DIR_FH      = 1030
+ACTION_PARENT_FH        = 1031
+ACTION_EXAMINE_ALL      = 1033
 ACTION_EXAMINE_FH       = 1034
+ACTION_EXAMINE_ALL_END  = 1035
 ACTION_UNSUPPORTED      = 65535
 
 ERROR_NO_FREE_STORE             = 103
@@ -690,6 +703,64 @@ def process_same_lock(key1, key2):
     else:
         return struct.pack('>HH', 0, LOCK_SAME_VOLUME)
 
+def _fh_path_to_cp(arg1):
+    if arg1 not in open_file_handles:
+        return None
+
+    shared_root = os.path.realpath(SHARED_DIRECTORY)
+    path = os.path.realpath(open_file_handles[arg1].f.name)
+
+    # Keep locks constrained to the exported share.
+    try:
+        common = os.path.commonpath([shared_root, path])
+    except ValueError:
+        return None
+    if common != shared_root:
+        return None
+
+    rel = os.path.relpath(path, shared_root)
+    if rel == '.':
+        return ()
+    return tuple(rel.split('/'))
+
+def process_is_filesystem():
+    logger.debug('ACTION_IS_FILESYSTEM')
+    return struct.pack('>HH', 1, 0)
+
+def process_copy_dir_fh(arg1):
+    logger.debug('ACTION_COPY_DIR_FH, arg1: %s', arg1)
+    cp = _fh_path_to_cp(arg1)
+    if cp is None:
+        return struct.pack('>HH', 0, ERROR_OBJECT_NOT_FOUND)
+
+    key = get_key()
+    locks[key] = ObjectLock(key, SHARED_LOCK, cp)
+    return struct.pack('>HHI', 1, 0, key)
+
+def process_parent_fh(arg1):
+    logger.debug('ACTION_PARENT_FH, arg1: %s', arg1)
+    cp = _fh_path_to_cp(arg1)
+    if cp is None:
+        return struct.pack('>HH', 0, ERROR_OBJECT_NOT_FOUND)
+
+    parent_cp = cp[:-1]
+    if len(parent_cp) == 0:
+        return struct.pack('>HHI', 1, 0, 0)
+
+    key = get_key()
+    locks[key] = ObjectLock(key, SHARED_LOCK, parent_cp)
+    return struct.pack('>HHI', 1, 0, key)
+
+def process_examine_all():
+    # Deprecated packet; by design we return ACTION_NOT_KNOWN so DOS can emulate.
+    logger.debug('ACTION_EXAMINE_ALL (deprecated) -> ERROR_ACTION_NOT_KNOWN')
+    return struct.pack('>HH', 0, ERROR_ACTION_NOT_KNOWN)
+
+def process_examine_all_end():
+    # Deprecated companion packet.
+    logger.debug('ACTION_EXAMINE_ALL_END (deprecated)')
+    return struct.pack('>HH', 1, 0)
+
 def process_set_date(req):
     # rtype is already known (34)
     logger.warning('ACTION_SET_DATE(34) raw=%s', req[:64].hex())
@@ -776,14 +847,33 @@ def process_request(req):
     elif rtype == ACTION_SAME_LOCK:
         key1, key2 = struct.unpack('>II', req[2:10])
         return process_same_lock(key1, key2)
+    elif rtype == ACTION_IS_FILESYSTEM:
+        return process_is_filesystem()
+    elif rtype == ACTION_COPY_DIR_FH:
+        (arg1,) = struct.unpack('>I', req[2:6])
+        return process_copy_dir_fh(arg1)
+    elif rtype == ACTION_PARENT_FH:
+        (arg1,) = struct.unpack('>I', req[2:6])
+        return process_parent_fh(arg1)
+    elif rtype == ACTION_EXAMINE_ALL:
+        return process_examine_all()
+    elif rtype == ACTION_EXAMINE_ALL_END:
+        return process_examine_all_end()
     elif rtype == ACTION_SET_DATE:
         return process_set_date(req)
     elif rtype == ACTION_UNSUPPORTED:
         (dp_Type,) = struct.unpack('>H', req[2:4])
         if dp_Type == ACTION_SET_DATE:
-            # No args are provided by sender; accept to prevent retries/spam
+            # Older Amiga-side handlers may forward this as ACTION_UNSUPPORTED.
+            # ACK to keep copying moving.
             return struct.pack('>HH', 1, 0)
-            #    return process_set_date(req)   # your debug function
+        if dp_Type == ACTION_IS_FILESYSTEM:
+            # By convention filesystems should return TRUE.
+            return struct.pack('>HH', 1, 0)
+        if dp_Type in (ACTION_COPY_DIR_FH, ACTION_PARENT_FH, ACTION_EXAMINE_ALL, ACTION_EXAMINE_ALL_END):
+            # Preserve DOS fallback behavior for packets not implemented in the
+            # Amiga-side handler.
+            return struct.pack('>HH', 0, ERROR_ACTION_NOT_KNOWN)
         logger.warning('Unsupported action %d (Amiga/a314fs)', dp_Type)
         return struct.pack('>HH', 0, ERROR_ACTION_NOT_KNOWN)
     else:

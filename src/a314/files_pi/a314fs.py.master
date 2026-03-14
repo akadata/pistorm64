@@ -17,20 +17,28 @@ logging.basicConfig(format = '%(levelname)s, %(asctime)s, %(name)s, line %(linen
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-try:
-    idx = sys.argv.index('-conf-file')
-    CONFIG_FILE_PATH = sys.argv[idx + 1]
-except (ValueError, IndexError):
-    CONFIG_FILE_PATH = '/home/smalley/pistorm64/src/a314/files_pi/a314fs.conf'
+CONFIG_FILE_PATH = os.getenv('A314_FS_CONF', '/opt/pistorm64/a314/a314fs.conf')
+for arg in ('-conf-file', '--config-file'):
+    try:
+        idx = sys.argv.index(arg)
+        CONFIG_FILE_PATH = sys.argv[idx + 1]
+        break
+    except (ValueError, IndexError):
+        pass
 
-SHARED_DIRECTORY = '/home/smalley/pistorm64/data/a314shared'
+SHARED_DIRECTORY = os.getenv('A314_SHARED', '/opt/pistorm64/data/a314-shared')
 METAFILE_EXTENSION = ':a314'
 
-with open(CONFIG_FILE_PATH, encoding='utf-8') as f:
-    cfg = json.load(f)
-    devs = cfg['devices']
-    dev = devs['PI0']
-    SHARED_DIRECTORY = dev['path']
+try:
+    with open(CONFIG_FILE_PATH, encoding='utf-8') as f:
+        cfg = json.load(f)
+        devs = cfg['devices']
+        dev = devs['PI0']
+        SHARED_DIRECTORY = dev['path']
+except FileNotFoundError:
+    logger.warning('Config file not found: %s, using shared directory fallback %s', CONFIG_FILE_PATH, SHARED_DIRECTORY)
+except Exception as exc:
+    logger.warning('Failed to load config file %s (%s), using shared directory fallback %s', CONFIG_FILE_PATH, exc, SHARED_DIRECTORY)
 
 MSG_REGISTER_REQ        = 1
 MSG_REGISTER_RES        = 2
@@ -148,7 +156,12 @@ ACTION_END              = 1007
 ACTION_SEEK             = 1008
 ACTION_TRUNCATE         = 1022
 ACTION_WRITE_PROTECT    = 1023
+ACTION_IS_FILESYSTEM    = 1027
+ACTION_COPY_DIR_FH      = 1030
+ACTION_PARENT_FH        = 1031
+ACTION_EXAMINE_ALL      = 1033
 ACTION_EXAMINE_FH       = 1034
+ACTION_EXAMINE_ALL_END  = 1035
 ACTION_UNSUPPORTED      = 65535
 
 ERROR_NO_FREE_STORE             = 103
@@ -758,8 +771,24 @@ def process_request(req):
     elif rtype == ACTION_SAME_LOCK:
         key1, key2 = struct.unpack('>II', req[2:10])
         return process_same_lock(key1, key2)
+    elif rtype == ACTION_IS_FILESYSTEM:
+        return struct.pack('>HH', 1, 0)
+    elif rtype == ACTION_COPY_DIR_FH:
+        return struct.pack('>HH', 0, ERROR_ACTION_NOT_KNOWN)
+    elif rtype == ACTION_PARENT_FH:
+        return struct.pack('>HH', 0, ERROR_ACTION_NOT_KNOWN)
+    elif rtype == ACTION_EXAMINE_ALL:
+        return struct.pack('>HH', 0, ERROR_ACTION_NOT_KNOWN)
+    elif rtype == ACTION_EXAMINE_ALL_END:
+        return struct.pack('>HH', 1, 0)
     elif rtype == ACTION_UNSUPPORTED:
         (dp_Type,) = struct.unpack('>H', req[2:4])
+        if dp_Type == ACTION_SET_DATE:
+            return struct.pack('>HH', 1, 0)
+        if dp_Type == ACTION_IS_FILESYSTEM:
+            return struct.pack('>HH', 1, 0)
+        if dp_Type in (ACTION_COPY_DIR_FH, ACTION_PARENT_FH, ACTION_EXAMINE_ALL, ACTION_EXAMINE_ALL_END):
+            return struct.pack('>HH', 0, ERROR_ACTION_NOT_KNOWN)
         logger.warning('Unsupported action %d (Amiga/a314fs)', dp_Type)
         return struct.pack('>HH', 0, ERROR_ACTION_NOT_KNOWN)
     else:

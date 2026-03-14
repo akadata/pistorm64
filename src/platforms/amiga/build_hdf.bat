@@ -24,6 +24,5 @@ if exist piscsi/device_driver_amiga/pi-scsi.device xdftool pistorm.hdf open part
 xdftool pistorm.hdf open part=DH99 + makedir rtg
 if exist "pirtg64/Amiga/PiRTG64/PiRTG64 Installer" xdftool pistorm.hdf open part=DH99 + write "pirtg64/Amiga/PiRTG64/PiRTG64 Installer" "rtg/PiRTG64 Install"
 if exist "pirtg64/Amiga/PiRTG64/PiRTG64 Installer.info" xdftool pistorm.hdf open part=DH99 + write "pirtg64/Amiga/PiRTG64/PiRTG64 Installer.info" "rtg/PiRTG64 Install.info"
-xdftool pistorm.hdf open part=DH99 + makedir "rtg/PiRTG64 Install/Files"
-if exist pirtg64/Amiga/rtg_driver_amiga/pirtg64.card xdftool pistorm.hdf open part=DH99 + write pirtg64/Amiga/rtg_driver_amiga/pirtg64.card "rtg/PiRTG64 Install/Files/pirtg64.card"
-if exist pirtg64/Amiga/rtg_driver_amiga/PiRTG64.info xdftool pistorm.hdf open part=DH99 + write pirtg64/Amiga/rtg_driver_amiga/PiRTG64.info "rtg/PiRTG64 Install/Files/PiRTG64.info"
+if exist pirtg64/Amiga/rtg_driver_amiga/pirtg64.card xdftool pistorm.hdf open part=DH99 + write pirtg64/Amiga/rtg_driver_amiga/pirtg64.card "rtg/pirtg64.card"
+if exist pirtg64/Amiga/rtg_driver_amiga/PiRTG64.info xdftool pistorm.hdf open part=DH99 + write pirtg64/Amiga/rtg_driver_amiga/PiRTG64.info "rtg/PiRTG64.info"

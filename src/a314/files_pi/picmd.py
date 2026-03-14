@@ -21,8 +21,11 @@ logging.basicConfig(format = '%(levelname)s, %(asctime)s, %(name)s, line %(linen
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-FS_CFG_FILE = '/home/smalley/pistorm64/src/a314/files_pi/a314fs.conf'
-PICMD_CFG_FILE = '/home/smalley/pistorm64/src/a314/files_pi/picmd.conf'
+FS_CFG_FILE = os.getenv('A314_FS_CONF', '/opt/pistorm64/a314/a314fs.conf')
+PICMD_CFG_FILE = os.getenv(
+    'A314_PICMD_CONF',
+    os.path.join(os.getenv('PISTORM_A314', '/opt/pistorm64/a314'), 'picmd.conf')
+)
 
 volume_paths = {}
 search_path = ''
@@ -30,29 +33,39 @@ env_vars = {}
 sgr_map = {}
 
 def load_cfg():
-    with open(FS_CFG_FILE, 'rt') as f:
-        cfg = json.load(f)
-        devs = cfg['devices']
-        for _, dev in devs.items():
-            volume_paths[dev['volume']] = dev['path']
+    try:
+        with open(FS_CFG_FILE, 'rt') as f:
+            cfg = json.load(f)
+            devs = cfg['devices']
+            for _, dev in devs.items():
+                volume_paths[dev['volume']] = dev['path']
+    except FileNotFoundError:
+        logger.warning('FS config not found: %s', FS_CFG_FILE)
+    except Exception as exc:
+        logger.warning('Failed to load FS config %s: %s', FS_CFG_FILE, exc)
 
     global search_path
     search_path = os.getenv('PATH')
 
-    with open(PICMD_CFG_FILE, 'rt') as f:
-        cfg = json.load(f)
+    try:
+        with open(PICMD_CFG_FILE, 'rt') as f:
+            cfg = json.load(f)
 
-        if 'paths' in cfg:
-            search_path = ':'.join(cfg['paths']) + ':' + search_path
-            os.environ['PATH'] = search_path
+            if 'paths' in cfg:
+                search_path = ':'.join(cfg['paths']) + ':' + search_path
+                os.environ['PATH'] = search_path
 
-        if 'env_vars' in cfg:
-            for key, val in cfg['env_vars'].items():
-                env_vars[key] = val
+            if 'env_vars' in cfg:
+                for key, val in cfg['env_vars'].items():
+                    env_vars[key] = val
 
-        if 'sgr_map' in cfg:
-            for key, val in cfg['sgr_map'].items():
-                sgr_map[key] = str(val)
+            if 'sgr_map' in cfg:
+                for key, val in cfg['sgr_map'].items():
+                    sgr_map[key] = str(val)
+    except FileNotFoundError:
+        logger.warning('picmd config not found: %s', PICMD_CFG_FILE)
+    except Exception as exc:
+        logger.warning('Failed to load picmd config %s: %s', PICMD_CFG_FILE, exc)
 
 load_cfg()
 

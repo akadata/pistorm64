@@ -4,12 +4,18 @@
 # Copyright (c) 2018 Niklas Ekström
 
 import glob
+import json
+import logging
 import os
 import select
-import struct
 import socket
+import struct
 import sys
 import time
+
+logging.basicConfig(format='%(levelname)s, %(asctime)s, %(name)s, line %(lineno)d: %(message)s')
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 MSG_REGISTER_REQ        = 1
 MSG_REGISTER_RES        = 2
@@ -25,40 +31,88 @@ MSG_DATA                = 11
 MSG_EOS                 = 12
 MSG_RESET               = 13
 
+MAX_MESSAGE_SIZE = 1024 * 1024
+KNOWN_PTYPES = {
+    MSG_REGISTER_REQ,
+    MSG_REGISTER_RES,
+    MSG_DEREGISTER_REQ,
+    MSG_DEREGISTER_RES,
+    MSG_READ_MEM_REQ,
+    MSG_READ_MEM_RES,
+    MSG_WRITE_MEM_REQ,
+    MSG_WRITE_MEM_RES,
+    MSG_CONNECT,
+    MSG_CONNECT_RESPONSE,
+    MSG_DATA,
+    MSG_EOS,
+    MSG_RESET,
+}
+
+VIDEO_CONF = os.getenv('A314_VIDEO_CONF', '/opt/pistorm64/a314/videoplayer.conf')
+DEFAULT_VIDEO_GLOB = os.getenv('A314_VIDEO_GLOB', '/opt/pistorm64/data/a314-shared/videoplayer/*.ami')
+LEGACY_VIDEO_GLOB = '/home/pi/player/her_dither3/*.ami'
+
+
+def load_video_glob():
+    video_glob = DEFAULT_VIDEO_GLOB
+    try:
+        with open(VIDEO_CONF, 'rt', encoding='utf-8') as f:
+            cfg = json.load(f)
+            if isinstance(cfg, dict) and isinstance(cfg.get('video_glob'), str) and cfg['video_glob']:
+                video_glob = cfg['video_glob']
+    except FileNotFoundError:
+        pass
+    except Exception as exc:
+        logger.warning('Failed to load %s: %s', VIDEO_CONF, exc)
+    return video_glob
+
+
+VIDEO_GLOB = load_video_glob()
+
+
+def _validate_header(plen, stream_id, ptype):
+    if plen > MAX_MESSAGE_SIZE or ptype not in KNOWN_PTYPES:
+        raise RuntimeError(f'Bad A314 header len={plen} stream={stream_id} type={ptype}')
+
 def wait_for_msg():
     header = b''
     while len(header) < 9:
         data = drv.recv(9 - len(header))
+        if not data:
+            raise RuntimeError('Connection to a314d closed while reading header')
         header += data
-    (plen, pstream, ptype) = struct.unpack('=IIB', header)
+    (plen, pstream, ptype) = struct.unpack('<IIB', header)
+    _validate_header(plen, pstream, ptype)
     payload = b''
     while len(payload) < plen:
         data = drv.recv(plen - len(payload))
+        if not data:
+            raise RuntimeError('Connection to a314d closed while reading payload')
         payload += data
     return (header, payload)
 
 def send_register(name):
-    m = struct.pack('=IIB', len(name), 0, MSG_REGISTER_REQ) + name
+    m = struct.pack('<IIB', len(name), 0, MSG_REGISTER_REQ) + name
     drv.sendall(m)
 
 def send_write_mem_req(address, data):
-    m = struct.pack('=IIBI', 4 + len(data), 0, MSG_WRITE_MEM_REQ, address) + data
+    m = struct.pack('<IIBI', 4 + len(data), 0, MSG_WRITE_MEM_REQ, address) + data
     drv.sendall(m)
 
 def send_connect_response(stream_id, result):
-    m = struct.pack('=IIBB', 1, stream_id, MSG_CONNECT_RESPONSE, result)
+    m = struct.pack('<IIBB', 1, stream_id, MSG_CONNECT_RESPONSE, result)
     drv.sendall(m)
 
 def send_data(stream_id, data):
-    m = struct.pack('=IIB', len(data), stream_id, MSG_DATA) + data
+    m = struct.pack('<IIB', len(data), stream_id, MSG_DATA) + data
     drv.sendall(m)
 
 def send_eos(stream_id):
-    m = struct.pack('=IIB', 0, stream_id, MSG_EOS)
+    m = struct.pack('<IIB', 0, stream_id, MSG_EOS)
     drv.sendall(m)
 
 def send_reset(stream_id):
-    m = struct.pack('=IIB', 0, stream_id, MSG_RESET)
+    m = struct.pack('<IIB', 0, stream_id, MSG_RESET)
     drv.sendall(m)
 
 write_mem_q = []
@@ -83,7 +137,12 @@ class VideoPlayerSession(object):
         self.received_bpl_ptrs = False
 
     def start(self):
-        self.fns = sorted(glob.glob('/home/pi/player/her_dither3/*.ami'))
+        self.fns = sorted(glob.glob(VIDEO_GLOB))
+        if not self.fns and VIDEO_GLOB != LEGACY_VIDEO_GLOB:
+            self.fns = sorted(glob.glob(LEGACY_VIDEO_GLOB))
+            if self.fns:
+                logger.info('Videoplayer falling back to legacy frame glob: %s', LEGACY_VIDEO_GLOB)
+        logger.info('Videoplayer stream %d frame files: %d (glob=%s)', self.stream_id, len(self.fns), VIDEO_GLOB)
         self.fc = 0
         self.read_next_frame()
 
@@ -91,6 +150,9 @@ class VideoPlayerSession(object):
         del sessions[self.stream_id]
 
     def massage_pal(self):
+        if len(self.pal) < 64:
+            self.pal = b''
+            return
         new_pal = b''
         for i in range(16):
             creg, col = struct.unpack('>HH', self.pal[4*i:4*(i+1)])
@@ -111,10 +173,20 @@ class VideoPlayerSession(object):
 
     def process_msg_data(self, data):
         if not self.received_bpl_ptrs:
+            if len(data) != 8:
+                logger.warning('Videoplayer expected 8-byte plane pointer packet, got %d', len(data))
+                self.reset_after = time.time() + 0.1
+                return
             self.addresses = struct.unpack('>II', data)
             self.received_bpl_ptrs = True
         else:
+            if len(data) < 1:
+                logger.warning('Videoplayer expected next-bpl packet, got empty payload')
+                return
             self.next_bpl = data[0]
+            if self.next_bpl not in (0, 1):
+                logger.warning('Videoplayer invalid next_bpl index %d', self.next_bpl)
+                return
             if self.bpl_data is None:
                 send_data(self.stream_id, struct.pack('>H', 0))
             else:
@@ -195,7 +267,7 @@ else:
 rbuf = b''
 
 if not done:
-    print('Video player server is running')
+    logger.info('Video player service running (video_glob=%s)', VIDEO_GLOB)
     
 while not done:
     sel_fds = [drv]
@@ -220,7 +292,8 @@ while not done:
                     if len(rbuf) < 9:
                         break
 
-                    (plen, stream_id, ptype) = struct.unpack('=IIB', rbuf[:9])
+                    (plen, stream_id, ptype) = struct.unpack('<IIB', rbuf[:9])
+                    _validate_header(plen, stream_id, ptype)
                     if len(rbuf) < 9 + plen:
                         break
 

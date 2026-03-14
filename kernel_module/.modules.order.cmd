@@ -1,1 +1,0 @@
-savedcmd_/home/smalley/pistorm64/kernel_module/modules.order := {   echo /home/smalley/pistorm64/kernel_module/pistorm.o;   echo /home/smalley/pistorm64/kernel_module/z3bus.o; :; } > /home/smalley/pistorm64/kernel_module/modules.order

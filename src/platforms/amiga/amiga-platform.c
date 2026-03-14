@@ -761,6 +761,12 @@ void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val)
       set_env_if_unset("A314_CONF", path_buf);
       snprintf(path_buf, sizeof(path_buf), "%s/a314/a314fs.conf", val);
       set_env_if_unset("A314_FS_CONF", path_buf);
+      snprintf(path_buf, sizeof(path_buf), "%s/a314/picmd.conf", val);
+      set_env_if_unset("A314_PICMD_CONF", path_buf);
+      snprintf(path_buf, sizeof(path_buf), "%s/a314/disk.conf", val);
+      set_env_if_unset("A314_DISK_CONF", path_buf);
+      snprintf(path_buf, sizeof(path_buf), "%s/a314/videoplayer.conf", val);
+      set_env_if_unset("A314_VIDEO_CONF", path_buf);
     }
   }
   if CHKVAR ("pistorm_a314") {
@@ -771,6 +777,12 @@ void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val)
       set_env_if_unset("A314_CONF", path_buf);
       snprintf(path_buf, sizeof(path_buf), "%s/a314fs.conf", val);
       set_env_if_unset("A314_FS_CONF", path_buf);
+      snprintf(path_buf, sizeof(path_buf), "%s/picmd.conf", val);
+      set_env_if_unset("A314_PICMD_CONF", path_buf);
+      snprintf(path_buf, sizeof(path_buf), "%s/disk.conf", val);
+      set_env_if_unset("A314_DISK_CONF", path_buf);
+      snprintf(path_buf, sizeof(path_buf), "%s/videoplayer.conf", val);
+      set_env_if_unset("A314_VIDEO_CONF", path_buf);
     }
   }
   if CHKVAR ("pistorm_data") {
@@ -786,6 +798,15 @@ void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val)
   }
   if CHKVAR ("a314_fs_conf") {
     set_env_if_value("A314_FS_CONF", val);
+  }
+  if CHKVAR ("a314_picmd_conf") {
+    set_env_if_value("A314_PICMD_CONF", val);
+  }
+  if CHKVAR ("a314_disk_conf") {
+    set_env_if_value("A314_DISK_CONF", val);
+  }
+  if CHKVAR ("a314_video_conf") {
+    set_env_if_value("A314_VIDEO_CONF", val);
   }
   if CHKVAR ("queue") {
     int enabled = parse_bool_flag(val, 1);

@@ -36,7 +36,7 @@ OP_RES_WRITE_PROTECTED = 2
 
 NUM_DRIVES = 4
 
-DEFAULT_CONF_FILE = os.path.join(os.path.dirname(__file__), 'disk.conf')
+DEFAULT_CONF_FILE = os.getenv('A314_DISK_CONF', os.path.join(os.path.dirname(__file__), 'disk.conf'))
 try:
     idx = sys.argv.index('-conf-file')
     CONF_FILE = sys.argv[idx + 1]

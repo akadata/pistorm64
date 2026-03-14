@@ -193,3 +193,6 @@ These help launch A314 services without systemd by defining install locations in
 - `setvar a314_shared /opt/pistorm64/data/a314-shared`
 - `setvar a314_conf /opt/pistorm64/a314/a314d.conf`
 - `setvar a314_fs_conf /opt/pistorm64/a314/a314fs.conf`
+- `setvar a314_picmd_conf /opt/pistorm64/a314/picmd.conf`
+- `setvar a314_disk_conf /opt/pistorm64/a314/disk.conf`
+- `setvar a314_video_conf /opt/pistorm64/a314/videoplayer.conf`
