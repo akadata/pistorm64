@@ -539,6 +539,7 @@ all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest pistorm_truth_tes
 
 clean:
 	rm -f $(DELETEFILES) $(TARGET).tmp
+	rm -rf src/a314/files_pi/__pycache__
 	$(MAKE) kernel_clean
 	rm -rf kernel_module/.tmp_versions
 	find . \( -name '*.o' -o -name '*.tmp' \) -print0 | xargs -0 -r rm -f --

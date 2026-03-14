@@ -485,6 +485,7 @@ all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest pistorm_truth_tes
 
 clean:
 	rm -f $(DELETEFILES)
+	rm -rf src/a314/files_pi/__pycache__
 
 # Ensure generated m68k files are built before other files that depend on them
 # Link is atomic: write to $@.tmp then move into place on success.
