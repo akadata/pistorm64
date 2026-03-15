@@ -40,6 +40,8 @@ Development:
 - Dev-Environment.md
 - Setup_Amiga_Compiler.md
 - Tools.md
+- 680x0TestSuite-Phase1.md
+- 680x0-Status-2026-03-15.md
 - UAE-JIT-Status.md (experimental UAE JIT backend status)
 - ppc_roadmap.md
 - Janus-Bus-Engine.md

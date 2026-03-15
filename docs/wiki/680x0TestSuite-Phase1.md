@@ -2,6 +2,14 @@
 
 Phase 1 establishes a repeatable baseline for 68k core regression checks before deeper PMMU work.
 
+## Current Baseline (2026-03-15)
+
+- `make processortests-quick` passes with:
+  - `files=124 tests=992 transactions=5097 errors=0`
+- `make stage1-680x0-ci` passes with:
+  - quick Musashi smoke: `pass=4 fail=0`
+  - 68040 reference set: `pass=18 fail=0 xfail=0 xpass=0`
+
 ## Targets
 
 - `make processortests-quick`
@@ -33,6 +41,24 @@ Override at invocation time as needed, for example:
 ```bash
 make MUSASHI_REF_TEST_ROOT=/some/other/path musashi-ref-tests-68040
 ```
+
+## How To Run (Local)
+
+```bash
+# 1) quick ProcessorTests dataset verification
+make processortests-quick
+
+# 2) quick Musashi smoke
+make musashi-ref-tests-quick
+
+# 3) full Musashi 68040 reference binaries
+make musashi-ref-tests-68040
+
+# 4) CI gate used by GitHub Actions
+make stage1-680x0-ci
+```
+
+The low-noise gate for day-to-day correctness work is `make stage1-680x0-ci`.
 
 ## Notes
 

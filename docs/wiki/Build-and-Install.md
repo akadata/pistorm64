@@ -29,6 +29,21 @@ make USE_RAYLIB=0
 make USE_ALSA=0
 ```
 
+## CPU correctness harness (Phase 1)
+
+- Quick dataset validation:
+```
+make processortests-quick
+```
+
+- Core regression gate (quick + 68040 reference):
+```
+make stage1-680x0-ci
+```
+
+For details and target breakdown, see:
+- `680x0TestSuite-Phase1.md`
+
 ## Install layout (runtime)
 
 The canonical runtime layout is:
