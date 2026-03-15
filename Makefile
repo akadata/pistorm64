@@ -185,13 +185,17 @@ PISTORM_KMOD_PARAMS ?= run_batch_enable=1 berr_reset_input=1 gpclk_src=$(PISTORM
 
 PS_PROTOCOL_SRC := src/gpio/ps_protocol_kmod.c
 PS_BACKEND_SRCS := src/pistorm/backend.c src/pistorm/backend_kmod.c src/pistorm/backend_userspace_mmio.c
-PROCESSORTESTS_ROOT ?= $(if $(wildcard $(CURDIR)/third_party/ProcessorTests),$(CURDIR)/third_party/ProcessorTests,/home/smalley/reference/ProcessorTests)
+PROCESSORTESTS_ROOT ?= $(CURDIR)/third_party/ProcessorTests
 PROCESSORTESTS_SOURCE ?= $(PROCESSORTESTS_ROOT)/680x0/68000/v1
+PROCESSORTESTS_SOURCE_NEW ?= $(PROCESSORTESTS_ROOT)/m68000/v1
 PROCESSORTESTS_MAP ?= $(PROCESSORTESTS_ROOT)/680x0/map/68000.official.json
 PROCESSORTESTS_TOOLS ?= $(PROCESSORTESTS_ROOT)/tools
 PROCESSORTESTS_QUICK_DIR ?= build/processortests/quick
+PROCESSORTESTS_QUICK_DIR_NEW ?= build/processortests/quick-new
 PROCESSORTESTS_QUICK_PERCENT ?= 1
 PROCESSORTESTS_QUICK_SAMPLE ?= 64
+PROCESSORTESTS_COMPARE_OLD ?= $(PROCESSORTESTS_SOURCE)
+PROCESSORTESTS_COMPARE_NEW ?= $(PROCESSORTESTS_SOURCE_NEW)
 MUSASHI_REF_TEST_ROOT ?= /home/smalley/reference/Musashi/test
 MUSASHI_REF_TEST_DRIVER ?= build/musashi_ref_test_driver
 MUSASHI_REF_TEST_CPU ?= 68040
@@ -542,6 +546,9 @@ HELP_TARGETS = \
 	"make full"         "Stop emulator, rebuild userspace, install" \
 	"make processortests-quick"       "Generate/use quick ProcessorTests subset and validate" \
 	"make processortests-full"        "Validate full ProcessorTests 68000/v1 dataset" \
+	"make processortests-quick-new"   "Generate/use quick subset for ProcessorTests m68000/v1 and validate" \
+	"make processortests-full-new"    "Validate full ProcessorTests m68000/v1 dataset" \
+	"make processortests-compare-sets" "Compare old/new ProcessorTests corpus operation coverage" \
 	"make musashi-ref-tests-quick"    "Run quick standalone Musashi regression binaries (68000/68040)" \
 	"make musashi-ref-tests-68040"    "Run all reference Musashi 68040 binary tests" \
 	"make musashi-ref-tests-68040-ci" "Run 68040 suite with xfail baseline (fails on regressions/xpass)" \
@@ -901,6 +908,29 @@ processortests-full:
 		--check-map \
 		--map-file "$(PROCESSORTESTS_MAP)"
 
+processortests-quick-new:
+	python3 tools/processortests_runner.py \
+		--mode quick \
+		--source-dir "$(PROCESSORTESTS_SOURCE_NEW)" \
+		--tools-dir "$(PROCESSORTESTS_TOOLS)" \
+		--subset-dir "$(PROCESSORTESTS_QUICK_DIR_NEW)" \
+		--subset-percent "$(PROCESSORTESTS_QUICK_PERCENT)" \
+		--sample-per-file "$(PROCESSORTESTS_QUICK_SAMPLE)" \
+		--check-map \
+		--map-file "$(PROCESSORTESTS_MAP)"
+
+processortests-full-new:
+	python3 tools/processortests_runner.py \
+		--mode full \
+		--suite-dir "$(PROCESSORTESTS_SOURCE_NEW)" \
+		--check-map \
+		--map-file "$(PROCESSORTESTS_MAP)"
+
+processortests-compare-sets:
+	python3 tools/processortests_compare_sets.py \
+		--old-dir "$(PROCESSORTESTS_COMPARE_OLD)" \
+		--new-dir "$(PROCESSORTESTS_COMPARE_NEW)"
+
 $(MUSASHI_REF_TEST_DRIVER): tools/musashi_ref_test_driver.c tools/musashi_ref_test_stubs.c src/musashi/m68kcpu.c src/musashi/m68kdasm.c src/musashi/m68kops.c src/musashi/softfloat/softfloat.c src/musashi/softfloat/softfloat_fpsp.c
 	@mkdir -p $(dir $@)
 	$(CC) $(EMU_WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) -I. -Isrc -Isrc/musashi \
@@ -943,4 +973,4 @@ help:
 
 -include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d tools/piscsi_remote/piscsi_remote_server.d tools/piscsi_remote/piscsi_remote_client.d $(UAE_OBJS:%.o=%.d)
 
-.PHONY: all clean buptest pistorm_truth_test install install-boot-firmware uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-net64 amiga-piscsi amiga-pirtg64 amiga-ahi amiga-all amiga-clean piscsi-remote piscsi-remote-server piscsi-remote-client processortests-quick processortests-full musashi-ref-tests musashi-ref-tests-quick musashi-ref-tests-68040 musashi-ref-tests-68040-ci musashi-ref-tests-68040-pmmu stage1-680x0 stage1-680x0-ci
+.PHONY: all clean buptest pistorm_truth_test install install-boot-firmware uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-net64 amiga-piscsi amiga-pirtg64 amiga-ahi amiga-all amiga-clean piscsi-remote piscsi-remote-server piscsi-remote-client processortests-quick processortests-full processortests-quick-new processortests-full-new processortests-compare-sets musashi-ref-tests musashi-ref-tests-quick musashi-ref-tests-68040 musashi-ref-tests-68040-ci musashi-ref-tests-68040-pmmu stage1-680x0 stage1-680x0-ci

@@ -3,7 +3,7 @@
 
 This tool is intentionally lightweight:
 - It can generate a reduced subset via ProcessorTests' own subset.py utility.
-- It validates JSON(.gz) test bundles structurally.
+- It validates JSON, JSON.gz, and JSON.bin test bundles structurally.
 - It supports quick and full modes.
 
 It does not execute tests against a CPU core directly; it prepares and validates
@@ -38,13 +38,63 @@ def eprint(msg: str) -> None:
     print(msg, file=sys.stderr)
 
 
+def is_supported_test_file(path: Path) -> bool:
+    return (
+        path.suffix == ".json"
+        or path.name.endswith(".json.gz")
+        or path.name.endswith(".json.bin")
+    )
+
+
+def canonical_test_filename(path: Path) -> str:
+    name = path.name
+    if name.endswith(".json.bin"):
+        return name[:-4]  # strip trailing ".bin"
+    if name.endswith(".json.gz"):
+        return name[:-3]  # strip trailing ".gz"
+    return name
+
+
+def test_file_rank(path: Path) -> int:
+    # Prefer plain JSON, then gz, then binary-encoded JSON.
+    if path.suffix == ".json":
+        return 0
+    if path.name.endswith(".json.gz"):
+        return 1
+    if path.name.endswith(".json.bin"):
+        return 2
+    return 99
+
+
 def iter_test_files(suite_dir: Path) -> Iterable[Path]:
+    selected: dict[str, Path] = {}
     for path in sorted(suite_dir.iterdir()):
-        if path.is_file() and (path.suffix == ".json" or path.name.endswith(".json.gz")):
-            yield path
+        if not path.is_file() or not is_supported_test_file(path):
+            continue
+        key = canonical_test_filename(path)
+        current = selected.get(key)
+        if current is None or test_file_rank(path) < test_file_rank(current):
+            selected[key] = path
+    for key in sorted(selected):
+        yield selected[key]
+
+def ensure_json_from_bin(
+    path: Path, decode_script: Path, decoded_suite_roots: set[Path]
+) -> Path:
+    json_path = Path(str(path)[:-4])  # strip ".bin"
+    if json_path.exists():
+        return json_path
+
+    decode_suite_dir(path.parent, decode_script, decoded_suite_roots)
+
+    if not json_path.exists():
+        raise FileNotFoundError(f"decode.py ran but JSON output was not created: {json_path}")
+    return json_path
 
 
-def load_json(path: Path):
+def load_json(path: Path, decode_script: Path, decoded_suite_roots: set[Path]):
+    if path.name.endswith(".json.bin"):
+        path = ensure_json_from_bin(path, decode_script, decoded_suite_roots)
     if path.name.endswith(".json.gz"):
         with gzip.open(path, "rt", encoding="utf-8") as f:
             return json.load(f)
@@ -111,17 +161,25 @@ def validate_test_object(test_obj: object, file_path: Path, test_idx: int) -> tu
     return txn_count, errs
 
 
-def validate_suite(suite_dir: Path, sample_per_file: int | None, max_error_prints: int = 200) -> ValidationSummary:
+def validate_suite(
+    suite_dir: Path,
+    sample_per_file: int | None,
+    decode_script: Path,
+    max_error_prints: int = 200,
+) -> ValidationSummary:
     summary = ValidationSummary()
+    decoded_suite_roots: set[Path] = set()
     printed_errors = 0
     omitted_errors = 0
     files = list(iter_test_files(suite_dir))
     if not files:
-        raise FileNotFoundError(f"No .json/.json.gz files found in suite dir: {suite_dir}")
+        raise FileNotFoundError(
+            f"No .json/.json.gz/.json.bin files found in suite dir: {suite_dir}"
+        )
 
     for file_path in files:
         try:
-            data = load_json(file_path)
+            data = load_json(file_path, decode_script, decoded_suite_roots)
         except Exception as exc:  # noqa: BLE001
             summary.errors += 1
             if printed_errors < max_error_prints:
@@ -217,6 +275,34 @@ def run_checkdups(tools_dir: Path, suite_dir: Path) -> int:
     return subprocess.run(cmd).returncode
 
 
+def decode_suite_dir(
+    suite_dir: Path, decode_script: Path, decoded_suite_roots: set[Path]
+) -> None:
+    suite_root = suite_dir.parent
+    if suite_root in decoded_suite_roots:
+        return
+    if not decode_script.exists():
+        raise FileNotFoundError(
+            f"decode.py not found ({decode_script}) and JSON source missing under {suite_dir}"
+        )
+    subprocess.run([sys.executable, str(decode_script)], cwd=suite_root, check=True)
+    decoded_suite_roots.add(suite_root)
+
+
+def suite_has_json_payload(suite_dir: Path) -> bool:
+    for path in suite_dir.iterdir():
+        if path.is_file() and (path.suffix == ".json" or path.name.endswith(".json.gz")):
+            return True
+    return False
+
+
+def suite_has_json_bin_payload(suite_dir: Path) -> bool:
+    for path in suite_dir.iterdir():
+        if path.is_file() and path.name.endswith(".json.bin"):
+            return True
+    return False
+
+
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     repo_root = Path(__file__).resolve().parents[1]
     default_root = repo_root / "third_party" / "ProcessorTests"
@@ -234,6 +320,11 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
         "--map-file",
         default=str(default_root / "680x0" / "map" / "68000.official.json"),
     )
+    p.add_argument(
+        "--decode-script",
+        default=str(default_root / "680x0" / "68000" / "decode.py"),
+        help="Path to decode.py used only when .json.bin exists without matching .json",
+    )
     p.add_argument("--check-map", action="store_true")
     return p.parse_args(argv)
 
@@ -245,6 +336,7 @@ def main(argv: Sequence[str]) -> int:
     tools_dir = Path(args.tools_dir)
     subset_dir = Path(args.subset_dir)
     map_file = Path(args.map_file)
+    decode_script = Path(args.decode_script)
 
     if args.mode == "quick":
         if suite_dir is None:
@@ -252,6 +344,9 @@ def main(argv: Sequence[str]) -> int:
         subset_missing = not subset_dir.exists()
         subset_empty = (not subset_missing) and (not any(iter_test_files(subset_dir)))
         if suite_dir == subset_dir and (args.refresh_subset or subset_missing or subset_empty):
+            if source_dir.exists() and not suite_has_json_payload(source_dir) and suite_has_json_bin_payload(source_dir):
+                # subset.py only understands .json/.json.gz; decode only when required.
+                decode_suite_dir(source_dir, decode_script, set())
             print(
                 f"[processortests] generating subset: {args.subset_percent:.3f}% "
                 f"from {source_dir} -> {subset_dir}"
@@ -277,7 +372,7 @@ def main(argv: Sequence[str]) -> int:
         f"[processortests] validating suite dir={suite_dir} mode={args.mode} "
         f"sample_per_file={'all' if sample_per_file is None else sample_per_file}"
     )
-    summary = validate_suite(suite_dir, sample_per_file)
+    summary = validate_suite(suite_dir, sample_per_file, decode_script)
     print(
         f"[processortests] files={summary.files_checked} tests={summary.tests_checked} "
         f"transactions={summary.transactions_checked} errors={summary.errors}"

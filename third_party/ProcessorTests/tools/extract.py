@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # extract.py
 #
 # Given a specified JSON or gzipped JZON test file, this utility will extract

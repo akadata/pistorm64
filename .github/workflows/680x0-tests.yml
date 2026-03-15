@@ -40,3 +40,23 @@ jobs:
       - name: Run 68040 suite with xfail baseline
         run: |
           make PLATFORM=NATIVE MUSASHI_REF_TEST_ROOT="$RUNNER_TEMP/Musashi/test" musashi-ref-tests-68040-ci -j1
+
+  processortests-corpus-sets:
+    name: ProcessorTests Corpus Sets
+    runs-on: ubuntu-24.04
+    if: ${{ hashFiles('third_party/ProcessorTests/680x0/map/68000.official.json') != '' && hashFiles('third_party/ProcessorTests/680x0/68000/v1/*') != '' && hashFiles('third_party/ProcessorTests/m68000/v1/*') != '' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Run old/new ProcessorTests quick + compare
+        run: |
+          make PLATFORM=NATIVE processortests-quick -j1
+          make PLATFORM=NATIVE processortests-quick-new -j1
+          make PLATFORM=NATIVE processortests-compare-sets -j1
+
+      - name: Run old/new ProcessorTests full
+        run: |
+          make PLATFORM=NATIVE processortests-full -j1
+          make PLATFORM=NATIVE processortests-full-new -j1
