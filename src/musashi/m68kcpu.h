@@ -1196,27 +1196,11 @@ static inline int m68ki_movec_reg_legal(m68ki_cpu_core *state, uint reg)
 	case 0x805: /* MMUSR */
 	case 0x806: /* URP */
 	case 0x807: /* SRP */
-	case 0x808: /* PCR */
 		return CPU_TYPE_IS_040_PLUS(state->cpu_type);
 
 	default:
 		return 0;
 	}
-}
-
-/* Minimal 68040 Processor Configuration Register encoding used by MOVEC.
- * Classic software probes this with:
- *   MOVEC PCR,Dn ; SWAP Dn ; CMP #$431 / #$430
- */
-static inline uint m68ki_movec_pcr_value(m68ki_cpu_core *state)
-{
-	if (state->cpu_type == CPU_TYPE_040) {
-		return 0x04310000;
-	}
-	if (CPU_TYPE_IS_040_PLUS(state->cpu_type)) {
-		return 0x04300000;
-	}
-	return 0;
 }
 
 /* 
