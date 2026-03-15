@@ -6881,9 +6881,16 @@ M68KMAKE_OP(movec, 32, cr, .)
 		if(FLAG_S)
 		{
 			uint word2 = OPER_I_16(state);
+			uint reg = word2 & 0xfff;
 
 			m68ki_trace_t0();		   /* auto-disable (see m68kcpu.h) */
-			switch (word2 & 0xfff)
+			if (!m68ki_movec_reg_legal(state, reg))
+			{
+				m68ki_exception_illegal(state);
+				return;
+			}
+
+			switch (reg)
 			{
 			case 0x000:			   /* SFC */
 				REG_DA[(word2 >> 12) & 15] = REG_SFC;
@@ -6892,11 +6899,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				REG_DA[(word2 >> 12) & 15] = REG_DFC;
 				return;
 			case 0x002:			   /* CACR */
-				if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-				{
-					REG_DA[(word2 >> 12) & 15] = REG_CACR;
-					return;
-				}
+				REG_DA[(word2 >> 12) & 15] = REG_CACR;
 				return;
 			case 0x800:			   /* USP */
 				REG_DA[(word2 >> 12) & 15] = REG_USP;
@@ -6905,92 +6908,37 @@ M68KMAKE_OP(movec, 32, cr, .)
 				REG_DA[(word2 >> 12) & 15] = REG_VBR;
 				return;
 			case 0x802:			   /* CAAR */
-				if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-				{
-					REG_DA[(word2 >> 12) & 15] = REG_CAAR;
-					return;
-				}
-				m68ki_exception_illegal(state);
-				break;
+				REG_DA[(word2 >> 12) & 15] = REG_CAAR;
+				return;
 			case 0x803:			   /* MSP */
-				if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-				{
-					REG_DA[(word2 >> 12) & 15] = FLAG_M ? REG_SP : REG_MSP;
-					return;
-				}
-				m68ki_exception_illegal(state);
+				REG_DA[(word2 >> 12) & 15] = FLAG_M ? REG_SP : REG_MSP;
 				return;
 			case 0x804:			   /* ISP */
-				if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-				{
-					REG_DA[(word2 >> 12) & 15] = FLAG_M ? REG_ISP : REG_SP;
-					return;
-				}
-				m68ki_exception_illegal(state);
+				REG_DA[(word2 >> 12) & 15] = FLAG_M ? REG_ISP : REG_SP;
 				return;
 			case 0x003:				/* TC */
-				if(CPU_TYPE_IS_040_PLUS(CPU_TYPE))
-				{
-					REG_DA[(word2 >> 12) & 15] = state->mmu_tc;
-					return;
-				}
-				m68ki_exception_illegal(state);
+				REG_DA[(word2 >> 12) & 15] = state->mmu_tc;
 				return;
 			case 0x004:				/* ITT0 */
-				if(CPU_TYPE_IS_040_PLUS(CPU_TYPE))
-				{
-					REG_DA[(word2 >> 12) & 15] = state->mmu_itt0;
-					return;
-				}
-				m68ki_exception_illegal(state);
+				REG_DA[(word2 >> 12) & 15] = state->mmu_itt0;
 				return;
 			case 0x005:				/* ITT1 */
-				if(CPU_TYPE_IS_040_PLUS(CPU_TYPE))
-				{
-					REG_DA[(word2 >> 12) & 15] = state->mmu_itt1;
-					return;
-				}
-				m68ki_exception_illegal(state);
+				REG_DA[(word2 >> 12) & 15] = state->mmu_itt1;
 				return;
 			case 0x006:				/* DTT0 */
-				if(CPU_TYPE_IS_040_PLUS(CPU_TYPE))
-				{
-					REG_DA[(word2 >> 12) & 15] = state->mmu_dtt0;
-					return;
-				}
-				m68ki_exception_illegal(state);
+				REG_DA[(word2 >> 12) & 15] = state->mmu_dtt0;
 				return;
 			case 0x007:				/* DTT1 */
-				if(CPU_TYPE_IS_040_PLUS(CPU_TYPE))
-				{
-					REG_DA[(word2 >> 12) & 15] = state->mmu_dtt1;
-					return;
-				}
-				m68ki_exception_illegal(state);
+				REG_DA[(word2 >> 12) & 15] = state->mmu_dtt1;
 				return;
 			case 0x805:				/* MMUSR */
-				if(CPU_TYPE_IS_040_PLUS(CPU_TYPE))
-				{
-					REG_DA[(word2 >> 12) & 15] = state->mmu_sr_040;
-					return;
-				}
-				m68ki_exception_illegal(state);
+				REG_DA[(word2 >> 12) & 15] = state->mmu_sr_040;
 				return;
 			case 0x806:				/* URP */
-				if(CPU_TYPE_IS_040_PLUS(CPU_TYPE))
-				{
-					REG_DA[(word2 >> 12) & 15] = state->mmu_urp_aptr;
-					return;
-				}
-				m68ki_exception_illegal(state);
+				REG_DA[(word2 >> 12) & 15] = state->mmu_urp_aptr;
 				return;
 			case 0x807:				/* SRP */
-				if(CPU_TYPE_IS_040_PLUS(CPU_TYPE))
-				{
-					REG_DA[(word2 >> 12) & 15] = state->mmu_srp_aptr;
-					return;
-				}
-				m68ki_exception_illegal(state);
+				REG_DA[(word2 >> 12) & 15] = state->mmu_srp_aptr;
 				return;
 			default:
 				m68ki_exception_illegal(state);
@@ -7011,9 +6959,16 @@ M68KMAKE_OP(movec, 32, rc, .)
 		if(FLAG_S)
 		{
 			uint word2 = OPER_I_16(state);
+			uint reg = word2 & 0xfff;
 
 			m68ki_trace_t0();		   /* auto-disable (see m68kcpu.h) */
-			switch (word2 & 0xfff)
+			if (!m68ki_movec_reg_legal(state, reg))
+			{
+				m68ki_exception_illegal(state);
+				return;
+			}
+
+			switch (reg)
 			{
 			case 0x000:			   /* SFC */
 				REG_SFC = REG_DA[(word2 >> 12) & 15] & 7;
@@ -7044,8 +6999,6 @@ M68KMAKE_OP(movec, 32, rc, .)
 					}
 					return;
 				}
-				m68ki_exception_illegal(state);
-				return;
 			case 0x800:			   /* USP */
 				REG_USP = REG_DA[(word2 >> 12) & 15];
 				return;
@@ -7053,112 +7006,57 @@ M68KMAKE_OP(movec, 32, rc, .)
 				REG_VBR = REG_DA[(word2 >> 12) & 15];
 				return;
 			case 0x802:			   /* CAAR */
-				if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-				{
-					REG_CAAR = REG_DA[(word2 >> 12) & 15];
-					return;
-				}
-				m68ki_exception_illegal(state);
+				REG_CAAR = REG_DA[(word2 >> 12) & 15];
 				return;
 			case 0x803:			   /* MSP */
-				if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
+				/* we are in supervisor mode so just check for M flag */
+				if(!FLAG_M)
 				{
-					/* we are in supervisor mode so just check for M flag */
-					if(!FLAG_M)
-					{
-						REG_MSP = REG_DA[(word2 >> 12) & 15];
-						return;
-					}
+					REG_MSP = REG_DA[(word2 >> 12) & 15];
+					return;
+				}
+				REG_SP = REG_DA[(word2 >> 12) & 15];
+				return;
+			case 0x804:			   /* ISP */
+				if(!FLAG_M)
+				{
 					REG_SP = REG_DA[(word2 >> 12) & 15];
 					return;
 				}
-				m68ki_exception_illegal(state);
-				return;
-			case 0x804:			   /* ISP */
-				if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-				{
-					if(!FLAG_M)
-					{
-						REG_SP = REG_DA[(word2 >> 12) & 15];
-						return;
-					}
-					REG_ISP = REG_DA[(word2 >> 12) & 15];
-					return;
-				}
-				m68ki_exception_illegal(state);
+				REG_ISP = REG_DA[(word2 >> 12) & 15];
 				return;
 			case 0x003:			/* TC */
-				if (CPU_TYPE_IS_040_PLUS(CPU_TYPE))
-				{
-					state->mmu_tc = REG_DA[(word2 >> 12) & 15];
+				state->mmu_tc = REG_DA[(word2 >> 12) & 15];
 
-					if (state->mmu_tc & 0x8000)
-					{
-						state->pmmu_enabled = 1;
-					}
-					else
-					{
-						state->pmmu_enabled = 0;
-					}
-					return;
+				if (state->mmu_tc & 0x8000)
+				{
+					state->pmmu_enabled = 1;
 				}
-				m68ki_exception_illegal(state);
+				else
+				{
+					state->pmmu_enabled = 0;
+				}
 				return;
 			case 0x004:			/* ITT0 */
-				if (CPU_TYPE_IS_040_PLUS(CPU_TYPE))
-				{
-					state->mmu_itt0 = REG_DA[(word2 >> 12) & 15];
-					return;
-				}
-				m68ki_exception_illegal(state);
+				state->mmu_itt0 = REG_DA[(word2 >> 12) & 15];
 				return;
 			case 0x005:			/* ITT1 */
-				if (CPU_TYPE_IS_040_PLUS(CPU_TYPE))
-				{
-					state->mmu_itt1 = REG_DA[(word2 >> 12) & 15];
-					return;
-				}
-				m68ki_exception_illegal(state);
+				state->mmu_itt1 = REG_DA[(word2 >> 12) & 15];
 				return;
 			case 0x006:			/* DTT0 */
-				if (CPU_TYPE_IS_040_PLUS(CPU_TYPE))
-				{
-					state->mmu_dtt0 = REG_DA[(word2 >> 12) & 15];
-					return;
-				}
-				m68ki_exception_illegal(state);
+				state->mmu_dtt0 = REG_DA[(word2 >> 12) & 15];
 				return;
 			case 0x007:			/* DTT1 */
-				if (CPU_TYPE_IS_040_PLUS(CPU_TYPE))
-				{
-					state->mmu_dtt1 = REG_DA[(word2 >> 12) & 15];
-					return;
-				}
-				m68ki_exception_illegal(state);
+				state->mmu_dtt1 = REG_DA[(word2 >> 12) & 15];
 				return;
 			case 0x805:			/* MMUSR */
-				if (CPU_TYPE_IS_040_PLUS(CPU_TYPE))
-				{
-					state->mmu_sr_040 = REG_DA[(word2 >> 12) & 15];
-					return;
-				}
-				m68ki_exception_illegal(state);
+				state->mmu_sr_040 = REG_DA[(word2 >> 12) & 15];
 				return;
 			case 0x806:			/* URP */
-				if (CPU_TYPE_IS_040_PLUS(CPU_TYPE))
-				{
-					state->mmu_urp_aptr = REG_DA[(word2 >> 12) & 15];
-					return;
-				}
-				m68ki_exception_illegal(state);
+				state->mmu_urp_aptr = REG_DA[(word2 >> 12) & 15];
 				return;
 			case 0x807:			/* SRP */
-				if (CPU_TYPE_IS_040_PLUS(CPU_TYPE))
-				{
-					state->mmu_srp_aptr = REG_DA[(word2 >> 12) & 15];
-					return;
-				}
-				m68ki_exception_illegal(state);
+				state->mmu_srp_aptr = REG_DA[(word2 >> 12) & 15];
 				return;
 			default:
 				m68ki_exception_illegal(state);

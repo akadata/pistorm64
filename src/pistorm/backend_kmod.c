@@ -56,6 +56,7 @@ struct ps_kmod_state {
   bool queue_enabled;
   bool queue_mode_initialized;
   bool queue_error_logged;
+  bool fc_v2_unavailable_logged;
   uint64_t queue_full_events;
   uint64_t queue_full_fallbacks;
 
@@ -344,6 +345,56 @@ static int kmod_busop(int is_read, int width, uint32_t addr, uint32_t* val, uint
   return rc;
 }
 
+static int kmod_busop_fc(int is_read, int width, uint32_t addr, uint32_t* val, uint8_t fc) {
+  const uint8_t fc7 = (uint8_t)(fc & 0x7u);
+
+  if (fc7 == 0u) {
+    return kmod_busop(is_read, width, addr, val, 0);
+  }
+
+  if (kmod_open_dev() < 0) {
+    return -1;
+  }
+
+  struct pistorm_busop_v2 op = {
+      .op = (uint8_t)(is_read ? 0u : 1u),
+      .width = (uint8_t)width,
+      .fc = fc7,
+      .flags = 0,
+      .addr = addr,
+      .value = val ? *val : 0u,
+      .status = 0,
+  };
+  struct pistorm_run_batch batch = {
+      .count = 1u,
+      .flags = 0u,
+      .ops_ptr = (uint64_t)(uintptr_t)&op,
+  };
+
+  if (ioctl(gk.fd, PISTORM_IOC_RUN_BATCH, &batch) < 0) {
+    if (!gk.fc_v2_unavailable_logged && (errno == ENOTTY || errno == EINVAL)) {
+      LOG_ERROR("[FC] kmod FC path unavailable (RUN_BATCH disabled). Enable run_batch_enable=1.\n");
+      gk.fc_v2_unavailable_logged = true;
+    }
+    return -1;
+  }
+
+  if (op.status < 0) {
+    errno = (int)-op.status;
+    return -1;
+  }
+
+  if (is_read && val) {
+    *val = op.value;
+  }
+
+  if ((uint32_t)op.status & PISTORM_BUSOP_ST_BERR) {
+    LOG_VERBOSE("[BERR] bus error observed addr=0x%08x fc=%u\n", addr, (unsigned)fc7);
+  }
+
+  return 0;
+}
+
 static void kmod_queue_write(uint32_t addr, unsigned int width, uint32_t value) {
   struct pistorm_busop op;
   uint32_t temp = value;
@@ -399,10 +450,9 @@ static int kmod_pulse_reset(struct ps_ctx* ctx) {
 static int kmod_read8(struct ps_ctx* ctx, uint32_t addr, uint8_t fc, uint8_t* out) {
   uint32_t v = 0;
   (void)ctx;
-  (void)fc;
 
   kmod_flush_queue_before_read();
-  if (kmod_busop(1, PISTORM_W8, addr, &v, 0) < 0) {
+  if (kmod_busop_fc(1, PISTORM_W8, addr, &v, fc) < 0) {
     return -1;
   }
   if (out) {
@@ -414,10 +464,9 @@ static int kmod_read8(struct ps_ctx* ctx, uint32_t addr, uint8_t fc, uint8_t* ou
 static int kmod_read16(struct ps_ctx* ctx, uint32_t addr, uint8_t fc, uint16_t* out) {
   uint32_t v = 0;
   (void)ctx;
-  (void)fc;
 
   kmod_flush_queue_before_read();
-  if (kmod_busop(1, PISTORM_W16, addr, &v, 0) < 0) {
+  if (kmod_busop_fc(1, PISTORM_W16, addr, &v, fc) < 0) {
     return -1;
   }
   if (out) {
@@ -429,10 +478,9 @@ static int kmod_read16(struct ps_ctx* ctx, uint32_t addr, uint8_t fc, uint16_t* 
 static int kmod_read32(struct ps_ctx* ctx, uint32_t addr, uint8_t fc, uint32_t* out) {
   uint32_t v = 0;
   (void)ctx;
-  (void)fc;
 
   kmod_flush_queue_before_read();
-  if (kmod_busop(1, PISTORM_W32, addr, &v, 0) < 0) {
+  if (kmod_busop_fc(1, PISTORM_W32, addr, &v, fc) < 0) {
     return -1;
   }
   if (out) {
@@ -442,23 +490,50 @@ static int kmod_read32(struct ps_ctx* ctx, uint32_t addr, uint8_t fc, uint32_t* 
 }
 
 static int kmod_write8(struct ps_ctx* ctx, uint32_t addr, uint8_t value, uint8_t fc) {
+  uint32_t v = (uint32_t)value;
   (void)ctx;
-  (void)fc;
-  kmod_queue_write(addr, PISTORM_W8, (uint32_t)value);
+
+  if ((fc & 0x7u) == 0u) {
+    kmod_queue_write(addr, PISTORM_W8, v);
+    return 0;
+  }
+
+  kmod_flush_queue_before_read();
+  if (kmod_busop_fc(0, PISTORM_W8, addr, &v, fc) < 0) {
+    return -1;
+  }
   return 0;
 }
 
 static int kmod_write16(struct ps_ctx* ctx, uint32_t addr, uint16_t value, uint8_t fc) {
+  uint32_t v = (uint32_t)value;
   (void)ctx;
-  (void)fc;
-  kmod_queue_write(addr, PISTORM_W16, (uint32_t)value);
+
+  if ((fc & 0x7u) == 0u) {
+    kmod_queue_write(addr, PISTORM_W16, v);
+    return 0;
+  }
+
+  kmod_flush_queue_before_read();
+  if (kmod_busop_fc(0, PISTORM_W16, addr, &v, fc) < 0) {
+    return -1;
+  }
   return 0;
 }
 
 static int kmod_write32(struct ps_ctx* ctx, uint32_t addr, uint32_t value, uint8_t fc) {
+  uint32_t v = value;
   (void)ctx;
-  (void)fc;
-  kmod_queue_write(addr, PISTORM_W32, value);
+
+  if ((fc & 0x7u) == 0u) {
+    kmod_queue_write(addr, PISTORM_W32, v);
+    return 0;
+  }
+
+  kmod_flush_queue_before_read();
+  if (kmod_busop_fc(0, PISTORM_W32, addr, &v, fc) < 0) {
+    return -1;
+  }
   return 0;
 }
 

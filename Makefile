@@ -185,6 +185,13 @@ PISTORM_KMOD_PARAMS ?= run_batch_enable=1 berr_reset_input=1 gpclk_src=$(PISTORM
 
 PS_PROTOCOL_SRC := src/gpio/ps_protocol_kmod.c
 PS_BACKEND_SRCS := src/pistorm/backend.c src/pistorm/backend_kmod.c src/pistorm/backend_userspace_mmio.c
+PROCESSORTESTS_ROOT ?= /home/smalley/reference/ProcessorTests
+PROCESSORTESTS_SOURCE ?= $(PROCESSORTESTS_ROOT)/680x0/68000/v1
+PROCESSORTESTS_MAP ?= $(PROCESSORTESTS_ROOT)/680x0/map/68000.official.json
+PROCESSORTESTS_TOOLS ?= $(PROCESSORTESTS_ROOT)/tools
+PROCESSORTESTS_QUICK_DIR ?= build/processortests/quick
+PROCESSORTESTS_QUICK_PERCENT ?= 1
+PROCESSORTESTS_QUICK_SAMPLE ?= 64
 
 
 MAINFILES =
@@ -514,16 +521,18 @@ HELP_TARGETS = \
 	"make install [PREFIX=… DESTDIR=…]" "Install emulator, data/, configs, piscsi.rom, a314 files" \
 	"make install-boot-firmware"      "Safely install boot/firmware config+cmdline (preserves current root=, rootfstype=)" \
 	"make uninstall [PREFIX=… DESTDIR=…]" "Remove installed tree" \
-	"make kernel_module"              "Build pistorm.ko + z3bus.ko (out-of-tree)" \
-	"make kernel_module_pistorm"      "Build pistorm.ko only (out-of-tree)" \
-	"make kernel_module_z3bus"        "Build z3bus.ko only (out-of-tree)" \
-	"make kernel_install"             "Install pistorm.ko + z3bus.ko via kernel_module/Makefile (no build)" \
-	"make kernel_install_build"       "Build + install pistorm.ko + z3bus.ko" \
-	"make kernel_install_pistorm"     "Install pistorm.ko only via kernel_module/Makefile" \
-	"make kernel_install_z3bus"       "Install z3bus.ko only via kernel_module/Makefile" \
-	"make kernel_clean"               "Clean kernel module build outputs" \
+	"make kernel_module"              "Retired target (no-op; kernel module left in tree)" \
+	"make kernel_module_pistorm"      "Retired target (no-op)" \
+	"make kernel_module_z3bus"        "Retired target (no-op)" \
+	"make kernel_install"             "Retired target (no-op)" \
+	"make kernel_install_build"       "Retired target (no-op)" \
+	"make kernel_install_pistorm"     "Retired target (no-op)" \
+	"make kernel_install_z3bus"       "Retired target (no-op)" \
+	"make kernel_clean"               "Retired target (no-op)" \
 	"make "            "Build interactive bus monitor" \
-	"make full"         "Stop emulator, rebuild kmod+userland, install" \
+	"make full"         "Stop emulator, rebuild userspace, install" \
+	"make processortests-quick"       "Generate/use quick ProcessorTests subset and validate" \
+	"make processortests-full"        "Validate full ProcessorTests 68000/v1 dataset" \
 	"make uae-jit"      "Build UAE AArch64 JIT objects (libuae.a)" \
 	"make uae-opcodes"  "Regenerate UAE CPU/JIT opcode tables"
 
@@ -540,8 +549,6 @@ all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest pistorm_truth_tes
 clean:
 	rm -f $(DELETEFILES) $(TARGET).tmp
 	rm -rf src/a314/files_pi/__pycache__
-	$(MAKE) kernel_clean
-	rm -rf kernel_module/.tmp_versions
 	find . \( -name '*.o' -o -name '*.tmp' \) -print0 | xargs -0 -r rm -f --
 
 # Ensure generated m68k files are built before other files that depend on them
@@ -696,14 +703,6 @@ install: all amiga-piscsi
 		$(INSTALL) -d /etc/security/limits.d; \
 		$(INSTALL) -m 644 $(LIMITS_CONF) /etc/security/limits.d/pistorm-rt.conf; \
 	fi
-	if [ -f $(MODULES_LOAD) ]; then \
-		$(INSTALL) -d /etc/modules-load.d; \
-		$(INSTALL) -m 644 $(MODULES_LOAD) /etc/modules-load.d/pistorm.conf; \
-	fi
-	if [ -f $(MODPROBE_CONF) ]; then \
-		$(INSTALL) -d /etc/modprobe.d; \
-		$(INSTALL) -m 644 $(MODPROBE_CONF) /etc/modprobe.d/pistorm.conf; \
-	fi
 	@if [ "$(INSTALL_BOOT_FIRMWARE)" = "1" ]; then \
 		$(MAKE) BOOT_FIRMWARE_DIR="$(BOOT_FIRMWARE_DIR)" install-boot-firmware; \
 	else \
@@ -785,43 +784,28 @@ uninstall:
 	rm -rf $(INSTALL_DIR)
 
 kernel_module:
-	@if [ "$$(id -u)" = "0" ]; then \
-		echo "ERROR: build kernel_module as a normal user, not root."; \
-		echo "       (root-owned .d files will break subsequent builds)"; \
-		exit 1; \
-	fi
-	$(MAKE) -C kernel_module module
+	@echo "kernel_module target is retired; skipping build."
 
 kernel_module_pistorm:
-	@if [ "$$(id -u)" = "0" ]; then \
-		echo "ERROR: build kernel_module as a normal user, not root."; \
-		echo "       (root-owned .d files will break subsequent builds)"; \
-		exit 1; \
-	fi
-	$(MAKE) -C kernel_module module_pistorm
+	@echo "kernel_module_pistorm target is retired; skipping build."
 
 kernel_module_z3bus:
-	@if [ "$$(id -u)" = "0" ]; then \
-		echo "ERROR: build kernel_module as a normal user, not root."; \
-		echo "       (root-owned .d files will break subsequent builds)"; \
-		exit 1; \
-	fi
-	$(MAKE) -C kernel_module module_z3bus
+	@echo "kernel_module_z3bus target is retired; skipping build."
 
 kernel_install:
-	$(MAKE) -C kernel_module install
+	@echo "kernel_install target is retired; skipping install."
 
-kernel_install_build: kernel_module
-	$(MAKE) -C kernel_module install
+kernel_install_build:
+	@echo "kernel_install_build target is retired; skipping install."
 
-kernel_install_pistorm: kernel_module_pistorm
-	$(MAKE) -C kernel_module install_pistorm
+kernel_install_pistorm:
+	@echo "kernel_install_pistorm target is retired; skipping install."
 
-kernel_install_z3bus: kernel_module_z3bus
-	$(MAKE) -C kernel_module install_z3bus
+kernel_install_z3bus:
+	@echo "kernel_install_z3bus target is retired; skipping install."
 
 kernel_clean:
-	$(MAKE) -C kernel_module clean
+	@echo "kernel_clean target is retired; skipping clean."
 
 amiga-net:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/net/net_driver_amiga
@@ -861,7 +845,6 @@ full:
 		exit 1; \
 	fi
 	sudo pkill -x emulator 2>/dev/null || true
-	sudo rmmod pistorm 2>/dev/null || true
 	$(MAKE) clean
 ifeq ($(USE_UAE_JIT),1)
 	$(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) uae-jit
@@ -870,14 +853,9 @@ else
 endif
 	$(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD)
 	$(MAKE) amiga-piscsi amiga-pirtg64
-	$(MAKE) kernel_module
-	sudo $(MAKE) kernel_install
 	sudo $(MAKE) USE_UAE_JIT=$(USE_UAE_JIT) PISTORM_KMOD=$(PISTORM_KMOD) INSTALL_BOOT_FIRMWARE=$(INSTALL_BOOT_FIRMWARE) BOOT_FIRMWARE_DIR="$(BOOT_FIRMWARE_DIR)" install
 	# Copy system configuration files
 	#sudo cp -f 10-hugepages.conf /etc/sysctl.d/10-hugepages.conf
-	sudo cp -f etc/modules-load.d/pistorm.conf /etc/modules-load.d/pistorm.conf
-	sudo cp -f etc/modules-load.d/z3bus.conf /etc/modules-load.d/z3bus.conf	
-	sudo cp -f $(MODPROBE_CONF) /etc/modprobe.d/pistorm.conf
 	sudo cp -f etc/security/limits.d/pistorm-rt.conf /etc/security/limits.d/pistorm-rt.conf
 	sudo cp -f etc/udev/99-pistorm.rules /etc/udev/rules.d/99-pistorm.rules
 	sudo cp -f etc/systemd/system/pistorm64.service /etc/systemd/system/pistorm64.service
@@ -888,9 +866,25 @@ endif
 	sudo sysctl -p /etc/sysctl.d/10-hugepages.conf || echo "Note: Some hugepage settings may not be supported on this system"
 	# Enable and start the emulator service
 	# sudo systemctl enable pistorm64.service
-	echo "Loading Kernel PiStorm64"
-#	sudo modprobe pistorm run_batch_enable=1 berr_reset_input=1 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV) 2>/dev/null || true
-	#sudo modprobe pistorm $(PISTORM_KMOD_PARAMS) 2>/dev/null || true
+	echo "PiStorm64 userspace build/install complete."
+
+processortests-quick:
+	python3 tools/processortests_runner.py \
+		--mode quick \
+		--source-dir "$(PROCESSORTESTS_SOURCE)" \
+		--tools-dir "$(PROCESSORTESTS_TOOLS)" \
+		--subset-dir "$(PROCESSORTESTS_QUICK_DIR)" \
+		--subset-percent "$(PROCESSORTESTS_QUICK_PERCENT)" \
+		--sample-per-file "$(PROCESSORTESTS_QUICK_SAMPLE)" \
+		--check-map \
+		--map-file "$(PROCESSORTESTS_MAP)"
+
+processortests-full:
+	python3 tools/processortests_runner.py \
+		--mode full \
+		--suite-dir "$(PROCESSORTESTS_SOURCE)" \
+		--check-map \
+		--map-file "$(PROCESSORTESTS_MAP)"
 
 help:
 	@printf "Available targets:\n"
@@ -898,4 +892,4 @@ help:
 
 -include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d tools/piscsi_remote/piscsi_remote_server.d tools/piscsi_remote/piscsi_remote_client.d $(UAE_OBJS:%.o=%.d)
 
-.PHONY: all clean buptest pistorm_truth_test install install-boot-firmware uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-net64 amiga-piscsi amiga-pirtg64 amiga-ahi amiga-all amiga-clean piscsi-remote piscsi-remote-server piscsi-remote-client
+.PHONY: all clean buptest pistorm_truth_test install install-boot-firmware uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-net64 amiga-piscsi amiga-pirtg64 amiga-ahi amiga-all amiga-clean piscsi-remote piscsi-remote-server piscsi-remote-client processortests-quick processortests-full

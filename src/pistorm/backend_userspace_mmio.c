@@ -115,8 +115,19 @@ struct ps_userspace_mmio_state {
   bool ramseq_enable;
   bool wpipe_enable;
   bool write_pending;
+  bool trace_txn;
+  bool trace_txn_only_nonzero_fc;
+  bool trace_txn_limit_reported;
+  bool force_fc0;
+  uint32_t trace_txn_limit;
+  uint32_t trace_txn_count;
   uint32_t wr_stretch;
   uint32_t rd_stretch;
+  const char* last_txn_op;
+  uint32_t last_txn_addr;
+  uint8_t last_txn_fc;
+  uint16_t last_txn_opbits;
+  bool last_txn_is_read;
 
   uint32_t fsel_input[3];
   uint32_t fsel_output[3];
@@ -374,6 +385,44 @@ static inline uint32_t um_effective_rd_stretch(void) {
   return gu.rd_stretch == 0u ? 1u : gu.rd_stretch;
 }
 
+static inline uint8_t um_effective_fc(uint8_t fc) {
+  uint8_t fc7 = (uint8_t)(fc & 0x7u);
+  if (gu.force_fc0) {
+    return 0u;
+  }
+  return fc7;
+}
+
+static inline void um_note_txn(const char* op_name, uint32_t addr, uint8_t fc, uint16_t opbits,
+                               bool is_read) {
+  bool should_print;
+  gu.last_txn_op = op_name;
+  gu.last_txn_addr = addr;
+  gu.last_txn_fc = (uint8_t)(fc & 0x7u);
+  gu.last_txn_opbits = opbits;
+  gu.last_txn_is_read = is_read;
+  should_print = gu.trace_txn;
+  if (should_print && gu.trace_txn_only_nonzero_fc && gu.last_txn_fc == 0u) {
+    should_print = false;
+  }
+  if (should_print && gu.trace_txn_limit != 0u && gu.trace_txn_count >= gu.trace_txn_limit) {
+    should_print = false;
+    if (!gu.trace_txn_limit_reported) {
+      fprintf(stderr,
+              "[ps_backend:userspace-mmio] txn trace limit reached (%u); suppressing further txn logs\n",
+              gu.trace_txn_limit);
+      gu.trace_txn_limit_reported = true;
+    }
+  }
+  if (should_print) {
+    gu.trace_txn_count++;
+    fprintf(stderr,
+            "[ps_backend:userspace-mmio] txn %s addr=%08X fc=%u opbits=%03X read=%u pending=%u out=%u\n",
+            op_name ? op_name : "?", addr, (unsigned int)gu.last_txn_fc, (unsigned int)opbits,
+            is_read ? 1u : 0u, gu.write_pending ? 1u : 0u, gu.data_out ? 1u : 0u);
+  }
+}
+
 static inline bool um_addr_is_chip_ram(uint32_t addr, uint32_t bytes) {
   if (bytes == 0u) {
     return false;
@@ -478,7 +527,15 @@ static int um_wait_for_txn(const char* op_name) {
   while (um_readl_gpio(GPIO_GPLEV0) & (1u << PIN_TXN_IN_PROGRESS)) {
     spins++;
     if ((spins & (UMIO_DEADLINE_CHECK_ITERS - 1u)) == 0u && now_us_monotonic() > deadline) {
-      fprintf(stderr, "[ps_backend:userspace-mmio] txn timeout waiting for %s\n", op_name);
+      uint32_t gplev0 = um_readl_gpio(GPIO_GPLEV0);
+      uint32_t gplev1 = um_readl_gpio(GPIO_GPLEV1);
+      fprintf(stderr,
+              "[ps_backend:userspace-mmio] txn timeout waiting for %s "
+              "(last=%s addr=%08X fc=%u opbits=%03X read=%u pending=%u out=%u gplev0=%08X gplev1=%08X)\n",
+              op_name, gu.last_txn_op ? gu.last_txn_op : "?", gu.last_txn_addr,
+              (unsigned int)gu.last_txn_fc, (unsigned int)gu.last_txn_opbits,
+              gu.last_txn_is_read ? 1u : 0u, gu.write_pending ? 1u : 0u, gu.data_out ? 1u : 0u,
+              gplev0, gplev1);
       return -ETIMEDOUT;
     }
   }
@@ -582,8 +639,9 @@ static inline uint32_t um_addr_hi_payload(uint32_t addr, uint16_t opbits, uint8_
 
 static int um_write16_fc(uint32_t addr, uint16_t data, uint8_t fc) {
   int ret;
+  uint8_t fc7 = um_effective_fc(fc);
   bool sticky_ram = gu.ramseq_enable && um_addr_is_chip_ram(addr, 2u);
-  bool pipe_ram = um_wpipe_allowed(addr, 2u, fc);
+  bool pipe_ram = um_wpipe_allowed(addr, 2u, fc7);
 
   ret = um_drain_pending_write(pipe_ram ? "write16_fc[pending]" : "write16_fc[drain]");
   if (ret < 0) {
@@ -594,16 +652,17 @@ static int um_write16_fc(uint32_t addr, uint16_t data, uint8_t fc) {
   um_set_bus_dir(true);
   um_write_payload(((uint32_t)data & 0xFFFFu) << 8, REG_DATA);
   um_write_payload((addr & 0xFFFFu) << 8, REG_ADDR_LO);
+  um_note_txn("write16_fc", addr, fc7, 0x0000u, false);
 
   if (pipe_ram) {
-    um_write_payload(um_addr_hi_payload(addr, 0x0000u, fc) << 8, REG_ADDR_HI);
+    um_write_payload(um_addr_hi_payload(addr, 0x0000u, fc7) << 8, REG_ADDR_HI);
     gu.write_pending = true;
     if (!sticky_ram) {
       um_set_bus_dir(false);
     }
     return 0;
   }
-  um_write_payload(um_addr_hi_payload(addr, 0x0000u, fc) << 8, REG_ADDR_HI);
+  um_write_payload(um_addr_hi_payload(addr, 0x0000u, fc7) << 8, REG_ADDR_HI);
   if (!sticky_ram) {
     um_set_bus_dir(false);
   }
@@ -612,8 +671,9 @@ static int um_write16_fc(uint32_t addr, uint16_t data, uint8_t fc) {
 
 static int um_write8_fc(uint32_t addr, uint8_t data, uint8_t fc) {
   int ret;
+  uint8_t fc7 = um_effective_fc(fc);
   bool sticky_ram = gu.ramseq_enable && um_addr_is_chip_ram(addr, 1u);
-  bool pipe_ram = um_wpipe_allowed(addr, 1u, fc);
+  bool pipe_ram = um_wpipe_allowed(addr, 1u, fc7);
   uint16_t payload = (addr & 1u) ? (uint16_t)data : (uint16_t)(data | (uint16_t)(data << 8));
 
   ret = um_drain_pending_write(pipe_ram ? "write8_fc[pending]" : "write8_fc[drain]");
@@ -625,16 +685,17 @@ static int um_write8_fc(uint32_t addr, uint8_t data, uint8_t fc) {
   um_set_bus_dir(true);
   um_write_payload(((uint32_t)payload & 0xFFFFu) << 8, REG_DATA);
   um_write_payload((addr & 0xFFFFu) << 8, REG_ADDR_LO);
+  um_note_txn("write8_fc", addr, fc7, 0x0100u, false);
 
   if (pipe_ram) {
-    um_write_payload(um_addr_hi_payload(addr, 0x0100u, fc) << 8, REG_ADDR_HI);
+    um_write_payload(um_addr_hi_payload(addr, 0x0100u, fc7) << 8, REG_ADDR_HI);
     gu.write_pending = true;
     if (!sticky_ram) {
       um_set_bus_dir(false);
     }
     return 0;
   }
-  um_write_payload(um_addr_hi_payload(addr, 0x0100u, fc) << 8, REG_ADDR_HI);
+  um_write_payload(um_addr_hi_payload(addr, 0x0100u, fc7) << 8, REG_ADDR_HI);
   if (!sticky_ram) {
     um_set_bus_dir(false);
   }
@@ -644,6 +705,7 @@ static int um_write8_fc(uint32_t addr, uint8_t data, uint8_t fc) {
 static int um_read16_fc(uint32_t addr, uint16_t* out, uint8_t fc) {
   int ret;
   uint32_t value;
+  uint8_t fc7 = um_effective_fc(fc);
   uint32_t stretch = um_effective_rd_stretch();
 
   if (!out) {
@@ -657,7 +719,8 @@ static int um_read16_fc(uint32_t addr, uint16_t* out, uint8_t fc) {
 
   um_set_bus_dir(true);
   um_write_payload((addr & 0xFFFFu) << 8, REG_ADDR_LO);
-  um_write_payload(um_addr_hi_payload(addr, 0x0200u, fc) << 8, REG_ADDR_HI);
+  um_note_txn("read16_fc", addr, fc7, 0x0200u, true);
+  um_write_payload(um_addr_hi_payload(addr, 0x0200u, fc7) << 8, REG_ADDR_HI);
 
   um_set_bus_dir(false);
   um_write_set(REG_DATA << PIN_A0);
@@ -688,6 +751,7 @@ static int um_read32_fc_pair(uint32_t addr, uint32_t* out, uint8_t fc) {
   uint16_t hi = 0;
   uint16_t lo = 0;
   uint32_t value;
+  uint8_t fc7 = um_effective_fc(fc);
   int ret;
   uint32_t addr1 = addr + 2u;
 
@@ -702,7 +766,8 @@ static int um_read32_fc_pair(uint32_t addr, uint32_t* out, uint8_t fc) {
 
   um_set_bus_dir(true);
   um_write_payload((addr & 0xFFFFu) << 8, REG_ADDR_LO);
-  um_write_payload(um_addr_hi_payload(addr, 0x0200u, fc) << 8, REG_ADDR_HI);
+  um_note_txn("read32_fc[0]", addr, fc7, 0x0200u, true);
+  um_write_payload(um_addr_hi_payload(addr, 0x0200u, fc7) << 8, REG_ADDR_HI);
 
   um_set_bus_dir(false);
   um_mmio_barrier();
@@ -721,7 +786,8 @@ static int um_read32_fc_pair(uint32_t addr, uint32_t* out, uint8_t fc) {
 
   um_set_bus_dir(true);
   um_write_payload((addr1 & 0xFFFFu) << 8, REG_ADDR_LO);
-  um_write_payload(um_addr_hi_payload(addr1, 0x0200u, fc) << 8, REG_ADDR_HI);
+  um_note_txn("read32_fc[1]", addr1, fc7, 0x0200u, true);
+  um_write_payload(um_addr_hi_payload(addr1, 0x0200u, fc7) << 8, REG_ADDR_HI);
 
   um_set_bus_dir(false);
   um_mmio_barrier();
@@ -767,6 +833,7 @@ static int um_read8_fc(uint32_t addr, uint8_t* out, uint8_t fc) {
 static int um_write32_fc_pair(uint32_t addr, uint32_t value, uint8_t fc) {
   bool sticky_ram = gu.ramseq_enable && um_addr_is_chip_ram(addr, 4u);
   uint32_t addr1 = addr + 2u;
+  uint8_t fc7 = um_effective_fc(fc);
   uint16_t hi = (uint16_t)(value >> 16);
   uint16_t lo = (uint16_t)(value & 0xFFFFu);
   int ret;
@@ -780,7 +847,8 @@ static int um_write32_fc_pair(uint32_t addr, uint32_t value, uint8_t fc) {
 
   um_write_payload(((uint32_t)hi & 0xFFFFu) << 8, REG_DATA);
   um_write_payload((addr & 0xFFFFu) << 8, REG_ADDR_LO);
-  um_write_payload(um_addr_hi_payload(addr, 0x0000u, fc) << 8, REG_ADDR_HI);
+  um_note_txn("write32_fc[0]", addr, fc7, 0x0000u, false);
+  um_write_payload(um_addr_hi_payload(addr, 0x0000u, fc7) << 8, REG_ADDR_HI);
   ret = um_wait_for_txn("write32_fc[0]");
   if (ret < 0) {
     um_set_bus_dir(false);
@@ -789,7 +857,8 @@ static int um_write32_fc_pair(uint32_t addr, uint32_t value, uint8_t fc) {
 
   um_write_payload(((uint32_t)lo & 0xFFFFu) << 8, REG_DATA);
   um_write_payload((addr1 & 0xFFFFu) << 8, REG_ADDR_LO);
-  um_write_payload(um_addr_hi_payload(addr1, 0x0000u, fc) << 8, REG_ADDR_HI);
+  um_note_txn("write32_fc[1]", addr1, fc7, 0x0000u, false);
+  um_write_payload(um_addr_hi_payload(addr1, 0x0000u, fc7) << 8, REG_ADDR_HI);
   ret = um_wait_for_txn("write32_fc[1]");
 
   if (!sticky_ram || ret < 0) {
@@ -895,6 +964,13 @@ static int um_init(struct ps_ctx* ctx) {
   gu.berr_reset_input = (parse_bool_env("PISTORM_MMIO_BERR_RESET_INPUT", 1) != 0);
   gu.bus_arb_release = (parse_bool_env("PISTORM_MMIO_BUS_ARB_RELEASE", 0) != 0);
   gu.setup_gpclk = (parse_bool_env("PISTORM_MMIO_SETUP_GPCLK", 1) != 0);
+  gu.trace_txn = (parse_bool_env("PISTORM_MMIO_TRACE_TXN", 0) != 0);
+  gu.trace_txn_only_nonzero_fc = (parse_bool_env("PISTORM_MMIO_TRACE_TXN_NONZERO_FC", 0) != 0);
+  gu.trace_txn_limit_reported = false;
+  gu.trace_txn_count = 0u;
+  gu.trace_txn_limit = 0u;
+  (void)parse_u32_env("PISTORM_MMIO_TRACE_TXN_LIMIT", &gu.trace_txn_limit);
+  gu.force_fc0 = (parse_bool_env("PISTORM_MMIO_FORCE_FC0", 0) != 0);
   gu.lwpair_enable = gu_cfg.lwpair_enable;
   gu.lrpair_enable = gu_cfg.r32pair_enable;
   gu.ramseq_enable = gu_cfg.ramseq_enable;
@@ -929,6 +1005,14 @@ static int um_init(struct ps_ctx* ctx) {
   if (gu.wpipe_enable) {
     fprintf(stderr, "[ps_backend:userspace-mmio] WPIPE enabled in conservative mode "
                     "(non-FC fc=0 chip-ram writes only)\n");
+  }
+  if (gu.force_fc0) {
+    fprintf(stderr, "[ps_backend:userspace-mmio] FC override active: all transactions use fc=0\n");
+  }
+  if (gu.trace_txn) {
+    fprintf(stderr,
+            "[ps_backend:userspace-mmio] txn trace enabled (limit=%u nonzero_fc_only=%u)\n",
+            gu.trace_txn_limit, gu.trace_txn_only_nonzero_fc ? 1u : 0u);
   }
 
   gu.wr_stretch = gu_cfg.wr_stretch;

@@ -104,39 +104,63 @@ void ps_fc_write(uint8_t fc) {
 #endif
 
 uint8_t ps_read_8(uint32_t addr) {
-  uint8_t v = 0;
-  if (ps_backend_read8(addr, 0, &v) < 0) {
-    return 0;
-  }
-  return v;
+  return ps_read_8_fc(addr, 0);
 }
 
 uint16_t ps_read_16(uint32_t addr) {
-  uint16_t v = 0;
-  if (ps_backend_read16(addr, 0, &v) < 0) {
-    return 0;
-  }
-  return v;
+  return ps_read_16_fc(addr, 0);
 }
 
 uint32_t ps_read_32(uint32_t addr) {
-  uint32_t v = 0;
-  if (ps_backend_read32(addr, 0, &v) < 0) {
+  return ps_read_32_fc(addr, 0);
+}
+
+void ps_write_8(uint32_t addr, uint8_t v) {
+  ps_write_8_fc(addr, v, 0);
+}
+
+void ps_write_16(uint32_t addr, uint16_t v) {
+  ps_write_16_fc(addr, v, 0);
+}
+
+void ps_write_32(uint32_t addr, uint32_t v) {
+  ps_write_32_fc(addr, v, 0);
+}
+
+uint8_t ps_read_8_fc(uint32_t addr, uint8_t fc) {
+  uint8_t v = 0;
+  if (ps_backend_read8(addr, (uint8_t)(fc & 0x7u), &v) < 0) {
     return 0;
   }
   return v;
 }
 
-void ps_write_8(uint32_t addr, uint8_t v) {
-  (void)ps_backend_write8(addr, v, 0);
+uint16_t ps_read_16_fc(uint32_t addr, uint8_t fc) {
+  uint16_t v = 0;
+  if (ps_backend_read16(addr, (uint8_t)(fc & 0x7u), &v) < 0) {
+    return 0;
+  }
+  return v;
 }
 
-void ps_write_16(uint32_t addr, uint16_t v) {
-  (void)ps_backend_write16(addr, v, 0);
+uint32_t ps_read_32_fc(uint32_t addr, uint8_t fc) {
+  uint32_t v = 0;
+  if (ps_backend_read32(addr, (uint8_t)(fc & 0x7u), &v) < 0) {
+    return 0;
+  }
+  return v;
 }
 
-void ps_write_32(uint32_t addr, uint32_t v) {
-  (void)ps_backend_write32(addr, v, 0);
+void ps_write_8_fc(uint32_t addr, uint8_t v, uint8_t fc) {
+  (void)ps_backend_write8(addr, v, (uint8_t)(fc & 0x7u));
+}
+
+void ps_write_16_fc(uint32_t addr, uint16_t v, uint8_t fc) {
+  (void)ps_backend_write16(addr, v, (uint8_t)(fc & 0x7u));
+}
+
+void ps_write_32_fc(uint32_t addr, uint32_t v, uint8_t fc) {
+  (void)ps_backend_write32(addr, v, (uint8_t)(fc & 0x7u));
 }
 
 uint16_t ps_read_status_reg(void) {

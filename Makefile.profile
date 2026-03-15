@@ -462,19 +462,19 @@ HELP_TARGETS = \
 	"make amiga-clean"                "Clean Amiga-side driver build artifacts" \
 	"make install [PREFIX=… DESTDIR=…]" "Install emulator, data/, configs, piscsi.rom, a314 files" \
 	"make uninstall [PREFIX=… DESTDIR=…]" "Remove installed tree" \
-	"make kernel_module"              "Build pistorm.ko + z3bus.ko (out-of-tree)" \
-	"make kernel_module_pistorm"      "Build pistorm.ko only (out-of-tree)" \
-	"make kernel_module_z3bus"        "Build z3bus.ko only (out-of-tree)" \
-	"make kernel_install"             "Install pistorm.ko + z3bus.ko via kernel_module/Makefile (no build)" \
-	"make kernel_install_build"       "Build + install pistorm.ko + z3bus.ko" \
-	"make kernel_install_pistorm"     "Install pistorm.ko only via kernel_module/Makefile" \
-	"make kernel_install_z3bus"       "Install z3bus.ko only via kernel_module/Makefile" \
-	"make kernel_clean"               "Clean kernel module build outputs" \
+	"make kernel_module"              "Retired target (no-op; kernel module left in tree)" \
+	"make kernel_module_pistorm"      "Retired target (no-op)" \
+	"make kernel_module_z3bus"        "Retired target (no-op)" \
+	"make kernel_install"             "Retired target (no-op)" \
+	"make kernel_install_build"       "Retired target (no-op)" \
+	"make kernel_install_pistorm"     "Retired target (no-op)" \
+	"make kernel_install_z3bus"       "Retired target (no-op)" \
+	"make kernel_clean"               "Retired target (no-op)" \
 	"make profile"                    "Build emulator with PGO instrumentation" \
 	"make runprofile"                 "Run emulator to generate PGO profile data" \
 	"make buildprofile"               "Rebuild emulator using PGO profile data + compile trace" \
 	"make "            "Build interactive bus monitor" \
-	"make full"         "Stop emulator, rebuild kmod+userland, install"
+	"make full"         "Stop emulator, rebuild userspace, install"
 
 # Safety: never leave partial outputs
 .DELETE_ON_ERROR:
@@ -565,52 +565,32 @@ install: all
 		$(INSTALL) -d /etc/security/limits.d; \
 		$(INSTALL) -m 644 $(LIMITS_CONF) /etc/security/limits.d/pistorm-rt.conf; \
 	fi
-	if [ -f $(MODULES_LOAD) ]; then \
-		$(INSTALL) -d /etc/modules-load.d; \
-		$(INSTALL) -m 644 $(MODULES_LOAD) /etc/modules-load.d/pistorm.conf; \
-	fi
-
 uninstall:
 	rm -rf $(INSTALL_DIR)
 
 kernel_module:
-	@if [ "$$(id -u)" = "0" ]; then \
-		echo "ERROR: build kernel_module as a normal user, not root."; \
-		echo "       (root-owned .d files will break subsequent builds)"; \
-		exit 1; \
-	fi
-	$(MAKE) -C kernel_module module
+	@echo "kernel_module target is retired; skipping build."
 
 kernel_module_pistorm:
-	@if [ "$$(id -u)" = "0" ]; then \
-		echo "ERROR: build kernel_module as a normal user, not root."; \
-		echo "       (root-owned .d files will break subsequent builds)"; \
-		exit 1; \
-	fi
-	$(MAKE) -C kernel_module module_pistorm
+	@echo "kernel_module_pistorm target is retired; skipping build."
 
 kernel_module_z3bus:
-	@if [ "$$(id -u)" = "0" ]; then \
-		echo "ERROR: build kernel_module as a normal user, not root."; \
-		echo "       (root-owned .d files will break subsequent builds)"; \
-		exit 1; \
-	fi
-	$(MAKE) -C kernel_module module_z3bus
+	@echo "kernel_module_z3bus target is retired; skipping build."
 
 kernel_install:
-	$(MAKE) -C kernel_module install
+	@echo "kernel_install target is retired; skipping install."
 
-kernel_install_build: kernel_module
-	$(MAKE) -C kernel_module install
+kernel_install_build:
+	@echo "kernel_install_build target is retired; skipping install."
 
-kernel_install_pistorm: kernel_module_pistorm
-	$(MAKE) -C kernel_module install_pistorm
+kernel_install_pistorm:
+	@echo "kernel_install_pistorm target is retired; skipping install."
 
-kernel_install_z3bus: kernel_module_z3bus
-	$(MAKE) -C kernel_module install_z3bus
+kernel_install_z3bus:
+	@echo "kernel_install_z3bus target is retired; skipping install."
 
 kernel_clean:
-	$(MAKE) -C kernel_module clean
+	@echo "kernel_clean target is retired; skipping clean."
 
 amiga-net:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/net/net_driver_amiga
@@ -646,31 +626,24 @@ full:
 		exit 1; \
 	fi
 	-pkill -x emulator 2>/dev/null || true
-	-sudo rmmod pistorm 2>/dev/null || true
 	$(MAKE) clean
 	$(MAKE) PISTORM_KMOD=$(PISTORM_KMOD)
-	$(MAKE) kernel_module
-	sudo $(MAKE) kernel_install
 	sudo $(MAKE) PISTORM_KMOD=$(PISTORM_KMOD) install
 	# Copy boot configuration files
 	#sudo cp -f boot/firmware/config.txt /boot/firmware/config.txt
 	#sudo cp -f boot/firmware/cmdline.txt /boot/firmware/cmdline.txt
 	# Copy system configuration files
 	#sudo cp -f 10-hugepages.conf /etc/sysctl.d/10-hugepages.conf
-	sudo cp -f etc/modules-load.d/pistorm.conf /etc/modules-load.d/pistorm.conf
-	sudo cp -f etc/modules-load.d/z3bus.conf /etc/modules-load.d/z3bus.conf	
 	sudo cp -f etc/security/limits.d/pistorm-rt.conf /etc/security/limits.d/pistorm-rt.conf
 	sudo cp -f etc/udev/99-pistorm.rules /etc/udev/rules.d/99-pistorm.rules
-	sudo cp -f etc/systemd/system/kernelpistorm64.service /etc/systemd/system/kernelpistorm64.service
+	sudo cp -f etc/systemd/system/pistorm64.service /etc/systemd/system/pistorm64.service
 	# Reload systemd configurations
 	sudo systemctl daemon-reload
 	sudo udevadm control --reload-rules && sudo udevadm trigger
 	# Apply sysctl settings (continue even if hugepages not supported)
 	sudo sysctl -p /etc/sysctl.d/10-hugepages.conf || echo "Note: Some hugepage settings may not be supported on this system"
 	# Enable and start the emulator service
-	sudo systemctl enable kernelpistorm64.service
-	echo "Loading Kernel PiStorm64"
-	sudo modprobe pistorm 2>/dev/null || true
+	sudo systemctl enable pistorm64.service
 
 # -------------------------
 # PGO / profiling workflow
@@ -682,8 +655,6 @@ profile:
 	@mkdir -p $(PGO_DIR)
 	$(MAKE) -f Makefile.profile clean
 	$(MAKE) -f Makefile.profile PGO_MODE=gen
-	@echo "[PGO] Building Pi kernel modules"
-	$(MAKE) -f Makefile.profile kernel_module
 
 runprofile: profile
 	@mkdir -p $(PGO_DIR)
@@ -704,8 +675,6 @@ buildprofile:
 	fi
 	$(MAKE) -f Makefile.profile clean
 	$(MAKE) -f Makefile.profile PGO_MODE=use BUILD_TRACE=1
-	@echo "[PGO] Building Pi kernel modules"
-	$(MAKE) -f Makefile.profile kernel_module
 
 help:
 	@printf "Available targets:\n"

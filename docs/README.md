@@ -18,6 +18,7 @@ PiStorm64 is an Amiga-focused PiStorm fork with ongoing platform, storage, and t
 - Build/install: `docs/wiki/Build-and-Install.md`
 - Quickstart: `docs/wiki/Quickstart.md`
 - Known issues: `docs/wiki/Known-Issues.md`
+- SDK/OS target matrix: `docs/sdk_target_matrix.md`
 
 ## PiSCSI64 Notes
 

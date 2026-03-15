@@ -49,9 +49,6 @@ extern void m68ki_build_opcode_table(void);
 
 #include "m68kfpu.c"
 #include "m68kmmu.h" // uses some functions from m68kfpu.c which are static !
-#ifdef M68K_ENHANCE
-#include "m68k_enhanced.h"
-#endif 
 /* ======================================================================== */
 /* ================================= DATA ================================= */
 /* ======================================================================== */
@@ -1152,9 +1149,6 @@ void m68k_init(void) {
 	/* The first call to this function initializes the opcode handler jump table */
 	if(!emulation_initialized) {
 		m68ki_build_opcode_table();
-#ifdef M68K_ENHANCE	
-		m68k_enhanced_install();
-#endif 
 		emulation_initialized = 1;
 	}
 

@@ -55,6 +55,14 @@ void ps_write_8 (uint32_t address, uint8_t  data);
 void ps_write_16(uint32_t address, uint16_t data);
 void ps_write_32(uint32_t address, uint32_t data);
 
+/* FC-aware accessors (FC2..FC0 in low 3 bits) */
+uint8_t  ps_read_8_fc (uint32_t address, uint8_t fc);
+uint16_t ps_read_16_fc(uint32_t address, uint8_t fc);
+uint32_t ps_read_32_fc(uint32_t address, uint8_t fc);
+void ps_write_8_fc (uint32_t address, uint8_t data, uint8_t fc);
+void ps_write_16_fc(uint32_t address, uint16_t data, uint8_t fc);
+void ps_write_32_fc(uint32_t address, uint32_t data, uint8_t fc);
+
 uint16_t ps_read_status_reg(void);
 void     ps_write_status_reg(uint16_t value);
 

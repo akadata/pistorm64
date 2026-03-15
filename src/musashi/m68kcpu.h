@@ -1164,6 +1164,45 @@ typedef struct __attribute__((aligned(16))) m68ki_cpu_core
 	volatile unsigned int *gpio;
 } m68ki_cpu_core;
 
+/* Strict MOVEC legality matrix (Moira-style):
+ * 68010+: SFC/DFC/USP/VBR
+ * 68020+: +CACR/MSP/ISP
+ * 68020/68030 only: CAAR
+ * 68040+: TC/ITT0/ITT1/DTT0/DTT1/MMUSR/URP/SRP
+ */
+static inline int m68ki_movec_reg_legal(m68ki_cpu_core *state, uint reg)
+{
+	switch (reg & 0x0fff)
+	{
+	case 0x000: /* SFC */
+	case 0x001: /* DFC */
+	case 0x800: /* USP */
+	case 0x801: /* VBR */
+		return CPU_TYPE_IS_010_PLUS(state->cpu_type);
+
+	case 0x002: /* CACR */
+	case 0x803: /* MSP */
+	case 0x804: /* ISP */
+		return CPU_TYPE_IS_EC020_PLUS(state->cpu_type);
+
+	case 0x802: /* CAAR (020/030 only) */
+		return CPU_TYPE_IS_EC020_PLUS(state->cpu_type) && !CPU_TYPE_IS_040_PLUS(state->cpu_type);
+
+	case 0x003: /* TC */
+	case 0x004: /* ITT0 */
+	case 0x005: /* ITT1 */
+	case 0x006: /* DTT0 */
+	case 0x007: /* DTT1 */
+	case 0x805: /* MMUSR */
+	case 0x806: /* URP */
+	case 0x807: /* SRP */
+		return CPU_TYPE_IS_040_PLUS(state->cpu_type);
+
+	default:
+		return 0;
+	}
+}
+
 /* 
  * The softfloat FPU uses 80-bit (floatx80) values which must be
  * naturally aligned for efficient and correct access on AArch64.

@@ -2153,14 +2153,18 @@ static void d68010_movec(void)
 			reg_name = "URP";
 			processor = "4+";
 			break;
-		case 0x807:
-			reg_name = "SRP";
-			processor = "4+";
-			break;
-		default:
-			reg_name = make_signed_hex_str_16(extension & 0xfff);
-			processor = "?";
-	}
+			case 0x807:
+				reg_name = "SRP";
+				processor = "4+";
+				break;
+			case 0x808:
+				reg_name = "PCR";
+				processor = "4+";
+				break;
+			default:
+				reg_name = make_signed_hex_str_16(extension & 0xfff);
+				processor = "?";
+		}
 
 	if(BIT_0(g_cpu_ir))
 		sprintf(g_dasm_str, "movec %c%d, %s; (%s)", BIT_F(extension) ? 'A' : 'D', (extension>>12)&7, reg_name, processor);

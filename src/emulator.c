@@ -85,6 +85,9 @@ static int use_uae_jit = 0;
 static int reset_trace_setting = -1;
 static uint64_t reset_last_edge_ns = 0;
 
+extern unsigned int cpu_type;
+extern struct emulator_config* cfg;
+
 #if USE_UAE_JIT
 
 
@@ -181,6 +184,17 @@ typedef struct mem_trace_cfg_s {
 
 static mem_trace_cfg_t g_mem_trace = {0};
 
+typedef struct illg_trace_cfg_s {
+  int init_done;
+  int enabled;
+  uint32_t insns_each_side;
+  uint32_t event_limit;
+  uint32_t emitted;
+  int limit_noted;
+} illg_trace_cfg_t;
+
+static illg_trace_cfg_t g_illg_trace = {0};
+
 static uint32_t mem_trace_parse_u32(const char* name, uint32_t default_value) {
   const char* env;
   char* endptr;
@@ -219,6 +233,72 @@ static int mem_trace_parse_bool(const char* name, int default_value) {
     return 0;
   }
   return default_value;
+}
+
+static void illg_trace_init(void) {
+  if (g_illg_trace.init_done) {
+    return;
+  }
+  g_illg_trace.init_done = 1;
+  g_illg_trace.enabled = mem_trace_parse_bool("PISTORM_ILLG_TRACE_CTX", 0);
+  g_illg_trace.insns_each_side = mem_trace_parse_u32("PISTORM_ILLG_TRACE_INSNS", 10);
+  g_illg_trace.event_limit = mem_trace_parse_u32("PISTORM_ILLG_TRACE_LIMIT", 8);
+  g_illg_trace.emitted = 0;
+  g_illg_trace.limit_noted = 0;
+}
+
+static unsigned int disasm_len_safe(uint32_t addr, char* out, size_t out_sz) {
+  unsigned int len;
+  out[0] = '\0';
+  len = m68k_disassemble(out, addr, cpu_type);
+  if (len == 0 || len > 32) {
+    len = 2;
+  }
+  if (len & 1u) {
+    len++;
+  }
+  (void)out_sz;
+  return len;
+}
+
+static void dump_disasm_window(const char* tag, uint32_t anchor_pc, uint32_t before, uint32_t after) {
+  uint32_t start;
+  uint32_t total;
+  uint32_t i;
+  uint32_t addr;
+  char dbuf[512];
+
+  if ((before + after + 1u) > 64u) {
+    // Hard cap to avoid runaway log spam.
+    before = (before > 31u) ? 31u : before;
+    after = (after > 31u) ? 31u : after;
+  }
+
+  if (anchor_pc >= (before * 2u)) {
+    start = anchor_pc - (before * 2u);
+  } else {
+    start = 0u;
+  }
+  if (start & 1u) {
+    start--;
+  }
+
+  total = before + after + 1u;
+  addr = start;
+
+  LOG_ERROR("[CPU] %s around $%.8X (-%u/+%u insns)\n",
+            tag, anchor_pc, (unsigned)before, (unsigned)after);
+  for (i = 0; i < total; i++) {
+    unsigned int step = disasm_len_safe(addr, dbuf, sizeof(dbuf));
+    LOG_ERROR("[CPU]   %c $%.8X  %s\n",
+              (addr == anchor_pc) ? '>' : ' ',
+              addr,
+              dbuf[0] ? dbuf : "<disasm-empty>");
+    if (addr > 0xFFFFFFE0u) {
+      break;
+    }
+    addr += step;
+  }
 }
 
 static inline int mem_trace_range_match(uint32_t addr, uint32_t width, uint32_t base, uint32_t size) {
@@ -557,13 +637,11 @@ static void configure_ipl_nops(void);
 static void print_help(const char* prog);
 static void print_about(const char* prog);
 
-extern unsigned int cpu_type;
-extern struct emulator_config* cfg;
-
 static void dump_cpu_state(const char *reason, int opcode) {
   unsigned int pc = m68k_get_reg(NULL, M68K_REG_PC);
   unsigned int ppc = m68k_get_reg(NULL, M68K_REG_PPC);
   unsigned int sr = m68k_get_reg(NULL, M68K_REG_SR);
+  int pc_unmapped = 0;
   if (reason) {
     LOG_ERROR("[CPU] %s: PC=$%.8X PPC=$%.8X SR=$%.4X OPCODE=$%.4X\n",
               reason, pc, ppc, sr, (unsigned int)(opcode & 0xFFFF));
@@ -649,7 +727,26 @@ static void dump_cpu_state(const char *reason, int opcode) {
       }
     } else {
       LOG_ERROR("[CPU] PC map: unmapped\n");
+      pc_unmapped = 1;
     }
+  }
+
+  illg_trace_init();
+  if (g_illg_trace.enabled) {
+    if (g_illg_trace.event_limit == 0 || g_illg_trace.emitted < g_illg_trace.event_limit) {
+      dump_disasm_window("PPC window", ppc, g_illg_trace.insns_each_side, g_illg_trace.insns_each_side);
+      if (pc != ppc) {
+        dump_disasm_window("PC window", pc, g_illg_trace.insns_each_side, g_illg_trace.insns_each_side);
+      }
+      g_illg_trace.emitted++;
+    } else if (!g_illg_trace.limit_noted) {
+      LOG_WARN("[CPU] Illegal-context trace limit reached (%u events); suppressing further windows.\n",
+               (unsigned)g_illg_trace.event_limit);
+      g_illg_trace.limit_noted = 1;
+    }
+  } else if (pc_unmapped) {
+    // Keep an explicit hint when unmapped without trace context.
+    LOG_INFO("[CPU] Hint: set PISTORM_ILLG_TRACE_CTX=1 for ±instruction windows around PC/PPC.\n");
   }
 }
 
@@ -2108,22 +2205,30 @@ void cdtv_dmac_write(uint32_t address, uint32_t value, uint8_t type);
 
 unsigned int garbage = 0;
 
+static inline uint8_t ps_cpu_fc(void) {
+  if (fc_get_mode() == FC_MODE_OFF) {
+    return 0u;
+  }
+  return (uint8_t)(current_fc & 0x7u);
+}
+
 static inline uint32_t ps_read(uint8_t type, uint32_t addr) {
+  const uint8_t fc = ps_cpu_fc();
   switch (type) {
   case OP_TYPE_BYTE:
-    return (uint32_t)ps_read_8(addr);
+    return (uint32_t)ps_read_8_fc(addr, fc);
   case OP_TYPE_WORD:
-    return (uint32_t)ps_read_16(addr);
+    return (uint32_t)ps_read_16_fc(addr, fc);
   case OP_TYPE_LONGWORD:
     if (addr & 0x01) {
-      uint32_t c = (uint32_t)ps_read_8(addr);
-      c |= ((uint32_t)be16toh(ps_read_16(addr + 1)) << 8);
-      c |= ((uint32_t)ps_read_8(addr + 3) << 24);
+      uint32_t c = (uint32_t)ps_read_8_fc(addr, fc);
+      c |= ((uint32_t)be16toh(ps_read_16_fc(addr + 1, fc)) << 8);
+      c |= ((uint32_t)ps_read_8_fc(addr + 3, fc) << 24);
       return htobe32(c);
     }
     {
-      uint32_t a = (uint32_t)ps_read_16(addr);
-      uint32_t b = (uint32_t)ps_read_16(addr + 2);
+      uint32_t a = (uint32_t)ps_read_16_fc(addr, fc);
+      uint32_t b = (uint32_t)ps_read_16_fc(addr + 2, fc);
       return (a << 16) | b;
     }
   }
@@ -2132,22 +2237,23 @@ static inline uint32_t ps_read(uint8_t type, uint32_t addr) {
 }
 
 static inline void ps_write(uint8_t type, uint32_t addr, uint32_t val) {
+  const uint8_t fc = ps_cpu_fc();
   switch (type) {
   case OP_TYPE_BYTE:
-    ps_write_8(addr, (uint8_t)val);
+    ps_write_8_fc(addr, (uint8_t)val, fc);
     return;
   case OP_TYPE_WORD:
-    ps_write_16(addr, (uint16_t)val);
+    ps_write_16_fc(addr, (uint16_t)val, fc);
     return;
   case OP_TYPE_LONGWORD:
     if (addr & 0x01) {
-      ps_write_8(addr, (uint8_t)(val & 0xFF));
-      ps_write_16(addr + 1, htobe16((uint16_t)((val >> 8) & 0xFFFF)));
-      ps_write_8(addr + 3, (uint8_t)(val >> 24));
+      ps_write_8_fc(addr, (uint8_t)(val & 0xFF), fc);
+      ps_write_16_fc(addr + 1, htobe16((uint16_t)((val >> 8) & 0xFFFF)), fc);
+      ps_write_8_fc(addr + 3, (uint8_t)(val >> 24), fc);
       return;
     }
-    ps_write_16(addr, (uint16_t)(val >> 16));
-    ps_write_16(addr + 2, (uint16_t)val);
+    ps_write_16_fc(addr, (uint16_t)(val >> 16), fc);
+    ps_write_16_fc(addr + 2, (uint16_t)val, fc);
     return;
   }
   // This shouldn't actually happen.
@@ -2351,7 +2457,7 @@ unsigned int m68k_read_memory_8(unsigned int address) {
     return 0;
   }
 
-  unsigned int v = (unsigned int)ps_read_8((uint32_t)address);
+  unsigned int v = (unsigned int)ps_read(OP_TYPE_BYTE, (uint32_t)address);
   lowvec_trace_log("R08 ps", address, v & 0xFF);
   mem_trace_log("R08", address, v & 0xFFu, 1u, "ps");
   return v;
@@ -2377,12 +2483,13 @@ unsigned int m68k_read_memory_16(unsigned int address) {
 
   unsigned int v;
   if (address & 0x01) {
-    v = ((unsigned int)(ps_read_8(address) << 8) | (unsigned int)ps_read_8(address + 1));
+    v = ((unsigned int)(ps_read(OP_TYPE_BYTE, address) << 8) |
+         (unsigned int)ps_read(OP_TYPE_BYTE, address + 1));
     lowvec_trace_log("R16 ps-odd", address, v & 0xFFFF);
     mem_trace_log("R16", address, v & 0xFFFFu, 2u, "ps-odd");
     return v;
   }
-  v = (unsigned int)ps_read_16((uint32_t)address);
+  v = (unsigned int)ps_read(OP_TYPE_WORD, (uint32_t)address);
   lowvec_trace_log("R16 ps", address, v & 0xFFFF);
   mem_trace_log("R16", address, v & 0xFFFFu, 2u, "ps");
   return v;
@@ -2590,7 +2697,7 @@ void m68k_write_memory_8(unsigned int address, unsigned int value) {
     return;
   }
 
-  ps_write_8((uint32_t)address, (uint8_t)value);
+  ps_write(OP_TYPE_BYTE, (uint32_t)address, (uint8_t)value);
   lowvec_trace_log("W08 ps", address, value & 0xFF);
   mem_trace_log("W08", address, value & 0xFFu, 1u, "ps");
   return;
@@ -2616,14 +2723,14 @@ void m68k_write_memory_16(unsigned int address, unsigned int value) {
   }
 
   if (address & 0x01) {
-    ps_write_8((uint32_t)address, (uint8_t)(value & 0xFF));
-    ps_write_8((uint32_t)address + 1, (uint8_t)((value >> 8) & 0xFF));
+    ps_write(OP_TYPE_BYTE, (uint32_t)address, (uint8_t)(value & 0xFF));
+    ps_write(OP_TYPE_BYTE, (uint32_t)address + 1, (uint8_t)((value >> 8) & 0xFF));
     lowvec_trace_log("W16 ps-odd", address, value & 0xFFFF);
     mem_trace_log("W16", address, value & 0xFFFFu, 2u, "ps-odd");
     return;
   }
 
-  ps_write_16((uint32_t)address, (uint16_t)value);
+  ps_write(OP_TYPE_WORD, (uint32_t)address, (uint16_t)value);
   lowvec_trace_log("W16 ps", address, value & 0xFFFF);
   mem_trace_log("W16", address, value & 0xFFFFu, 2u, "ps");
   return;
