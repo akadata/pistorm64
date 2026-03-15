@@ -1,0 +1,39 @@
+name: 680x0 Stage 1
+
+on:
+  push:
+    branches:
+      - main
+      - enhancement/**
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  stage1-musashi:
+    name: Stage1 Musashi Baseline
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch Musashi test corpus (sparse)
+        run: |
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/kstenerud/Musashi.git "$RUNNER_TEMP/Musashi"
+          cd "$RUNNER_TEMP/Musashi"
+          git sparse-checkout set test
+
+      - name: Run quick suite
+        run: |
+          make PLATFORM=NATIVE MUSASHI_REF_TEST_ROOT="$RUNNER_TEMP/Musashi/test" musashi-ref-tests-quick -j1
+
+      - name: Run ProcessorTests quick (if vendored in repo)
+        if: ${{ hashFiles('third_party/ProcessorTests/680x0/map/68000.official.json') != '' }}
+        run: |
+          make PLATFORM=NATIVE processortests-quick -j1
+
+      - name: Run 68040 suite with xfail baseline
+        run: |
+          make PLATFORM=NATIVE MUSASHI_REF_TEST_ROOT="$RUNNER_TEMP/Musashi/test" musashi-ref-tests-68040-ci -j1
