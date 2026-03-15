@@ -218,17 +218,22 @@ def run_checkdups(tools_dir: Path, suite_dir: Path) -> int:
 
 
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:
+    repo_root = Path(__file__).resolve().parents[1]
+    default_root = repo_root / "third_party" / "ProcessorTests"
     p = argparse.ArgumentParser(description="ProcessorTests dataset runner/validator")
     p.add_argument("--mode", choices=("quick", "full"), default="quick")
-    p.add_argument("--source-dir", default="/home/smalley/reference/ProcessorTests/680x0/68000/v1")
+    p.add_argument("--source-dir", default=str(default_root / "680x0" / "68000" / "v1"))
     p.add_argument("--suite-dir", default="", help="Explicit suite dir to validate")
-    p.add_argument("--tools-dir", default="/home/smalley/reference/ProcessorTests/tools")
+    p.add_argument("--tools-dir", default=str(default_root / "tools"))
     p.add_argument("--subset-dir", default="build/processortests/quick")
     p.add_argument("--subset-percent", type=float, default=1.0)
     p.add_argument("--sample-per-file", type=int, default=64)
     p.add_argument("--refresh-subset", action="store_true")
     p.add_argument("--check-dups", action="store_true")
-    p.add_argument("--map-file", default="/home/smalley/reference/ProcessorTests/680x0/map/68000.official.json")
+    p.add_argument(
+        "--map-file",
+        default=str(default_root / "680x0" / "map" / "68000.official.json"),
+    )
     p.add_argument("--check-map", action="store_true")
     return p.parse_args(argv)
 
