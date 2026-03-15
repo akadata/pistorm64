@@ -6815,6 +6815,9 @@ M68KMAKE_OP(movec, 32, cr, .)
 			case 0x807:				/* SRP */
 				REG_DA[(word2 >> 12) & 15] = state->mmu_srp_aptr;
 				return;
+			case 0x808:				/* PCR (040+) */
+				REG_DA[(word2 >> 12) & 15] = m68ki_movec_pcr_value(state);
+				return;
 			default:
 				m68ki_exception_illegal(state);
 				return;
@@ -6930,13 +6933,18 @@ M68KMAKE_OP(movec, 32, rc, .)
 			case 0x806:			/* URP */
 				state->mmu_urp_aptr = REG_DA[(word2 >> 12) & 15];
 				return;
-			case 0x807:			/* SRP */
-				state->mmu_srp_aptr = REG_DA[(word2 >> 12) & 15];
-				return;
-			default:
-				m68ki_exception_illegal(state);
-				return;
-			}
+				case 0x807:			/* SRP */
+					state->mmu_srp_aptr = REG_DA[(word2 >> 12) & 15];
+					return;
+				case 0x808:			/* PCR (040+) */
+					/* PCR writes are accepted for compatibility with CPU probe/setup
+					 * handlers. Current core keeps a fixed model PCR readback value.
+					 */
+					return;
+				default:
+					m68ki_exception_illegal(state);
+					return;
+				}
 		}
 		m68ki_exception_privilege_violation(state);
 		return;
