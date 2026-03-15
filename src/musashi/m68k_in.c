@@ -2667,20 +2667,17 @@ M68KMAKE_OP(bfexts, 32, ., .)
 		if(BIT_5(word2))
 			width = REG_D[width&7];
 
-		if(BIT_B(word2))  {
-			/* Offset is signed so we have to use ugly math =( */
-			ea += offset / 8;
-			offset %= 8;
-			if(offset < 0)
-			{
-				offset += 8;
-				ea--;
-			}
+		/* Offset is signed so we have to use ugly math =( */
+		ea += offset / 8;
+		offset %= 8;
+		if(offset < 0)
+		{
+			offset += 8;
+			ea--;
 		}
 		width = ((width-1) & 31) + 1;
 
-		data = (offset+width) < 8 ? (m68ki_read_8(state, ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(state, ea) << 16) : m68ki_read_32(state, ea);
+		data = m68ki_read_32(state, ea);
 
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
@@ -2752,20 +2749,17 @@ M68KMAKE_OP(bfextu, 32, ., .)
 		if(BIT_5(word2))
 			width = REG_D[width&7];
 
-		if(BIT_B(word2)) {
-			/* Offset is signed so we have to use ugly math =( */
-			ea += offset / 8;
-			offset %= 8;
-			if(offset < 0)
-			{
-				offset += 8;
-				ea--;
-			}
+		/* Offset is signed so we have to use ugly math =( */
+		ea += offset / 8;
+		offset %= 8;
+		if(offset < 0)
+		{
+			offset += 8;
+			ea--;
 		}
 		width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 8 ? (m68ki_read_8(state, ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(state, ea) << 16) : m68ki_read_32(state, ea);
+		data = m68ki_read_32(state, ea);
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
 		if((offset+width) > 32)
