@@ -2920,13 +2920,8 @@ M68KMAKE_OP(bfins, 32, ., .)
 		sint offset = (word2>>6)&31;
 		uint width = word2;
 		uint insert_base = REG_D[(word2>>12)&7];
-		uint insert_long;
-		uint insert_byte;
+		m68ki_bitfield_t data;
 		uint mask_base;
-		uint data_long;
-		uint mask_long;
-		uint data_byte = 0;
-		uint mask_byte = 0;
 		uint ea = M68KMAKE_GET_EA_AY_8;
 
 
@@ -2935,47 +2930,21 @@ M68KMAKE_OP(bfins, 32, ., .)
 		if(BIT_5(word2))
 			width = REG_D[width&7];
 
-		if(BIT_B(word2)) {
-			/* Offset is signed so we have to use ugly math =( */
-			ea += offset / 8;
-			offset %= 8;
-			if(offset < 0)
-			{
-				offset += 8;
-				ea--;
-			}
-		}
 		width = ((width-1) & 31) + 1;
 
 		mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
-		mask_long = mask_base >> offset;
+		ea = m68ki_bitfield_patch_ea(ea, offset);
+		offset = m68ki_bitfield_patch_offset(offset);
+		data = m68ki_load_bitfield(state, ea, offset, width);
 
 		insert_base = MASK_OUT_ABOVE_32(insert_base << (32 - width));
 		FLAG_N = NFLAG_32(insert_base);
 		FLAG_Z = insert_base;
-		insert_long = insert_base >> offset;
-
-		data_long = (offset+width) < 8 ? (m68ki_read_8(state, ea) << 24) :
-				(offset+width) < 16 ? (m68ki_read_16(state, ea) << 16) : m68ki_read_32(state, ea);
 		FLAG_V = VFLAG_CLEAR;
 		FLAG_C = CFLAG_CLEAR;
 
-		if((width + offset) < 8) {
-			m68ki_write_8(state, ea, ((data_long & ~mask_long) | insert_long) >> 24);
-		} else if((width + offset) < 16) {
-			m68ki_write_16(state, ea, ((data_long & ~mask_long) | insert_long) >> 16);
-		} else {
-			m68ki_write_32(state, ea, (data_long & ~mask_long) | insert_long);
-		}
-
-		if((width + offset) > 32)
-		{
-			mask_byte = MASK_OUT_ABOVE_8(mask_base);
-			insert_byte = MASK_OUT_ABOVE_8(insert_base);
-			data_byte = m68ki_read_8(state, ea+4);
-			FLAG_Z |= (data_byte & mask_byte);
-			m68ki_write_8(state, ea+4, (data_byte & ~mask_byte) | insert_byte);
-		}
+		data.field = (data.field & ~mask_base) | insert_base;
+		m68ki_store_bitfield(state, ea, offset, width, data.field, &data);
 		return;
 	}
 	m68ki_exception_illegal(state);

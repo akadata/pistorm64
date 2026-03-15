@@ -2656,6 +2656,103 @@ static inline void m68ki_check_interrupts(m68ki_cpu_core *state)
 		m68ki_exception_interrupt(state, CPU_INT_LEVEL >> 8);
 }
 
+/* Helper to load/store memory bitfields (used by BFINS/BFSET memory forms). */
+typedef struct {
+	uint32 field;
+	uint32 lo;
+	uint8 hi;
+} m68ki_bitfield_t;
+
+static inline m68ki_bitfield_t m68ki_make_bf(uint32 lo, uint8 hi, unsigned offset)
+{
+	m68ki_bitfield_t ret;
+	ret.field = (lo << offset) | (hi >> (8 - offset));
+	ret.lo = lo;
+	ret.hi = hi;
+	return ret;
+}
+
+static inline m68ki_bitfield_t m68ki_load_bitfield(m68ki_cpu_core *state, uint32 addr, unsigned offset, unsigned width)
+{
+	unsigned bcount = (offset + width + 7) / 8;
+
+	if(bcount == 1) {
+		uint8 lo = m68ki_read_8(state, addr);
+		return m68ki_make_bf(((uint32)lo) << 24, 0, offset);
+	}
+
+	if(bcount < 4) {
+		uint16 lo1 = m68ki_read_16(state, addr);
+
+		if(bcount == 2) {
+			return m68ki_make_bf(((uint32)lo1) << 16, 0, offset);
+		}
+
+		uint8 lo2 = m68ki_read_8(state, addr + 2);
+		return m68ki_make_bf((((uint32)lo1) << 16) | (((uint32)lo2) << 8), 0, offset);
+	}
+
+	{
+		uint32 lo = m68ki_read_32(state, addr);
+		if(bcount == 4) {
+			return m68ki_make_bf(lo, 0, offset);
+		}
+
+		{
+			uint8 hi = m68ki_read_8(state, addr + 4);
+			return m68ki_make_bf(lo, hi, offset);
+		}
+	}
+}
+
+/* val << shift but safe when shift >= 32. */
+static inline uint32 m68ki_lshift32_safe(uint32 val, unsigned shift)
+{
+	return shift < 32 ? (val << shift) : 0;
+}
+
+static inline unsigned m68ki_bitfield_patch_offset(sint offset)
+{
+	return ((uint32)offset) % 8;
+}
+
+static inline uint32 m68ki_bitfield_patch_ea(uint32 ea, sint offset)
+{
+	return ea + (offset >= 0 ? offset / 8 : -((7 - offset) / 8));
+}
+
+static inline void m68ki_store_bitfield(m68ki_cpu_core *state, uint32 addr, unsigned offset, unsigned width,
+										uint32 res, m68ki_bitfield_t* bf)
+{
+	unsigned bcount = (offset + width + 7) / 8;
+	uint32 lomask = m68ki_lshift32_safe(0xFFFFFFFF, 32 - offset);
+	uint8 himask = (0xFF >> offset) & 0xFF;
+	uint32 lo = (bf->lo & lomask) | (res >> offset);
+	uint8 hi = (bf->hi & himask) | ((res << (8 - offset)) & 0xFF);
+
+	if(bcount == 1) {
+		m68ki_write_8(state, addr, (lo >> 24) & 0xFF);
+		return;
+	}
+
+	if(bcount < 4) {
+		m68ki_write_16(state, addr, (lo >> 16) & 0xFFFF);
+		if(bcount == 2) {
+			return;
+		}
+
+		m68ki_write_8(state, addr + 2, (lo >> 8) & 0xFF);
+		return;
+	}
+
+	m68ki_write_32(state, addr, lo);
+	if(bcount == 4) {
+		return;
+	}
+
+	m68ki_write_8(state, addr + 4, hi);
+}
+
 
 
 /* ======================================================================== */
