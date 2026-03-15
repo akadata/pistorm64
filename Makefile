@@ -200,7 +200,9 @@ MUSASHI_REF_TEST_ITERATIONS ?= 100
 MUSASHI_REF_TEST_CYCLES ?= 0x1000000
 MUSASHI_REF_TEST_TIMEOUT_SEC ?= 20
 MUSASHI_REF_TEST_XFAIL_FILE ?=
+MUSASHI_REF_TEST_XFAIL_68000 ?= tools/baselines/musashi_ref_68000.xfail
 MUSASHI_REF_TEST_XFAIL_68040 ?= tools/baselines/musashi_ref_68040.xfail
+MUSASHI_REF_TEST_EXTRA_ARGS ?=
 
 
 MAINFILES =
@@ -543,8 +545,9 @@ HELP_TARGETS = \
 	"make processortests-quick"       "Generate/use quick ProcessorTests subset and validate" \
 	"make processortests-full"        "Validate full ProcessorTests 68000/v1 dataset" \
 	"make musashi-ref-tests-quick"    "Run quick standalone Musashi regression binaries (68000/68040)" \
+	"make musashi-ref-tests-68000"    "Run all reference Musashi 68000 binary tests (with 68000 baseline xfails)" \
 	"make musashi-ref-tests-68040"    "Run all reference Musashi 68040 binary tests" \
-	"make musashi-ref-tests-68040-ci" "Run 68040 suite with xfail baseline (fails on regressions/xpass)" \
+	"make musashi-ref-tests-68040-ci" "Run 68040 suite with zero-xfail policy (fails if baseline has entries)" \
 	"make stage1-680x0"               "Stage 1 baseline: ProcessorTests quick + Musashi quick" \
 	"make stage1-680x0-ci"            "Stage 1 CI baseline (quick + 68040 xfail-gated)" \
 	"make uae-jit"      "Build UAE AArch64 JIT objects (libuae.a)" \
@@ -917,16 +920,20 @@ musashi-ref-tests: $(MUSASHI_REF_TEST_DRIVER)
 		--iterations "$(MUSASHI_REF_TEST_ITERATIONS)" \
 		--cycles "$(MUSASHI_REF_TEST_CYCLES)" \
 		--timeout-sec "$(MUSASHI_REF_TEST_TIMEOUT_SEC)" \
-		--xfail-file "$(MUSASHI_REF_TEST_XFAIL_FILE)"
+		--xfail-file "$(MUSASHI_REF_TEST_XFAIL_FILE)" \
+		$(MUSASHI_REF_TEST_EXTRA_ARGS)
 
 musashi-ref-tests-quick:
 	$(MAKE) MUSASHI_REF_TEST_MODE=quick musashi-ref-tests
+
+musashi-ref-tests-68000:
+	$(MAKE) MUSASHI_REF_TEST_MODE=68000 MUSASHI_REF_TEST_CPU=68000 MUSASHI_REF_TEST_XFAIL_FILE="$(MUSASHI_REF_TEST_XFAIL_68000)" musashi-ref-tests
 
 musashi-ref-tests-68040:
 	$(MAKE) MUSASHI_REF_TEST_MODE=68040 musashi-ref-tests
 
 musashi-ref-tests-68040-ci:
-	$(MAKE) MUSASHI_REF_TEST_MODE=68040 MUSASHI_REF_TEST_XFAIL_FILE="$(MUSASHI_REF_TEST_XFAIL_68040)" musashi-ref-tests
+	$(MAKE) MUSASHI_REF_TEST_MODE=68040 MUSASHI_REF_TEST_XFAIL_FILE="$(MUSASHI_REF_TEST_XFAIL_68040)" MUSASHI_REF_TEST_EXTRA_ARGS="--require-empty-xfail" musashi-ref-tests
 
 musashi-ref-tests-68040-pmmu:
 	$(MAKE) USE_PMMU=1 MUSASHI_REF_TEST_MODE=68040 musashi-ref-tests
@@ -943,4 +950,4 @@ help:
 
 -include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d tools/piscsi_remote/piscsi_remote_server.d tools/piscsi_remote/piscsi_remote_client.d $(UAE_OBJS:%.o=%.d)
 
-.PHONY: all clean buptest pistorm_truth_test install install-boot-firmware uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-net64 amiga-piscsi amiga-pirtg64 amiga-ahi amiga-all amiga-clean piscsi-remote piscsi-remote-server piscsi-remote-client processortests-quick processortests-full musashi-ref-tests musashi-ref-tests-quick musashi-ref-tests-68040 musashi-ref-tests-68040-ci musashi-ref-tests-68040-pmmu stage1-680x0 stage1-680x0-ci
+.PHONY: all clean buptest pistorm_truth_test install install-boot-firmware uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-net64 amiga-piscsi amiga-pirtg64 amiga-ahi amiga-all amiga-clean piscsi-remote piscsi-remote-server piscsi-remote-client processortests-quick processortests-full musashi-ref-tests musashi-ref-tests-quick musashi-ref-tests-68000 musashi-ref-tests-68040 musashi-ref-tests-68040-ci musashi-ref-tests-68040-pmmu stage1-680x0 stage1-680x0-ci

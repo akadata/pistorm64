@@ -949,14 +949,11 @@ M68KMAKE_OP(abcd, 8, rr, .)
 	uint src = DY;
 	uint dst = *r_dst;
 	uint res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_AS_1();
-	uint corf = 0;
-
-	if(res > 9)
-		corf = 6;
-	res += HIGH_NIBBLE(src) + HIGH_NIBBLE(dst);
 	FLAG_V = ~res; /* Undefined V behavior */
-	res += corf;
-	FLAG_X = FLAG_C = (res > 0x9f) << 8;
+	if(res > 9)
+		res += 6;
+	res += HIGH_NIBBLE(src) + HIGH_NIBBLE(dst);
+	FLAG_X = FLAG_C = (res > 0x99) << 8;
 	if(FLAG_C)
 		res -= 0xa0;
 
@@ -976,14 +973,11 @@ M68KMAKE_OP(abcd, 8, mm, ax7)
 	uint ea  = EA_A7_PD_8();
 	uint dst = m68ki_read_8(state, ea);
 	uint res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_AS_1();
-	uint corf = 0;
-
-	if(res > 9)
-		corf = 6;
-	res += HIGH_NIBBLE(src) + HIGH_NIBBLE(dst);
 	FLAG_V = ~res; /* Undefined V behavior */
-	res += corf;
-	FLAG_X = FLAG_C = (res > 0x9f) << 8;
+	if(res > 9)
+		res += 6;
+	res += HIGH_NIBBLE(src) + HIGH_NIBBLE(dst);
+	FLAG_X = FLAG_C = (res > 0x99) << 8;
 	if(FLAG_C)
 		res -= 0xa0;
 
@@ -1003,14 +997,11 @@ M68KMAKE_OP(abcd, 8, mm, ay7)
 	uint ea  = EA_AX_PD_8();
 	uint dst = m68ki_read_8(state, ea);
 	uint res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_AS_1();
-	uint corf = 0;
-
-	if(res > 9)
-		corf = 6;
-	res += HIGH_NIBBLE(src) + HIGH_NIBBLE(dst);
 	FLAG_V = ~res; /* Undefined V behavior */
-	res += corf;
-	FLAG_X = FLAG_C = (res > 0x9f) << 8;
+	if(res > 9)
+		res += 6;
+	res += HIGH_NIBBLE(src) + HIGH_NIBBLE(dst);
+	FLAG_X = FLAG_C = (res > 0x99) << 8;
 	if(FLAG_C)
 		res -= 0xa0;
 
@@ -1030,14 +1021,11 @@ M68KMAKE_OP(abcd, 8, mm, axy7)
 	uint ea  = EA_A7_PD_8();
 	uint dst = m68ki_read_8(state, ea);
 	uint res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_AS_1();
-	uint corf = 0;
-
-	if(res > 9)
-		corf = 6;
-	res += HIGH_NIBBLE(src) + HIGH_NIBBLE(dst);
 	FLAG_V = ~res; /* Undefined V behavior */
-	res += corf;
-	FLAG_X = FLAG_C = (res > 0x9f) << 8;
+	if(res > 9)
+		res += 6;
+	res += HIGH_NIBBLE(src) + HIGH_NIBBLE(dst);
+	FLAG_X = FLAG_C = (res > 0x99) << 8;
 	if(FLAG_C)
 		res -= 0xa0;
 
@@ -1057,14 +1045,11 @@ M68KMAKE_OP(abcd, 8, mm, .)
 	uint ea  = EA_AX_PD_8();
 	uint dst = m68ki_read_8(state, ea);
 	uint res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_AS_1();
-	uint corf = 0;
-
 	if(res > 9)
-		corf = 6;
+		res += 6;
 	res += HIGH_NIBBLE(src) + HIGH_NIBBLE(dst);
 	FLAG_V = ~res; /* Undefined V behavior */
-	res  += corf;
-	FLAG_X = FLAG_C = (res > 0x9f) << 8;
+	FLAG_X = FLAG_C = (res > 0x99) << 8;
 	if(FLAG_C)
 		res -= 0xa0;
 
@@ -9341,23 +9326,18 @@ M68KMAKE_OP(sbcd, 8, rr, .)
 	uint src = DY;
 	uint dst = *r_dst;
 	uint res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_AS_1();
-	uint corf = 0;
+	FLAG_V = ~res; /* Undefined V behavior */
 
-	if(res > 0xf)
-		corf = 6;
+	if(res > 9)
+		res -= 6;
 	res += HIGH_NIBBLE(dst) - HIGH_NIBBLE(src);
-	FLAG_V = res; /* Undefined V behavior */
-	if(res > 0xff) {
+	FLAG_X = FLAG_C = (res > 0x99) << 8;
+	if(FLAG_C)
 		res += 0xa0;
-		FLAG_X = FLAG_C = CFLAG_SET;
-	} else if(res < corf)
-		FLAG_X = FLAG_C = CFLAG_SET;
-	else
-		FLAG_N = FLAG_X = FLAG_C = 0;
 
-	res = MASK_OUT_ABOVE_8(res - corf);
+	res = MASK_OUT_ABOVE_8(res);
 
-	FLAG_V &= ~res; /* Undefined V behavior part II */
+	FLAG_V &= res; /* Undefined V behavior part II */
 	FLAG_N = NFLAG_8(res); /* Undefined N behavior */
 	FLAG_Z |= res;
 
@@ -9371,23 +9351,18 @@ M68KMAKE_OP(sbcd, 8, mm, ax7)
 	uint ea  = EA_A7_PD_8();
 	uint dst = m68ki_read_8(state, ea);
 	uint res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_AS_1();
-	uint corf = 0;
+	FLAG_V = ~res; /* Undefined V behavior */
 
-	if(res > 0xf)
-		corf = 6;
+	if(res > 9)
+		res -= 6;
 	res += HIGH_NIBBLE(dst) - HIGH_NIBBLE(src);
-	FLAG_V = res; /* Undefined V behavior */
-	if(res > 0xff) {
+	FLAG_X = FLAG_C = (res > 0x99) << 8;
+	if(FLAG_C)
 		res += 0xa0;
-		FLAG_X = FLAG_C = CFLAG_SET;
-	} else if(res < corf)
-		FLAG_X = FLAG_C = CFLAG_SET;
-	else
-		FLAG_N = FLAG_X = FLAG_C = 0;
 
-	res = MASK_OUT_ABOVE_8(res - corf);
+	res = MASK_OUT_ABOVE_8(res);
 
-	FLAG_V &= ~res; /* Undefined V behavior part II */
+	FLAG_V &= res; /* Undefined V behavior part II */
 	FLAG_N = NFLAG_8(res); /* Undefined N behavior */
 	FLAG_Z |= res;
 
@@ -9401,23 +9376,18 @@ M68KMAKE_OP(sbcd, 8, mm, ay7)
 	uint ea  = EA_AX_PD_8();
 	uint dst = m68ki_read_8(state, ea);
 	uint res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_AS_1();
-	uint corf = 0;
+	FLAG_V = ~res; /* Undefined V behavior */
 
-	if(res > 0xf)
-		corf = 6;
+	if(res > 9)
+		res -= 6;
 	res += HIGH_NIBBLE(dst) - HIGH_NIBBLE(src);
-	FLAG_V = res; /* Undefined V behavior */
-	if(res > 0xff) {
+	FLAG_X = FLAG_C = (res > 0x99) << 8;
+	if(FLAG_C)
 		res += 0xa0;
-		FLAG_X = FLAG_C = CFLAG_SET;
-	} else if(res < corf)
-		FLAG_X = FLAG_C = CFLAG_SET;
-	else
-		FLAG_N = FLAG_X = FLAG_C = 0;
 
-	res = MASK_OUT_ABOVE_8(res - corf);
+	res = MASK_OUT_ABOVE_8(res);
 
-	FLAG_V &= ~res; /* Undefined V behavior part II */
+	FLAG_V &= res; /* Undefined V behavior part II */
 	FLAG_N = NFLAG_8(res); /* Undefined N behavior */
 	FLAG_Z |= res;
 
@@ -9431,23 +9401,18 @@ M68KMAKE_OP(sbcd, 8, mm, axy7)
 	uint ea  = EA_A7_PD_8();
 	uint dst = m68ki_read_8(state, ea);
 	uint res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_AS_1();
-	uint corf = 0;
+	FLAG_V = ~res; /* Undefined V behavior */
 
-	if(res > 0xf)
-		corf = 6;
+	if(res > 9)
+		res -= 6;
 	res += HIGH_NIBBLE(dst) - HIGH_NIBBLE(src);
-	FLAG_V = res; /* Undefined V behavior */
-	if(res > 0xff) {
+	FLAG_X = FLAG_C = (res > 0x99) << 8;
+	if(FLAG_C)
 		res += 0xa0;
-		FLAG_X = FLAG_C = CFLAG_SET;
-	} else if(res < corf)
-		FLAG_X = FLAG_C = CFLAG_SET;
-	else
-		FLAG_N = FLAG_X = FLAG_C = 0;
 
-	res = MASK_OUT_ABOVE_8(res - corf);
+	res = MASK_OUT_ABOVE_8(res);
 
-	FLAG_V &= ~res; /* Undefined V behavior part II */
+	FLAG_V &= res; /* Undefined V behavior part II */
 	FLAG_N = NFLAG_8(res); /* Undefined N behavior */
 	FLAG_Z |= res;
 
@@ -9461,23 +9426,18 @@ M68KMAKE_OP(sbcd, 8, mm, .)
 	uint ea  = EA_AX_PD_8();
 	uint dst = m68ki_read_8(state, ea);
 	uint res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_AS_1();
-	uint corf = 0;
+	FLAG_V = ~res; /* Undefined V behavior */
 
-	if(res > 0xf)
-		corf = 6;
+	if(res > 9)
+		res -= 6;
 	res += HIGH_NIBBLE(dst) - HIGH_NIBBLE(src);
-	FLAG_V = res; /* Undefined V behavior */
-	if(res > 0xff) {
+	FLAG_X = FLAG_C = (res > 0x99) << 8;
+	if(FLAG_C)
 		res += 0xa0;
-		FLAG_X = FLAG_C = CFLAG_SET;
-	} else if(res < corf)
-		FLAG_X = FLAG_C = CFLAG_SET;
-	else
-		FLAG_N = FLAG_X = FLAG_C = 0;
 
-	res = MASK_OUT_ABOVE_8(res - corf);
+	res = MASK_OUT_ABOVE_8(res);
 
-	FLAG_V &= ~res; /* Undefined V behavior part II */
+	FLAG_V &= res; /* Undefined V behavior part II */
 	FLAG_N = NFLAG_8(res); /* Undefined N behavior */
 	FLAG_Z |= res;
 

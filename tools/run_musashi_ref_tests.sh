@@ -12,6 +12,7 @@ Options:
   --cycles N                          Cycles per execute loop (default: 0x1000000)
   --timeout-sec N                     Per-test timeout in seconds (default: 20)
   --xfail-file <path>                 Optional list of expected-failing test paths
+  --require-empty-xfail               Fail if xfail file has any active entries
   --allow-xpass                       Do not fail run when an expected failure passes
 EOF
 }
@@ -24,6 +25,7 @@ iterations="100"
 cycles="0x1000000"
 timeout_sec="20"
 xfail_file=""
+require_empty_xfail=0
 allow_xpass=0
 
 while [[ $# -gt 0 ]]; do
@@ -36,6 +38,7 @@ while [[ $# -gt 0 ]]; do
         --cycles) cycles="$2"; shift 2 ;;
         --timeout-sec) timeout_sec="$2"; shift 2 ;;
         --xfail-file) xfail_file="$2"; shift 2 ;;
+        --require-empty-xfail) require_empty_xfail=1; shift 1 ;;
         --allow-xpass) allow_xpass=1; shift 1 ;;
         -h|--help) usage; exit 0 ;;
         *) echo "Unknown arg: $1" >&2; usage; exit 2 ;;
@@ -57,6 +60,18 @@ if [[ ! -d "$tests_root" ]]; then
     exit 2
 fi
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -z "$xfail_file" ]]; then
+    case "${mode}:${cpu}" in
+        68000:68000)
+            candidate="${script_dir}/baselines/musashi_ref_68000.xfail"
+            if [[ -f "$candidate" ]]; then
+                xfail_file="$candidate"
+            fi
+            ;;
+    esac
+fi
+
 declare -A xfails=()
 if [[ -n "$xfail_file" ]]; then
     if [[ ! -f "$xfail_file" ]]; then
@@ -70,6 +85,12 @@ if [[ -n "$xfail_file" ]]; then
         [[ -z "$line" ]] && continue
         xfails["$line"]=1
     done < "$xfail_file"
+fi
+
+if [[ $require_empty_xfail -eq 1 && ${#xfails[@]} -ne 0 ]]; then
+    echo "CI policy violation: xfail baseline is not empty (${#xfails[@]} active entries)." >&2
+    echo "Remove xfail entries (or fix tests) before using --require-empty-xfail." >&2
+    exit 1
 fi
 
 declare -a tests=()

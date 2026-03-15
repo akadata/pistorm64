@@ -2419,13 +2419,13 @@ static inline void m68ki_exception_bus_error(m68ki_cpu_core *state)
 	 * this is a catastrophic failure.
 	 * Halt the CPU
 	 */
-	if(CPU_RUN_MODE == RUN_MODE_BERR_AERR_RESET)
+	if(CPU_RUN_MODE == RUN_MODE_BERR_AERR_RESET_WSF)
 	{
 		m68k_read_memory_8(0x00ffff01);
 		CPU_STOPPED = STOP_LEVEL_HALT;
 		return;
 	}
-	CPU_RUN_MODE = RUN_MODE_BERR_AERR_RESET;
+	CPU_RUN_MODE = RUN_MODE_BERR_AERR_RESET_WSF;
 
 	/* Use up some clock cycles and undo the instruction's cycles */
 	USE_CYCLES(CYC_EXCEPTION[EXCEPTION_BUS_ERROR] - CYC_INSTRUCTION[REG_IR]);
@@ -2438,6 +2438,7 @@ static inline void m68ki_exception_bus_error(m68ki_cpu_core *state)
 	m68ki_stack_frame_1000(state, REG_PPC, sr, EXCEPTION_BUS_ERROR);
 
 	m68ki_jump_vector(state, EXCEPTION_BUS_ERROR);
+	CPU_RUN_MODE = RUN_MODE_BERR_AERR_RESET;
 	longjmp(state->bus_error_jmp_buf, 1);
 }
 
