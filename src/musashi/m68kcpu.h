@@ -44,7 +44,6 @@ extern "C" {
 
 #include <setjmp.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include "gpio/ps_protocol.h"
 
 /* included to ensure CPU is alligned (16) on fpr[8] */
@@ -1211,23 +1210,11 @@ static inline int m68ki_movec_reg_legal(m68ki_cpu_core *state, uint reg)
  */
 static inline uint m68ki_movec_pcr_value(m68ki_cpu_core *state)
 {
-	/* Default to LC040-style PCR ID for compatibility with mixed 040 library
-	 * stacks that probe PCR and then execute optional F-line paths.
-	 * Override by exporting:
-	 *   PISTORM_PCR_ID=431   -> report full 68040
-	 *   PISTORM_PCR_ID=430   -> report LC040-style (default)
-	 */
-	static int pcr_mode = -1; /* -1=uninit, 0=430, 1=431 */
-	if (pcr_mode < 0) {
-		const char *env = getenv("PISTORM_PCR_ID");
-		if (env && strcmp(env, "431") == 0) {
-			pcr_mode = 1;
-		} else {
-			pcr_mode = 0;
-		}
+	if (state->cpu_type == CPU_TYPE_040) {
+		return 0x04310000;
 	}
 	if (CPU_TYPE_IS_040_PLUS(state->cpu_type)) {
-		return pcr_mode ? 0x04310000u : 0x04300000u;
+		return 0x04300000;
 	}
 	return 0;
 }
