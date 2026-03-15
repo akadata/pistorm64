@@ -58,6 +58,10 @@ USE_PMMU   ?= 1
 # libuae.a for bring-up and integration work.
 USE_UAE_JIT ?= 0
 
+# Optional: build m68xkcpu JIT (our AArch64 JIT for 68000).
+# This is the new test-driven JIT implementation.
+USE_M68XK_JIT ?= 0
+
 # Force FPU on EC/020/EC040/LC040 for 68881/68882 emulation (optional).
 USE_EC_FPU ?= 0
 
@@ -326,7 +330,23 @@ EXTRA_CXX_OBJS :=
 EXTRA_CXX_STUB_OBJS :=
 EXTRA_LINK_DEPS :=
 
-ifeq ($(USE_UAE_JIT),1) 
+# m68xkcpu JIT (optional, AArch64 only)
+M68XK_JIT_SRCS := \
+	src/m68xkcpu/jit.c \
+	src/m68xkcpu/jit_block.c \
+	src/m68xkcpu/jit_cache.c \
+	src/m68xkcpu/jit_emit_aarch64.c \
+	src/m68xkcpu/generated/jit_68000_opinfo.c
+
+M68XK_JIT_OBJS := $(M68XK_JIT_SRCS:%.c=%.o)
+
+ifeq ($(USE_M68XK_JIT),1)
+DEFINES += -DUSE_M68XK_JIT
+INCLUDES += -Isrc/m68xkcpu -Isrc/m68xkcpu/generated
+EXTRA_LINK_DEPS += $(M68XK_JIT_OBJS)
+endif
+
+ifeq ($(USE_UAE_JIT),1)
 # UAE/JIT build (optional, AArch64 only)
 UAE_SRCDIR   := src/uae
 UAE_BUILDDIR := build/uae
@@ -555,7 +575,10 @@ HELP_TARGETS = \
 	"make stage1-680x0"               "Stage 1 baseline: ProcessorTests quick + Musashi quick" \
 	"make stage1-680x0-ci"            "Stage 1 CI baseline (quick + 68040 xfail-gated)" \
 	"make uae-jit"      "Build UAE AArch64 JIT objects (libuae.a)" \
-	"make uae-opcodes"  "Regenerate UAE CPU/JIT opcode tables"
+	"make uae-opcodes"  "Regenerate UAE CPU/JIT opcode tables" \
+	"make m68xkcpu-jit" "Build m68xkcpu AArch64 JIT objects" \
+	"make m68xkcpu-opinfo" "Regenerate m68xkcpu opcode info tables" \
+	"make jit-validate" "Run JIT validation suite (placeholder)"
 
 # Safety: never leave partial outputs
 .DELETE_ON_ERROR:
@@ -565,6 +588,7 @@ DELETEFILES = $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(.OFILES) $(.OFILES:%.o=%
 	$(UAE_TARGET) $(UAE_OBJS) $(UAE_OBJS:%.o=%.d) $(EXTRA_CXX_OBJS) $(EXTRA_CXX_OBJS:%.o=%.d)
 DELETEFILES += $(UAE_FPP_NATIVE_CPP)
 DELETEFILES += $(MUSASHI_REF_TEST_DRIVER)
+DELETEFILES += $(M68XK_JIT_OBJS) $(M68XK_JIT_OBJS:%.o=%.d)
 
 all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest pistorm_truth_test 
 
@@ -597,6 +621,27 @@ $(UAE_GENCOMP): $(UAE_SRCDIR)/jit/gencomp.cpp $(UAE_SRCDIR)/readcpu.cc $(UAE_SRC
 uae-opcodes: $(UAE_GENCPU) $(UAE_GENCOMP)
 	cd $(UAE_SRCDIR) && $(abspath $(UAE_GENCPU))
 	cd $(UAE_SRCDIR) && $(abspath $(UAE_GENCOMP))
+
+# m68xkcpu JIT targets
+M68XK_OPINFO_GEN = src/m68xkcpu/generate_opinfo.py
+M68XK_OPINFO_SRC = third_party/ProcessorTests/680x0/map/68000.official.json
+M68XK_OPINFO_OUT_H = src/m68xkcpu/generated/jit_68000_opinfo.h
+M68XK_OPINFO_OUT_C = src/m68xkcpu/generated/jit_68000_opinfo.c
+
+m68xkcpu-opinfo: $(M68XK_OPINFO_OUT_H) $(M68XK_OPINFO_OUT_C)
+
+$(M68XK_OPINFO_OUT_H) $(M68XK_OPINFO_OUT_C): $(M68XK_OPINFO_GEN) $(M68XK_OPINFO_SRC)
+	@mkdir -p src/m68xkcpu/generated
+	python3 $(M68XK_OPINFO_GEN) $(M68XK_OPINFO_SRC) src/m68xkcpu/generated
+
+m68xkcpu-jit: $(M68XK_OPINFO_OUT_H) $(M68XK_OPINFO_OUT_C) $(M68XK_JIT_OBJS)
+ifeq ($(USE_M68XK_JIT),1)
+m68xkcpu-jit: $(TARGET)
+endif
+
+# JIT validation suite
+jit-validate:
+	@python3 tools/jit_vs_musashi.py --suite-dir $(PROCESSORTESTS_SOURCE) --mode quick
 
 $(UAE_TARGET): $(UAE_OBJS)
 	@mkdir -p $(UAE_BUILDDIR)
@@ -666,6 +711,15 @@ src/uae/pistorm_uae_bridge.o: src/uae/pistorm_uae_bridge.cc src/uae/pistorm_uae_
 
 src/uae/pistorm_uae_stubs.o: src/uae/pistorm_uae_stubs.cc
 	$(CXX) -MMD -MP -c -o $@ $(UAE_CXXFLAGS) $(NO_LTO_FLAGS) $<
+endif
+
+# m68xkcpu JIT object files
+ifeq ($(USE_M68XK_JIT),1)
+src/m68xkcpu/%.o: src/m68xkcpu/%.c
+	$(CC) -MMD -MP $(CFLAGS) $(NO_LTO_FLAGS) -c -o $@ $<
+
+src/m68xkcpu/generated/%.o: src/m68xkcpu/generated/%.c
+	$(CC) -MMD -MP $(CFLAGS) $(NO_LTO_FLAGS) -c -o $@ $<
 endif
 
 $(UAE_BUILDDIR)/%.o: $(UAE_SRCDIR)/%.c
