@@ -1,3 +1,0 @@
-# Known unstable in standalone Musashi reference harness when forced to --cpu 68000.
-# Upstream test harness also crashes on this case when changed from default 68040.
-mc68000/move.bin

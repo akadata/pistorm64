@@ -23,22 +23,11 @@ typedef struct memory_device_tag_t {
 
 static memory_device_t *memory_map[MMAP_SIZE];
 
-static void signal_bus_error_once(void)
-{
-    static int in_bus_error = 0;
-    if (in_bus_error) {
-        return;
-    }
-    in_bus_error = 1;
-    m68k_pulse_bus_error(&m68ki_cpu);
-    in_bus_error = 0;
-}
-
 static uint8_t read8_fail(memory_device_t *dev, uint32_t address)
 {
     (void)dev;
     (void)address;
-    signal_bus_error_once();
+    m68k_pulse_bus_error(&m68ki_cpu);
     return 0;
 }
 
@@ -46,7 +35,7 @@ static uint16_t read16_fail(memory_device_t *dev, uint32_t address)
 {
     (void)dev;
     (void)address;
-    signal_bus_error_once();
+    m68k_pulse_bus_error(&m68ki_cpu);
     return 0;
 }
 
@@ -54,7 +43,7 @@ static uint32_t read32_fail(memory_device_t *dev, uint32_t address)
 {
     (void)dev;
     (void)address;
-    signal_bus_error_once();
+    m68k_pulse_bus_error(&m68ki_cpu);
     return 0;
 }
 
@@ -63,7 +52,7 @@ static void write8_fail(memory_device_t *dev, uint32_t address, uint8_t value)
     (void)dev;
     (void)address;
     (void)value;
-    signal_bus_error_once();
+    m68k_pulse_bus_error(&m68ki_cpu);
 }
 
 static void write16_fail(memory_device_t *dev, uint32_t address, uint16_t value)
@@ -71,7 +60,7 @@ static void write16_fail(memory_device_t *dev, uint32_t address, uint16_t value)
     (void)dev;
     (void)address;
     (void)value;
-    signal_bus_error_once();
+    m68k_pulse_bus_error(&m68ki_cpu);
 }
 
 static void write32_fail(memory_device_t *dev, uint32_t address, uint32_t value)
@@ -79,7 +68,7 @@ static void write32_fail(memory_device_t *dev, uint32_t address, uint32_t value)
     (void)dev;
     (void)address;
     (void)value;
-    signal_bus_error_once();
+    m68k_pulse_bus_error(&m68ki_cpu);
 }
 
 static memory_device_t mdev_not_mapped = {
@@ -105,54 +94,50 @@ static void memory_map_add(memory_device_t *dev, uint32_t start_addr, uint32_t s
 
     count = size / BLOCK_SIZE;
     off = start_addr / BLOCK_SIZE;
-    assert(off + count <= MMAP_SIZE);
     for (i = 0; i < count; ++i) {
         memory_map[off + i] = dev;
     }
 }
 
-static inline memory_device_t *lookup_device(uint32_t address)
-{
-    unsigned slot = address / BLOCK_SIZE;
-    if (slot >= MMAP_SIZE) {
-        return &mdev_not_mapped;
-    }
-    return memory_map[slot];
-}
-
 unsigned int m68k_read_memory_8(unsigned int address)
 {
-    memory_device_t *dev = lookup_device(address);
+    unsigned slot = address / BLOCK_SIZE;
+    memory_device_t *dev = memory_map[slot];
     return dev->read8(dev, dev->mask & address);
 }
 
 unsigned int m68k_read_memory_16(unsigned int address)
 {
-    memory_device_t *dev = lookup_device(address);
+    unsigned slot = address / BLOCK_SIZE;
+    memory_device_t *dev = memory_map[slot];
     return dev->read16(dev, dev->mask & address);
 }
 
 unsigned int m68k_read_memory_32(unsigned int address)
 {
-    memory_device_t *dev = lookup_device(address);
+    unsigned slot = address / BLOCK_SIZE;
+    memory_device_t *dev = memory_map[slot];
     return dev->read32(dev, dev->mask & address);
 }
 
 void m68k_write_memory_8(unsigned int address, unsigned int value)
 {
-    memory_device_t *dev = lookup_device(address);
+    unsigned slot = address / BLOCK_SIZE;
+    memory_device_t *dev = memory_map[slot];
     dev->write8(dev, dev->mask & address, value);
 }
 
 void m68k_write_memory_16(unsigned int address, unsigned int value)
 {
-    memory_device_t *dev = lookup_device(address);
+    unsigned slot = address / BLOCK_SIZE;
+    memory_device_t *dev = memory_map[slot];
     dev->write16(dev, dev->mask & address, value);
 }
 
 void m68k_write_memory_32(unsigned int address, unsigned int value)
 {
-    memory_device_t *dev = lookup_device(address);
+    unsigned slot = address / BLOCK_SIZE;
+    memory_device_t *dev = memory_map[slot];
     dev->write32(dev, dev->mask & address, value);
 }
 
