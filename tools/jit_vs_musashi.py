@@ -105,42 +105,23 @@ def compare_states(expected, actual, test_name):
 
 def run_musashi_test(test_path, cycles=0x1000000):
     """
-    Run a test through Musashi interpreter using the reference test driver.
+    Run a test through Musashi interpreter.
     
-    The Musashi driver reads the JSON, executes the instruction, and returns
-    the final CPU state.
+    NOTE: This currently returns a placeholder. Full implementation requires:
+    1. A C driver that can parse ProcessorTests JSON format
+    2. Set up Musashi CPU state from 'initial' dict
+    3. Set up memory from 'ram' entries
+    4. Execute one instruction (or specified cycles)
+    5. Return final CPU state as dict
+    
+    The existing musashi_ref_test_driver.c runs .bin files, not JSON.
+    We need a new driver for JSON-format ProcessorTests.
     
     Returns dict with CPU state after execution, or None on error.
     """
-    if not os.path.exists(MUSASHI_DRIVER):
-        # Try to build it
-        result = subprocess.run(
-            ['make', 'musashi-ref-tests'],
-            capture_output=True,
-            text=True,
-            cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        )
-    
-    if not os.path.exists(MUSASHI_DRIVER):
-        return {'error': 'Musashi test driver not found'}
-    
-    # Run the Musashi driver
-    # The driver outputs JSON with final state
-    result = subprocess.run(
-        [MUSASHI_DRIVER, test_path, str(cycles)],
-        capture_output=True,
-        text=True
-    )
-    
-    if result.returncode != 0:
-        return {'error': f'Musashi driver failed: {result.stderr}'}
-    
-    # Parse output - driver should output JSON with final state
-    try:
-        output = json.loads(result.stdout)
-        return extract_cpu_state(output.get('final', output))
-    except json.JSONDecodeError:
-        return {'error': f'Invalid output from driver: {result.stdout[:200]}'}
+    # TODO: Implement Musashi JSON test driver
+    # For now, return None to indicate not implemented
+    return {'error': 'Musashi JSON test driver not yet implemented'}
 
 
 def run_jit_test(test_path, cycles=0x1000000):
@@ -267,6 +248,11 @@ def run_test_suite(suite_dir, mode='quick', max_tests=None, verbose=False, use_m
     print(f"Running {len(test_files)} tests from {suite_dir}...")
     print()
     
+    if use_musashi:
+        print("WARNING: --musashi mode not yet implemented.")
+        print("         Currently validating JSON structure only.")
+        print()
+    
     total_passed = 0
     total_failed = 0
     file_passed = 0
@@ -308,7 +294,28 @@ def run_test_suite(suite_dir, mode='quick', max_tests=None, verbose=False, use_m
 
 
 def main():
-    parser = argparse.ArgumentParser(description='JIT vs Musashi Differential Tester')
+    parser = argparse.ArgumentParser(
+        description='JIT vs Musashi Differential Tester',
+        epilog='''
+Status:
+  - JSON structure validation: IMPLEMENTED
+  - Test discovery and counting: IMPLEMENTED  
+  - Musashi execution: PENDING (needs C driver for JSON format)
+  - JIT execution: PENDING (needs JIT integration)
+  - State comparison: IMPLEMENTED (ready when execution is added)
+
+The ProcessorTests JSON format requires setting up CPU state and memory
+from the 'initial' dict and 'ram' entries, executing one instruction,
+then comparing against 'final' state. This needs a custom C driver.
+
+Example usage:
+  # Validate JSON structure (current capability)
+  python3 tools/jit_vs_musashi.py --suite-dir third_party/ProcessorTests/680x0/68000/v1 --mode quick
+  
+  # Run with Musashi execution (when implemented)
+  python3 tools/jit_vs_musashi.py --suite-dir ... --mode quick --musashi
+'''
+    )
     parser.add_argument('--test', type=str, help='Single test JSON file to validate')
     parser.add_argument('--suite-dir', type=str, default=DEFAULT_SUITE_DIR,
                         help='Test suite directory')

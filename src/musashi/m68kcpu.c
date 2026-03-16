@@ -1373,7 +1373,7 @@ void m68k_add_ram_range_state(m68ki_cpu_core *state, uint32_t addr, uint32_t upp
 				changed = 1;
 			}
 			if (changed) {
-				printf("[MUSASHI] Adjusted mapped write range %d: %.8X-%.8X (%p)\n", state->write_ranges, addr, upper, (void *)ptr);
+				//printf("[MUSASHI] Adjusted mapped write range %d: %.8X-%.8X (%p)\n", state->write_ranges, addr, upper, (void *)ptr);
 			}
 			return;
 		}
@@ -1384,7 +1384,7 @@ void m68k_add_ram_range_state(m68ki_cpu_core *state, uint32_t addr, uint32_t upp
 		state->read_upper[state->read_ranges] = upper;
 		state->read_data[state->read_ranges] = ptr;
 		state->read_ranges++;
-		printf("[MUSASHI] Mapped read range %d: %.8X-%.8X (%p)\n", state->read_ranges, addr, upper, (void *)ptr);
+		//printf("[MUSASHI] Mapped read range %d: %.8X-%.8X (%p)\n", state->read_ranges, addr, upper, (void *)ptr);
 	} else {
 		printf("Can't Musashi map more than eight RAM/ROM read ranges.\n");
 	}
@@ -1393,7 +1393,7 @@ void m68k_add_ram_range_state(m68ki_cpu_core *state, uint32_t addr, uint32_t upp
 		state->write_upper[state->write_ranges] = upper;
 		state->write_data[state->write_ranges] = ptr;
 		state->write_ranges++;
-		printf("[MUSASHI] Mapped write range %d: %.8X-%.8X (%p)\n", state->write_ranges, addr, upper, (void *)ptr);
+		//printf("[MUSASHI] Mapped write range %d: %.8X-%.8X (%p)\n", state->write_ranges, addr, upper, (void *)ptr);
 	} else {
 		printf("Can't Musashi map more than eight RAM write ranges.\n");
 	}
@@ -1422,7 +1422,7 @@ void m68k_add_rom_range_state(m68ki_cpu_core *state, uint32_t addr, uint32_t upp
 				changed = 1;
 			}
 			if (changed) {
-				printf("[MUSASHI] Adjusted mapped read range %d: %.8X-%.8X (%p)\n", state->read_ranges, addr, upper, (void *)ptr);
+				//printf("[MUSASHI] Adjusted mapped read range %d: %.8X-%.8X (%p)\n", state->read_ranges, addr, upper, (void *)ptr);
 			}
 			return;
 		}
@@ -1433,7 +1433,7 @@ void m68k_add_rom_range_state(m68ki_cpu_core *state, uint32_t addr, uint32_t upp
 		state->read_upper[state->read_ranges] = upper;
 		state->read_data[state->read_ranges] = ptr;
 		state->read_ranges++;
-		printf("[MUSASHI] Mapped read range %d: %.8X-%.8X (%p)\n", state->read_ranges, addr, upper, (void *)ptr);
+		//printf("[MUSASHI] Mapped read range %d: %.8X-%.8X (%p)\n", state->read_ranges, addr, upper, (void *)ptr);
 	} else {
 		printf("Can't Musashi map more than eight RAM/ROM read ranges.\n");
 	}
@@ -1453,7 +1453,7 @@ void m68k_remove_range_state(m68ki_cpu_core *state, unsigned char *ptr) {
 			state->read_data[i] = NULL;
 			state->read_addr[i] = 0;
 			state->read_upper[i] = 0;
-			printf("[MUSASHI] Unmapped read range %d.\n", i);
+			//printf("[MUSASHI] Unmapped read range %d.\n", i);
 			for (int j = i; j < 8 - 1; j++) {
 				state->read_data[j] = state->read_data[j + 1];
 				state->read_addr[j] = state->read_addr[j + 1];
@@ -1468,7 +1468,7 @@ void m68k_remove_range_state(m68ki_cpu_core *state, unsigned char *ptr) {
 			state->write_data[i] = NULL;
 			state->write_addr[i] = 0;
 			state->write_upper[i] = 0;
-			printf("[MUSASHI] Unmapped write range %d.\n", i);
+			//printf("[MUSASHI] Unmapped write range %d.\n", i);
 			for (int j = i; j < 8 - 1; j++) {
 				state->write_data[j] = state->write_data[j + 1];
 				state->write_addr[j] = state->write_addr[j + 1];
@@ -1483,7 +1483,7 @@ void m68k_remove_range_state(m68ki_cpu_core *state, unsigned char *ptr) {
 }
 
 void m68k_clear_ranges_state(m68ki_cpu_core *state) {
-	printf("[MUSASHI] Clearing all reads/write memory ranges.\n");
+	//printf("[MUSASHI] Clearing all reads/write memory ranges.\n");
 	for (int i = 0; i < 8; i++) {
 		state->read_upper[i] = 0;
 		state->read_addr[i] = 0;

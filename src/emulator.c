@@ -23,6 +23,9 @@
 #include "log.h"
 #include "memory_mapped.h"
 #include "cpu_backend.h"
+#if USE_M68XK_JIT
+#include "m68xkcpu/jit.h"
+#endif
 #ifdef USE_UAE_JIT
 #ifdef __cplusplus
 extern "C" {
@@ -82,6 +85,13 @@ static unsigned int fc_boot_log_remaining = 0;
 static int fc_boot_log_inited = 0;
 
 static int use_uae_jit = 0;
+static int use_m68xk_jit = 0;
+typedef enum {
+  JIT_REQ_AUTO = 0,
+  JIT_REQ_UAE,
+  JIT_REQ_M68XKCPU,
+} jit_backend_request_t;
+static jit_backend_request_t jit_backend_request = JIT_REQ_AUTO;
 static int reset_trace_setting = -1;
 static uint64_t reset_last_edge_ns = 0;
 
@@ -1239,6 +1249,25 @@ static inline int fpu_backend_execute(m68ki_cpu_core* state, uint16_t opcode) {
 }
 
 void jit_backend_execute(m68ki_cpu_core* state, int cycles) {
+#if USE_M68XK_JIT
+  if (use_m68xk_jit) {
+    static int m68xk_exec_enabled = -1;
+    if (m68xk_exec_enabled < 0) {
+      const char* e = getenv("PISTORM_M68XK_EXEC");
+      m68xk_exec_enabled = (e && atoi(e) != 0) ? 1 : 0;
+      if (!m68xk_exec_enabled) {
+        LOG_WARN("[CPU] m68xkcpu JIT selected but execution is gated; set PISTORM_M68XK_EXEC=1 to execute compiled blocks.\n");
+      }
+    }
+
+    if (m68xk_exec_enabled) {
+      int ran = jit_execute((uint32_t)m68k_get_reg(NULL, M68K_REG_PC), cycles);
+      if (ran > 0) {
+        return;
+      }
+    }
+  }
+#endif
   musashi_backend_execute(state, cycles);
 }
 
@@ -1854,7 +1883,16 @@ switch_config:
     configure_ipl_nops();
     if (!enable_jit_backend && cfg->enable_jit) {
       enable_jit_backend = 1;
-      printf("[CFG] JIT backend enabled via config.\n");
+      if (cfg->jit_backend == JIT_BACKEND_UAE) {
+        jit_backend_request = JIT_REQ_UAE;
+      } else if (cfg->jit_backend == JIT_BACKEND_M68XKCPU) {
+        jit_backend_request = JIT_REQ_M68XKCPU;
+      } else {
+        jit_backend_request = JIT_REQ_AUTO;
+      }
+      printf("[CFG] JIT backend enabled via config (request=%s).\n",
+             (jit_backend_request == JIT_REQ_UAE) ? "uae" :
+             (jit_backend_request == JIT_REQ_M68XKCPU) ? "m68xkcpu" : "auto");
     }
     if (!enable_fpu_jit_backend && cfg->enable_fpu_jit) {
       enable_fpu_jit_backend = 1;
@@ -1971,8 +2009,18 @@ switch_config:
 
   //amiga_reset_and_wait("pre-cpu");
 
+  if (enable_jit_backend && jit_backend_request == JIT_REQ_AUTO) {
+#if USE_UAE_JIT
+    jit_backend_request = JIT_REQ_UAE;
+#elif USE_M68XK_JIT
+    jit_backend_request = JIT_REQ_M68XKCPU;
+#else
+    jit_backend_request = JIT_REQ_AUTO;
+#endif
+  }
+
 #ifdef USE_UAE_JIT
-  if (enable_jit_backend) {
+  if (enable_jit_backend && jit_backend_request == JIT_REQ_UAE) {
     int rc = uae_pistorm_init(uae_cpu_model_from_musashi(cpu_type), 1, enable_fpu_jit_backend ? 1 : 0);
     if (rc == 0) {
       use_uae_jit = 1;
@@ -1995,9 +2043,12 @@ switch_config:
       }
     }
   }
+#else
+  if (enable_jit_backend && jit_backend_request == JIT_REQ_UAE) {
+    LOG_WARN("[CPU] JIT backend 'uae' requested but binary was built without USE_UAE_JIT; falling back to Musashi\n");
+    enable_jit_backend = 0;
+  }
 #endif
-
-  LOG_INFO("[CPU] Active backend: %s\n", use_uae_jit ? "UAE JIT" : "Musashi");
 
   if (!use_uae_jit) {
     m68k_init();
@@ -2006,8 +2057,31 @@ switch_config:
     m68k_set_instr_hook_callback(&m68ki_cpu, instr_hook_callback);
     m68k_set_fc_callback(&m68ki_cpu, fc_callback_wrapper);  // Use wrapper to call cpu_set_fc
     m68k_set_illg_instr_callback(&m68ki_cpu, illg_instr_callback);
+
+#if USE_M68XK_JIT
+    if (enable_jit_backend && jit_backend_request == JIT_REQ_M68XKCPU) {
+      int rc = jit_init(&m68ki_cpu, 0);
+      if (rc == 0) {
+        use_m68xk_jit = 1;
+        LOG_INFO("[CPU] m68xkcpu JIT backend selected (execution currently gated; set PISTORM_M68XK_EXEC=1 to run compiled blocks)\n");
+      } else {
+        enable_jit_backend = 0;
+        LOG_ERROR("[CPU] m68xkcpu JIT init failed (rc=%d), falling back to Musashi\n", rc);
+      }
+    }
+#else
+    if (enable_jit_backend && jit_backend_request == JIT_REQ_M68XKCPU) {
+      LOG_WARN("[CPU] JIT backend 'm68xkcpu' requested but binary was built without USE_M68XK_JIT; falling back to Musashi\n");
+      enable_jit_backend = 0;
+    }
+#endif
+
     cpu_pulse_reset();
   }
+
+  LOG_INFO("[CPU] Active backend: %s\n",
+           use_uae_jit ? "UAE JIT" :
+           (use_m68xk_jit ? "m68xkcpu JIT" : "Musashi"));
 
   pthread_t ipl_tid = 0, cpu_tid, kbd_tid, mouse_tid = 0;
   int err;
@@ -2161,6 +2235,13 @@ switch_config:
 
 #ifdef PS_PROTOCOL_HAS_CLEANUP
   ps_cleanup_protocol();
+#endif
+
+#if USE_M68XK_JIT
+  if (use_m68xk_jit) {
+    jit_shutdown();
+    use_m68xk_jit = 0;
+  }
 #endif
 
   ps_protocol_dump_stats();
@@ -3079,7 +3160,7 @@ static void print_help(const char* prog) {
   printf("  -c, --config <file>        Load config file\n");
   printf("  -C, --cpu <type>           CPU type (e.g., 68000, 68020)\n");
   printf("  -L, --loopcycles <n>       CPU loop cycles\n");
-  printf("  -j, --jit                  Enable JIT backend\n");
+  printf("  -j, --jit                  Enable JIT backend (config: jit [auto|uae|m68xkcpu])\n");
   printf("  -f, --jit-fpu              Enable FPU JIT backend\n");
   printf("  -m, --map <args...>        Map entry (same syntax as .cfg map line)\n");
   printf("  -M, --mouse <file> <key> [autoconnect]\n");

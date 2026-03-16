@@ -578,7 +578,6 @@ HELP_TARGETS = \
 	"make uae-opcodes"  "Regenerate UAE CPU/JIT opcode tables" \
 	"make m68xkcpu-jit" "Build m68xkcpu AArch64 JIT objects" \
 	"make m68xkcpu-opinfo" "Regenerate m68xkcpu opcode info tables" \
-	"make jit-validate" "Run JIT validation suite (placeholder)"
 
 # Safety: never leave partial outputs
 .DELETE_ON_ERROR:
@@ -639,9 +638,8 @@ ifeq ($(USE_M68XK_JIT),1)
 m68xkcpu-jit: $(TARGET)
 endif
 
-# JIT validation suite
-jit-validate:
-	@python3 tools/jit_vs_musashi.py --suite-dir $(PROCESSORTESTS_SOURCE) --mode quick
+# Note: Run JIT validation with:
+#   python3 tools/jit_vs_musashi.py --suite-dir $(PROCESSORTESTS_SOURCE) --mode quick
 
 $(UAE_TARGET): $(UAE_OBJS)
 	@mkdir -p $(UAE_BUILDDIR)
@@ -692,6 +690,17 @@ buptest: src/buptest/buptest.c $(PS_PROTOCOL_SRC) $(PS_BACKEND_SRCS) src/log.c
 
 pistorm_truth_test: tools/pistorm_truth_test.c $(PS_PROTOCOL_SRC) $(PS_BACKEND_SRCS) src/log.c
 	$(CC) $(CFLAGS) -o $@ tools/pistorm_truth_test.c $(PS_PROTOCOL_SRC) $(PS_BACKEND_SRCS) src/log.c
+
+# Musashi JSON test driver for ProcessorTests
+MUSASHI_JSON_DRIVER = build/musashi_json_driver
+$(MUSASHI_JSON_DRIVER): tools/musashi_json_driver.c $(MUSASHIFILES:%.c=%.o) $(MUSASHIGENCFILES:%.c=%.o) src/musashi/softfloat/softfloat.o src/musashi/softfloat/softfloat_fpsp.o
+	@mkdir -p $(dir $@)
+	$(CC) $(EMU_WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) -I. -Isrc -Isrc/musashi \
+		-o $@ tools/musashi_json_driver.c \
+		src/musashi/m68kcpu.o src/musashi/m68kops.o src/musashi/m68kdasm.o \
+		src/musashi/softfloat/softfloat.o src/musashi/softfloat/softfloat_fpsp.o -lm
+
+musashi-json-driver: $(MUSASHI_JSON_DRIVER)
 
 piscsi-remote: tools/piscsi_remote/piscsi_remote_server.c
 	$(CC) -MMD -MP $(CFLAGS) -o $@ $< -lssl -lcrypto

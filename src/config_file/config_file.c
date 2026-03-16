@@ -519,15 +519,43 @@ mapid[sizeof(mapid) - 1] = '\0';  // Ensure null termination
     break;
   case CONFITEM_JIT: {
     get_next_string(parse_line, cur_cmd, &str_pos, ' ');
-    unsigned char enable = 0;
+    unsigned char enable = 1;
+    unsigned char backend = JIT_BACKEND_AUTO;
+
     if (strlen(cur_cmd)) {
-      if (!strcasecmp(cur_cmd, "1") || !strcasecmp(cur_cmd, "on") || !strcasecmp(cur_cmd, "yes") ||
-          !strcasecmp(cur_cmd, "true")) {
+      if (!strcasecmp(cur_cmd, "0") || !strcasecmp(cur_cmd, "off") || !strcasecmp(cur_cmd, "no") ||
+          !strcasecmp(cur_cmd, "false")) {
+        enable = 0;
+      } else if (!strcasecmp(cur_cmd, "1") || !strcasecmp(cur_cmd, "on") ||
+                 !strcasecmp(cur_cmd, "yes") || !strcasecmp(cur_cmd, "true") ||
+                 !strcasecmp(cur_cmd, "auto")) {
         enable = 1;
+        backend = JIT_BACKEND_AUTO;
+      } else if (!strcasecmp(cur_cmd, "uae") || !strcasecmp(cur_cmd, "uae-jit")) {
+        enable = 1;
+        backend = JIT_BACKEND_UAE;
+      } else if (!strcasecmp(cur_cmd, "m68xkcpu") || !strcasecmp(cur_cmd, "m68xk")) {
+        enable = 1;
+        backend = JIT_BACKEND_M68XKCPU;
+      } else {
+        enable = 0;
+        backend = JIT_BACKEND_AUTO;
+        printf("[CFG] Unknown jit backend '%s'; disabling JIT.\n", cur_cmd);
       }
     }
+
     cfg->enable_jit = enable;
-    printf("[CFG] JIT backend %s via config.\n", cfg->enable_jit ? "enabled" : "disabled");
+    cfg->jit_backend = backend;
+    if (!cfg->enable_jit) {
+      printf("[CFG] JIT backend disabled via config.\n");
+    } else {
+      const char* backend_name = "auto";
+      if (cfg->jit_backend == JIT_BACKEND_UAE)
+        backend_name = "uae";
+      else if (cfg->jit_backend == JIT_BACKEND_M68XKCPU)
+        backend_name = "m68xkcpu";
+      printf("[CFG] JIT backend enabled via config (backend=%s).\n", backend_name);
+    }
     break;
   }
   case CONFITEM_JIT_FPU: {
@@ -1275,6 +1303,7 @@ struct emulator_config* load_config_file(const char* filename) {
 
   memset(cfg, 0x00, sizeof(struct emulator_config));
   cfg->cpu_type = M68K_CPU_TYPE_68000;
+  cfg->jit_backend = JIT_BACKEND_AUTO;
 
   while (!feof(in)) {
     memset(parse_line, 0x00, 512);

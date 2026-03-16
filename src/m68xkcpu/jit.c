@@ -14,10 +14,6 @@
 /* Global JIT context */
 jit_context_t g_jit = {0};
 
-/* External Musashi CPU reference */
-extern struct m68ki_cpu_core *g_m68k_cpu;
-
-
 /**
  * Initialize the JIT subsystem
  * 
@@ -27,6 +23,12 @@ extern struct m68ki_cpu_core *g_m68k_cpu;
  */
 int jit_init(struct m68ki_cpu_core *cpu, size_t cache_size)
 {
+#if !defined(__aarch64__)
+    (void)cpu;
+    (void)cache_size;
+    fprintf(stderr, "JIT: m68xkcpu backend currently requires an AArch64 host\n");
+    return -1;
+#else
     if (g_jit.initialized) {
         fprintf(stderr, "JIT: Already initialized\n");
         return -1;
@@ -52,6 +54,7 @@ int jit_init(struct m68ki_cpu_core *cpu, size_t cache_size)
     printf("JIT: Initialized with %zu KB cache\n", g_jit.cache_size / 1024);
     
     return 0;
+#endif
 }
 
 
@@ -99,6 +102,7 @@ int jit_execute(uint32_t pc, int cycles)
 {
     jit_block_t *block;
     int cycles_remaining = cycles;
+    static int warned_non_progress = 0;
     
     if (!g_jit.initialized || !g_jit.enabled) {
         return -1;
@@ -117,10 +121,19 @@ int jit_execute(uint32_t pc, int cycles)
             g_jit.stats.blocks_executed++;
             
             /* Execute the compiled block */
+            uint32_t pc_before = pc;
             int block_cycles = jit_block_execute(block, cycles_remaining);
             
-            if (block_cycles < 0) {
-                /* Block execution requested fallback */
+            if (block_cycles <= 0 || g_jit.current_pc == pc_before) {
+                /* Block execution made no forward progress - fall back safely. */
+                g_jit.stats.fallback_count++;
+                g_jit.enabled = false;
+                if (!warned_non_progress) {
+                    fprintf(stderr,
+                            "JIT: block at 0x%08X made no progress (cycles=%d, next_pc=0x%08X); disabling m68xkcpu execution and falling back to Musashi\n",
+                            pc_before, block_cycles, g_jit.current_pc);
+                    warned_non_progress = 1;
+                }
                 break;
             }
             
@@ -145,9 +158,18 @@ int jit_execute(uint32_t pc, int cycles)
                 /* Successfully compiled - execute it */
                 g_jit.stats.blocks_compiled++;
                 
+                uint32_t pc_before = pc;
                 int block_cycles = jit_block_execute(block, cycles_remaining);
                 
-                if (block_cycles < 0) {
+                if (block_cycles <= 0 || g_jit.current_pc == pc_before) {
+                    g_jit.stats.fallback_count++;
+                    g_jit.enabled = false;
+                    if (!warned_non_progress) {
+                        fprintf(stderr,
+                                "JIT: compiled block at 0x%08X made no progress (cycles=%d, next_pc=0x%08X); disabling m68xkcpu execution and falling back to Musashi\n",
+                                pc_before, block_cycles, g_jit.current_pc);
+                        warned_non_progress = 1;
+                    }
                     break;
                 }
                 

@@ -70,6 +70,12 @@ typedef enum {
 } config_items;
 
 typedef enum {
+  JIT_BACKEND_AUTO = 0,
+  JIT_BACKEND_UAE = 1,
+  JIT_BACKEND_M68XKCPU = 2,
+} jit_backend_kind_t;
+
+typedef enum {
   OP_TYPE_BYTE,
   OP_TYPE_WORD,
   OP_TYPE_LONGWORD,
@@ -105,6 +111,7 @@ struct emulator_config {
   unsigned char keyboard_grab;
   unsigned char keyboard_autoconnect;
   unsigned char enable_jit;
+  unsigned char jit_backend;
   unsigned char enable_fpu_jit;
 
   unsigned int loop_cycles; 
