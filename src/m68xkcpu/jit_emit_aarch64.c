@@ -550,6 +550,9 @@ void jit_emit_str_h(jit_emit_context_t *ctx, uint8_t rt, uint8_t rn, int offset)
 }
 
 
+/* Forward declaration */
+extern struct m68ki_cpu_core m68ki_cpu;
+
 /**
  * Emit block prologue
  */
@@ -557,10 +560,26 @@ void jit_emit_prologue(jit_emit_context_t *ctx, jit_block_t *block)
 {
     (void)block;
     
-    /* Save callee-saved registers we'll use */
-    /* For initial implementation, we'll use mostly caller-saved regs */
+    /* AArch64 function prologue:
+     * Function signature: int block_execute(int cycles)
+     * R0 on entry: cycles argument
+     * 
+     * Prologue must:
+     * 1. Save cycles (R0) in R1 for return value
+     * 2. Load &m68ki_cpu into X19 (callee-saved) for translators
+     * 3. X19 survives entire block execution
+     * 4. Epilogue uses X19 to store PC back
+     */
     
-    /* Prologue: nothing special for now */
+    /* Save cycles argument in R1 */
+    jit_emit_mov_reg(ctx, 1, 0);  /* R1 = cycles (preserved for return) */
+    
+    /* Load address of m68ki_cpu into X19 (callee-saved register)
+     * X19-X28 must be preserved across function calls
+     * This ensures CPU pointer survives translator code emission
+     */
+    uint64_t cpu_addr = (uint64_t)&m68ki_cpu;
+    jit_emit_mov(ctx, 19, cpu_addr);  /* X19 = &m68ki_cpu */
 }
 
 
@@ -573,12 +592,12 @@ void jit_emit_epilogue(jit_emit_context_t *ctx, jit_block_t *block)
     
     /* Store R10 (PC) back to m68ki_cpu.pc before returning */
     /* pc is at offset 136 (0x88) in m68ki_cpu_core structure */
-    /* R0 points to &m68ki_cpu */
-    jit_emit_str_w(ctx, 10, 0, 136);  /* str w10, [r0, #136] */
+    /* X19 points to &m68ki_cpu (preserved throughout block) */
+    jit_emit_str_w(ctx, 10, 19, 136);  /* str w10, [x19, #136] */
     
     /* Return cycles used in W0 */
-    /* For now, just return 0 */
-    jit_emit_mov(ctx, 0, 0);
+    /* Restore cycles from R1 */
+    jit_emit_mov_reg(ctx, 0, 1);  /* R0 = R1 (cycles) */
     
     /* Return to caller */
     jit_emit_dword(ctx, 0xD65F03C0);  /* RET */

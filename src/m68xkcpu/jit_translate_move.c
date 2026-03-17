@@ -490,10 +490,14 @@ int jit_translate_move(jit_translate_context_t *ctx)
         /* This is MOVEA - destination An is in bits 11-9, source in bits 8-6 */
         dst_mode = JIT_EA_AN;
         dst_reg = (ctx->opcode >> 9) & 0x7;  /* Extract An from bits 11-9 */
-        src_mode = (ctx->opcode >> 3) & 0x7;  /* Extract src mode from bits 5-3 */
-        src_reg = ctx->opcode & 0x7;  /* Extract src reg from bits 2-0 */
-        LOG_ERROR("[JIT-MOVEA] Corrected for MOVEA: dst_reg=%u src_mode=%u src_reg=%u\n",
-                  dst_reg, src_mode, src_reg);
+        /* Source is in bits 8-6: bit 8 = mode high, bits 7-6 = mode low + reg high */
+        /* For MOVEA, bits 8-6 encode: 000=Dn, 001=An, 010=(An), etc. */
+        src_mode = (ctx->opcode >> 6) & 0x7;  /* Extract src mode from bits 8-6 */
+        src_reg = 0;  /* Source reg is part of mode for most EA modes */
+        if (src_mode == JIT_EA_DN || src_mode == JIT_EA_AN) {
+            src_reg = (ctx->opcode >> 3) & 0x7;  /* For Dn/An, reg is in bits 5-3 */
+        }
+
     }
     
     /* Validate size (11 = illegal for MOVE) */
@@ -530,12 +534,6 @@ int jit_translate_move(jit_translate_context_t *ctx)
         LOG_VERBOSE("[CPU] m68xkcpu: MOVE byte to An is illegal - fallback\n");
         return -1;
     }
-    
-    /* Log MOVEA vs MOVE distinction */
-    const char *move_type = (dst_mode == JIT_EA_AN) ? "MOVEA" : "MOVE";
-    const char *size_str = (size_enc == 0) ? "b" : (size_enc == 1) ? "w" : "l";
-    LOG_ERROR("[JIT-MOVE] %s.%s src_mode=%u src_reg=%u dst_mode=%u dst_reg=%u an_check=%d\n",
-              move_type, size_str, src_mode, src_reg, dst_mode, dst_reg, an_check);
     LOG_VERBOSE("[CPU] m68xkcpu: MOVE %s.%c (mode %u->%u, opcode=%04X)\n",
                 (size_enc == 0) ? "b" : (size_enc == 1) ? "w" : "l",
                 src_mode, dst_mode, ctx->opcode);
@@ -565,66 +563,40 @@ int jit_translate_move(jit_translate_context_t *ctx)
     
     /* Step 1: Read from source */
     uint16_t src_ext = (ctx->ext_count > 0) ? ctx->ext_words[0] : 0;
-    LOG_ERROR("[JIT-MOVE] Step 1: Reading from src_mode=%u src_reg=%u\n", src_mode, src_reg);
     value_reg = emit_read_src_ea(&emit_ctx, src_mode, src_reg, size_enc, fetch_fc, src_ext);
     if (value_reg == 0) {
-        LOG_ERROR("[CPU] m68xkcpu: MOVE failed to emit source read\n");
         jit_cache_free(ctx->jit, code_buffer, code_size);
         return -1;
     }
-    LOG_ERROR("[JIT-MOVE] Source read OK, value_reg=%u\n", value_reg);
     
     /* Step 2: Write to destination */
     uint16_t dst_ext = (ctx->ext_count > 0) ? ctx->ext_words[0] : 0;
-    LOG_ERROR("[JIT-MOVE] Step 2: Writing to dst_mode=%u dst_reg=%u\n", dst_mode, dst_reg);
     if (emit_write_dst_ea(&emit_ctx, dst_mode, dst_reg, size_enc, value_reg, fetch_fc, dst_ext) < 0) {
-        LOG_ERROR("[CPU] m68xkcpu: MOVE failed to emit dest write\n");
         jit_cache_free(ctx->jit, code_buffer, code_size);
         return -1;
     }
-    LOG_ERROR("[JIT-MOVE] Dest write OK\n");
-    fflush(stderr);
     
     /* Step 3: Update CCR flags (skip for MOVE to An word/long) */
-    LOG_ERROR("[JIT-MOVE] an_check=%d, skipping CCR=%s\n", an_check, (an_check == 2) ? "YES" : "NO");
-    fflush(stderr);
     if (an_check != 2) {
         emit_move_ccr_update(&emit_ctx, value_reg, size_enc);
-    } else {
-        LOG_ERROR("[JIT-MOVE] Skipping CCR update for MOVEA\n");
     }
     
     /* Step 4: Advance PC by 2 or 4 depending on EA modes */
     int pc_advance = 2;
     if (src_mode == JIT_EA_DI || src_mode == JIT_EA_AW) pc_advance = 4;
     if (dst_mode == JIT_EA_DI || dst_mode == JIT_EA_AW) pc_advance = 4;
-    LOG_ERROR("[JIT-MOVE] Step 4: PC advance by %d...\n", pc_advance);
-    fflush(stderr);
     jit_emit_add_immed(&emit_ctx, AARCH64_R10, AARCH64_R10, pc_advance);
-    LOG_ERROR("[JIT-MOVE] PC advance OK\n");
-    fflush(stderr);
     
-    /* Step 5: Set cycles used (don't RET - block epilogue handles return) */
-    LOG_ERROR("[JIT-MOVE] Step 5: Setting cycles...\n");
-    fflush(stderr);
+    /* Step 5: Set cycles used */
     jit_emit_movz(&emit_ctx, AARCH64_R0, 4, 0);
-    LOG_ERROR("[JIT-MOVE] Cycles set OK\n");
-    fflush(stderr);
     
     /* Check for errors */
-    LOG_ERROR("[JIT-MOVE] Checking emit_ctx.error=%d...\n", emit_ctx.error);
-    fflush(stderr);
     if (emit_ctx.error) {
-        LOG_ERROR("[CPU] m68xkcpu: MOVE code emission failed\n");
         jit_cache_free(ctx->jit, code_buffer, code_size);
         return -1;
     }
-    LOG_ERROR("[JIT-MOVE] No emit errors\n");
-    fflush(stderr);
     
     /* Store compiled code in block */
-    LOG_ERROR("[JIT-MOVE] Storing compiled code...\n");
-    fflush(stderr);
     ctx->block->code_ptr = code_buffer;
     ctx->block->code_size = emit_ctx.offset;
     ctx->block->instruction_count = 1;
@@ -637,9 +609,6 @@ int jit_translate_move(jit_translate_context_t *ctx)
     ctx->block->instructions[0].opcode = ctx->opcode;
     ctx->block->instructions[0].ext_count = 0;
     ctx->block->instructions[0].cycles = 4;
-    
-    LOG_DEBUG("[CPU] m68xkcpu: MOVE translated successfully (code_size=%zu bytes)\n",
-              emit_ctx.offset);
     
     return 0;
 }

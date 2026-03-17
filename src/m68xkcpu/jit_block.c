@@ -277,7 +277,10 @@ int jit_block_emit(jit_context_t *jit, jit_block_t *block)
     /* DEBUG: Instrument block at 0x00F80BD4 */
     bool debug_block = (block->start_pc == 0x00F80BD4);
     if (debug_block) {
-        LOG_ERROR("[JIT-DEBUG] ===== BLOCK EMIT START PC=0x%08X =====\n", block->start_pc);
+        LOG_ERROR("[JIT-DEBUG] ===== BLOCK EMIT ENTERED PC=0x%08X =====\n", block->start_pc);
+        LOG_ERROR("[JIT-DEBUG] block=%p instruction_count=%u flags=0x%04X\n",
+                  (void*)block, block->instruction_count, block->flags);
+        fflush(stderr);
     }
     
     if (block->flags & JIT_BLOCK_INTERPRET_ONLY) {
@@ -300,7 +303,7 @@ int jit_block_emit(jit_context_t *jit, jit_block_t *block)
     
     /* Emit each instruction */
     if (debug_block) {
-        LOG_ERROR("[JIT-DEBUG] EMIT LOOP: block->instruction_count=%d\n", block->instruction_count);
+        LOG_ERROR("[JIT-DEBUG] EMIT LOOP START: instruction_count=%d\n", block->instruction_count);
         fflush(stderr);
     }
     for (int i = 0; i < block->instruction_count; i++) {
@@ -310,6 +313,7 @@ int jit_block_emit(jit_context_t *jit, jit_block_t *block)
         if (debug_block) {
             LOG_ERROR("[JIT-DEBUG] ===== EMIT LOOP i=%d/%d opcode=0x%04X family=%u =====\n",
                       i, block->instruction_count, opcode, opinfo->family);
+            LOG_ERROR("[JIT-DEBUG] About to enter switch statement...\n");
             fflush(stderr);
         }
         
@@ -381,45 +385,35 @@ int jit_block_emit(jit_context_t *jit, jit_block_t *block)
                     /* IMMEDIATELY save code_ptr and code_size before they get overwritten! */
                     local_code_ptr = block->code_ptr;
                     local_code_size = block->code_size;
-                    block->code_ptr = NULL;  /* Prevent accidental reuse */
+                    block->code_ptr = NULL;
                     block->code_size = 0;
                     if (debug_block) {
-                        LOG_ERROR("[JIT-DEBUG] MOVE translation OK, local_code_ptr=%p local_code_size=%zu\n",
+                        LOG_ERROR("[JIT-DEBUG] Saved: local_code_ptr=%p local_code_size=%zu\n",
                                   (void*)local_code_ptr, local_code_size);
-                        LOG_ERROR("[JIT-DEBUG] About to check local_code_ptr...\n");
                         fflush(stderr);
                     }
-                    /* Copy from local pointer */
-                    if (local_code_ptr) {
+                    if (!local_code_ptr) {
                         if (debug_block) {
-                            LOG_ERROR("[JIT-DEBUG] local_code_ptr is VALID, proceeding...\n");
+                            LOG_ERROR("[JIT-DEBUG] ERROR: local_code_ptr is NULL!\n");
                             fflush(stderr);
                         }
-                        if (debug_block) {
-                            LOG_ERROR("[JIT-DEBUG] About to memcpy %zu bytes from %p to offset %zu...\n",
-                                      local_code_size, (void*)local_code_ptr, emit.offset);
-                            fflush(stderr);
-                        }
-                        if (debug_block) {
-                            LOG_ERROR("[JIT-DEBUG] memcpy START...\n");
-                            fflush(stderr);
-                        }
-                        memcpy(tmp_code + emit.offset, local_code_ptr, local_code_size);
-                        if (debug_block) {
-                            LOG_ERROR("[JIT-DEBUG] memcpy DONE...\n");
-                            fflush(stderr);
-                        }
-                        emit.offset += local_code_size;
-                        if (debug_block) {
-                            LOG_ERROR("[JIT-DEBUG] memcpy OK, new offset=%zu\n", emit.offset);
-                            fflush(stderr);
-                        }
-                    } else {
-                        if (debug_block) {
-                            LOG_ERROR("[JIT-DEBUG] WARNING: local_code_ptr is NULL!\n");
-                            fflush(stderr);
-                        }
+                        break;
                     }
+                    if (debug_block) {
+                        LOG_ERROR("[JIT-DEBUG] memcpy %zu bytes to offset %zu...\n",
+                                  local_code_size, emit.offset);
+                        fflush(stderr);
+                    }
+                    memcpy(tmp_code + emit.offset, local_code_ptr, local_code_size);
+                    emit.offset += local_code_size;
+                    if (debug_block) {
+                        LOG_ERROR("[JIT-DEBUG] memcpy DONE, offset=%zu\n", emit.offset);
+                        fflush(stderr);
+                    }
+                }
+                if (debug_block) {
+                    LOG_ERROR("[JIT-DEBUG] MOVE case COMPLETE, about to break...\n");
+                    fflush(stderr);
                 }
                 break;
             case JIT_FAMILY_MOVEP:
@@ -824,6 +818,11 @@ int jit_block_emit(jit_context_t *jit, jit_block_t *block)
                 }
                 jit_emit_unimplemented(&emit, opcode, "UNKNOWN");
                 break;
+        }
+        
+        if (debug_block) {
+            LOG_ERROR("[JIT-DEBUG] Switch statement COMPLETE for i=%d\n", i);
+            fflush(stderr);
         }
         
         /* Check for emission errors */
