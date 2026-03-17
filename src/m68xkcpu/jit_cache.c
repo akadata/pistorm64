@@ -6,10 +6,12 @@
 
 #include "jit.h"
 #include "jit_cache.h"
+#include "log.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <errno.h>
 
 /* Hash function for PC lookup */
 static inline uint32_t jit_cache_hash_pc(uint32_t pc)
@@ -42,7 +44,7 @@ int jit_cache_init(jit_context_t *jit)
                  -1, 0);
     
     if (cache == MAP_FAILED) {
-        perror("JIT: mmap failed for code cache");
+        LOG_ERROR("[CPU] m68xkcpu: mmap failed for code cache (%s)\n", strerror(errno));
         return -1;
     }
     
@@ -147,11 +149,24 @@ void *jit_cache_alloc(jit_context_t *jit, size_t size)
  */
 void jit_cache_free(jit_context_t *jit, void *ptr, size_t size)
 {
-    /* Simple implementation doesn't track individual frees */
-    /* Space is only reclaimed on cache reset */
-    (void)jit;
-    (void)ptr;
-    (void)size;
+    uint8_t *p;
+    size_t aligned;
+    if (jit == NULL || ptr == NULL || size == 0) {
+        return;
+    }
+
+    /* Opportunistic LIFO reclaim for top-of-cache frees. */
+    p = (uint8_t *)ptr;
+    aligned = (size + 15u) & ~15u;
+    if (p + aligned == jit->cache_ptr) {
+        jit->cache_ptr = p;
+        if (jit->stats.cache_bytes_used >= aligned) {
+            jit->stats.cache_bytes_used -= aligned;
+        } else {
+            jit->stats.cache_bytes_used = 0;
+        }
+        jit->stats.cache_bytes_free = jit->cache_size - jit->stats.cache_bytes_used;
+    }
 }
 
 
@@ -196,20 +211,44 @@ jit_block_t *jit_cache_lookup(jit_context_t *jit, uint32_t pc)
     uint32_t hash;
     jit_block_t *block;
     
+    /* DEBUG: Instrument lookup for 0x00F80BD4 */
+    bool debug_lookup = (pc == 0x00F80BD4);
+    if (debug_lookup) {
+        LOG_ERROR("[JIT-DEBUG] CACHE LOOKUP PC=0x%08X jit=%p\n", pc, (void*)jit);
+    }
+    
     if (jit == NULL) {
+        if (debug_lookup) {
+            LOG_ERROR("[JIT-DEBUG] CACHE LOOKUP FAILED: jit=NULL\n");
+        }
         return NULL;
     }
     
     hash = jit_cache_hash_pc(pc);
     block = jit->hash_table[hash];
     
+    if (debug_lookup) {
+        LOG_ERROR("[JIT-DEBUG] hash=0x%08X table[hash]=%p\n", hash, (void*)block);
+    }
+    
     while (block != NULL) {
+        if (debug_lookup) {
+            LOG_ERROR("[JIT-DEBUG]   checking block: start_pc=0x%08X flags=0x%04X\n",
+                      block->start_pc, block->flags);
+        }
         if (block->start_pc == pc && (block->flags & JIT_BLOCK_VALID)) {
+            if (debug_lookup) {
+                LOG_ERROR("[JIT-DEBUG] CACHE HIT: block=%p code_ptr=%p\n",
+                          (void*)block, (void*)block->code_ptr);
+            }
             return block;
         }
         block = block->hash_next;
     }
     
+    if (debug_lookup) {
+        LOG_ERROR("[JIT-DEBUG] CACHE MISS: no block found\n");
+    }
     return NULL;
 }
 

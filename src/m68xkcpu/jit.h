@@ -27,6 +27,7 @@ typedef struct {
     uint32_t blocks_executed;
     uint32_t cache_hits;
     uint32_t cache_misses;
+    uint32_t fast_step_count;
     uint32_t fallback_count;
     uint32_t cache_invalidations;
     size_t cache_bytes_used;
@@ -71,6 +72,10 @@ void jit_reset(void);
 
 /* Execution */
 int jit_execute(uint32_t pc, int cycles);
+
+/* Hard fail mode - abort on unsupported instructions */
+int jit_no_fallback_enabled(void);
+void jit_hard_fail(uint32_t pc, uint16_t opcode, const char *reason);
 
 /* Cache management */
 void jit_invalidate_range(uint32_t start_addr, uint32_t end_addr);

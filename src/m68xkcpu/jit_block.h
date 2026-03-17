@@ -22,6 +22,7 @@
 #define JIT_BLOCK_ENDS_RTS      0x08    /* Block ends with RTS */
 #define JIT_BLOCK_ENDS_RTE      0x10    /* Block ends with RTE */
 #define JIT_BLOCK_ENDS_JMP      0x20    /* Block ends with JMP/JSR */
+#define JIT_BLOCK_INTERPRET_ONLY 0x40   /* Cached as interpreter-only (no native code) */
 
 /* Compiled block structure */
 struct jit_block {

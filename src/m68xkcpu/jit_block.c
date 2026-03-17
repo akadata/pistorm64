@@ -9,6 +9,9 @@
 #include "jit_cache.h"
 #include "jit_translate.h"
 #include "jit_emit_aarch64.h"
+#include "jit_arch.h"
+#include "musashi/m68kcpu.h"
+#include "log.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -19,6 +22,41 @@ static inline uint32_t jit_hash_pc(uint32_t pc)
     /* Simple hash - multiply by prime and fold */
     uint32_t hash = pc * 2654435761u;
     return (hash >> 16) & (JIT_HASH_SIZE - 1);
+}
+
+static inline int jit_family_codegen_supported(uint8_t family)
+{
+    /* Implemented: MOVEQ, MOVE, ADD, SUB, CMP, ADDQ, SUBQ, AND/OR/EOR, BRA/BCC/BSR/RTS/JSR/JMP, MOVEC, LEA, CLR, TST, bitops, NOP */
+    return (family == JIT_FAMILY_NOP || 
+            family == JIT_FAMILY_MOVEQ || 
+            family == JIT_FAMILY_MOVE ||
+            family == JIT_FAMILY_ADD ||
+            family == JIT_FAMILY_ADDQ ||
+            family == JIT_FAMILY_SUB ||
+            family == JIT_FAMILY_SUBQ ||
+            family == JIT_FAMILY_CMP ||
+            family == JIT_FAMILY_CMPI ||
+            family == JIT_FAMILY_CMPM ||
+            family == JIT_FAMILY_AND ||
+            family == JIT_FAMILY_OR ||
+            family == JIT_FAMILY_EOR ||
+            family == JIT_FAMILY_ANDI ||
+            family == JIT_FAMILY_ORI ||
+            family == JIT_FAMILY_EORI ||
+            family == JIT_FAMILY_BRA ||
+            family == JIT_FAMILY_BCC ||
+            family == JIT_FAMILY_BSR ||
+            family == JIT_FAMILY_RTS ||
+            family == JIT_FAMILY_JSR ||
+            family == JIT_FAMILY_JMP ||
+            family == JIT_FAMILY_MOVEC ||
+            family == JIT_FAMILY_LEA ||
+            family == JIT_FAMILY_CLR ||
+            family == JIT_FAMILY_TST ||
+            family == JIT_FAMILY_BTST ||
+            family == JIT_FAMILY_BSET ||
+            family == JIT_FAMILY_BCLR ||
+            family == JIT_FAMILY_BCHG);
 }
 
 
@@ -83,9 +121,22 @@ int jit_block_translate(jit_context_t *jit, jit_block_t *block)
     uint32_t pc = block->start_pc;
     int instr_count = 0;
     bool end_block = false;
+    uint8_t fetch_fc;
     
-    /* TODO: Get memory access functions from CPU state */
-    /* For now, this is a placeholder */
+    if (!jit || !block || !jit->cpu) {
+        LOG_ERROR("[CPU] m68xkcpu: jit_block_translate invalid context (jit=%p cpu=%p block=%p)\n",
+                  (void *)jit, (void *)(jit ? jit->cpu : NULL), (void *)block);
+        return -1;
+    }
+
+    /* DEBUG: Instrument block at 0x00F80BD4 */
+    bool debug_block = (block->start_pc == 0x00F80BD4);
+    if (debug_block) {
+        LOG_ERROR("[JIT-DEBUG] ===== BLOCK TRANSLATE START PC=0x%08X =====\n", block->start_pc);
+        fflush(stderr);
+    }
+
+    fetch_fc = jit_get_fc(jit->cpu->s_flag ? 1 : 0, 1);
     
     while (!end_block && instr_count < JIT_MAX_BLOCK_INSTRUCTIONS) {
         const jit_opinfo_t *opinfo;
@@ -94,11 +145,23 @@ int jit_block_translate(jit_context_t *jit, jit_block_t *block)
         int ext_count = 0;
         
         /* Fetch opcode from memory */
-        /* TODO: Replace with actual memory read */
-        opcode = 0x4E71;  /* NOP placeholder */
+        opcode = jit_fetch_word(pc, fetch_fc);
+        
+        if (debug_block) {
+            LOG_ERROR("[JIT-DEBUG] Instr[%d] PC=0x%08X opcode=0x%04X\n", instr_count, pc, opcode);
+        }
         
         /* Get opcode metadata */
         opinfo = jit_get_opinfo(opcode);
+        
+        if (debug_block) {
+            LOG_ERROR("[JIT-DEBUG]   family=%u ext_words=%u\n", opinfo->family, opinfo->ext_words);
+        }
+
+        if (!jit_family_codegen_supported(opinfo->family)) {
+            block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+            end_block = true;
+        }
         
         /* Check for illegal instruction */
         if (opinfo->family == JIT_FAMILY_ILLEGAL ||
@@ -111,9 +174,31 @@ int jit_block_translate(jit_context_t *jit, jit_block_t *block)
         
         /* Fetch extension words */
         ext_count = opinfo->ext_words;
+        
+        /* Special handling for JMP/JSR - EA mode determines ext word count */
+        if (opinfo->family == JIT_FAMILY_JMP || opinfo->family == JIT_FAMILY_JSR) {
+            uint8_t ea_mode = (opcode >> 3) & 0x7;
+            uint8_t ea_reg = opcode & 0x7;
+            /* EA mode 7, reg 0 = (xxx).W = 1 ext word */
+            /* EA mode 7, reg 1 = (xxx).L = 2 ext words */
+            if (ea_mode == 7 && ea_reg == 0) {
+                ext_count = 1;
+            } else if (ea_mode == 7 && ea_reg == 1) {
+                ext_count = 2;
+            } else if (ea_mode == 5) {  /* (d16,An) */
+                ext_count = 1;
+            }
+        }
+        
+        if (debug_block && ext_count > 0) {
+            LOG_ERROR("[JIT-DEBUG]   fetching %d ext words\n", ext_count);
+        }
+        
         for (int i = 0; i < ext_count && i < 4; i++) {
-            /* TODO: Replace with actual memory read */
-            ext_words[i] = 0;
+            ext_words[i] = jit_fetch_word(pc + 2 + (uint32_t)(i * 2), fetch_fc);
+            if (debug_block) {
+                LOG_ERROR("[JIT-DEBUG]     ext[%d]=0x%04X\n", i, ext_words[i]);
+            }
         }
         
         /* Store instruction info */
@@ -151,12 +236,23 @@ int jit_block_translate(jit_context_t *jit, jit_block_t *block)
         
         /* Advance PC */
         pc += 2 + (ext_count * 2);
+        
+        if (debug_block) {
+            LOG_ERROR("[JIT-DEBUG]   PC advance to 0x%08X\n", pc);
+        }
+        
         instr_count++;
     }
     
     block->instruction_count = instr_count;
     block->end_pc = pc;
     block->ends_block = end_block ? 1 : 0;
+    
+    if (debug_block) {
+        LOG_ERROR("[JIT-DEBUG] ===== BLOCK TRANSLATE COMPLETE: %d instructions, end_pc=0x%08X =====\n",
+                  instr_count, pc);
+        fflush(stderr);
+    }
     
     return 0;
 }
@@ -174,115 +270,613 @@ int jit_block_translate(jit_context_t *jit, jit_block_t *block)
  */
 int jit_block_emit(jit_context_t *jit, jit_block_t *block)
 {
+    uint8_t tmp_code[JIT_MAX_BLOCK_SIZE];
     uint8_t *code_start;
-    uint8_t *code_ptr;
+    size_t final_size;
     
-    /* Allocate space in code cache */
-    code_start = jit_cache_alloc(jit, JIT_MAX_BLOCK_SIZE);
-    if (code_start == NULL) {
-        fprintf(stderr, "JIT: Failed to allocate code cache for block at 0x%08X\n", 
-                block->start_pc);
-        return -1;
+    /* DEBUG: Instrument block at 0x00F80BD4 */
+    bool debug_block = (block->start_pc == 0x00F80BD4);
+    if (debug_block) {
+        LOG_ERROR("[JIT-DEBUG] ===== BLOCK EMIT START PC=0x%08X =====\n", block->start_pc);
     }
     
-    code_ptr = code_start;
-    
+    if (block->flags & JIT_BLOCK_INTERPRET_ONLY) {
+        if (debug_block) {
+            LOG_ERROR("[JIT-DEBUG] Block marked INTERPRET_ONLY, skipping emit\n");
+        }
+        return 0;
+    }
+
     /* Initialize emitter context */
     jit_emit_context_t emit;
-    jit_emit_init(&emit, code_ptr, JIT_MAX_BLOCK_SIZE);
+    jit_emit_init(&emit, tmp_code, JIT_MAX_BLOCK_SIZE);
+    
+    if (debug_block) {
+        LOG_ERROR("[JIT-DEBUG] Emit prologue...\n");
+    }
     
     /* Emit prologue - sync CPU state */
     jit_emit_prologue(&emit, block);
     
     /* Emit each instruction */
+    if (debug_block) {
+        LOG_ERROR("[JIT-DEBUG] EMIT LOOP: block->instruction_count=%d\n", block->instruction_count);
+        fflush(stderr);
+    }
     for (int i = 0; i < block->instruction_count; i++) {
         uint16_t opcode = block->instructions[i].opcode;
         const jit_opinfo_t *opinfo = jit_get_opinfo(opcode);
         
+        if (debug_block) {
+            LOG_ERROR("[JIT-DEBUG] ===== EMIT LOOP i=%d/%d opcode=0x%04X family=%u =====\n",
+                      i, block->instruction_count, opcode, opinfo->family);
+            fflush(stderr);
+        }
+        
         /* Dispatch to appropriate translator based on family */
         switch (opinfo->family) {
             case JIT_FAMILY_NOP:
-                /* Nothing to emit for NOP */
+                /* Nothing to emit for NOP - it's a no-op */
+                break;
+                
+            case JIT_FAMILY_MOVEQ:
+                /* MOVEQ: Move Quick - 8-bit immediate to Dn */
+                /* Call translator to emit code for this instruction */
+                {
+                    jit_translate_context_t tctx;
+                    memset(&tctx, 0, sizeof(tctx));
+                    tctx.jit = jit;
+                    tctx.block = block;
+                    tctx.opcode = opcode;
+                    tctx.ext_count = 0;
+                    if (jit_translate_moveq(&tctx) < 0) {
+                        LOG_ERROR("[CPU] m68xkcpu: MOVEQ translation failed at PC=0x%08X\n", block->start_pc);
+                        emit.error = true;
+                        return -1;
+                    }
+                    /* Code already emitted to block->code_ptr, copy to our buffer */
+                    if (block->code_ptr) {
+                        memcpy(tmp_code + emit.offset, block->code_ptr, block->code_size);
+                        emit.offset += block->code_size;
+                    }
+                }
                 break;
                 
             case JIT_FAMILY_MOVE:
-            case JIT_FAMILY_MOVEQ:
+                /* MOVE: General move instruction */
+                /* Call translator to emit code for this instruction */
+                {
+                    jit_translate_context_t tctx;
+                    uint8_t *local_code_ptr;
+                    size_t local_code_size;
+                    memset(&tctx, 0, sizeof(tctx));
+                    tctx.jit = jit;
+                    tctx.block = block;
+                    tctx.opcode = opcode;
+                    tctx.ext_count = block->instructions[i].ext_count;
+                    memcpy(tctx.ext_words, block->instructions[i].ext_words, sizeof(tctx.ext_words));
+                    if (debug_block) {
+                        LOG_ERROR("[JIT-DEBUG] Calling jit_translate_move...\n");
+                        LOG_ERROR("[JIT-DEBUG] block->code_ptr before translate=%p\n", (void*)block->code_ptr);
+                        fflush(stderr);
+                    }
+                    if (jit_translate_move(&tctx) < 0) {
+                        /* Translation failed - likely unsupported EA mode */
+                        if (debug_block) {
+                            LOG_ERROR("[JIT-DEBUG] MOVE translation FAILED\n");
+                            fflush(stderr);
+                        }
+                        if (jit_no_fallback_enabled()) {
+                            jit_hard_fail(block->start_pc, opcode, "MOVE translation failed (unsupported EA mode)");
+                        }
+                        block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+                        return 0;
+                    }
+                    if (debug_block) {
+                        LOG_ERROR("[JIT-DEBUG] MOVE translation RETURNED SUCCESS\n");
+                        LOG_ERROR("[JIT-DEBUG] block->code_ptr after translate=%p block->code_size=%zu\n",
+                                  (void*)block->code_ptr, block->code_size);
+                        fflush(stderr);
+                    }
+                    /* IMMEDIATELY save code_ptr and code_size before they get overwritten! */
+                    local_code_ptr = block->code_ptr;
+                    local_code_size = block->code_size;
+                    block->code_ptr = NULL;  /* Prevent accidental reuse */
+                    block->code_size = 0;
+                    if (debug_block) {
+                        LOG_ERROR("[JIT-DEBUG] MOVE translation OK, local_code_ptr=%p local_code_size=%zu\n",
+                                  (void*)local_code_ptr, local_code_size);
+                        LOG_ERROR("[JIT-DEBUG] About to check local_code_ptr...\n");
+                        fflush(stderr);
+                    }
+                    /* Copy from local pointer */
+                    if (local_code_ptr) {
+                        if (debug_block) {
+                            LOG_ERROR("[JIT-DEBUG] local_code_ptr is VALID, proceeding...\n");
+                            fflush(stderr);
+                        }
+                        if (debug_block) {
+                            LOG_ERROR("[JIT-DEBUG] About to memcpy %zu bytes from %p to offset %zu...\n",
+                                      local_code_size, (void*)local_code_ptr, emit.offset);
+                            fflush(stderr);
+                        }
+                        if (debug_block) {
+                            LOG_ERROR("[JIT-DEBUG] memcpy START...\n");
+                            fflush(stderr);
+                        }
+                        memcpy(tmp_code + emit.offset, local_code_ptr, local_code_size);
+                        if (debug_block) {
+                            LOG_ERROR("[JIT-DEBUG] memcpy DONE...\n");
+                            fflush(stderr);
+                        }
+                        emit.offset += local_code_size;
+                        if (debug_block) {
+                            LOG_ERROR("[JIT-DEBUG] memcpy OK, new offset=%zu\n", emit.offset);
+                            fflush(stderr);
+                        }
+                    } else {
+                        if (debug_block) {
+                            LOG_ERROR("[JIT-DEBUG] WARNING: local_code_ptr is NULL!\n");
+                            fflush(stderr);
+                        }
+                    }
+                }
+                break;
             case JIT_FAMILY_MOVEP:
             case JIT_FAMILY_MOVEM:
                 /* TODO: Implement MOVE translators */
+                if (jit_no_fallback_enabled()) {
+                    jit_hard_fail(block->start_pc, opcode, "MOVEP/MOVEM not implemented");
+                }
                 jit_emit_unimplemented(&emit, opcode, "MOVE");
                 break;
                 
             case JIT_FAMILY_ADD:
+                /* ADD: Addition instruction */
+                {
+                    jit_translate_context_t tctx;
+                    memset(&tctx, 0, sizeof(tctx));
+                    tctx.jit = jit;
+                    tctx.block = block;
+                    tctx.opcode = opcode;
+                    tctx.ext_count = block->instructions[i].ext_count;
+                    memcpy(tctx.ext_words, block->instructions[i].ext_words, sizeof(tctx.ext_words));
+                    if (jit_translate_add(&tctx) < 0) {
+                        if (jit_no_fallback_enabled()) {
+                            jit_hard_fail(block->start_pc, opcode, "ADD translation failed");
+                        }
+                        block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+                        return 0;
+                    }
+                    if (block->code_ptr) {
+                        memcpy(tmp_code + emit.offset, block->code_ptr, block->code_size);
+                        emit.offset += block->code_size;
+                    }
+                }
+                break;
+                
             case JIT_FAMILY_ADDQ:
+                /* ADDQ: Add quick immediate */
+                {
+                    jit_translate_context_t tctx;
+                    memset(&tctx, 0, sizeof(tctx));
+                    tctx.jit = jit;
+                    tctx.block = block;
+                    tctx.opcode = opcode;
+                    tctx.ext_count = block->instructions[i].ext_count;
+                    memcpy(tctx.ext_words, block->instructions[i].ext_words, sizeof(tctx.ext_words));
+                    if (jit_translate_addq_subq(&tctx) < 0) {
+                        if (jit_no_fallback_enabled()) {
+                            jit_hard_fail(block->start_pc, opcode, "ADDQ/SUBQ translation failed");
+                        }
+                        block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+                        return 0;
+                    }
+                    if (block->code_ptr) {
+                        memcpy(tmp_code + emit.offset, block->code_ptr, block->code_size);
+                        emit.offset += block->code_size;
+                    }
+                }
+                break;
+                
             case JIT_FAMILY_ADDI:
             case JIT_FAMILY_ADDX:
-                /* TODO: Implement ADD translators */
-                jit_emit_unimplemented(&emit, opcode, "ADD");
+                /* TODO: Implement ADDI/ADDX translators */
+                if (jit_no_fallback_enabled()) {
+                    jit_hard_fail(block->start_pc, opcode, "ADDI/ADDX not implemented");
+                }
+                jit_emit_unimplemented(&emit, opcode, "ADDI/ADDX");
                 break;
                 
             case JIT_FAMILY_SUB:
+                /* SUB: Subtraction instruction */
+                {
+                    jit_translate_context_t tctx;
+                    memset(&tctx, 0, sizeof(tctx));
+                    tctx.jit = jit;
+                    tctx.block = block;
+                    tctx.opcode = opcode;
+                    tctx.ext_count = block->instructions[i].ext_count;
+                    memcpy(tctx.ext_words, block->instructions[i].ext_words, sizeof(tctx.ext_words));
+                    if (jit_translate_sub(&tctx) < 0) {
+                        if (jit_no_fallback_enabled()) {
+                            jit_hard_fail(block->start_pc, opcode, "SUB translation failed");
+                        }
+                        block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+                        return 0;
+                    }
+                    if (block->code_ptr) {
+                        memcpy(tmp_code + emit.offset, block->code_ptr, block->code_size);
+                        emit.offset += block->code_size;
+                    }
+                }
+                break;
+                
             case JIT_FAMILY_SUBQ:
+                /* SUBQ: Subtract quick immediate */
+                {
+                    jit_translate_context_t tctx;
+                    memset(&tctx, 0, sizeof(tctx));
+                    tctx.jit = jit;
+                    tctx.block = block;
+                    tctx.opcode = opcode;
+                    tctx.ext_count = block->instructions[i].ext_count;
+                    memcpy(tctx.ext_words, block->instructions[i].ext_words, sizeof(tctx.ext_words));
+                    if (jit_translate_addq_subq(&tctx) < 0) {
+                        if (jit_no_fallback_enabled()) {
+                            jit_hard_fail(block->start_pc, opcode, "ADDQ/SUBQ translation failed");
+                        }
+                        block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+                        return 0;
+                    }
+                    if (block->code_ptr) {
+                        memcpy(tmp_code + emit.offset, block->code_ptr, block->code_size);
+                        emit.offset += block->code_size;
+                    }
+                }
+                break;
+                
             case JIT_FAMILY_SUBI:
             case JIT_FAMILY_SUBX:
-                /* TODO: Implement SUB translators */
-                jit_emit_unimplemented(&emit, opcode, "SUB");
+                /* TODO: Implement SUBI/SUBX translators */
+                if (jit_no_fallback_enabled()) {
+                    jit_hard_fail(block->start_pc, opcode, "SUBI/SUBX not implemented");
+                }
+                jit_emit_unimplemented(&emit, opcode, "SUBI/SUBX");
                 break;
                 
             case JIT_FAMILY_CMP:
             case JIT_FAMILY_CMPI:
             case JIT_FAMILY_CMPM:
-                /* TODO: Implement CMP translators */
-                jit_emit_unimplemented(&emit, opcode, "CMP");
+                /* CMP/CMPI/CMPM: Compare instruction */
+                /* Note: CMPA (bit 11=1) is classified as FAMILY_CMP but handled by fallback */
+                {
+                    jit_translate_context_t tctx;
+                    memset(&tctx, 0, sizeof(tctx));
+                    tctx.jit = jit;
+                    tctx.block = block;
+                    tctx.opcode = opcode;
+                    tctx.ext_count = block->instructions[i].ext_count;
+                    memcpy(tctx.ext_words, block->instructions[i].ext_words, sizeof(tctx.ext_words));
+                    if (jit_translate_cmp(&tctx) < 0) {
+                        /* CMPA or unsupported - fall back to interpreter */
+                        if (jit_no_fallback_enabled()) {
+                            jit_hard_fail(block->start_pc, opcode, "CMP/CMPI/CMPM translation failed");
+                        }
+                        block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+                        return 0;
+                    }
+                    if (block->code_ptr) {
+                        memcpy(tmp_code + emit.offset, block->code_ptr, block->code_size);
+                        emit.offset += block->code_size;
+                    }
+                }
                 break;
                 
             case JIT_FAMILY_AND:
             case JIT_FAMILY_ANDI:
-                /* TODO: Implement AND translators */
-                jit_emit_unimplemented(&emit, opcode, "AND");
+                /* AND/ANDI: Logical AND */
+                {
+                    jit_translate_context_t tctx;
+                    memset(&tctx, 0, sizeof(tctx));
+                    tctx.jit = jit;
+                    tctx.block = block;
+                    tctx.opcode = opcode;
+                    tctx.ext_count = block->instructions[i].ext_count;
+                    memcpy(tctx.ext_words, block->instructions[i].ext_words, sizeof(tctx.ext_words));
+                    if (jit_translate_logic(&tctx) < 0) {
+                        if (jit_no_fallback_enabled()) {
+                            jit_hard_fail(block->start_pc, opcode, "Logic (AND/OR/EOR) translation failed");
+                        }
+                        block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+                        return 0;
+                    }
+                    if (block->code_ptr) {
+                        memcpy(tmp_code + emit.offset, block->code_ptr, block->code_size);
+                        emit.offset += block->code_size;
+                    }
+                }
                 break;
                 
             case JIT_FAMILY_OR:
             case JIT_FAMILY_ORI:
-                /* TODO: Implement OR translators */
-                jit_emit_unimplemented(&emit, opcode, "OR");
+                /* OR/ORI: Logical OR */
+                {
+                    jit_translate_context_t tctx;
+                    memset(&tctx, 0, sizeof(tctx));
+                    tctx.jit = jit;
+                    tctx.block = block;
+                    tctx.opcode = opcode;
+                    tctx.ext_count = block->instructions[i].ext_count;
+                    memcpy(tctx.ext_words, block->instructions[i].ext_words, sizeof(tctx.ext_words));
+                    if (jit_translate_logic(&tctx) < 0) {
+                        block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+                        return 0;
+                    }
+                    if (block->code_ptr) {
+                        memcpy(tmp_code + emit.offset, block->code_ptr, block->code_size);
+                        emit.offset += block->code_size;
+                    }
+                }
                 break;
                 
             case JIT_FAMILY_EOR:
             case JIT_FAMILY_EORI:
-                /* TODO: Implement EOR translators */
-                jit_emit_unimplemented(&emit, opcode, "EOR");
+                /* EOR/EORI: Logical EOR */
+                {
+                    jit_translate_context_t tctx;
+                    memset(&tctx, 0, sizeof(tctx));
+                    tctx.jit = jit;
+                    tctx.block = block;
+                    tctx.opcode = opcode;
+                    tctx.ext_count = block->instructions[i].ext_count;
+                    memcpy(tctx.ext_words, block->instructions[i].ext_words, sizeof(tctx.ext_words));
+                    if (jit_translate_logic(&tctx) < 0) {
+                        block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+                        return 0;
+                    }
+                    if (block->code_ptr) {
+                        memcpy(tmp_code + emit.offset, block->code_ptr, block->code_size);
+                        emit.offset += block->code_size;
+                    }
+                }
                 break;
                 
             case JIT_FAMILY_BRA:
             case JIT_FAMILY_BCC:
+                /* BRA/BCC: Branch instruction */
+                {
+                    jit_translate_context_t tctx;
+                    memset(&tctx, 0, sizeof(tctx));
+                    tctx.jit = jit;
+                    tctx.block = block;
+                    tctx.opcode = opcode;
+                    tctx.ext_count = block->instructions[i].ext_count;
+                    memcpy(tctx.ext_words, block->instructions[i].ext_words, sizeof(tctx.ext_words));
+                    if (jit_translate_branch(&tctx) < 0) {
+                        if (jit_no_fallback_enabled()) {
+                            jit_hard_fail(block->start_pc, opcode, "Branch (BRA/BCC) translation failed");
+                        }
+                        block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+                        return 0;
+                    }
+                    if (block->code_ptr) {
+                        memcpy(tmp_code + emit.offset, block->code_ptr, block->code_size);
+                        emit.offset += block->code_size;
+                    }
+                }
+                break;
+                
             case JIT_FAMILY_BSR:
-                /* TODO: Implement branch translators */
-                jit_emit_unimplemented(&emit, opcode, "BRANCH");
+                /* BSR - Branch to Subroutine */
+                {
+                    jit_translate_context_t tctx;
+                    memset(&tctx, 0, sizeof(tctx));
+                    tctx.jit = jit;
+                    tctx.block = block;
+                    tctx.opcode = opcode;
+                    tctx.ext_count = block->instructions[i].ext_count;
+                    memcpy(tctx.ext_words, block->instructions[i].ext_words, sizeof(tctx.ext_words));
+                    if (jit_translate_bsr(&tctx) < 0) {
+                        if (jit_no_fallback_enabled()) {
+                            jit_hard_fail(block->start_pc, opcode, "BSR translation failed");
+                        }
+                        block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+                        return 0;
+                    }
+                    if (block->code_ptr) {
+                        memcpy(tmp_code + emit.offset, block->code_ptr, block->code_size);
+                        emit.offset += block->code_size;
+                    }
+                }
+                break;
+                
+            case JIT_FAMILY_RTS:
+                /* RTS - Return from Subroutine */
+                {
+                    jit_translate_context_t tctx;
+                    memset(&tctx, 0, sizeof(tctx));
+                    tctx.jit = jit;
+                    tctx.block = block;
+                    tctx.opcode = opcode;
+                    tctx.ext_count = block->instructions[i].ext_count;
+                    memcpy(tctx.ext_words, block->instructions[i].ext_words, sizeof(tctx.ext_words));
+                    if (jit_translate_rts(&tctx) < 0) {
+                        if (jit_no_fallback_enabled()) {
+                            jit_hard_fail(block->start_pc, opcode, "RTS translation failed");
+                        }
+                        block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+                        return 0;
+                    }
+                    if (block->code_ptr) {
+                        memcpy(tmp_code + emit.offset, block->code_ptr, block->code_size);
+                        emit.offset += block->code_size;
+                    }
+                }
+                break;
+                
+            case JIT_FAMILY_JSR:
+                /* JSR - Jump to Subroutine */
+                {
+                    jit_translate_context_t tctx;
+                    memset(&tctx, 0, sizeof(tctx));
+                    tctx.jit = jit;
+                    tctx.block = block;
+                    tctx.opcode = opcode;
+                    tctx.ext_count = block->instructions[i].ext_count;
+                    memcpy(tctx.ext_words, block->instructions[i].ext_words, sizeof(tctx.ext_words));
+                    if (jit_translate_jsr(&tctx) < 0) {
+                        if (jit_no_fallback_enabled()) {
+                            jit_hard_fail(block->start_pc, opcode, "JSR translation failed");
+                        }
+                        block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+                        return 0;
+                    }
+                    if (block->code_ptr) {
+                        memcpy(tmp_code + emit.offset, block->code_ptr, block->code_size);
+                        emit.offset += block->code_size;
+                    }
+                }
+                break;
+                
+            case JIT_FAMILY_JMP:
+                /* JMP - Jump */
+                {
+                    jit_translate_context_t tctx;
+                    memset(&tctx, 0, sizeof(tctx));
+                    tctx.jit = jit;
+                    tctx.block = block;
+                    tctx.opcode = opcode;
+                    tctx.ext_count = block->instructions[i].ext_count;
+                    memcpy(tctx.ext_words, block->instructions[i].ext_words, sizeof(tctx.ext_words));
+                    if (jit_translate_jmp(&tctx) < 0) {
+                        if (jit_no_fallback_enabled()) {
+                            jit_hard_fail(block->start_pc, opcode, "JMP translation failed");
+                        }
+                        block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+                        return 0;
+                    }
+                    if (block->code_ptr) {
+                        memcpy(tmp_code + emit.offset, block->code_ptr, block->code_size);
+                        emit.offset += block->code_size;
+                    }
+                }
+                break;
+                
+            case JIT_FAMILY_MOVEC:
+                /* MOVEC - Move Control Register (68010+) */
+                {
+                    jit_translate_context_t tctx;
+                    memset(&tctx, 0, sizeof(tctx));
+                    tctx.jit = jit;
+                    tctx.block = block;
+                    tctx.opcode = opcode;
+                    tctx.ext_count = block->instructions[i].ext_count;
+                    memcpy(tctx.ext_words, block->instructions[i].ext_words, sizeof(tctx.ext_words));
+                    if (jit_translate_movec(&tctx) < 0) {
+                        if (jit_no_fallback_enabled()) {
+                            jit_hard_fail(block->start_pc, opcode, "MOVEC translation failed");
+                        }
+                        block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+                        return 0;
+                    }
+                    if (block->code_ptr) {
+                        memcpy(tmp_code + emit.offset, block->code_ptr, block->code_size);
+                        emit.offset += block->code_size;
+                    }
+                }
+                break;
+                
+            case JIT_FAMILY_LEA:
+            case JIT_FAMILY_CLR:
+            case JIT_FAMILY_TST:
+            case JIT_FAMILY_BTST:
+            case JIT_FAMILY_BSET:
+            case JIT_FAMILY_BCLR:
+            case JIT_FAMILY_BCHG:
+                /* LEA, CLR, TST, bit operations */
+                {
+                    jit_translate_context_t tctx;
+                    memset(&tctx, 0, sizeof(tctx));
+                    tctx.jit = jit;
+                    tctx.block = block;
+                    tctx.opcode = opcode;
+                    tctx.ext_count = block->instructions[i].ext_count;
+                    memcpy(tctx.ext_words, block->instructions[i].ext_words, sizeof(tctx.ext_words));
+                    if (jit_translate_misc(&tctx) < 0) {
+                        if (jit_no_fallback_enabled()) {
+                            jit_hard_fail(block->start_pc, opcode, "MISC (LEA/CLR/TST/bitops) translation failed");
+                        }
+                        block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+                        return 0;
+                    }
+                    if (block->code_ptr) {
+                        memcpy(tmp_code + emit.offset, block->code_ptr, block->code_size);
+                        emit.offset += block->code_size;
+                    }
+                }
                 break;
                 
             default:
-                /* Unimplemented - will fall back to interpreter */
+                /* Unimplemented family - hard fail or fall back to interpreter */
+                if (jit_no_fallback_enabled()) {
+                    jit_hard_fail(block->start_pc, opcode, "Unknown/unimplemented instruction family");
+                }
                 jit_emit_unimplemented(&emit, opcode, "UNKNOWN");
                 break;
         }
         
         /* Check for emission errors */
         if (emit.error) {
-            jit_cache_free(jit, code_start, JIT_MAX_BLOCK_SIZE);
+            if (debug_block) {
+                LOG_ERROR("[JIT-DEBUG] EMIT ERROR at instruction %d!\n", i);
+                fflush(stderr);
+            }
             return -1;
+        }
+        
+        if (debug_block) {
+            LOG_ERROR("[JIT-DEBUG] ===== EMIT LOOP i=%d COMPLETE, emit.offset=%zu =====\n",
+                      i, emit.offset);
+            fflush(stderr);
         }
     }
     
     /* Emit epilogue - return to dispatcher */
+    if (debug_block) {
+        LOG_ERROR("[JIT-DEBUG] Emit epilogue, offset=%zu...\n", emit.offset);
+    }
     jit_emit_epilogue(&emit, block);
     
-    /* Flush instruction cache */
+    final_size = (emit.offset + 15u) & ~15u;
+    
+    if (debug_block) {
+        LOG_ERROR("[JIT-DEBUG] Allocating cache: final_size=%zu...\n", final_size);
+    }
+    code_start = jit_cache_alloc(jit, final_size);
+    if (code_start == NULL) {
+        LOG_ERROR("[CPU] m68xkcpu: code cache exhausted while emitting block at 0x%08X (need=%zu)\n",
+                  block->start_pc, final_size);
+        if (debug_block) {
+            LOG_ERROR("[JIT-DEBUG] CACHE ALLOCATION FAILED!\n");
+        }
+        return -1;
+    }
+    
+    if (debug_block) {
+        LOG_ERROR("[JIT-DEBUG] Cache allocated at %p, copying %zu bytes...\n", (void*)code_start, emit.offset);
+    }
+    memcpy(code_start, tmp_code, emit.offset);
     jit_cache_flush(jit, code_start, emit.offset);
     
     /* Update block with code location */
     block->code_ptr = code_start;
-    block->code_size = emit.offset;
+    block->code_size = final_size;
+    
+    if (debug_block) {
+        LOG_ERROR("[JIT-DEBUG] ===== BLOCK EMIT COMPLETE: code_ptr=%p code_size=%zu =====\n",
+                  (void*)code_start, final_size);
+    }
     
     return 0;
 }
@@ -297,7 +891,20 @@ int jit_block_emit(jit_context_t *jit, jit_block_t *block)
  */
 int jit_block_execute(jit_block_t *block, int max_cycles)
 {
+    /* DEBUG: Instrument block at 0x00F80BD4 */
+    bool debug_block = (block && block->start_pc == 0x00F80BD4);
+    if (debug_block) {
+        LOG_ERROR("[JIT-DEBUG] ===== BLOCK EXECUTE PC=0x%08X code_ptr=%p =====\n",
+                  block->start_pc, (void*)block->code_ptr);
+        fflush(stderr);
+    }
+    
     if (block == NULL || block->code_ptr == NULL) {
+        if (debug_block) {
+            LOG_ERROR("[JIT-DEBUG] EXECUTE ABORT: block=%p code_ptr=%p\n",
+                      (void*)block, (void*)(block ? block->code_ptr : NULL));
+            fflush(stderr);
+        }
         return -1;
     }
     
@@ -305,8 +912,31 @@ int jit_block_execute(jit_block_t *block, int max_cycles)
     typedef int (*jit_func_t)(int cycles);
     jit_func_t func = (jit_func_t)block->code_ptr;
     
+    if (debug_block) {
+        LOG_ERROR("[JIT-DEBUG] Calling JIT function at %p...\n", (void*)func);
+        fflush(stderr);
+    }
+    
     /* Execute the compiled code */
     int cycles = func(max_cycles);
+    
+    if (debug_block) {
+        extern jit_context_t g_jit;
+        LOG_ERROR("[JIT-DEBUG] JIT function returned cycles=%d\n", cycles);
+        LOG_ERROR("[JIT-DEBUG] g_jit.current_pc after execution: 0x%08X\n", g_jit.current_pc);
+        fflush(stderr);
+    }
+    
+    /* Sync PC from CPU state after execution */
+    extern struct m68ki_cpu_core m68ki_cpu;
+    extern jit_context_t g_jit;
+    g_jit.current_pc = (uint32_t)m68ki_cpu.pc;
+    
+    if (debug_block) {
+        extern jit_context_t g_jit;
+        LOG_ERROR("[JIT-DEBUG] Synced PC from m68ki_cpu.pc: 0x%08X\n", g_jit.current_pc);
+        fflush(stderr);
+    }
     
     return cycles;
 }

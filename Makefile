@@ -336,6 +336,17 @@ M68XK_JIT_SRCS := \
 	src/m68xkcpu/jit_block.c \
 	src/m68xkcpu/jit_cache.c \
 	src/m68xkcpu/jit_emit_aarch64.c \
+	src/m68xkcpu/jit_translate_moveq.c \
+	src/m68xkcpu/jit_translate_move.c \
+	src/m68xkcpu/jit_translate_add.c \
+	src/m68xkcpu/jit_translate_sub.c \
+	src/m68xkcpu/jit_translate_cmp.c \
+	src/m68xkcpu/jit_translate_addq_subq.c \
+	src/m68xkcpu/jit_translate_logic.c \
+	src/m68xkcpu/jit_translate_control.c \
+	src/m68xkcpu/jit_translate_movec.c \
+	src/m68xkcpu/jit_translate_branch.c \
+	src/m68xkcpu/jit_translate_misc.c \
 	src/m68xkcpu/generated/jit_68000_opinfo.c
 
 M68XK_JIT_OBJS := $(M68XK_JIT_SRCS:%.c=%.o)
@@ -701,6 +712,25 @@ $(MUSASHI_JSON_DRIVER): tools/musashi_json_driver.c $(MUSASHIFILES:%.c=%.o) $(MU
 		src/musashi/softfloat/softfloat.o src/musashi/softfloat/softfloat_fpsp.o -lm
 
 musashi-json-driver: $(MUSASHI_JSON_DRIVER)
+
+# JIT JSON test driver for ProcessorTests
+JIT_JSON_DRIVER = build/jit_json_driver
+$(JIT_JSON_DRIVER): tools/jit_json_driver.c $(M68XK_JIT_OBJS) $(MUSASHIFILES:%.c=%.o) $(MUSASHIGENCFILES:%.c=%.o) src/musashi/softfloat/softfloat.o src/musashi/softfloat/softfloat_fpsp.o src/log.o src/pistorm/backend.o src/pistorm/backend_kmod.o src/pistorm/backend_userspace_mmio.o src/gpio/ps_protocol_kmod.o
+	@mkdir -p $(dir $@)
+	$(CC) $(EMU_WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) -I. -Isrc -Isrc/musashi -Isrc/m68xkcpu \
+		-o $@ tools/jit_json_driver.c \
+		src/m68xkcpu/jit.o src/m68xkcpu/jit_block.o src/m68xkcpu/jit_cache.o src/m68xkcpu/jit_emit_aarch64.o \
+		src/m68xkcpu/jit_translate_moveq.o src/m68xkcpu/jit_translate_move.o \
+		src/m68xkcpu/jit_translate_add.o src/m68xkcpu/jit_translate_sub.o \
+		src/m68xkcpu/jit_translate_cmp.o src/m68xkcpu/jit_translate_branch.o \
+		src/m68xkcpu/generated/jit_68000_opinfo.o \
+		src/musashi/m68kcpu.o src/musashi/m68kops.o src/musashi/m68kdasm.o \
+		src/musashi/softfloat/softfloat.o src/musashi/softfloat/softfloat_fpsp.o \
+		src/log.o src/emulator.o src/emulator_fc.o src/memory_mapped.o \
+		src/pistorm/backend.o src/pistorm/backend_kmod.o src/pistorm/backend_userspace_mmio.o \
+		src/gpio/ps_protocol_kmod.o -lm
+
+jit-json-driver: $(JIT_JSON_DRIVER)
 
 piscsi-remote: tools/piscsi_remote/piscsi_remote_server.c
 	$(CC) -MMD -MP $(CFLAGS) -o $@ $< -lssl -lcrypto

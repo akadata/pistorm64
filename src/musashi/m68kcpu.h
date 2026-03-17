@@ -1196,8 +1196,6 @@ static inline int m68ki_movec_reg_legal(m68ki_cpu_core *state, uint reg)
 	case 0x805: /* MMUSR */
 	case 0x806: /* URP */
 	case 0x807: /* SRP */
-		return CPU_TYPE_IS_040_PLUS(state->cpu_type);
-
 	default:
 		return 0;
 	}
@@ -1332,14 +1330,14 @@ static inline uint m68ki_read_imm_8(m68ki_cpu_core *state)
 
 static inline uint m68ki_read_imm_32(m68ki_cpu_core *state)
 {
+	uint32_t address = ADDRESS_68K(REG_PC);
 #if M68K_SEPARATE_READS
 #if M68K_EMULATE_PMMU
-	if (PMMU_ENABLED) {  // THIS BLOCK WAS COMMENTED OUT
-	    address = pmmu_translate_addr(address,1);
+	if (PMMU_ENABLED) {
+		address = pmmu_translate_addr(state, address, 1);
 	}
 #endif
 #endif
-	uint32_t address = ADDRESS_68K(REG_PC);
 	for (int i = 0; i < state->read_ranges; i++) {
 		if(m68ki_range_contains_32(address, state->read_addr[i], state->read_upper[i])) {
 			REG_PC += 4;
@@ -2487,28 +2485,45 @@ extern int m68ki_illg_callback(int);
 /* Exception for illegal instructions */
 static inline void m68ki_exception_illegal(m68ki_cpu_core *state)
 {
-	uint sr;
+uint sr;
+        uint vector_addr, handler_addr, sp_before, sp_after;
 
-	M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: illegal instruction %04x (%s)\n",
-				 m68ki_cpu_names[CPU_TYPE], ADDRESS_68K(REG_PPC), REG_IR,
-				 m68ki_disassemble_quick(ADDRESS_68K(REG_PPC),CPU_TYPE)));
-	if (m68ki_illg_callback(state, REG_IR))
-	    return;
+M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: illegal instruction %04x (%s)\n",
+m68ki_cpu_names[CPU_TYPE], ADDRESS_68K(REG_PPC), REG_IR,
+                         m68ki_disassemble_quick(ADDRESS_68K(REG_PPC),CPU_TYPE)));
+if (m68ki_illg_callback(state, REG_IR))
+            return;
 
-	sr = m68ki_init_exception(state);
+        /* INSTRUMENTATION: Log exception entry */
+sp_before = REG_SP;
+vector_addr = (EXCEPTION_ILLEGAL_INSTRUCTION << 2) + REG_VBR;
+handler_addr = m68ki_read_data_32(state, vector_addr);
+fprintf(stderr, "[EXC-ILLG] Entry: PPC=%08X PC=%08X IR=%04X SR=%04X A7=%08X\n",
+        REG_PPC, REG_PC, REG_IR, m68ki_get_sr(state), REG_SP);
+fprintf(stderr, "[EXC-ILLG] Vector %d at %08X -> handler %08X\n",
+                EXCEPTION_ILLEGAL_INSTRUCTION, vector_addr, handler_addr);
 
-	#if M68K_EMULATE_ADDRESS_ERROR == OPT_ON
-	if(CPU_TYPE_IS_000(CPU_TYPE))
-	{
-		CPU_INSTR_MODE = INSTRUCTION_NO;
-	}
-	#endif /* M68K_EMULATE_ADDRESS_ERROR */
+sr = m68ki_init_exception(state);
 
-	m68ki_stack_frame_0000(state, REG_PPC, sr, EXCEPTION_ILLEGAL_INSTRUCTION);
-	m68ki_jump_vector(state, EXCEPTION_ILLEGAL_INSTRUCTION);
+#if M68K_EMULATE_ADDRESS_ERROR == OPT_ON
+if(CPU_TYPE_IS_000(CPU_TYPE))
+        {
+                CPU_INSTR_MODE = INSTRUCTION_NO;
+        }
+        #endif /* M68K_EMULATE_ADDRESS_ERROR */
 
-	/* Use up some clock cycles and undo the instruction's cycles */
-	USE_CYCLES(CYC_EXCEPTION[EXCEPTION_ILLEGAL_INSTRUCTION] - CYC_INSTRUCTION[REG_IR]);
+        m68ki_stack_frame_0000(state, REG_PPC, sr, EXCEPTION_ILLEGAL_INSTRUCTION);
+        sp_after = REG_SP;
+        fprintf(stderr, "[EXC-ILLG] Stack: before=%08X after=%08X [SP]=%08X [SP+4]=%04X\n",
+                sp_before, sp_after,
+                m68ki_read_32(state, sp_after),
+                m68ki_read_16(state, sp_after+4));
+
+        m68ki_jump_vector(state, EXCEPTION_ILLEGAL_INSTRUCTION);
+        fprintf(stderr, "[EXC-ILLG] Jumped to new PC=%08X\n", REG_PC);
+
+        /* Use up some clock cycles and undo the instruction's cycles */
+        USE_CYCLES(CYC_EXCEPTION[EXCEPTION_ILLEGAL_INSTRUCTION] - CYC_INSTRUCTION[REG_IR]);
 }
 
 /* Exception for format errror in RTE */

@@ -7,12 +7,378 @@
 #include "jit.h"
 #include "jit_block.h"
 #include "jit_cache.h"
+#include "jit_arch.h"
+#include "musashi/m68k.h"
+#include "musashi/m68kcpu.h"
+#include "log.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 /* Global JIT context */
 jit_context_t g_jit = {0};
+static const char *g_jit_last_compile_fail_reason = "unknown";
+static int g_jit_faststep_enabled = -1;
+static int g_jit_safe_interp_enabled = -1;
+static int g_jit_no_fallback_enabled = -1;
+
+static int jit_faststep_enabled(void)
+{
+    if (g_jit_faststep_enabled < 0) {
+        const char *e = getenv("PISTORM_M68XK_FASTSTEP");
+        /* Safety-first default: disabled unless explicitly enabled. */
+        g_jit_faststep_enabled = (e && atoi(e) != 0) ? 1 : 0;
+        if (g_jit_faststep_enabled) {
+            LOG_INFO("[CPU] m68xkcpu fast-step enabled via PISTORM_M68XK_FASTSTEP=1\n");
+        } else if (e) {
+            LOG_WARN("[CPU] m68xkcpu fast-step disabled via PISTORM_M68XK_FASTSTEP=0\n");
+        } else {
+            LOG_INFO("[CPU] m68xkcpu fast-step disabled by default (set PISTORM_M68XK_FASTSTEP=1 to enable)\n");
+        }
+    }
+    return g_jit_faststep_enabled;
+}
+
+static int jit_safe_interp_enabled(void)
+{
+    if (g_jit_safe_interp_enabled < 0) {
+        const char *e = getenv("PISTORM_M68XK_SAFE_INTERP");
+        /* Safety-first default: keep m68xkcpu in interpret-only mode unless explicitly disabled. */
+        g_jit_safe_interp_enabled = (!e || atoi(e) != 0) ? 1 : 0;
+        if (g_jit_safe_interp_enabled) {
+            if (e) {
+                LOG_INFO("[CPU] m68xkcpu safe interpret-only mode enabled via PISTORM_M68XK_SAFE_INTERP=1\n");
+            } else {
+                LOG_INFO("[CPU] m68xkcpu safe interpret-only mode enabled by default (set PISTORM_M68XK_SAFE_INTERP=0 to allow decode/emit path)\n");
+            }
+        } else {
+            LOG_WARN("[CPU] m68xkcpu safe interpret-only mode disabled via PISTORM_M68XK_SAFE_INTERP=0\n");
+        }
+    }
+    return g_jit_safe_interp_enabled;
+}
+
+int jit_no_fallback_enabled(void)
+{
+    if (g_jit_no_fallback_enabled < 0) {
+        const char *e = getenv("PISTORM_M68XK_NO_FALLBACK");
+        g_jit_no_fallback_enabled = (e && atoi(e) != 0) ? 1 : 0;
+        if (g_jit_no_fallback_enabled) {
+            LOG_WARN("[CPU] m68xkcpu NO_FALLBACK mode enabled - unsupported instructions will abort()\n");
+        }
+    }
+    return g_jit_no_fallback_enabled;
+}
+
+void jit_hard_fail(uint32_t pc, uint16_t opcode, const char *reason)
+{
+    LOG_ERROR("[CPU] m68xkcpu HARD FAIL at PC=0x%08X: opcode=0x%04X reason=%s\n", pc, opcode, reason);
+    LOG_ERROR("[CPU] m68xkcpu: Aborting due to unsupported instruction with NO_FALLBACK=1\n");
+    abort();
+}
+
+static int jit_fallback_interpreter_step(jit_context_t *jit, int cycles_budget)
+{
+    int ran;
+    int slice;
+    if (!jit || !jit->cpu) {
+        return -1;
+    }
+
+    if (cycles_budget <= 0) {
+        return 0;
+    }
+
+    /* Keep fallback semantics aligned with the emulator's normal Musashi path. */
+    extern void musashi_backend_execute(m68ki_cpu_core *state, int cycles);
+    slice = (cycles_budget > 256) ? 256 : cycles_budget;
+    musashi_backend_execute(jit->cpu, slice);
+    ran = slice;
+    jit->current_pc = (uint32_t)m68k_get_reg(jit->cpu, M68K_REG_PC);
+    return ran;
+}
+
+static inline int jit_flag_c(const m68ki_cpu_core *cpu) { return (cpu->c_flag & 0x100u) != 0; }
+static inline int jit_flag_v(const m68ki_cpu_core *cpu) { return (cpu->v_flag & 0x80u) != 0; }
+static inline int jit_flag_n(const m68ki_cpu_core *cpu) { return (cpu->n_flag & 0x80u) != 0; }
+static inline int jit_flag_z(const m68ki_cpu_core *cpu) { return cpu->not_z_flag == 0; }
+
+static int jit_eval_cond(const m68ki_cpu_core *cpu, uint8_t cond)
+{
+    int c = jit_flag_c(cpu);
+    int v = jit_flag_v(cpu);
+    int n = jit_flag_n(cpu);
+    int z = jit_flag_z(cpu);
+    switch (cond & 0x0F) {
+    case 0x0: return 1;                 /* T  */
+    case 0x1: return 0;                 /* F  */
+    case 0x2: return (!c) && (!z);      /* HI */
+    case 0x3: return c || z;            /* LS */
+    case 0x4: return !c;                /* CC */
+    case 0x5: return c;                 /* CS */
+    case 0x6: return !z;                /* NE */
+    case 0x7: return z;                 /* EQ */
+    case 0x8: return !v;                /* VC */
+    case 0x9: return v;                 /* VS */
+    case 0xA: return !n;                /* PL */
+    case 0xB: return n;                 /* MI */
+    case 0xC: return n == v;            /* GE */
+    case 0xD: return n != v;            /* LT */
+    case 0xE: return (!z) && (n == v);  /* GT */
+    case 0xF: return z || (n != v);     /* LE */
+    default: return 0;
+    }
+}
+
+static int jit_cycles_base(const m68ki_cpu_core *cpu, uint16_t opcode)
+{
+    int c = (int)cpu->cyc_instruction[opcode];
+    return (c > 0) ? c : 1;
+}
+
+static void jit_flags_add_32(m68ki_cpu_core *cpu, uint32_t src, uint32_t dst, uint32_t res)
+{
+    uint64_t wide = (uint64_t)src + (uint64_t)dst;
+    cpu->n_flag = (res >> 24) & 0x80;
+    cpu->v_flag = (((src ^ res) & (dst ^ res)) >> 24) & 0x80;
+    cpu->c_flag = cpu->x_flag = (wide >> 32) ? 0x100 : 0;
+    cpu->not_z_flag = res;
+}
+
+static void jit_flags_add_16(m68ki_cpu_core *cpu, uint16_t src, uint16_t dst, uint16_t res)
+{
+    uint32_t wide = (uint32_t)src + (uint32_t)dst;
+    cpu->n_flag = (res >> 8) & 0x80;
+    cpu->v_flag = (((src ^ res) & (dst ^ res)) >> 8) & 0x80;
+    cpu->c_flag = cpu->x_flag = (wide & 0x10000u) ? 0x100 : 0;
+    cpu->not_z_flag = res;
+}
+
+static void jit_flags_add_8(m68ki_cpu_core *cpu, uint8_t src, uint8_t dst, uint8_t res, uint16_t wide)
+{
+    cpu->n_flag = res & 0x80;
+    cpu->v_flag = ((src ^ res) & (dst ^ res)) & 0x80;
+    cpu->c_flag = cpu->x_flag = (wide & 0x100u) ? 0x100 : 0;
+    cpu->not_z_flag = res;
+}
+
+static int jit_try_fast_step(jit_context_t *jit, uint32_t pc, int cycles_budget)
+{
+    m68ki_cpu_core *cpu;
+    uint16_t opcode;
+    uint8_t fc_prog;
+    uint8_t fc_data;
+
+    if (!jit || !jit->cpu || cycles_budget <= 0) {
+        return 0;
+    }
+
+    cpu = jit->cpu;
+    fc_prog = jit_get_fc(cpu->s_flag ? 1 : 0, 1);
+    fc_data = jit_get_fc(cpu->s_flag ? 1 : 0, 0);
+    opcode = jit_fetch_word(pc, fc_prog);
+
+    /* Bcc/BRA (8-bit and 16-bit displacement), excluding BSR. */
+    if ((opcode & 0xF000) == 0x6000) {
+        uint8_t cond = (uint8_t)((opcode >> 8) & 0x0F);
+        int taken;
+        int cycles = jit_cycles_base(cpu, opcode);
+        if (cond == 0x1) {
+            return 0; /* BSR not handled here yet. */
+        }
+        taken = jit_eval_cond(cpu, cond);
+        if ((opcode & 0x00FF) == 0x00) {
+            int16_t disp = (int16_t)jit_fetch_word(pc + 2, fc_prog);
+            cpu->pc = taken ? (uint32_t)(pc + 2 + disp) : (pc + 4);
+            if (!taken) cycles += cpu->cyc_bcc_notake_w;
+        } else {
+            int8_t disp = (int8_t)(opcode & 0x00FF);
+            cpu->pc = taken ? (uint32_t)(pc + 2 + disp) : (pc + 2);
+            if (!taken) cycles += cpu->cyc_bcc_notake_b;
+        }
+        jit->current_pc = cpu->pc;
+        return (cycles > 0) ? cycles : 1;
+    }
+
+    /* DBcc */
+    if ((opcode & 0xF0F8) == 0x50C8) {
+        uint8_t cond = (uint8_t)((opcode >> 8) & 0x0F);
+        uint8_t dn = opcode & 0x07;
+        int16_t disp = (int16_t)jit_fetch_word(pc + 2, fc_prog);
+        int cycles = jit_cycles_base(cpu, opcode);
+        if (!jit_eval_cond(cpu, cond)) {
+            uint16_t ctr = (uint16_t)((cpu->dar[dn] - 1) & 0xFFFFu);
+            cpu->dar[dn] = (cpu->dar[dn] & 0xFFFF0000u) | ctr;
+            if (ctr != 0xFFFFu) {
+                cpu->pc = (uint32_t)(pc + 2 + disp);
+                cycles += cpu->cyc_dbcc_f_noexp;
+            } else {
+                cpu->pc = pc + 4;
+                cycles += cpu->cyc_dbcc_f_exp;
+            }
+        } else {
+            cpu->pc = pc + 4;
+        }
+        jit->current_pc = cpu->pc;
+        return (cycles > 0) ? cycles : 1;
+    }
+
+    /* ADDQ */
+    if ((opcode & 0xF100) == 0x5000) {
+        uint8_t imm = (uint8_t)((opcode >> 9) & 7);
+        uint8_t sz = (uint8_t)((opcode >> 6) & 3);
+        uint8_t mode = (uint8_t)((opcode >> 3) & 7);
+        uint8_t reg = opcode & 7;
+        int cycles = jit_cycles_base(cpu, opcode);
+        if (imm == 0) imm = 8;
+
+        if (mode == 0) { /* Dn */
+            uint32_t d = cpu->dar[reg];
+            if (sz == 0) {
+                uint8_t dst = (uint8_t)d;
+                uint16_t wide = (uint16_t)dst + imm;
+                uint8_t res = (uint8_t)wide;
+                cpu->dar[reg] = (d & 0xFFFFFF00u) | res;
+                jit_flags_add_8(cpu, imm, dst, res, wide);
+            } else if (sz == 1) {
+                uint16_t dst = (uint16_t)d;
+                uint16_t res = (uint16_t)(dst + imm);
+                cpu->dar[reg] = (d & 0xFFFF0000u) | res;
+                jit_flags_add_16(cpu, imm, dst, res);
+            } else if (sz == 2) {
+                uint32_t dst = d;
+                uint32_t res = dst + imm;
+                cpu->dar[reg] = res;
+                jit_flags_add_32(cpu, imm, dst, res);
+            } else {
+                return 0;
+            }
+        } else if (mode == 1) { /* An */
+            if (sz == 1 || sz == 2) {
+                cpu->dar[8 + reg] = cpu->dar[8 + reg] + imm;
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+
+        cpu->pc = pc + 2;
+        jit->current_pc = cpu->pc;
+        return (cycles > 0) ? cycles : 1;
+    }
+
+    /* LEA */
+    if ((opcode & 0xF1C0) == 0x41C0) {
+        uint8_t an = (uint8_t)((opcode >> 9) & 7);
+        uint8_t mode = (uint8_t)((opcode >> 3) & 7);
+        uint8_t reg = opcode & 7;
+        uint32_t ea;
+        int cycles = jit_cycles_base(cpu, opcode);
+
+        if (mode == 7 && reg == 0) { /* abs.w */
+            ea = (uint32_t)(int32_t)(int16_t)jit_fetch_word(pc + 2, fc_prog);
+            cpu->pc = pc + 4;
+        } else if (mode == 7 && reg == 1) { /* abs.l */
+            ea = jit_fetch_long(pc + 2, fc_prog);
+            cpu->pc = pc + 6;
+        } else if (mode == 2) { /* (An) */
+            ea = cpu->dar[8 + reg];
+            cpu->pc = pc + 2;
+        } else if (mode == 5) { /* (d16,An) */
+            int16_t disp = (int16_t)jit_fetch_word(pc + 2, fc_prog);
+            ea = cpu->dar[8 + reg] + (int32_t)disp;
+            cpu->pc = pc + 4;
+        } else if (mode == 7 && reg == 2) { /* (d16,PC) */
+            int16_t disp = (int16_t)jit_fetch_word(pc + 2, fc_prog);
+            ea = (uint32_t)(pc + 2 + (int32_t)disp);
+            cpu->pc = pc + 4;
+        } else {
+            return 0;
+        }
+
+        cpu->dar[8 + an] = ea;
+        jit->current_pc = cpu->pc;
+        return (cycles > 0) ? cycles : 1;
+    }
+
+    /* ADD.L <ea>,Dn (limited: Dn/(An)/(An)+ source forms) */
+    if ((opcode & 0xF1C0) == 0xD080) {
+        uint8_t dn = (uint8_t)((opcode >> 9) & 7);
+        uint8_t opmode = (uint8_t)((opcode >> 6) & 7);
+        uint8_t mode = (uint8_t)((opcode >> 3) & 7);
+        uint8_t reg = opcode & 7;
+        uint32_t src, dst, res;
+        int cycles = jit_cycles_base(cpu, opcode);
+
+        if (opmode != 2) {
+            return 0;
+        }
+
+        if (mode == 0) { /* Dn */
+            src = cpu->dar[reg];
+        } else if (mode == 2) { /* (An) */
+            if (jit_mem_read32(cpu->dar[8 + reg], fc_data, &src) != 0) return 0;
+        } else if (mode == 3) { /* (An)+ */
+            if (jit_mem_read32(cpu->dar[8 + reg], fc_data, &src) != 0) return 0;
+            cpu->dar[8 + reg] += 4;
+        } else {
+            return 0;
+        }
+
+        dst = cpu->dar[dn];
+        res = dst + src;
+        cpu->dar[dn] = res;
+        jit_flags_add_32(cpu, src, dst, res);
+        cpu->pc = pc + 2;
+        jit->current_pc = cpu->pc;
+        return (cycles > 0) ? cycles : 1;
+    }
+
+    return 0;
+}
+
+static void jit_trace_fallback(jit_context_t *jit, uint32_t pc_before, const char *reason)
+{
+    static int trace_enabled = -1;
+    static int trace_cached = -1;
+    static unsigned int trace_count = 0;
+    const unsigned int trace_limit = 64;
+    uint8_t fc;
+    uint16_t opcode;
+    uint32_t sr;
+    const jit_opinfo_t *opinfo;
+
+    if (!jit || !jit->cpu) {
+        return;
+    }
+
+    if (trace_enabled < 0) {
+        const char *e = getenv("PISTORM_M68XK_TRACE_FALLBACK");
+        trace_enabled = (e && atoi(e) != 0) ? 1 : 0;
+    }
+    if (trace_cached < 0) {
+        const char *e = getenv("PISTORM_M68XK_TRACE_FALLBACK_CACHED");
+        trace_cached = (e && atoi(e) != 0) ? 1 : 0;
+    }
+    if (!trace_enabled || trace_count >= trace_limit) {
+        return;
+    }
+    if (!trace_cached && reason && strstr(reason, "cached") != NULL) {
+        return;
+    }
+
+    sr = (uint32_t)m68k_get_reg(jit->cpu, M68K_REG_SR);
+    fc = jit_get_fc((sr & 0x2000u) ? 1 : 0, 1);
+    opcode = jit_fetch_word(pc_before, fc);
+    opinfo = jit_get_opinfo(opcode);
+
+    LOG_INFO("[CPU][m68xkcpu] fallback[%u] reason=%s pc=0x%08X fc=%u opcode=0x%04X family=%u ext=%u flags=0x%02X\n",
+             trace_count + 1, reason ? reason : "unknown", pc_before, (unsigned)fc,
+             (unsigned)opcode, (unsigned)opinfo->family, (unsigned)opinfo->ext_words,
+             (unsigned)opinfo->flags);
+    trace_count++;
+}
 
 /**
  * Initialize the JIT subsystem
@@ -66,6 +432,13 @@ void jit_shutdown(void)
     if (!g_jit.initialized) {
         return;
     }
+
+    {
+        const char *e = getenv("PISTORM_M68XK_STATS");
+        if (e && atoi(e) != 0) {
+            jit_print_stats();
+        }
+    }
     
     jit_cache_shutdown(&g_jit);
     
@@ -102,7 +475,6 @@ int jit_execute(uint32_t pc, int cycles)
 {
     jit_block_t *block;
     int cycles_remaining = cycles;
-    static int warned_non_progress = 0;
     
     if (!g_jit.initialized || !g_jit.enabled) {
         return -1;
@@ -116,6 +488,26 @@ int jit_execute(uint32_t pc, int cycles)
         block = jit_cache_lookup(&g_jit, pc);
         
         if (block != NULL) {
+            if (block->flags & JIT_BLOCK_INTERPRET_ONLY) {
+                int ran;
+                ran = jit_faststep_enabled() ? jit_try_fast_step(&g_jit, pc, cycles_remaining) : 0;
+                if (ran > 0) {
+                    g_jit.stats.fast_step_count++;
+                    cycles_remaining -= ran;
+                    pc = g_jit.current_pc;
+                    continue;
+                }
+                g_jit.stats.fallback_count++;
+                jit_trace_fallback(&g_jit, pc, "cached interpret-only -> musashi");
+                ran = jit_fallback_interpreter_step(&g_jit, cycles_remaining);
+                if (ran <= 0) {
+                    break;
+                }
+                cycles_remaining -= ran;
+                pc = g_jit.current_pc;
+                continue;
+            }
+
             /* Block found - execute compiled code */
             g_jit.stats.cache_hits++;
             g_jit.stats.blocks_executed++;
@@ -125,16 +517,18 @@ int jit_execute(uint32_t pc, int cycles)
             int block_cycles = jit_block_execute(block, cycles_remaining);
             
             if (block_cycles <= 0 || g_jit.current_pc == pc_before) {
-                /* Block execution made no forward progress - fall back safely. */
+                /* Discard non-progress block and execute via interpreter fallback. */
                 g_jit.stats.fallback_count++;
-                g_jit.enabled = false;
-                if (!warned_non_progress) {
-                    fprintf(stderr,
-                            "JIT: block at 0x%08X made no progress (cycles=%d, next_pc=0x%08X); disabling m68xkcpu execution and falling back to Musashi\n",
-                            pc_before, block_cycles, g_jit.current_pc);
-                    warned_non_progress = 1;
+                jit_trace_fallback(&g_jit, pc_before, "non-progress cached block");
+                jit_cache_remove(&g_jit, block);
+                jit_block_free(&g_jit, block);
+                block_cycles = jit_fallback_interpreter_step(&g_jit, cycles_remaining);
+                if (block_cycles <= 0) {
+                    break;
                 }
-                break;
+                cycles_remaining -= block_cycles;
+                pc = g_jit.current_pc;
+                continue;
             }
             
             cycles_remaining -= block_cycles;
@@ -155,6 +549,26 @@ int jit_execute(uint32_t pc, int cycles)
             block = jit_compile_block(pc);
             
             if (block != NULL) {
+                if (block->flags & JIT_BLOCK_INTERPRET_ONLY) {
+                    int ran;
+                    ran = jit_faststep_enabled() ? jit_try_fast_step(&g_jit, pc, cycles_remaining) : 0;
+                    if (ran > 0) {
+                        g_jit.stats.fast_step_count++;
+                        cycles_remaining -= ran;
+                        pc = g_jit.current_pc;
+                        continue;
+                    }
+                    g_jit.stats.fallback_count++;
+                    jit_trace_fallback(&g_jit, pc, "new interpret-only -> musashi");
+                    ran = jit_fallback_interpreter_step(&g_jit, cycles_remaining);
+                    if (ran <= 0) {
+                        break;
+                    }
+                    cycles_remaining -= ran;
+                    pc = g_jit.current_pc;
+                    continue;
+                }
+
                 /* Successfully compiled - execute it */
                 g_jit.stats.blocks_compiled++;
                 
@@ -162,26 +576,45 @@ int jit_execute(uint32_t pc, int cycles)
                 int block_cycles = jit_block_execute(block, cycles_remaining);
                 
                 if (block_cycles <= 0 || g_jit.current_pc == pc_before) {
+                    /* Discard non-progress block and execute via interpreter fallback. */
                     g_jit.stats.fallback_count++;
-                    g_jit.enabled = false;
-                    if (!warned_non_progress) {
-                        fprintf(stderr,
-                                "JIT: compiled block at 0x%08X made no progress (cycles=%d, next_pc=0x%08X); disabling m68xkcpu execution and falling back to Musashi\n",
-                                pc_before, block_cycles, g_jit.current_pc);
-                        warned_non_progress = 1;
+                    jit_trace_fallback(&g_jit, pc_before, "non-progress compiled block");
+                    jit_cache_remove(&g_jit, block);
+                    jit_block_free(&g_jit, block);
+                    block_cycles = jit_fallback_interpreter_step(&g_jit, cycles_remaining);
+                    if (block_cycles <= 0) {
+                        break;
                     }
-                    break;
+                    cycles_remaining -= block_cycles;
+                    pc = g_jit.current_pc;
+                    continue;
                 }
                 
                 cycles_remaining -= block_cycles;
                 pc = g_jit.current_pc;
             } else {
-                /* Compilation failed - fall back to interpreter */
+                /* Compilation failed - try fast-step first, then interpreter fallback. */
+                int ran = jit_faststep_enabled() ? jit_try_fast_step(&g_jit, pc, cycles_remaining) : 0;
+                if (ran > 0) {
+                    g_jit.stats.fast_step_count++;
+                    cycles_remaining -= ran;
+                    pc = g_jit.current_pc;
+                    continue;
+                }
                 g_jit.stats.fallback_count++;
-                
-                /* Execute one instruction via Musashi */
-                /* This will be implemented when we wire up the interpreter */
-                break;
+                {
+                    char reason[96];
+                    snprintf(reason, sizeof(reason), "compile failed(%s) -> musashi",
+                             g_jit_last_compile_fail_reason ? g_jit_last_compile_fail_reason : "unknown");
+                    jit_trace_fallback(&g_jit, pc, reason);
+                }
+                ran = jit_fallback_interpreter_step(&g_jit, cycles_remaining);
+                if (ran <= 0) {
+                    break;
+                }
+                cycles_remaining -= ran;
+                pc = g_jit.current_pc;
+                continue;
             }
         }
     }
@@ -261,6 +694,7 @@ void jit_print_stats(void)
     printf("Blocks executed:      %u\n", g_jit.stats.blocks_executed);
     printf("Cache hits:           %u\n", g_jit.stats.cache_hits);
     printf("Cache misses:         %u\n", g_jit.stats.cache_misses);
+    printf("Fast-step count:      %u\n", g_jit.stats.fast_step_count);
     printf("Fallback count:       %u\n", g_jit.stats.fallback_count);
     printf("Cache invalidations:  %u\n", g_jit.stats.cache_invalidations);
     printf("Cache bytes used:     %zu / %zu\n", 
@@ -286,17 +720,30 @@ void jit_print_stats(void)
 jit_block_t *jit_compile_block(uint32_t pc)
 {
     jit_block_t *block;
+    g_jit_last_compile_fail_reason = "unknown";
     
     /* Allocate a new block structure */
     block = jit_block_alloc(&g_jit, pc);
     if (block == NULL) {
+        g_jit_last_compile_fail_reason = "alloc";
         return NULL;
+    }
+
+    if (jit_safe_interp_enabled()) {
+        block->flags |= JIT_BLOCK_INTERPRET_ONLY;
+        block->instruction_count = 0;
+        block->end_pc = pc;
+        block->ends_block = 1;
+        jit_cache_insert(&g_jit, block);
+        g_jit_last_compile_fail_reason = NULL;
+        return block;
     }
     
     /* Translate instructions until we hit a block boundary */
     if (jit_block_translate(&g_jit, block) != 0) {
         /* Translation failed - free the block */
         jit_block_free(&g_jit, block);
+        g_jit_last_compile_fail_reason = "translate";
         return NULL;
     }
     
@@ -304,11 +751,13 @@ jit_block_t *jit_compile_block(uint32_t pc)
     if (jit_block_emit(&g_jit, block) != 0) {
         /* Emission failed - free the block */
         jit_block_free(&g_jit, block);
+        g_jit_last_compile_fail_reason = "emit";
         return NULL;
     }
     
     /* Insert block into cache */
     jit_cache_insert(&g_jit, block);
+    g_jit_last_compile_fail_reason = NULL;
     
     return block;
 }

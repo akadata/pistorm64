@@ -78,10 +78,11 @@ uint32_t jit_fetch_long(uint32_t pc, uint8_t fc);
 /* ====================== Function Codes ================================== */
 /* ======================================================================== */
 
-#define JIT_FC_USER_DATA        0
-#define JIT_FC_USER_PROGRAM     1
+#define JIT_FC_USER_DATA        1
+#define JIT_FC_USER_PROGRAM     2
 #define JIT_FC_SUPERVISOR_DATA  5
 #define JIT_FC_SUPERVISOR_PROG  6
+#define JIT_FC_CPU_SPACE        7
 
 /* Helper to get FC from CPU state */
 static inline uint8_t jit_get_fc(int is_supervisor, int is_program)

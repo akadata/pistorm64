@@ -10,6 +10,10 @@ This is the validation infrastructure for a staged AArch64 JIT effort, beginning
 - JIT support for 020/030/040 comes later
 - FPU support is later still
 
+**Runtime Scope (Current):**
+- `m68xkcpu` runtime execution is currently `68000`-focused.
+- Non-68000 CPU models are expected to use Musashi by default unless explicitly overridden for debug experiments.
+
 **Critical Architecture Note:**
 
 There are **TWO distinct execution environments**:

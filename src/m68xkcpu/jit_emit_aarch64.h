@@ -172,4 +172,15 @@ void jit_emit_comment(jit_emit_context_t *ctx, const char *comment);
 size_t jit_emit_get_offset(jit_emit_context_t *ctx);
 void jit_emit_patch_branch(jit_emit_context_t *ctx, size_t offset, int target_offset);
 
+/* Additional helper functions */
+void jit_emit_movn(jit_emit_context_t *ctx, uint8_t rd, uint16_t imm, int shift);
+void jit_emit_mov_reg(jit_emit_context_t *ctx, uint8_t rd, uint8_t rn);
+void jit_emit_add_immed(jit_emit_context_t *ctx, uint8_t rd, uint8_t rn, int imm);
+void jit_emit_sub_immed(jit_emit_context_t *ctx, uint8_t rd, uint8_t rn, int imm);
+void jit_emit_and_immed(jit_emit_context_t *ctx, uint8_t rd, uint8_t rn, uint64_t imm);
+void jit_emit_str_offset(jit_emit_context_t *ctx, uint8_t rn, uint8_t rt, int offset);
+void jit_emit_cset(jit_emit_context_t *ctx, uint8_t rd, int condition);
+void jit_emit_patch_bcond(jit_emit_context_t *ctx, size_t offset, int target_offset);
+void jit_emit_patch_b(jit_emit_context_t *ctx, size_t offset, int target_offset);
+
 #endif /* JIT_EMIT_AARCH64_H */

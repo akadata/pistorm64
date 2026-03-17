@@ -571,6 +571,11 @@ void jit_emit_epilogue(jit_emit_context_t *ctx, jit_block_t *block)
 {
     (void)block;
     
+    /* Store R10 (PC) back to m68ki_cpu.pc before returning */
+    /* pc is at offset 136 (0x88) in m68ki_cpu_core structure */
+    /* R0 points to &m68ki_cpu */
+    jit_emit_str_w(ctx, 10, 0, 136);  /* str w10, [r0, #136] */
+    
     /* Return cycles used in W0 */
     /* For now, just return 0 */
     jit_emit_mov(ctx, 0, 0);
@@ -631,4 +636,103 @@ void jit_emit_patch_branch(jit_emit_context_t *ctx, size_t offset, int target_of
         int imm26 = (rel_offset / 4) & 0x03FFFFFF;
         *instr = (old & 0xFC000000) | imm26;
     }
+}
+
+
+/* MOVN - move with negated immediate */
+void jit_emit_movn(jit_emit_context_t *ctx, uint8_t rd, uint16_t imm, int shift)
+{
+    uint32_t instr = 0x92800000;
+    int shift_enc = (shift / 16) & 3;
+    instr |= ((uint32_t)imm << 5);
+    instr |= (shift_enc << 21);
+    instr |= (rd & 0x1F);
+    jit_emit_dword(ctx, instr);
+}
+
+/* MOV register */
+void jit_emit_mov_reg(jit_emit_context_t *ctx, uint8_t rd, uint8_t rn)
+{
+    uint32_t instr = 0xAA0003E0;
+    instr |= ((rn & 0x1F) << 16);
+    instr |= (rd & 0x1F);
+    jit_emit_dword(ctx, instr);
+}
+
+/* ADD immediate */
+void jit_emit_add_immed(jit_emit_context_t *ctx, uint8_t rd, uint8_t rn, int imm)
+{
+    uint32_t instr = 0x91000000;
+    if (imm < 0 || imm > 0xFFF) {
+        jit_emit_mov(ctx, 16, imm);
+        jit_emit_add_reg(ctx, rd, rn, 16);
+        return;
+    }
+    instr |= ((imm & 0xFFF) << 10);
+    instr |= ((rn & 0x1F) << 5);
+    instr |= (rd & 0x1F);
+    jit_emit_dword(ctx, instr);
+}
+
+/* SUB immediate */
+void jit_emit_sub_immed(jit_emit_context_t *ctx, uint8_t rd, uint8_t rn, int imm)
+{
+    uint32_t instr = 0xD1000000;
+    if (imm < 0 || imm > 0xFFF) {
+        jit_emit_mov(ctx, 16, imm);
+        jit_emit_sub_reg(ctx, rd, rn, 16);
+        return;
+    }
+    instr |= ((imm & 0xFFF) << 10);
+    instr |= ((rn & 0x1F) << 5);
+    instr |= (rd & 0x1F);
+    jit_emit_dword(ctx, instr);
+}
+
+/* AND immediate */
+void jit_emit_and_immed(jit_emit_context_t *ctx, uint8_t rd, uint8_t rn, uint64_t imm)
+{
+    if (imm <= 0xFFF) {
+        uint32_t instr = 0x92000000;
+        instr |= ((imm & 0xFFF) << 10);
+        instr |= ((rn & 0x1F) << 5);
+        instr |= (rd & 0x1F);
+        jit_emit_dword(ctx, instr);
+    } else {
+        jit_emit_mov(ctx, 16, imm);
+        jit_emit_and_reg(ctx, rd, rn, 16);
+    }
+}
+
+/* STR with offset */
+void jit_emit_str_offset(jit_emit_context_t *ctx, uint8_t rn, uint8_t rt, int offset)
+{
+    jit_emit_str_w(ctx, rt, rn, offset);
+}
+
+/* CSET - condition set */
+void jit_emit_cset(jit_emit_context_t *ctx, uint8_t rd, int condition)
+{
+    uint32_t instr = 0x1A8003E0;
+    instr |= ((condition ^ 1) << 12);
+    instr |= (rd & 0x1F);
+    jit_emit_dword(ctx, instr);
+}
+
+/* Patch conditional branch */
+void jit_emit_patch_bcond(jit_emit_context_t *ctx, size_t offset, int target_offset)
+{
+    if (offset + 4 > ctx->size) return;
+    uint32_t *instr = (uint32_t *)(ctx->buffer + offset);
+    int imm19 = (target_offset / 4) & 0x7FFFF;
+    *instr = (*instr & 0xFFFFE01F) | ((imm19 & 0x7FFFF) << 5);
+}
+
+/* Patch unconditional branch */
+void jit_emit_patch_b(jit_emit_context_t *ctx, size_t offset, int target_offset)
+{
+    if (offset + 4 > ctx->size) return;
+    uint32_t *instr = (uint32_t *)(ctx->buffer + offset);
+    int imm26 = (target_offset / 4) & 0x3FFFFFF;
+    *instr = (*instr & 0xFC000000) | (imm26 & 0x3FFFFFF);
 }

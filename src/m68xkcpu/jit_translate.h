@@ -64,11 +64,16 @@ int jit_translate_moveq(jit_translate_context_t *ctx);
 int jit_translate_add(jit_translate_context_t *ctx);
 int jit_translate_sub(jit_translate_context_t *ctx);
 int jit_translate_cmp(jit_translate_context_t *ctx);
-int jit_translate_and(jit_translate_context_t *ctx);
-int jit_translate_or(jit_translate_context_t *ctx);
-int jit_translate_eor(jit_translate_context_t *ctx);
+int jit_translate_addq_subq(jit_translate_context_t *ctx);
+int jit_translate_logic(jit_translate_context_t *ctx);
+int jit_translate_bsr(jit_translate_context_t *ctx);
+int jit_translate_rts(jit_translate_context_t *ctx);
+int jit_translate_jsr(jit_translate_context_t *ctx);
+int jit_translate_jmp(jit_translate_context_t *ctx);
+int jit_translate_movec(jit_translate_context_t *ctx);
 int jit_translate_branch(jit_translate_context_t *ctx);
 int jit_translate_shift(jit_translate_context_t *ctx);
+int jit_translate_misc(jit_translate_context_t *ctx);  /* LEA, CLR, TST, bitops */
 
 /* Helper: get size in bytes */
 static inline int jit_size_bytes(uint8_t size)

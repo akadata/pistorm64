@@ -430,22 +430,6 @@ static const char* fc_mode_name(enum fc_mode mode) {
 
 extern unsigned int cpu_type;
 
-static int cpu_type_at_least_68020(unsigned int type) {
-  switch (type) {
-  case M68K_CPU_TYPE_68EC020:
-  case M68K_CPU_TYPE_68020:
-  case M68K_CPU_TYPE_68EC030:
-  case M68K_CPU_TYPE_68030:
-  case M68K_CPU_TYPE_68EC040:
-  case M68K_CPU_TYPE_68LC040:
-  case M68K_CPU_TYPE_68040:
-  case M68K_CPU_TYPE_SCC68070:
-    return 1;
-  default:
-    return 0;
-  }
-}
-
 static const char* cpu_type_name(unsigned int type) {
   switch (type) {
   case M68K_CPU_TYPE_68000: return "68000";
@@ -462,7 +446,23 @@ static const char* cpu_type_name(unsigned int type) {
   }
 }
 
-static void enforce_kickstart_cpu_compat(struct emulator_config* cfg_) {
+static int cpu_type_at_least_68020(unsigned int type) {
+  switch (type) {
+  case M68K_CPU_TYPE_68EC020:
+  case M68K_CPU_TYPE_68020:
+  case M68K_CPU_TYPE_68EC030:
+  case M68K_CPU_TYPE_68030:
+  case M68K_CPU_TYPE_68EC040:
+  case M68K_CPU_TYPE_68LC040:
+  case M68K_CPU_TYPE_68040:
+  case M68K_CPU_TYPE_SCC68070:
+    return 1;
+  default:
+    return 0;
+  }
+}
+
+static void warn_kickstart_cpu_mismatch(const struct emulator_config* cfg_) {
   if (!cfg_) {
     return;
   }
@@ -494,13 +494,15 @@ static void enforce_kickstart_cpu_compat(struct emulator_config* cfg_) {
     return;
   }
 
-  unsigned int old_cpu = cpu_type;
-  cpu_type = M68K_CPU_TYPE_68020;
-  cfg_->cpu_type = cpu_type;
-  LOG_WARN("[CPU] Kickstart %u.%u (%s) requires at least 68020; overriding CPU %s -> 68020.\n",
-           info.major, info.minor, cfg_->map_id[kick_idx],
-           cpu_type_name(old_cpu));
-  LOG_WARN("[CPU] Use Kickstart 3.1 r40.63 for 68000/68010-class A500 boot.\n");
+  LOG_WARN("[CPU] Kickstart %u.%u (%s) requires at least 68020; configured CPU is %s.\n",
+           info.major, info.minor, cfg_->map_id[kick_idx], cpu_type_name(cpu_type));
+  LOG_WARN("[CPU] No auto-upgrade is applied. Expect ILLEGAL at MOVEC on 68000/68010-class runs.\n");
+  LOG_WARN("[CPU] Use Kickstart 3.1 r40.63 (or older 68000-safe ROM) for 68000 JIT validation.\n");
+}
+
+static int m68xkcpu_jit_cpu_supported(unsigned int type) {
+  /* Current translator/opinfo is 68000-only. */
+  return (type == M68K_CPU_TYPE_68000) ? 1 : 0;
 }
 
 static int read_kernel_param_bool(const char* name) {
@@ -765,8 +767,17 @@ static void instr_hook_callback(unsigned int pc) {
 }
 
 static int illg_instr_callback(int opcode) {
+  /* Handle MOVEC (0x4E7B) - 68010+ instruction used for CPU detection */
+  if ((opcode & 0xFFF8) == 0x4E70) {
+    /* MOVEC - skip this instruction (2 bytes + 2 byte extension word)
+     * PC was already advanced past opcode by Musashi, we need to add 2 more
+     * for the extension word */
+    m68ki_cpu.pc += 2;
+    return 1; /* Handled - suppress exception */
+  }
+  /* All other illegal instructions: dump state and let Musashi handle */
   dump_cpu_state("Illegal instruction", opcode);
-  return 0; // let Musashi raise the exception normally
+  return 0;
 }
 
 
@@ -1908,7 +1919,7 @@ switch_config:
       cfg->platform = make_platform_config("none", "generic");
     }
     cfg->platform->platform_initial_setup(cfg);
-    enforce_kickstart_cpu_compat(cfg);
+    warn_kickstart_cpu_mismatch(cfg);
   }
 
   if (fc_get_mode() != FC_MODE_OFF) {
@@ -2054,19 +2065,36 @@ switch_config:
     m68k_init();
     printf("Setting CPU type to %d.\n", cpu_type);
     m68k_set_cpu_type(&m68ki_cpu, cpu_type);
+    LOG_INFO("[CPU] Musashi configured: model=%s PMMU=%s FPU=%s\n",
+             cpu_type_name(cpu_type),
+             m68ki_cpu.has_pmmu ? "on" : "off",
+             m68ki_cpu.has_fpu ? "on" : "off");
     m68k_set_instr_hook_callback(&m68ki_cpu, instr_hook_callback);
     m68k_set_fc_callback(&m68ki_cpu, fc_callback_wrapper);  // Use wrapper to call cpu_set_fc
     m68k_set_illg_instr_callback(&m68ki_cpu, illg_instr_callback);
 
 #if USE_M68XK_JIT
     if (enable_jit_backend && jit_backend_request == JIT_REQ_M68XKCPU) {
-      int rc = jit_init(&m68ki_cpu, 0);
-      if (rc == 0) {
-        use_m68xk_jit = 1;
-        LOG_INFO("[CPU] m68xkcpu JIT backend selected (execution currently gated; set PISTORM_M68XK_EXEC=1 to run compiled blocks)\n");
-      } else {
+      const char *allow_unsupported = getenv("PISTORM_M68XK_ALLOW_UNSUPPORTED_CPU");
+      int allow_non68000 = (allow_unsupported && atoi(allow_unsupported) != 0) ? 1 : 0;
+      if (!m68xkcpu_jit_cpu_supported(cpu_type) && !allow_non68000) {
         enable_jit_backend = 0;
-        LOG_ERROR("[CPU] m68xkcpu JIT init failed (rc=%d), falling back to Musashi\n", rc);
+        LOG_WARN("[CPU] m68xkcpu JIT is currently 68000-only; cpu=%s requested. "
+                 "Falling back to Musashi. Set PISTORM_M68XK_ALLOW_UNSUPPORTED_CPU=1 to override.\n",
+                 cpu_type_name(cpu_type));
+      } else {
+        if (!m68xkcpu_jit_cpu_supported(cpu_type) && allow_non68000) {
+          LOG_WARN("[CPU] m68xkcpu JIT override enabled for cpu=%s; behavior is experimental.\n",
+                   cpu_type_name(cpu_type));
+        }
+        int rc = jit_init(&m68ki_cpu, 0);
+        if (rc == 0) {
+          use_m68xk_jit = 1;
+          LOG_INFO("[CPU] m68xkcpu JIT backend selected (execution currently gated; set PISTORM_M68XK_EXEC=1 to run compiled blocks)\n");
+        } else {
+          enable_jit_backend = 0;
+          LOG_ERROR("[CPU] m68xkcpu JIT init failed (rc=%d), falling back to Musashi\n", rc);
+        }
       }
     }
 #else
