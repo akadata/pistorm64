@@ -300,9 +300,6 @@ int jit_block_translate(jit_context_t *jit, jit_block_t *block)
     return 0;
 }
 
-/* Translator function type - appends to emit context */
-typedef int (*jit_translator_fn)(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
-
 int jit_block_emit(jit_context_t *jit, jit_block_t *block)
 {
     uint8_t tmp_code[JIT_MAX_BLOCK_SIZE];
@@ -408,7 +405,16 @@ int jit_block_emit(jit_context_t *jit, jit_block_t *block)
         }
         
         if (translator) {
-            if (translator(&emit, opcode, ext_words, ext_count) < 0) {
+            jit_translate_context_t tctx = {
+                .jit = jit,
+                .block = block,
+                .emit = &emit,
+                .opcode = opcode,
+                .ext_words = ext_words,
+                .ext_count = ext_count,
+                .instruction_index = (uint16_t)i,
+            };
+            if (translator(&tctx) < 0) {
                 /* Translator failed - mark block for interpretation and return error
                  * so the block is NOT cached as executable code */
                 block->flags |= JIT_BLOCK_INTERPRET_ONLY;
@@ -510,18 +516,26 @@ void jit_block_dump(jit_block_t *block)
 }
 
 /* ============================================================================
- * Stub translators - append to emit context
+ * Translator implementations (single block-based path)
  * ============================================================================ */
 
-int jit_translate_nop(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+int jit_translate_nop(jit_translate_context_t *tctx)
 {
     /* NOP - no code to emit */
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
     (void)ctx; (void)opcode; (void)ext_words; (void)ext_count;
     return 0;
 }
 
-int jit_translate_moveq(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+int jit_translate_moveq(jit_translate_context_t *tctx)
 {
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
     /* MOVEQ: 0111 dnnn dddddddd - move 8-bit immediate to Dn */
     int dn = (opcode >> 9) & 0x7;
     int8_t imm = (int8_t)(opcode & 0xFF);
@@ -539,8 +553,12 @@ int jit_translate_moveq(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_
     return 0;
 }
 
-int jit_translate_move(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+int jit_translate_move(jit_translate_context_t *tctx)
 {
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
     /* MOVE: 0001 size(2) dst_mode(3) dst_reg(3) src_mode(3) src_reg(3)
      * Bits 15-12 = 0001, Bits 11-9 = size, Bits 8-6 = dst EA, Bits 5-3 = dst reg,
      * Bits 2-0 = src mode, but src mode is in bits 5-3 actually
@@ -701,8 +719,12 @@ int jit_translate_move(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_w
     return 0;
 }
 
-int jit_translate_add(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+int jit_translate_add(jit_translate_context_t *tctx)
 {
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
     /* ADD: 1101 size(2) dst_mode(3) dst_reg(3) src_mode(3) src_reg(3) */
     uint8_t size = (opcode >> 12) & 0x3;
     uint8_t dst_mode = (opcode >> 6) & 0x7;
@@ -782,8 +804,12 @@ int jit_translate_add(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_wo
     return 0;
 }
 
-int jit_translate_addq(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+int jit_translate_addq(jit_translate_context_t *tctx)
 {
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
     /* ADDQ: #data, EA - data is 1-8 in bits 9-11 */
     int data = (opcode >> 9) & 0x7;
     if (data == 0) data = 8;
@@ -808,8 +834,12 @@ int jit_translate_addq(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_w
     return 0;
 }
 
-int jit_translate_sub(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+int jit_translate_sub(jit_translate_context_t *tctx)
 {
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
     /* SUB: 1001 size(2) dst_mode(3) dst_reg(3) src_mode(3) src_reg(3) */
     uint8_t size = (opcode >> 12) & 0x3;
     uint8_t dst_mode = (opcode >> 6) & 0x7;
@@ -866,8 +896,12 @@ int jit_translate_sub(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_wo
     return 0;
 }
 
-int jit_translate_subq(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+int jit_translate_subq(jit_translate_context_t *tctx)
 {
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
     /* SUBQ: #data, EA - similar to ADDQ */
     int data = (opcode >> 9) & 0x7;
     if (data == 0) data = 8;
@@ -892,8 +926,12 @@ int jit_translate_subq(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_w
     return 0;
 }
 
-int jit_translate_cmp(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+int jit_translate_cmp(jit_translate_context_t *tctx)
 {
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
     /* CMP: 1011 size(2) 00 dst_reg(3) src_mode(3) src_reg(3) */
     uint8_t size = (opcode >> 12) & 0x3;
     uint8_t dst_reg = (opcode >> 9) & 0x7;
@@ -953,8 +991,12 @@ int jit_translate_cmp(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_wo
     return 0;
 }
 
-int jit_translate_logic(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+int jit_translate_logic(jit_translate_context_t *tctx)
 {
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
     /* AND/OR/EOR: 1100/1000/1100 size(2) dst_mode(3) dst_reg(3) src_mode(3) src_reg(3) */
     uint8_t op = (opcode >> 13) & 0x7; /* 0=AND, 1=OR, 2=EOR */
     uint8_t dst_mode = (opcode >> 6) & 0x7;
@@ -995,8 +1037,12 @@ int jit_translate_logic(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_
     return 0;
 }
 
-int jit_translate_branch(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+int jit_translate_branch(jit_translate_context_t *tctx)
 {
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
     /* BCC/BRA: 0110 cond(4) displacement */
     uint8_t cond = (opcode >> 8) & 0x0F;
     int32_t disp;
@@ -1169,8 +1215,12 @@ int jit_translate_branch(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext
     return 0;
 }
 
-int jit_translate_bsr(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+int jit_translate_bsr(jit_translate_context_t *tctx)
 {
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
     /* BSR: Branch to subroutine - push return address, then branch */
     int32_t disp;
     int instr_size;
@@ -1212,8 +1262,12 @@ int jit_translate_bsr(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_wo
     return 0;
 }
 
-int jit_translate_rts(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+int jit_translate_rts(jit_translate_context_t *tctx)
 {
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
     /* RTS: Return from subroutine - pop PC from stack */
     /* Load A7 (SP) */
     jit_emit_load_an(ctx, AARCH64_R0, 7);
@@ -1225,7 +1279,8 @@ int jit_translate_rts(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_wo
     jit_emit_store_pc(ctx, AARCH64_R1);
     
     /* Increment SP by 4 */
-    jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R0, AARCH64_R0, 4));
+    jit_emit_mov64(ctx, AARCH64_R2, 4);
+    jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R0, AARCH64_R0, AARCH64_R2));
     jit_emit_store_an(ctx, AARCH64_R0, 7);
     
     /* Increment PC by 2 */
@@ -1235,237 +1290,259 @@ int jit_translate_rts(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_wo
     return 0;
 }
 
-int jit_translate_jsr(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+static void jit_movec_load_gpr(jit_emit_context_t *ctx, uint8_t reg_field, uint8_t dst)
 {
-    /* JSR: Jump to subroutine - TODO: implement */
-    (void)ctx; (void)opcode; (void)ext_words; (void)ext_count;
-    return -1;
+    if (reg_field < 8) {
+        jit_emit_load_dn(ctx, dst, reg_field);
+    } else {
+        jit_emit_load_an(ctx, dst, reg_field & 7);
+    }
 }
 
-int jit_translate_jmp(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+static void jit_movec_store_gpr(jit_emit_context_t *ctx, uint8_t reg_field, uint8_t src)
 {
-    /* JMP: Jump - TODO: implement */
-    (void)ctx; (void)opcode; (void)ext_words; (void)ext_count;
-    return -1;
+    if (reg_field < 8) {
+        jit_emit_store_dn(ctx, src, reg_field);
+    } else {
+        jit_emit_store_an(ctx, src, reg_field & 7);
+    }
 }
 
-int jit_translate_movec(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+static uint32_t jit_translate_current_pc(const jit_translate_context_t *tctx)
 {
-    /* MOVEC: Move to/from Control Register (68010+)
-     * Format: 0100111001111010/1011 (0x4E7A/0x4E7B)
-     * Extension word format:
-     *   Bit 15: Direction (0 = to CReg, 1 = from CReg)
-     *   Bit 14: Register type (0 = Dn, 1 = An)
-     *   Bits 13-12: Register number (bits 1-0)
-     *   Bits 11-0: Control register ID
-     * 
-     * 68040 Cache/MMU instructions (share opcode space):
-     *   CPUSHA, CPUSHP, CPUSH (Cache push)
-     *   PFLUSHA, PFLUSHP, PFLUSH (Cache flush)
-     *   These have extension word bits [15:12] = 1111 (0xF)
-     * 
-     * Common control registers:
-     * 0x800 = SFC (Source Function Code)
-     * 0x801 = DFC (Destination Function Code)
-     * 0x804 = VBR (Vector Base Register)
-     * 0x805 = CACR (Cache Control Register - 68020+)
-     * 0x808 = PCR (Processor Control Register - 68040)
-     * 0x80C = ITT0 (Instruction Translation Table 0 - 68040)
-     * 0x80D = ITT1 (Instruction Translation Table 1 - 68040)
-     * 0x80E = DTT0 (Data Translation Table 0 - 68040)
-     * 0x80F = DTT1 (Data Translation Table 1 - 68040)
-     */
-    (void)opcode; (void)ext_count;
-    
-    uint16_t ext = ext_words[0];
-    uint8_t reg_type = (ext >> 15) & 1;      /* 0 = to CReg, 1 = from CReg */
-    uint8_t addr_reg = (ext >> 14) & 1;      /* 0 = Dn, 1 = An */
-    uint8_t reg_num = (ext >> 12) & 7;       /* Register number */
-    uint16_t creg = ext & 0x0FFF;            /* Control register ID */
-    
-    /* Log MOVEC for debugging */
-    const char *dir = reg_type ? "from" : "to";
-    const char *regtype = addr_reg ? "A" : "D";
-    const char *creg_name = "UNKNOWN";
-    
-    switch (creg) {
-        case 0x800: creg_name = "SFC"; break;
-        case 0x801: creg_name = "DFC"; break;
-        case 0x804: creg_name = "VBR"; break;
-        case 0x805: creg_name = "CACR"; break;
-        case 0x808: creg_name = "PCR"; break;
-        case 0x80C: creg_name = "ITT0"; break;
-        case 0x80D: creg_name = "ITT1"; break;
-        case 0x80E: creg_name = "DTT0"; break;
-        case 0x80F: creg_name = "DTT1"; break;
-        case 0x840: creg_name = "TC"; break;
-        case 0x850: creg_name = "AC0"; break;
-        case 0x851: creg_name = "AC1"; break;
-        case 0x852: creg_name = "AC2"; break;
-        case 0x853: creg_name = "AC3"; break;
+    uint32_t pc = tctx->block->start_pc;
+    uint16_t i;
+    for (i = 0; i < tctx->instruction_index; i++) {
+        pc += 2 + (uint32_t)(tctx->block->instructions[i].ext_count * 2);
     }
-    
-    LOG_INFO("[JIT-MOVEC] opcode=0x%04X ext=0x%04X %s %s%d %s PC=0x%08X\n",
-             opcode, ext, dir, regtype, reg_num, creg_name, 0);
-    
-    /* Check for 68040 cache/MMU instructions (ext bits [15:12] = 0xF) */
-    if ((ext & 0xF000) == 0xF000) {
-        /* PFLUSHA, PFLUSHP, PFLUSH, CPUSHA, etc. - NOP (we don't emulate cache) */
-        LOG_INFO("[JIT-PFLUSH] PFLUSHA/CPUSHA detected - NOP\n");
-        return 0;
+    return pc;
+}
+
+int jit_translate_jsr(jit_translate_context_t *tctx)
+{
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
+    uint8_t ea_mode = (opcode >> 3) & 0x7;
+    uint8_t ea_reg = opcode & 0x7;
+    uint32_t return_pc = jit_translate_current_pc(tctx) + 2 + (uint32_t)(ext_count * 2);
+
+    /* Compute effective address into R2. JSR/JMP target is EA itself, not [EA]. */
+    if (ea_mode == 2) {
+        jit_emit_load_an(ctx, AARCH64_R2, ea_reg); /* (An) */
+    } else if (ea_mode == 5 && ext_count >= 1) {
+        jit_emit_load_an(ctx, AARCH64_R2, ea_reg); /* (d16,An) */
+        jit_emit_mov64(ctx, AARCH64_R3, (uint64_t)(int32_t)(int16_t)ext_words[0]);
+        jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R2, AARCH64_R2, AARCH64_R3));
+    } else if (ea_mode == 7 && ea_reg == 0 && ext_count >= 1) {
+        jit_emit_mov64(ctx, AARCH64_R2, (uint64_t)(int32_t)(int16_t)ext_words[0]); /* (xxx).W */
+    } else if (ea_mode == 7 && ea_reg == 1 && ext_count >= 2) {
+        uint32_t abs_l = ((uint32_t)ext_words[0] << 16) | ext_words[1]; /* (xxx).L */
+        jit_emit_mov64(ctx, AARCH64_R2, abs_l);
+    } else {
+        return -1;
     }
-    
-    /* VBR (0x804) - Vector Base Register */
-    if (creg == 0x804) {
-        if (reg_type == 0) {
-            /* MOVEC Rn, VBR - store Rn to VBR */
-            if (addr_reg) {
-                jit_emit_load_an(ctx, AARCH64_R0, reg_num);
-            } else {
-                jit_emit_load_dn(ctx, AARCH64_R0, reg_num);
-            }
-            /* VBR is at offset 256 in m68ki_cpu */
-            jit_emit_store_cpu_reg(ctx, AARCH64_R0, 256);
-        } else {
-            /* MOVEC VBR, Rn - load VBR to Rn */
-            jit_emit_load_cpu_reg(ctx, AARCH64_R0, 256);
-            if (addr_reg) {
-                jit_emit_store_an(ctx, AARCH64_R0, reg_num);
-            } else {
-                jit_emit_store_dn(ctx, AARCH64_R0, reg_num);
-            }
-        }
-        return 0;
-    }
-    
-    /* SFC/DFC (0x800/0x801) - Function Code registers */
-    if (creg == 0x800 || creg == 0x801) {
-        if (reg_type == 1) {
-            /* MOVEC SFC/DFC, Rn - return 0 */
-            jit_emit_mov64(ctx, AARCH64_R0, 0);
-            if (addr_reg) {
-                jit_emit_store_an(ctx, AARCH64_R0, reg_num);
-            } else {
-                jit_emit_store_dn(ctx, AARCH64_R0, reg_num);
-            }
-        }
-        return 0;
-    }
-    
-    /* CACR (0x805) - Cache Control Register (68020+) */
-    if (creg == 0x805) {
-        if (reg_type == 0) {
-            /* MOVEC Rn, CACR - ignore (we don't emulate cache) */
-        } else {
-            /* MOVEC CACR, Rn - return 0 (no cache) */
-            jit_emit_mov64(ctx, AARCH64_R0, 0);
-            if (addr_reg) {
-                jit_emit_store_an(ctx, AARCH64_R0, reg_num);
-            } else {
-                jit_emit_store_dn(ctx, AARCH64_R0, reg_num);
-            }
-        }
-        return 0;
-    }
-    
-    /* PCR (0x808) - Processor Control Register (68040) */
-    if (creg == 0x808) {
-        if (reg_type == 1) {
-            /* MOVEC PCR, Rn - return CPU ID */
-            jit_emit_mov64(ctx, AARCH64_R0, 0x0400);  /* 68040 ID */
-            if (addr_reg) {
-                jit_emit_store_an(ctx, AARCH64_R0, reg_num);
-            } else {
-                jit_emit_store_dn(ctx, AARCH64_R0, reg_num);
-            }
-        }
-        return 0;
-    }
-    
-    /* ITT0/ITT1/DTT0/DTT1 (0x80C-0x80F) - Translation tables (68040 MMU) */
-    if (creg >= 0x80C && creg <= 0x80F) {
-        if (reg_type == 0) {
-            /* MOVEC Rn, ITT/DTT - store Rn to MMU register */
-            if (addr_reg) {
-                jit_emit_load_an(ctx, AARCH64_R0, reg_num);
-            } else {
-                jit_emit_load_dn(ctx, AARCH64_R0, reg_num);
-            }
-            if (creg == 0x80C) jit_emit_store_itt0(ctx, AARCH64_R0);
-            else if (creg == 0x80D) jit_emit_store_itt1(ctx, AARCH64_R0);
-            else if (creg == 0x80E) jit_emit_store_dtt0(ctx, AARCH64_R0);
-            else if (creg == 0x80F) jit_emit_store_dtt1(ctx, AARCH64_R0);
-        } else {
-            /* MOVEC ITT/DTT, Rn - load from MMU register */
-            if (creg == 0x80C) jit_emit_load_itt0(ctx, AARCH64_R0);
-            else if (creg == 0x80D) jit_emit_load_itt1(ctx, AARCH64_R0);
-            else if (creg == 0x80E) jit_emit_load_dtt0(ctx, AARCH64_R0);
-            else if (creg == 0x80F) jit_emit_load_dtt1(ctx, AARCH64_R0);
-            if (addr_reg) {
-                jit_emit_store_an(ctx, AARCH64_R0, reg_num);
-            } else {
-                jit_emit_store_dn(ctx, AARCH64_R0, reg_num);
-            }
-        }
-        return 0;
-    }
-    
-    /* TC (0x840) - Translation Control (68040 MMU) */
-    if (creg == 0x840) {
-        if (reg_type == 0) {
-            /* MOVEC Rn, TC - store Rn to TC register */
-            if (addr_reg) {
-                jit_emit_load_an(ctx, AARCH64_R0, reg_num);
-            } else {
-                jit_emit_load_dn(ctx, AARCH64_R0, reg_num);
-            }
-            jit_emit_store_tc(ctx, AARCH64_R0);
-        } else {
-            /* MOVEC TC, Rn - load from TC register */
-            jit_emit_load_tc(ctx, AARCH64_R0);
-            if (addr_reg) {
-                jit_emit_store_an(ctx, AARCH64_R0, reg_num);
-            } else {
-                jit_emit_store_dn(ctx, AARCH64_R0, reg_num);
-            }
-        }
-        return 0;
-    }
-    
-    /* AC0-AC3 (0x850-0x853) - Access Control (68040 MMU) */
-    if (creg >= 0x850 && creg <= 0x853) {
-        int acr_num = creg - 0x850;  /* AC0=0, AC1=1, AC2=2, AC3=3 */
-        
-        if (reg_type == 0) {
-            /* MOVEC Rn, ACn - store Rn to ACR register */
-            if (addr_reg) {
-                jit_emit_load_an(ctx, AARCH64_R0, reg_num);
-            } else {
-                jit_emit_load_dn(ctx, AARCH64_R0, reg_num);
-            }
-            jit_emit_store_acr(ctx, AARCH64_R0, acr_num);
-        } else {
-            /* MOVEC ACn, Rn - load from ACR register */
-            jit_emit_load_acr(ctx, AARCH64_R0, acr_num);
-            if (addr_reg) {
-                jit_emit_store_an(ctx, AARCH64_R0, reg_num);
-            } else {
-                jit_emit_store_dn(ctx, AARCH64_R0, reg_num);
-            }
-        }
-        return 0;
-    }
-    
-    /* Unknown control register - NOP for safety */
-    
-    /* Increment PC */
-    jit_emit_inc_pc(ctx, 2 + ext_count * 2);
-    
+
+    /* Push return PC on supervisor stack (A7). */
+    jit_emit_load_an(ctx, AARCH64_R0, 7);
+    jit_emit_mov64(ctx, AARCH64_R1, 4);
+    jit_emit_dword(ctx, AARCH64_SUB(AARCH64_R0, AARCH64_R0, AARCH64_R1));
+    jit_emit_mov64(ctx, AARCH64_R1, return_pc);
+    jit_emit_dword(ctx, AARCH64_STR_W(AARCH64_R1, AARCH64_R0, 0));
+    jit_emit_store_an(ctx, AARCH64_R0, 7);
+
+    /* PC = EA (no dereference). */
+    jit_emit_store_pc(ctx, AARCH64_R2);
     return 0;
 }
 
-int jit_translate_extb(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+int jit_translate_jmp(jit_translate_context_t *tctx)
 {
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
+    uint8_t ea_mode = (opcode >> 3) & 0x7;
+    uint8_t ea_reg = opcode & 0x7;
+
+    /* Compute effective address into R2. JMP target is EA itself, not [EA]. */
+    if (ea_mode == 2) {
+        jit_emit_load_an(ctx, AARCH64_R2, ea_reg); /* (An) */
+    } else if (ea_mode == 5 && ext_count >= 1) {
+        jit_emit_load_an(ctx, AARCH64_R2, ea_reg); /* (d16,An) */
+        jit_emit_mov64(ctx, AARCH64_R3, (uint64_t)(int32_t)(int16_t)ext_words[0]);
+        jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R2, AARCH64_R2, AARCH64_R3));
+    } else if (ea_mode == 7 && ea_reg == 0 && ext_count >= 1) {
+        jit_emit_mov64(ctx, AARCH64_R2, (uint64_t)(int32_t)(int16_t)ext_words[0]); /* (xxx).W */
+    } else if (ea_mode == 7 && ea_reg == 1 && ext_count >= 2) {
+        uint32_t abs_l = ((uint32_t)ext_words[0] << 16) | ext_words[1]; /* (xxx).L */
+        jit_emit_mov64(ctx, AARCH64_R2, abs_l);
+    } else {
+        return -1;
+    }
+
+    /* PC = EA (no dereference). */
+    jit_emit_store_pc(ctx, AARCH64_R2);
+    return 0;
+}
+
+int jit_translate_movec(jit_translate_context_t *tctx)
+{
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
+    uint16_t ext;
+    uint8_t reg_field;
+    uint16_t creg;
+    int rn_to_cr;
+    int handled = 1;
+
+    if (ext_count < 1) {
+        return -1;
+    }
+
+    ext = ext_words[0];
+
+    /* 68040 cache/MMU ops sharing MOVEC space (PFLUSH/CPUSH class). */
+    if ((ext & 0xF000) == 0xF000) {
+        jit_emit_inc_pc(ctx, 4);
+        return 0;
+    }
+
+    /* MOVEC decode (matches Musashi): reg field in bits 15..12, control reg in bits 11..0. */
+    reg_field = (uint8_t)((ext >> 12) & 0x0F); /* 0..7 Dn, 8..15 An */
+    creg = ext & 0x0FFF;
+    rn_to_cr = (opcode & 1) ? 1 : 0;          /* 4E7B: Rn->CR, 4E7A: CR->Rn */
+
+    if (!rn_to_cr) {
+        /* MOVEC CR,Rn */
+        switch (creg) {
+        case 0x000: /* SFC */
+        case 0x001: /* DFC */
+            jit_emit_mov64(ctx, AARCH64_R0, 0);
+            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
+            break;
+        case 0x800: /* USP */
+            jit_emit_load_an(ctx, AARCH64_R0, 7);
+            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
+            break;
+        case 0x801: /* VBR */
+            jit_emit_load_cpu_reg(ctx, AARCH64_R0, 256);
+            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
+            break;
+        case 0x802: /* CAAR (020/030) */
+            jit_emit_mov64(ctx, AARCH64_R0, 0);
+            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
+            break;
+        case 0x803: /* MSP */
+        case 0x804: /* ISP */
+            jit_emit_load_an(ctx, AARCH64_R0, 7);
+            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
+            break;
+        case 0x002: /* CACR */
+            jit_emit_mov64(ctx, AARCH64_R0, 0);
+            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
+            break;
+        case 0x808: /* PCR */
+            jit_emit_mov64(ctx, AARCH64_R0, 0x04310000u);
+            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
+            break;
+        case 0x003: /* TC */
+            jit_emit_load_tc(ctx, AARCH64_R0);
+            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
+            break;
+        case 0x004: /* ITT0 */
+            jit_emit_load_itt0(ctx, AARCH64_R0);
+            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
+            break;
+        case 0x005: /* ITT1 */
+            jit_emit_load_itt1(ctx, AARCH64_R0);
+            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
+            break;
+        case 0x006: /* DTT0 */
+            jit_emit_load_dtt0(ctx, AARCH64_R0);
+            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
+            break;
+        case 0x007: /* DTT1 */
+            jit_emit_load_dtt1(ctx, AARCH64_R0);
+            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
+            break;
+        case 0x805: /* MMUSR */
+        case 0x806: /* URP */
+        case 0x807: /* SRP */
+            jit_emit_mov64(ctx, AARCH64_R0, 0);
+            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
+            break;
+        default:
+            handled = 0;
+            break;
+        }
+    } else {
+        /* MOVEC Rn,CR */
+        jit_movec_load_gpr(ctx, reg_field, AARCH64_R0);
+        switch (creg) {
+        case 0x000: /* SFC */
+        case 0x001: /* DFC */
+            /* Accepted, no side effect in JIT path. */
+            break;
+        case 0x800: /* USP */
+            jit_emit_store_an(ctx, AARCH64_R0, 7);
+            break;
+        case 0x801: /* VBR */
+            jit_emit_store_cpu_reg(ctx, AARCH64_R0, 256);
+            break;
+        case 0x802: /* CAAR (020/030) */
+            /* Accepted, no CAAR model in JIT path. */
+            break;
+        case 0x803: /* MSP */
+        case 0x804: /* ISP */
+            jit_emit_store_an(ctx, AARCH64_R0, 7);
+            break;
+        case 0x002: /* CACR */
+            /* Accepted, cache model is not implemented in JIT path. */
+            break;
+        case 0x003: /* TC */
+            jit_emit_store_tc(ctx, AARCH64_R0);
+            break;
+        case 0x004: /* ITT0 */
+            jit_emit_store_itt0(ctx, AARCH64_R0);
+            break;
+        case 0x005: /* ITT1 */
+            jit_emit_store_itt1(ctx, AARCH64_R0);
+            break;
+        case 0x006: /* DTT0 */
+            jit_emit_store_dtt0(ctx, AARCH64_R0);
+            break;
+        case 0x007: /* DTT1 */
+            jit_emit_store_dtt1(ctx, AARCH64_R0);
+            break;
+        case 0x805: /* MMUSR */
+        case 0x806: /* URP */
+        case 0x807: /* SRP */
+            /* Accepted, MMU root/sr registers are not modeled in JIT path. */
+            break;
+        default:
+            handled = 0;
+            break;
+        }
+    }
+
+    if (!handled) {
+        return -1;
+    }
+
+    jit_emit_inc_pc(ctx, 4);
+    return 0;
+}
+
+int jit_translate_extb(jit_translate_context_t *tctx)
+{
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
     /* EXTB: Sign Extend Byte to Long (68020+)
      * Format: 0100100011000nnn (0x49C0-0x49C7)
      * Extends bit 7 of Dn to fill all 32 bits
@@ -1490,8 +1567,12 @@ int jit_translate_extb(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_w
     return 0;
 }
 
-int jit_translate_lea(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+int jit_translate_lea(jit_translate_context_t *tctx)
 {
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
     /* LEA: Load Effective Address
      * Format: 0100 1111 MM MMM RRR (for xxx.L,An)
      *       or 0100 dd01 MM MMM RRR (for d16(An),An) etc.
@@ -1559,8 +1640,12 @@ int jit_translate_lea(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_wo
     return 0;
 }
 
-int jit_translate_misc(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count)
+int jit_translate_misc(jit_translate_context_t *tctx)
 {
+    jit_emit_context_t *ctx = tctx->emit;
+    uint16_t opcode = tctx->opcode;
+    uint16_t *ext_words = tctx->ext_words;
+    int ext_count = tctx->ext_count;
     /* DBcc: 0101 cond(4) 11001 Dn (4 bytes total) */
     if ((opcode & 0xF0F8) == 0x50C8) {
         uint8_t cond = (opcode >> 8) & 0x0F;
