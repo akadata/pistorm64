@@ -176,8 +176,15 @@ DECODE_TABLE = [
     (0xF100, 0x0100, FAMILY_MOVEP, EA_IMM, EA_AN, 1, 0, 0, 0),
     (0xF100, 0x0180, FAMILY_MOVEP, EA_AN, EA_IMM, 1, 0, 0, 0),
     
-    # General MOVE: 0x1000-0x3FFF (but not MOVEA which is 0x2000-0x2FFF with dest=An)
-    (0xC000, 0x1000, FAMILY_MOVE, EA_NONE, EA_NONE, 0, 0, CCR_N|CCR_Z|CCR_V, 0),
+    # General MOVE: 0x1000-0x3FFF (bits 15-12 = 0001, 0010, 0011)
+    # MOVE to Dn: 0001 size(2) MMM(3) RRR(3) = 0x1xxx
+    # MOVE to An: 0011 size(2) MMM(3) RRR(3) = 0x3xxx  
+    # But we need separate patterns because mask matching is (op & mask) == match
+    # Pattern for 0x1xxx: (0xF000, 0x1000) matches 0x1000-0x1FFF
+    (0xF000, 0x1000, FAMILY_MOVE, EA_NONE, EA_NONE, 0, 0, CCR_N|CCR_Z|CCR_V, 0),
+    # Pattern for 0x2xxx: (0xF000, 0x2000) matches 0x2000-0x2FFF (but 0x2000-0x2FFF is MOVEA which we handle separately)
+    # Pattern for 0x3xxx: (0xF000, 0x3000) matches 0x3000-0x3FFF
+    (0xF000, 0x3000, FAMILY_MOVE, EA_NONE, EA_NONE, 0, 0, CCR_N|CCR_Z|CCR_V, 0),
     
     # MOVEA: 0x2000-0x2FFF with destination EA=An (bits 15-12 = 001x)
     # MOVEA.W: 0010 0SSS MMMRRR, MOVEA.L: 0010 1SSS MMMRRR
@@ -189,9 +196,29 @@ DECODE_TABLE = [
     # BSR: 0x6100-0x61FF
     (0xFF00, 0x6100, FAMILY_BSR, EA_NONE, EA_NONE, 1, 0, 0, 0b101),
     # BRA: 0x6000-0x60FF (unconditional, cccc=0000)
-    (0xFFF0, 0x6000, FAMILY_BRA, EA_NONE, EA_NONE, 1, 0, 0, 0b101),
-    # Bcc: 0x6000-0x60FF (conditional, cccc=0001-1111)
-    (0xFFF0, 0x6010, FAMILY_BCC, EA_NONE, EA_NONE, 1, CCR_ALL, 0, 0b101),
+    (0xFF00, 0x6000, FAMILY_BRA, EA_NONE, EA_NONE, 1, 0, 0, 0b101),
+    # Bcc: 0x6xxx where bits 11-8 != 0000 and != 0001 (i.e., 0010-1111)
+    # Need multiple patterns since we can't do "not equal" matching
+    # BCC (BEQ): 0x6200-0x62FF
+    (0xFF00, 0x6200, FAMILY_BCC, EA_NONE, EA_NONE, 1, CCR_ALL, 0, 0b101),
+    # BCC (BNE): 0x6300-0x63FF
+    (0xFF00, 0x6300, FAMILY_BCC, EA_NONE, EA_NONE, 1, CCR_ALL, 0, 0b101),
+    # BCC (BCC/BHS): 0x6400-0x64FF
+    (0xFF00, 0x6400, FAMILY_BCC, EA_NONE, EA_NONE, 1, CCR_ALL, 0, 0b101),
+    # BCC (BCS/BLO): 0x6500-0x65FF
+    (0xFF00, 0x6500, FAMILY_BCC, EA_NONE, EA_NONE, 1, CCR_ALL, 0, 0b101),
+    # BCC (BPL): 0x6600-0x66FF
+    (0xFF00, 0x6600, FAMILY_BCC, EA_NONE, EA_NONE, 1, CCR_ALL, 0, 0b101),
+    # BCC (BMI): 0x6700-0x67FF
+    (0xFF00, 0x6700, FAMILY_BCC, EA_NONE, EA_NONE, 1, CCR_ALL, 0, 0b101),
+    # BCC (BGE): 0x6800-0x68FF
+    (0xFF00, 0x6800, FAMILY_BCC, EA_NONE, EA_NONE, 1, CCR_ALL, 0, 0b101),
+    # BCC (BLT): 0x6900-0x69FF
+    (0xFF00, 0x6900, FAMILY_BCC, EA_NONE, EA_NONE, 1, CCR_ALL, 0, 0b101),
+    # BCC (BGT): 0x6A00-0x6AFF
+    (0xFF00, 0x6A00, FAMILY_BCC, EA_NONE, EA_NONE, 1, CCR_ALL, 0, 0b101),
+    # BCC (BLE): 0x6B00-0x6BFF
+    (0xFF00, 0x6B00, FAMILY_BCC, EA_NONE, EA_NONE, 1, CCR_ALL, 0, 0b101),
     
     # DBcc: 0x54C8-0x54FF (specific form - must come BEFORE general SCC)
     (0xFFF8, 0x54C8, FAMILY_DBCC, EA_IMM, EA_NONE, 1, CCR_ALL, 0, 0b101),
@@ -242,6 +269,13 @@ DECODE_TABLE = [
     (0xFFF0, 0xB000, FAMILY_CMP, EA_NONE, EA_DN, 0, 0, CCR_ALL, 0),
     (0xFFF0, 0xB100, FAMILY_CMP, EA_NONE, EA_DN, 0, 0, CCR_ALL, 0),
     (0xFFF0, 0xB200, FAMILY_CMP, EA_NONE, EA_DN, 0, 0, CCR_ALL, 0),
+    # CMPM: 0xB1xx-0xB3xx with bits 5-3 = 1 (0xB1C8-0xB3C8 range)
+    # CMPM.B (Ay)+,(Ax)+: 1011 0001 10001xxx (0xB1C8-0xB1CF)
+    (0xFFF8, 0xB1C8, FAMILY_CMPM, EA_NONE, EA_NONE, 0, 0, CCR_ALL, 0),
+    # CMPM.W (Ay)+,(Ax)+: 1011 0001 10001xxx (0xB1C8-0xB1CF)
+    (0xFFF8, 0xB1C8, FAMILY_CMPM, EA_NONE, EA_NONE, 0, 0, CCR_ALL, 0),
+    # CMPM.L (Ay)+,(Ax)+: 1011 0011 10001xxx (0xB3C8-0xB3CF)
+    (0xFFF8, 0xB3C8, FAMILY_CMPM, EA_NONE, EA_NONE, 0, 0, CCR_ALL, 0),
     # AND: 0xC000-0xCFFF
     (0xF100, 0xC000, FAMILY_AND, EA_NONE, EA_DN, 0, 0, CCR_ALL, 0),
     (0xF100, 0xC100, FAMILY_AND, EA_NONE, EA_NONE, 0, 0, CCR_ALL, 0),
@@ -320,8 +354,45 @@ DECODE_TABLE = [
     (0xFFF8, 0x49C0, FAMILY_EXTB, EA_NONE, EA_DN, 0, 0, CCR_N|CCR_Z|CCR_V, 0),
     # PEA: 0x4840-0x487F
     (0xFFC0, 0x4840, FAMILY_PEA, EA_NONE, EA_AN, 1, 0, 0, 0),
-    # LEA: 0x4F00-0x4FFF
+    # LEA: 0x41xx, 0x45xx, 0x49xx, 0x4Dxx, 0x4Fxx (bits 11-8 = 1,5,9,D,F)
+    # LEA d16(An),An: 0100 0001 MMMRRR (0x41xx)
+    (0xF100, 0x4100, FAMILY_LEA, EA_NONE, EA_AN, 1, 0, 0, 0),
+    # LEA d16(An),An: 0100 0101 MMMRRR (0x45xx)
+    (0xF100, 0x4500, FAMILY_LEA, EA_NONE, EA_AN, 1, 0, 0, 0),
+    # LEA d16(An),An: 0100 1001 MMMRRR (0x49xx)
+    (0xF100, 0x4900, FAMILY_LEA, EA_NONE, EA_AN, 1, 0, 0, 0),
+    # LEA d16(An),An: 0100 1101 MMMRRR (0x4Dxx)
+    (0xF100, 0x4D00, FAMILY_LEA, EA_NONE, EA_AN, 1, 0, 0, 0),
+    # LEA xxx.L,An: 0100 1111 MMMRRR (0x4Fxx)
     (0xF100, 0x4F00, FAMILY_LEA, EA_NONE, EA_AN, 1, 0, 0, 0),
+    # MOVEM: 0x48xx and 0x4Cxx - multiple patterns for different EA modes
+    # MOVEM.L Dn,ea: 0100 1000 MM MMMRRR where MM = EA mode
+    # MOVEM.L ea,Dn: 0100 1100 MM MMMRRR where MM = EA mode
+    # Common EA modes: (An) = 010, (An)+ = 011, -(An) = 100, d16(An) = 110
+    # MOVEM.L Dn,(An): 0x4880-0x48BF
+    (0xFF80, 0x4880, FAMILY_MOVEM, EA_NONE, EA_NONE, 2, 0, 0, 0),
+    # MOVEM.L (An),Dn: 0x4C80-0x4CBF  
+    (0xFF80, 0x4C80, FAMILY_MOVEM, EA_NONE, EA_NONE, 2, 0, 0, 0),
+    # MOVEM.L Dn,(An)+: 0x48C0-0x48FF
+    (0xFF80, 0x48C0, FAMILY_MOVEM, EA_NONE, EA_NONE, 2, 0, 0, 0),
+    # MOVEM.L (An)+,Dn: 0x4CC0-0x4CFF
+    (0xFF80, 0x4CC0, FAMILY_MOVEM, EA_NONE, EA_NONE, 2, 0, 0, 0),
+    # MOVEM.L Dn,-(An): 0x4900-0x493F
+    (0xFFC0, 0x4900, FAMILY_MOVEM, EA_NONE, EA_NONE, 2, 0, 0, 0),
+    # MOVEM.L -(An),Dn: 0x4D00-0x4D3F
+    (0xFFC0, 0x4D00, FAMILY_MOVEM, EA_NONE, EA_NONE, 2, 0, 0, 0),
+    # MOVEM.L Dn,d16(An): 0x4940-0x497F
+    (0xFFC0, 0x4940, FAMILY_MOVEM, EA_NONE, EA_NONE, 2, 0, 0, 0),
+    # MOVEM.L d16(An),Dn: 0x4D40-0x4D7F
+    (0xFFC0, 0x4D40, FAMILY_MOVEM, EA_NONE, EA_NONE, 2, 0, 0, 0),
+    # MOVEM.L Dn,d16(PC): 0x4980-0x49BF
+    (0xFFC0, 0x4980, FAMILY_MOVEM, EA_NONE, EA_NONE, 2, 0, 0, 0),
+    # MOVEM.L d16(PC),Dn: 0x4D80-0x4DBF
+    (0xFFC0, 0x4D80, FAMILY_MOVEM, EA_NONE, EA_NONE, 2, 0, 0, 0),
+    # MOVEM.L Dn,xxx.W: 0x49C0-0x49FF
+    (0xFFC0, 0x49C0, FAMILY_MOVEM, EA_NONE, EA_NONE, 2, 0, 0, 0),
+    # MOVEM.L xxx.W,Dn: 0x4DC0-0x4DFF
+    (0xFFC0, 0x4DC0, FAMILY_MOVEM, EA_NONE, EA_NONE, 2, 0, 0, 0),
     # CHK: 0x4080-0x40BF
     (0xF1C0, 0x4080, FAMILY_CHK, EA_NONE, EA_DN, 0, 0, 0, 0b010),
     

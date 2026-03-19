@@ -14,6 +14,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <signal.h>
+#include <ucontext.h>
 
 /* Global JIT context */
 jit_context_t g_jit = {0};
@@ -21,6 +23,44 @@ static const char *g_jit_last_compile_fail_reason = "unknown";
 static int g_jit_faststep_enabled = -1;
 static int g_jit_safe_interp_enabled = -1;
 static int g_jit_no_fallback_enabled = -1;
+
+/* Signal handler for illegal instruction (SIGILL) */
+static void jit_sigill_handler(int sig, siginfo_t *info, void *context)
+{
+    ucontext_t *uc = (ucontext_t *)context;
+    uint64_t fault_pc = uc->uc_mcontext.pc;
+    
+    fprintf(stderr, "\n\n!!! SIGILL - Illegal Instruction !!!\n");
+    fprintf(stderr, "Fault PC: 0x%016lX (AArch64)\n", fault_pc);
+    fprintf(stderr, "JIT enabled: %d\n", g_jit.enabled);
+    fprintf(stderr, "Safe interp: %d\n", g_jit_safe_interp_enabled);
+    fprintf(stderr, "Current 68k PC: 0x%08X\n", g_jit.current_pc);
+    
+    if (g_jit.cpu) {
+        fprintf(stderr, "\n68k CPU State:\n");
+        fprintf(stderr, "D0-D7: %08X %08X %08X %08X %08X %08X %08X %08X\n",
+                g_jit.cpu->dar[0], g_jit.cpu->dar[1], g_jit.cpu->dar[2], g_jit.cpu->dar[3],
+                g_jit.cpu->dar[4], g_jit.cpu->dar[5], g_jit.cpu->dar[6], g_jit.cpu->dar[7]);
+        fprintf(stderr, "A0-A7: %08X %08X %08X %08X %08X %08X %08X %08X\n",
+                g_jit.cpu->dar[8], g_jit.cpu->dar[9], g_jit.cpu->dar[10], g_jit.cpu->dar[11],
+                g_jit.cpu->dar[12], g_jit.cpu->dar[13], g_jit.cpu->dar[14], g_jit.cpu->dar[15]);
+        fprintf(stderr, "PC: %08X\n", g_jit.cpu->pc);
+    }
+    
+    fprintf(stderr, "\nThis is likely a JIT code generation bug.\n");
+    fprintf(stderr, "Use PISTORM_M68XK_SAFE_INTERP=1 for stable (slow) operation.\n");
+    
+    _exit(1);
+}
+
+static void jit_install_signal_handler(void)
+{
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_sigaction = jit_sigill_handler;
+    sa.sa_flags = SA_SIGINFO;
+    sigaction(SIGILL, &sa, NULL);
+}
 
 static int jit_faststep_enabled(void)
 {
@@ -44,7 +84,7 @@ static int jit_safe_interp_enabled(void)
     if (g_jit_safe_interp_enabled < 0) {
         const char *e = getenv("PISTORM_M68XK_SAFE_INTERP");
         /* Safety-first default: keep m68xkcpu in interpret-only mode unless explicitly disabled. */
-        g_jit_safe_interp_enabled = (!e || atoi(e) != 0) ? 1 : 0;
+        g_jit_safe_interp_enabled = (e && atoi(e) == 0) ? 0 : 1;
         if (g_jit_safe_interp_enabled) {
             if (e) {
                 LOG_INFO("[CPU] m68xkcpu safe interpret-only mode enabled via PISTORM_M68XK_SAFE_INTERP=1\n");
@@ -74,6 +114,20 @@ void jit_hard_fail(uint32_t pc, uint16_t opcode, const char *reason)
 {
     LOG_ERROR("[CPU] m68xkcpu HARD FAIL at PC=0x%08X: opcode=0x%04X reason=%s\n", pc, opcode, reason);
     LOG_ERROR("[CPU] m68xkcpu: Aborting due to unsupported instruction with NO_FALLBACK=1\n");
+    
+    /* Dump CPU state for debugging */
+    extern struct m68ki_cpu_core m68ki_cpu;
+    LOG_ERROR("[CPU] D0-D7: %08X %08X %08X %08X %08X %08X %08X %08X\n",
+              m68ki_cpu.dar[0], m68ki_cpu.dar[1], m68ki_cpu.dar[2], m68ki_cpu.dar[3],
+              m68ki_cpu.dar[4], m68ki_cpu.dar[5], m68ki_cpu.dar[6], m68ki_cpu.dar[7]);
+    LOG_ERROR("[CPU] A0-A7: %08X %08X %08X %08X %08X %08X %08X %08X\n",
+              m68ki_cpu.dar[8], m68ki_cpu.dar[9], m68ki_cpu.dar[10], m68ki_cpu.dar[11],
+              m68ki_cpu.dar[12], m68ki_cpu.dar[13], m68ki_cpu.dar[14], m68ki_cpu.dar[15]);
+    LOG_ERROR("[CPU] PC=%08X SR=%04X\n", m68ki_cpu.pc, 
+              (m68ki_cpu.s_flag << 13) | (m68ki_cpu.m_flag << 11) | (m68ki_cpu.int_mask << 8) |
+              ((m68ki_cpu.x_flag >> 4) << 4) | ((m68ki_cpu.n_flag >> 4) << 3) |
+              ((!m68ki_cpu.not_z_flag) << 2) | ((m68ki_cpu.v_flag >> 6) << 1) | (m68ki_cpu.c_flag >> 8));
+    
     abort();
 }
 
@@ -400,6 +454,9 @@ int jit_init(struct m68ki_cpu_core *cpu, size_t cache_size)
         return -1;
     }
 
+    /* Install SIGILL handler for debugging */
+    jit_install_signal_handler();
+    
     memset(&g_jit, 0, sizeof(g_jit));
     
     g_jit.cpu = cpu;
@@ -480,11 +537,17 @@ int jit_execute(uint32_t pc, int cycles)
         return -1;
     }
     
+    /* DEBUG: Log entry */
+    LOG_INFO("[JIT-EXEC-ENTRY] pc=0x%08X cycles=%d\n", pc, cycles);
+    
+    /* Sync PC to CPU struct */
+    g_jit.cpu->pc = pc;
     g_jit.current_pc = pc;
     
     /* Main execution loop */
     while (cycles_remaining > 0) {
-        /* Look up compiled block */
+        /* Look up compiled block - use PC from CPU struct for consistency */
+        pc = g_jit.cpu->pc;
         block = jit_cache_lookup(&g_jit, pc);
         
         if (block != NULL) {
@@ -513,10 +576,14 @@ int jit_execute(uint32_t pc, int cycles)
             g_jit.stats.blocks_executed++;
             
             /* Execute the compiled block */
-            uint32_t pc_before = pc;
+            uint32_t pc_before = g_jit.cpu->pc;
             int block_cycles = jit_block_execute(block, cycles_remaining);
             
-            if (block_cycles <= 0 || g_jit.current_pc == pc_before) {
+            /* Read updated PC from CPU struct after execution */
+            uint32_t pc_after = g_jit.cpu->pc;
+            g_jit.current_pc = pc_after;
+            
+            if (block_cycles <= 0 || pc_after == pc_before) {
                 /* Discard non-progress block and execute via interpreter fallback. */
                 g_jit.stats.fallback_count++;
                 jit_trace_fallback(&g_jit, pc_before, "non-progress cached block");
@@ -527,14 +594,14 @@ int jit_execute(uint32_t pc, int cycles)
                     break;
                 }
                 cycles_remaining -= block_cycles;
-                pc = g_jit.current_pc;
+                pc = g_jit.cpu->pc;
                 continue;
             }
             
             cycles_remaining -= block_cycles;
             
             /* Update PC after block execution */
-            pc = g_jit.current_pc;
+            pc = pc_after;
             
             /* Check if block ended with a branch/exception */
             if (block->ends_block) {
@@ -572,10 +639,14 @@ int jit_execute(uint32_t pc, int cycles)
                 /* Successfully compiled - execute it */
                 g_jit.stats.blocks_compiled++;
                 
-                uint32_t pc_before = pc;
+                uint32_t pc_before = g_jit.cpu->pc;
                 int block_cycles = jit_block_execute(block, cycles_remaining);
                 
-                if (block_cycles <= 0 || g_jit.current_pc == pc_before) {
+                /* Read updated PC from CPU struct after execution */
+                uint32_t pc_after = g_jit.cpu->pc;
+                g_jit.current_pc = pc_after;
+                
+                if (block_cycles <= 0 || pc_after == pc_before) {
                     /* Discard non-progress block and execute via interpreter fallback. */
                     g_jit.stats.fallback_count++;
                     jit_trace_fallback(&g_jit, pc_before, "non-progress compiled block");
@@ -586,12 +657,12 @@ int jit_execute(uint32_t pc, int cycles)
                         break;
                     }
                     cycles_remaining -= block_cycles;
-                    pc = g_jit.current_pc;
+                    pc = g_jit.cpu->pc;
                     continue;
                 }
                 
                 cycles_remaining -= block_cycles;
-                pc = g_jit.current_pc;
+                pc = pc_after;
             } else {
                 /* Compilation failed - try fast-step first, then interpreter fallback. */
                 int ran = jit_faststep_enabled() ? jit_try_fast_step(&g_jit, pc, cycles_remaining) : 0;
@@ -697,6 +768,9 @@ void jit_print_stats(void)
     printf("Fast-step count:      %u\n", g_jit.stats.fast_step_count);
     printf("Fallback count:       %u\n", g_jit.stats.fallback_count);
     printf("Cache invalidations:  %u\n", g_jit.stats.cache_invalidations);
+    printf("Interpret blocks:     %u (max %d)\n", 
+           g_jit.stats.interpret_blocks_count, JIT_MAX_INTERPRET_BLOCKS);
+    printf("Interpret evictions:  %u\n", g_jit.stats.interpret_blocks_evicted);
     printf("Cache bytes used:     %zu / %zu\n", 
            g_jit.stats.cache_bytes_used, g_jit.cache_size);
     printf("Cache bytes free:     %zu\n", g_jit.stats.cache_bytes_free);
@@ -730,11 +804,18 @@ jit_block_t *jit_compile_block(uint32_t pc)
     }
 
     if (jit_safe_interp_enabled()) {
+        /* Check interpret block limit to prevent unbounded growth */
+        if (!jit_cache_should_add_interpret_block(&g_jit)) {
+            /* Limit reached - evict an old interpret block */
+            jit_cache_evict_oldest_interpret_block(&g_jit);
+        }
+        
         block->flags |= JIT_BLOCK_INTERPRET_ONLY;
         block->instruction_count = 0;
         block->end_pc = pc;
         block->ends_block = 1;
         jit_cache_insert(&g_jit, block);
+        g_jit.stats.interpret_blocks_count++;
         g_jit_last_compile_fail_reason = NULL;
         return block;
     }

@@ -37,6 +37,10 @@ void jit_cache_insert(jit_context_t *jit, jit_block_t *block);
 /* Remove a block from the cache */
 void jit_cache_remove(jit_context_t *jit, jit_block_t *block);
 
+/* Interpret-only block management */
+int jit_cache_should_add_interpret_block(jit_context_t *jit);
+void jit_cache_evict_oldest_interpret_block(jit_context_t *jit);
+
 /* Get cache statistics */
 size_t jit_cache_used(jit_context_t *jit);
 size_t jit_cache_free_space(jit_context_t *jit);

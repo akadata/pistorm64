@@ -20,6 +20,7 @@ struct m68ki_cpu_core;
 #define JIT_MAX_BLOCKS          65536
 #define JIT_MAX_BLOCK_SIZE      4096                /* Max bytes per compiled block */
 #define JIT_HASH_SIZE           4096                /* Hash table size for block lookup */
+#define JIT_MAX_INTERPRET_BLOCKS  8192              /* Max interpret-only blocks to prevent unbounded growth */
 
 /* JIT statistics */
 typedef struct {
@@ -30,6 +31,8 @@ typedef struct {
     uint32_t fast_step_count;
     uint32_t fallback_count;
     uint32_t cache_invalidations;
+    uint32_t interpret_blocks_count;    /* Current count of interpret-only blocks */
+    uint32_t interpret_blocks_evicted;  /* Count of evicted interpret-only blocks */
     size_t cache_bytes_used;
     size_t cache_bytes_free;
 } jit_stats_t;

@@ -426,6 +426,16 @@ typedef uint32 uint64;
 #define REG_CACR         state->cacr
 #define REG_CAAR         state->caar
 #define REG_IR           state->ir
+/* 68040 MMU registers */
+#define REG_ITT0         state->mmu_itt0
+#define REG_ITT1         state->mmu_itt1
+#define REG_DTT0         state->mmu_dtt0
+#define REG_DTT1         state->mmu_dtt1
+#define REG_TC           state->mmu_tc
+#define REG_ACR0         state->mmu_acr0
+#define REG_ACR1         state->mmu_acr1
+#define REG_ACR2         state->mmu_acr2
+#define REG_ACR3         state->mmu_acr3
 
 #define REG_FP           state->fpr
 #define REG_FPCR         state->fpcr
@@ -1196,6 +1206,8 @@ static inline int m68ki_movec_reg_legal(m68ki_cpu_core *state, uint reg)
 	case 0x805: /* MMUSR */
 	case 0x806: /* URP */
 	case 0x807: /* SRP */
+		return CPU_TYPE_IS_040_PLUS(state->cpu_type);
+
 	default:
 		return 0;
 	}

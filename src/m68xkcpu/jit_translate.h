@@ -1,100 +1,39 @@
 /*
- * JIT Translator Header
+ * JIT Translator Interface - Unified Model
  * 
- * Interface for translating 68k instructions to intermediate representation.
+ * Conventions:
+ * - X19 holds pointer to m68ki_cpu state structure
+ * - Translators append to emit context (no buffer allocation)
+ * - Single block builder manages instruction_count and code_ptr
  */
 
 #ifndef JIT_TRANSLATE_H
 #define JIT_TRANSLATE_H
 
 #include <stdint.h>
-#include "jit.h"
-#include "jit_block.h"
+#include "jit_emit_aarch64.h"
 
-/* Translator context */
-typedef struct {
-    jit_context_t *jit;
-    jit_block_t *block;
-    
-    /* Current instruction state */
-    uint16_t opcode;
-    uint16_t ext_words[4];
-    int ext_count;
-    
-    /* EA decoding */
-    uint8_t src_ea_mode;
-    uint8_t src_ea_reg;
-    uint8_t dst_ea_mode;
-    uint8_t dst_ea_reg;
-    
-    /* Size being operated on */
-    uint8_t op_size;  /* 0=byte, 1=word, 2=long */
-    
-    /* Register allocations for this instruction */
-    uint8_t src_reg;
-    uint8_t dst_reg;
-} jit_translate_context_t;
+/* Translator function type - appends to emit context */
+typedef int (*jit_translator_fn)(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
 
-/* Initialize translator context */
-void jit_translate_init(jit_translate_context_t *ctx, 
-                        jit_context_t *jit, 
-                        jit_block_t *block);
-
-/* Decode effective address from opcode */
-int jit_translate_decode_ea(jit_translate_context_t *ctx, 
-                            uint16_t opcode, 
-                            int is_src);
-
-/* Read effective address value */
-int jit_translate_read_ea(jit_translate_context_t *ctx, 
-                          uint8_t ea_mode, 
-                          uint8_t ea_reg,
-                          uint8_t size);
-
-/* Write effective address value */
-int jit_translate_write_ea(jit_translate_context_t *ctx, 
-                           uint8_t ea_mode, 
-                           uint8_t ea_reg,
-                           uint8_t size,
-                           uint8_t value_reg);
-
-/* Translate specific instruction families */
-int jit_translate_move(jit_translate_context_t *ctx);
-int jit_translate_moveq(jit_translate_context_t *ctx);
-int jit_translate_add(jit_translate_context_t *ctx);
-int jit_translate_sub(jit_translate_context_t *ctx);
-int jit_translate_cmp(jit_translate_context_t *ctx);
-int jit_translate_addq_subq(jit_translate_context_t *ctx);
-int jit_translate_logic(jit_translate_context_t *ctx);
-int jit_translate_bsr(jit_translate_context_t *ctx);
-int jit_translate_rts(jit_translate_context_t *ctx);
-int jit_translate_jsr(jit_translate_context_t *ctx);
-int jit_translate_jmp(jit_translate_context_t *ctx);
-int jit_translate_movec(jit_translate_context_t *ctx);
-int jit_translate_branch(jit_translate_context_t *ctx);
-int jit_translate_shift(jit_translate_context_t *ctx);
-int jit_translate_misc(jit_translate_context_t *ctx);  /* LEA, CLR, TST, bitops */
-
-/* Helper: get size in bytes */
-static inline int jit_size_bytes(uint8_t size)
-{
-    switch (size) {
-        case 0: return 1;   /* Byte */
-        case 1: return 2;   /* Word */
-        case 2: return 4;   /* Long */
-        default: return 0;
-    }
-}
-
-/* Helper: get size mask */
-static inline uint32_t jit_size_mask(uint8_t size)
-{
-    switch (size) {
-        case 0: return 0xFF;
-        case 1: return 0xFFFF;
-        case 2: return 0xFFFFFFFF;
-        default: return 0;
-    }
-}
+/* Translator declarations - all use unified signature */
+int jit_translate_nop(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
+int jit_translate_moveq(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
+int jit_translate_move(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
+int jit_translate_add(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
+int jit_translate_addq(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
+int jit_translate_sub(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
+int jit_translate_subq(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
+int jit_translate_cmp(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
+int jit_translate_logic(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
+int jit_translate_branch(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
+int jit_translate_bsr(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
+int jit_translate_rts(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
+int jit_translate_jsr(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
+int jit_translate_jmp(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
+int jit_translate_movec(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
+int jit_translate_extb(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
+int jit_translate_lea(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
+int jit_translate_misc(jit_emit_context_t *ctx, uint16_t opcode, uint16_t *ext_words, int ext_count);
 
 #endif /* JIT_TRANSLATE_H */

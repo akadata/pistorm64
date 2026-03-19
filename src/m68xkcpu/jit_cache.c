@@ -301,10 +301,99 @@ void jit_cache_remove(jit_context_t *jit, jit_block_t *block)
             } else {
                 prev->hash_next = curr->hash_next;
             }
+            /* Decrement interpret block count if applicable */
+            if (block->flags & JIT_BLOCK_INTERPRET_ONLY) {
+                if (jit->stats.interpret_blocks_count > 0) {
+                    jit->stats.interpret_blocks_count--;
+                }
+            }
             return;
         }
         prev = curr;
         curr = curr->hash_next;
+    }
+}
+
+
+/**
+ * Check if we should add an interpret-only block
+ * 
+ * Returns 1 if OK to add, 0 if limit reached
+ * 
+ * @param jit JIT context
+ * @return 1 if OK to add, 0 if limit reached
+ */
+int jit_cache_should_add_interpret_block(jit_context_t *jit)
+{
+    if (jit == NULL) {
+        return 0;
+    }
+    
+    if (jit->stats.interpret_blocks_count >= JIT_MAX_INTERPRET_BLOCKS) {
+        return 0; /* Limit reached */
+    }
+    
+    return 1;
+}
+
+
+/**
+ * Evict the oldest interpret-only block
+ * 
+ * Simple LRU approximation - evicts from the end of a hash chain
+ * 
+ * @param jit JIT context
+ */
+void jit_cache_evict_oldest_interpret_block(jit_context_t *jit)
+{
+    uint32_t i;
+    jit_block_t *prev, *curr, *victim = NULL, *victim_prev = NULL;
+    uint32_t victim_hash = 0;
+    
+    if (jit == NULL) {
+        return;
+    }
+    
+    /* Find an interpret-only block to evict */
+    for (i = 0; i < JIT_HASH_SIZE; i++) {
+        prev = NULL;
+        curr = jit->hash_table[i];
+        
+        while (curr != NULL) {
+            if (curr->flags & JIT_BLOCK_INTERPRET_ONLY) {
+                /* Found an interpret block - evict it */
+                victim = curr;
+                victim_prev = prev;
+                victim_hash = i;
+                break;
+            }
+            prev = curr;
+            curr = curr->hash_next;
+        }
+        
+        if (victim) {
+            break;
+        }
+    }
+    
+    if (victim) {
+        /* Remove from hash table */
+        if (victim_prev == NULL) {
+            jit->hash_table[victim_hash] = victim->hash_next;
+        } else {
+            victim_prev->hash_next = victim->hash_next;
+        }
+        
+        /* Free the block */
+        if (victim->code_ptr != NULL && victim->code_size > 0) {
+            jit_cache_free(jit, victim->code_ptr, victim->code_size);
+        }
+        free(victim);
+        
+        jit->stats.interpret_blocks_evicted++;
+        if (jit->stats.interpret_blocks_count > 0) {
+            jit->stats.interpret_blocks_count--;
+        }
     }
 }
 

@@ -501,8 +501,21 @@ static void warn_kickstart_cpu_mismatch(const struct emulator_config* cfg_) {
 }
 
 static int m68xkcpu_jit_cpu_supported(unsigned int type) {
-  /* Current translator/opinfo is 68000-only. */
-  return (type == M68K_CPU_TYPE_68000) ? 1 : 0;
+  /* JIT supports 68000-68040. Unsupported instructions fall back to Musashi. */
+  switch (type) {
+  case M68K_CPU_TYPE_68000:
+  case M68K_CPU_TYPE_68010:
+  case M68K_CPU_TYPE_68EC020:
+  case M68K_CPU_TYPE_68020:
+  case M68K_CPU_TYPE_68EC030:
+  case M68K_CPU_TYPE_68030:
+  case M68K_CPU_TYPE_68EC040:
+  case M68K_CPU_TYPE_68LC040:
+  case M68K_CPU_TYPE_68040:
+    return 1;
+  default:
+    return 0;
+  }
 }
 
 static int read_kernel_param_bool(const char* name) {
@@ -767,8 +780,8 @@ static void instr_hook_callback(unsigned int pc) {
 }
 
 static int illg_instr_callback(int opcode) {
-  /* Handle MOVEC (0x4E7B) - 68010+ instruction used for CPU detection */
-  if ((opcode & 0xFFF8) == 0x4E70) {
+  /* Handle MOVEC (0x4E7A/0x4E7B) - 68010+ instruction used for CPU detection */
+  if ((opcode & 0xFFF8) == 0x4E78) {
     /* MOVEC - skip this instruction (2 bytes + 2 byte extension word)
      * PC was already advanced past opcode by Musashi, we need to add 2 more
      * for the extension word */
@@ -1265,7 +1278,7 @@ void jit_backend_execute(m68ki_cpu_core* state, int cycles) {
     static int m68xk_exec_enabled = -1;
     if (m68xk_exec_enabled < 0) {
       const char* e = getenv("PISTORM_M68XK_EXEC");
-      m68xk_exec_enabled = (e && atoi(e) != 0) ? 1 : 0;
+      m68xk_exec_enabled = (e && (strcmp(e, "1") == 0 || strcasecmp(e, "yes") == 0 || strcasecmp(e, "true") == 0)) ? 1 : 0;
       if (!m68xk_exec_enabled) {
         LOG_WARN("[CPU] m68xkcpu JIT selected but execution is gated; set PISTORM_M68XK_EXEC=1 to execute compiled blocks.\n");
       }
