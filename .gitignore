@@ -1,3 +1,4 @@
+./node_modules/
 # Build artifacts
 emulator
 m68kmake
