@@ -181,10 +181,10 @@ static const char *jit_progress_update_and_detect(jit_progress_tracker_t *tracke
     tracker->last_exit = exit_pc;
     jit_progress_push_entry(tracker, entry_pc);
 
-    if (tracker->same_entry_hits >= 16u) {
+    if (tracker->same_entry_hits >= 4u) {
         return "same-entry-streak";
     }
-    if (tracker->pair_hits >= 16u) {
+    if (tracker->pair_hits >= 4u) {
         return "entry-exit-repeat";
     }
 
@@ -199,7 +199,7 @@ static const char *jit_progress_update_and_detect(jit_progress_tracker_t *tracke
         }
     }
 
-    if (tracker->count >= 6u) {
+    if (tracker->count >= 4u) {
         min_pc = tracker->entries[0];
         max_pc = tracker->entries[0];
         for (uint8_t i = 1u; i < tracker->count; i++) {
