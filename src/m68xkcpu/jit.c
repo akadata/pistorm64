@@ -602,6 +602,47 @@ static void jit_trace_fallback(jit_context_t *jit, uint32_t pc_before, const cha
     trace_count++;
 }
 
+static void jit_mark_interpret_only_pc(jit_context_t *jit, uint32_t pc, const char *reason)
+{
+    jit_block_t *existing;
+    jit_block_t *iblock;
+
+    if (!jit) {
+        return;
+    }
+
+    existing = jit_cache_lookup(jit, pc);
+    if (existing != NULL) {
+        if (existing->flags & JIT_BLOCK_INTERPRET_ONLY) {
+            return;
+        }
+        jit_cache_remove(jit, existing);
+        jit_block_free(jit, existing);
+    }
+
+    if (!jit_cache_should_add_interpret_block(jit)) {
+        jit_cache_evict_oldest_interpret_block(jit);
+    }
+
+    iblock = jit_block_alloc(jit, pc);
+    if (!iblock) {
+        return;
+    }
+    iblock->flags |= JIT_BLOCK_INTERPRET_ONLY;
+    iblock->instruction_count = 0;
+    iblock->end_pc = pc;
+    iblock->ends_block = 1;
+    jit_cache_insert(jit, iblock);
+    jit->stats.interpret_blocks_count++;
+
+    if (jit_trace_blocks_enabled()) {
+        LOG_INFO("[CPU][m68xkcpu][BLOCK] phase=mark-interpret origin=hotpc entry=0x%08X exit=0x%08X "
+                 "block_cycles=0 flags=0x%04X ends_block=%u icount=%u note=%s\n",
+                 pc, pc, (unsigned)iblock->flags, (unsigned)iblock->ends_block,
+                 (unsigned)iblock->instruction_count, reason ? reason : "hot-pc");
+    }
+}
+
 /**
  * Initialize the JIT subsystem
  * 
@@ -774,6 +815,7 @@ int jit_execute(uint32_t pc, int cycles)
                                      loop_reason ? loop_reason : "non-progress");
                 jit_cache_remove(&g_jit, block);
                 jit_block_free(&g_jit, block);
+                jit_mark_interpret_only_pc(&g_jit, pc_before, loop_reason ? loop_reason : "non-progress");
                 block_cycles = jit_fallback_interpreter_step(&g_jit, cycles_remaining);
                 if (block_cycles <= 0) {
                     break;
@@ -847,6 +889,7 @@ int jit_execute(uint32_t pc, int cycles)
                                          loop_reason ? loop_reason : "non-progress");
                     jit_cache_remove(&g_jit, block);
                     jit_block_free(&g_jit, block);
+                    jit_mark_interpret_only_pc(&g_jit, pc_before, loop_reason ? loop_reason : "non-progress");
                     block_cycles = jit_fallback_interpreter_step(&g_jit, cycles_remaining);
                     if (block_cycles <= 0) {
                         break;
@@ -874,6 +917,8 @@ int jit_execute(uint32_t pc, int cycles)
                     snprintf(reason, sizeof(reason), "compile failed(%s) -> musashi",
                              g_jit_last_compile_fail_reason ? g_jit_last_compile_fail_reason : "unknown");
                     jit_trace_fallback(&g_jit, pc, reason);
+                    jit_mark_interpret_only_pc(&g_jit, pc,
+                                               g_jit_last_compile_fail_reason ? g_jit_last_compile_fail_reason : "compile-fail");
                 }
                 ran = jit_fallback_interpreter_step(&g_jit, cycles_remaining);
                 if (ran <= 0) {
