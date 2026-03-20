@@ -11,6 +11,7 @@ extern unsigned int m68k_read_memory_32(unsigned int address);
 extern void m68k_write_memory_8(unsigned int address, unsigned int value);
 extern void m68k_write_memory_16(unsigned int address, unsigned int value);
 extern void m68k_write_memory_32(unsigned int address, unsigned int value);
+extern struct m68ki_cpu_core m68ki_cpu;
 
 void jit_emit_init(jit_emit_context_t *ctx, uint8_t *buffer, size_t size)
 {
@@ -208,6 +209,9 @@ static void jit_emit_call_read_common(jit_emit_context_t *ctx,
     jit_emit_mov64(ctx, AARCH64_R6, (uint64_t)fn_addr);
     jit_emit_dword(ctx, AARCH64_BLR(AARCH64_R6));
 
+    /* Re-anchor CPU pointer register after C helper calls. */
+    jit_emit_mov64(ctx, AARCH64_CPU_PTR, (uint64_t)(uintptr_t)&m68ki_cpu);
+
     /* Move return value from X0/W0 if needed. */
     if (dst_reg != AARCH64_R0) {
         jit_emit_dword(ctx, AARCH64_ORR(dst_reg, AARCH64_R0, AARCH64_R0));
@@ -244,6 +248,9 @@ static void jit_emit_call_write_common(jit_emit_context_t *ctx,
 
     jit_emit_mov64(ctx, AARCH64_R6, (uint64_t)fn_addr);
     jit_emit_dword(ctx, AARCH64_BLR(AARCH64_R6));
+
+    /* Re-anchor CPU pointer register after C helper calls. */
+    jit_emit_mov64(ctx, AARCH64_CPU_PTR, (uint64_t)(uintptr_t)&m68ki_cpu);
 }
 
 void jit_emit_call_write8(jit_emit_context_t *ctx, uint8_t value_reg, uint8_t addr_reg)
