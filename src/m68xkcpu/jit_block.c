@@ -1121,7 +1121,7 @@ int jit_translate_branch(jit_translate_context_t *tctx)
                 break;
             case 0x2: /* BHI: !C && !Z */
                 jit_emit_dword(ctx, AARCH64_ORR_W(AARCH64_R4, AARCH64_R3, AARCH64_R1));
-                jit_emit_dword(ctx, AARCH64_CBZ(AARCH64_R4, 8)); /* if (!C && !Z) branch */
+                jit_emit_dword(ctx, AARCH64_CBZ(AARCH64_R4, 4)); /* if (!C && !Z) branch */
                 jit_emit_dword(ctx, AARCH64_B(4)); /* else skip */
                 /* Branch taken: update PC */
                 jit_emit_load_pc(ctx, AARCH64_R0);
@@ -1131,7 +1131,7 @@ int jit_translate_branch(jit_translate_context_t *tctx)
                 break;
             case 0x3: /* BLS: C || Z */
                 jit_emit_dword(ctx, AARCH64_ORR_W(AARCH64_R4, AARCH64_R3, AARCH64_R1));
-                jit_emit_dword(ctx, AARCH64_CBNZ(AARCH64_R4, 8));
+                jit_emit_dword(ctx, AARCH64_CBNZ(AARCH64_R4, 4));
                 jit_emit_dword(ctx, AARCH64_B(4));
                 jit_emit_load_pc(ctx, AARCH64_R0);
                 jit_emit_mov64(ctx, AARCH64_R1, disp);
