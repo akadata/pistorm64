@@ -129,5 +129,8 @@ void jit_emit_store_nzcv_flags(jit_emit_context_t *ctx, int invert_carry);
 void jit_emit_call_read8(jit_emit_context_t *ctx, uint8_t dst_reg, uint8_t addr_reg);
 void jit_emit_call_read16(jit_emit_context_t *ctx, uint8_t dst_reg, uint8_t addr_reg);
 void jit_emit_call_read32(jit_emit_context_t *ctx, uint8_t dst_reg, uint8_t addr_reg);
+void jit_emit_call_write8(jit_emit_context_t *ctx, uint8_t value_reg, uint8_t addr_reg);
+void jit_emit_call_write16(jit_emit_context_t *ctx, uint8_t value_reg, uint8_t addr_reg);
+void jit_emit_call_write32(jit_emit_context_t *ctx, uint8_t value_reg, uint8_t addr_reg);
 
 #endif /* JIT_EMIT_AARCH64_H */

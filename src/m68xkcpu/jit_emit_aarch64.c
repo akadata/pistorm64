@@ -8,6 +8,9 @@
 extern unsigned int m68k_read_memory_8(unsigned int address);
 extern unsigned int m68k_read_memory_16(unsigned int address);
 extern unsigned int m68k_read_memory_32(unsigned int address);
+extern void m68k_write_memory_8(unsigned int address, unsigned int value);
+extern void m68k_write_memory_16(unsigned int address, unsigned int value);
+extern void m68k_write_memory_32(unsigned int address, unsigned int value);
 
 void jit_emit_init(jit_emit_context_t *ctx, uint8_t *buffer, size_t size)
 {
@@ -224,6 +227,38 @@ void jit_emit_call_read16(jit_emit_context_t *ctx, uint8_t dst_reg, uint8_t addr
 void jit_emit_call_read32(jit_emit_context_t *ctx, uint8_t dst_reg, uint8_t addr_reg)
 {
     jit_emit_call_read_common(ctx, dst_reg, addr_reg, (uintptr_t)&m68k_read_memory_32);
+}
+
+static void jit_emit_call_write_common(jit_emit_context_t *ctx,
+                                       uint8_t value_reg,
+                                       uint8_t addr_reg,
+                                       uintptr_t fn_addr)
+{
+    /* x0/w0 = address, x1/w1 = value */
+    if (addr_reg != AARCH64_R0) {
+        jit_emit_dword(ctx, AARCH64_ORR(AARCH64_R0, addr_reg, addr_reg));
+    }
+    if (value_reg != AARCH64_R1) {
+        jit_emit_dword(ctx, AARCH64_ORR(AARCH64_R1, value_reg, value_reg));
+    }
+
+    jit_emit_mov64(ctx, AARCH64_R6, (uint64_t)fn_addr);
+    jit_emit_dword(ctx, AARCH64_BLR(AARCH64_R6));
+}
+
+void jit_emit_call_write8(jit_emit_context_t *ctx, uint8_t value_reg, uint8_t addr_reg)
+{
+    jit_emit_call_write_common(ctx, value_reg, addr_reg, (uintptr_t)&m68k_write_memory_8);
+}
+
+void jit_emit_call_write16(jit_emit_context_t *ctx, uint8_t value_reg, uint8_t addr_reg)
+{
+    jit_emit_call_write_common(ctx, value_reg, addr_reg, (uintptr_t)&m68k_write_memory_16);
+}
+
+void jit_emit_call_write32(jit_emit_context_t *ctx, uint8_t value_reg, uint8_t addr_reg)
+{
+    jit_emit_call_write_common(ctx, value_reg, addr_reg, (uintptr_t)&m68k_write_memory_32);
 }
 
 void jit_emit_store_nzcv_flags(jit_emit_context_t *ctx, int invert_carry)
