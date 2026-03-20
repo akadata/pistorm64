@@ -23,6 +23,7 @@ static const char *g_jit_last_compile_fail_reason = "unknown";
 static int g_jit_faststep_enabled = -1;
 static int g_jit_safe_interp_enabled = -1;
 static int g_jit_no_fallback_enabled = -1;
+static int g_jit_trace_blocks_enabled = -1;
 
 /* Signal handler for illegal instruction (SIGILL) */
 static void jit_sigill_handler(int sig, siginfo_t *info, void *context)
@@ -96,6 +97,29 @@ static int jit_safe_interp_enabled(void)
         }
     }
     return g_jit_safe_interp_enabled;
+}
+
+static int jit_trace_blocks_enabled(void)
+{
+    if (g_jit_trace_blocks_enabled < 0) {
+        const char *e = getenv("PISTORM_M68XK_TRACE_BLOCKS");
+        g_jit_trace_blocks_enabled = (e && atoi(e) != 0) ? 1 : 0;
+    }
+    return g_jit_trace_blocks_enabled;
+}
+
+static void jit_trace_block_exec(const char *phase, uint32_t pc, uint32_t new_pc, int cycles, uint8_t ends_block)
+{
+    if (!jit_trace_blocks_enabled()) {
+        return;
+    }
+    if (phase && strcmp(phase, "enter") == 0) {
+        LOG_INFO("[CPU][m68xkcpu][BLOCK] enter pc=0x%08X cycles=%d ends_block=%u\n",
+                 pc, cycles, (unsigned)ends_block);
+    } else {
+        LOG_INFO("[CPU][m68xkcpu][BLOCK] exit  pc=0x%08X new_pc=0x%08X cycles=%d ends_block=%u\n",
+                 pc, new_pc, cycles, (unsigned)ends_block);
+    }
 }
 
 int jit_no_fallback_enabled(void)
@@ -532,6 +556,7 @@ int jit_execute(uint32_t pc, int cycles)
 {
     jit_block_t *block;
     int cycles_remaining = cycles;
+    int tight_window_hits = 0;
     
     if (!g_jit.initialized || !g_jit.enabled) {
         return -1;
@@ -577,16 +602,26 @@ int jit_execute(uint32_t pc, int cycles)
             
             /* Execute the compiled block */
             uint32_t pc_before = g_jit.cpu->pc;
+            jit_trace_block_exec("enter", pc_before, 0, cycles_remaining, block->ends_block);
             int block_cycles = jit_block_execute(block, cycles_remaining);
             
             /* Read updated PC from CPU struct after execution */
             uint32_t pc_after = g_jit.cpu->pc;
+            uint32_t pc_delta = (pc_after >= pc_before) ? (pc_after - pc_before) : (pc_before - pc_after);
             g_jit.current_pc = pc_after;
+            jit_trace_block_exec("exit", pc_before, pc_after, block_cycles, block->ends_block);
+
+            if (pc_delta <= 8u) {
+                tight_window_hits++;
+            } else {
+                tight_window_hits = 0;
+            }
             
-            if (block_cycles <= 0 || pc_after == pc_before) {
+            if (block_cycles <= 0 || pc_after == pc_before || tight_window_hits >= 64) {
                 /* Discard non-progress block and execute via interpreter fallback. */
                 g_jit.stats.fallback_count++;
-                jit_trace_fallback(&g_jit, pc_before, "non-progress cached block");
+                jit_trace_fallback(&g_jit, pc_before,
+                                   (tight_window_hits >= 64) ? "tight-loop cached block" : "non-progress cached block");
                 jit_cache_remove(&g_jit, block);
                 jit_block_free(&g_jit, block);
                 block_cycles = jit_fallback_interpreter_step(&g_jit, cycles_remaining);
@@ -595,6 +630,7 @@ int jit_execute(uint32_t pc, int cycles)
                 }
                 cycles_remaining -= block_cycles;
                 pc = g_jit.cpu->pc;
+                tight_window_hits = 0;
                 continue;
             }
             
@@ -640,16 +676,26 @@ int jit_execute(uint32_t pc, int cycles)
                 g_jit.stats.blocks_compiled++;
                 
                 uint32_t pc_before = g_jit.cpu->pc;
+                jit_trace_block_exec("enter", pc_before, 0, cycles_remaining, block->ends_block);
                 int block_cycles = jit_block_execute(block, cycles_remaining);
                 
                 /* Read updated PC from CPU struct after execution */
                 uint32_t pc_after = g_jit.cpu->pc;
+                uint32_t pc_delta = (pc_after >= pc_before) ? (pc_after - pc_before) : (pc_before - pc_after);
                 g_jit.current_pc = pc_after;
+                jit_trace_block_exec("exit", pc_before, pc_after, block_cycles, block->ends_block);
+
+                if (pc_delta <= 8u) {
+                    tight_window_hits++;
+                } else {
+                    tight_window_hits = 0;
+                }
                 
-                if (block_cycles <= 0 || pc_after == pc_before) {
+                if (block_cycles <= 0 || pc_after == pc_before || tight_window_hits >= 64) {
                     /* Discard non-progress block and execute via interpreter fallback. */
                     g_jit.stats.fallback_count++;
-                    jit_trace_fallback(&g_jit, pc_before, "non-progress compiled block");
+                    jit_trace_fallback(&g_jit, pc_before,
+                                       (tight_window_hits >= 64) ? "tight-loop compiled block" : "non-progress compiled block");
                     jit_cache_remove(&g_jit, block);
                     jit_block_free(&g_jit, block);
                     block_cycles = jit_fallback_interpreter_step(&g_jit, cycles_remaining);
@@ -658,6 +704,7 @@ int jit_execute(uint32_t pc, int cycles)
                     }
                     cycles_remaining -= block_cycles;
                     pc = g_jit.cpu->pc;
+                    tight_window_hits = 0;
                     continue;
                 }
                 
