@@ -22,6 +22,7 @@
 #define AARCH64_R4         4
 #define AARCH64_R5         5
 #define AARCH64_R6         6
+#define AARCH64_R7         7
 
 typedef struct {
     uint8_t *buffer;
