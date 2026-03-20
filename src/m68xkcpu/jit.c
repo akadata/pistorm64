@@ -602,6 +602,36 @@ static void jit_trace_fallback(jit_context_t *jit, uint32_t pc_before, const cha
     trace_count++;
 }
 
+static int jit_pc_preflight(jit_context_t *jit, uint32_t pc, const char **reason_out)
+{
+    uint8_t fc_prog;
+    uint16_t probe = 0;
+
+    if (!jit || !jit->cpu) {
+        if (reason_out) {
+            *reason_out = "no-cpu";
+        }
+        return 0;
+    }
+
+    if (pc & 1u) {
+        if (reason_out) {
+            *reason_out = "odd-pc";
+        }
+        return 0;
+    }
+
+    fc_prog = jit_get_fc(jit->cpu->s_flag ? 1 : 0, 1);
+    if (jit_mem_read16(pc, fc_prog, &probe) != 0) {
+        if (reason_out) {
+            *reason_out = "pc-read-fault";
+        }
+        return 0;
+    }
+
+    return 1;
+}
+
 static void jit_mark_interpret_only_pc(jit_context_t *jit, uint32_t pc, const char *reason)
 {
     jit_block_t *existing;
@@ -765,6 +795,24 @@ int jit_execute(uint32_t pc, int cycles)
 
         /* Look up compiled block - use PC from CPU struct for consistency */
         pc = g_jit.cpu->pc;
+        {
+            const char *preflight_reason = NULL;
+            if (!jit_pc_preflight(&g_jit, pc, &preflight_reason)) {
+                int ran;
+                g_jit.stats.fallback_count++;
+                jit_trace_fallback(&g_jit, pc, preflight_reason ? preflight_reason : "pc-preflight");
+                jit_mark_interpret_only_pc(&g_jit, pc, preflight_reason ? preflight_reason : "pc-preflight");
+                ran = jit_fallback_interpreter_step(&g_jit, cycles_remaining);
+                if (ran <= 0) {
+                    break;
+                }
+                jit_trace_block_exec("fallback", "pc-preflight", pc, g_jit.current_pc, ran, NULL,
+                                     preflight_reason ? preflight_reason : "pc-preflight");
+                cycles_remaining -= ran;
+                pc = g_jit.current_pc;
+                continue;
+            }
+        }
         block = jit_cache_lookup(&g_jit, pc);
         
         if (block != NULL) {
@@ -1038,6 +1086,14 @@ jit_block_t *jit_compile_block(uint32_t pc)
 {
     jit_block_t *block;
     g_jit_last_compile_fail_reason = "unknown";
+
+    {
+        const char *preflight_reason = NULL;
+        if (!jit_pc_preflight(&g_jit, pc, &preflight_reason)) {
+            g_jit_last_compile_fail_reason = preflight_reason ? preflight_reason : "pc-preflight";
+            return NULL;
+        }
+    }
     
     /* Allocate a new block structure */
     block = jit_block_alloc(&g_jit, pc);
