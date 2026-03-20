@@ -187,11 +187,8 @@
 #define M68K_LOG_FILEHANDLE         some_file_handle
 
 
-#if defined(PISTORM_EXPERIMENT_PMMU)
-#define M68K_EMULATE_PMMU   OPT_ON
-#else
 #define M68K_EMULATE_PMMU   OPT_OFF
-#endif
+// was off
 
 
 /* ----------------------------- COMPATIBILITY ---------------------------- */
