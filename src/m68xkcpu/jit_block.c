@@ -127,6 +127,8 @@ static void jit_log_block_done(jit_block_t *block, struct m68ki_cpu_core *cpu, i
 
 static inline int jit_family_codegen_supported(uint8_t family)
 {
+    /* Control-flow families are intentionally excluded for now.
+     * They execute via Musashi fallback until semantics are fully validated. */
     return (family == JIT_FAMILY_NOP || 
             family == JIT_FAMILY_MOVEQ || 
             family == JIT_FAMILY_MOVE ||
@@ -143,12 +145,6 @@ static inline int jit_family_codegen_supported(uint8_t family)
             family == JIT_FAMILY_ANDI ||
             family == JIT_FAMILY_ORI ||
             family == JIT_FAMILY_EORI ||
-            family == JIT_FAMILY_BRA ||
-            family == JIT_FAMILY_BCC ||
-            family == JIT_FAMILY_BSR ||
-            family == JIT_FAMILY_RTS ||
-            family == JIT_FAMILY_JSR ||
-            family == JIT_FAMILY_JMP ||
             family == JIT_FAMILY_MOVEC ||
             family == JIT_FAMILY_LEA ||
             family == JIT_FAMILY_CLR ||
