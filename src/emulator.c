@@ -1272,20 +1272,9 @@ static inline int fpu_backend_execute(m68ki_cpu_core* state, uint16_t opcode) {
 void jit_backend_execute(m68ki_cpu_core* state, int cycles) {
 #if USE_M68XK_JIT
   if (use_m68xk_jit) {
-    static int m68xk_exec_enabled = -1;
-    if (m68xk_exec_enabled < 0) {
-      const char* e = getenv("PISTORM_M68XK_EXEC");
-      m68xk_exec_enabled = (e && (strcmp(e, "1") == 0 || strcasecmp(e, "yes") == 0 || strcasecmp(e, "true") == 0)) ? 1 : 0;
-      if (!m68xk_exec_enabled) {
-        LOG_WARN("[CPU] m68xkcpu JIT selected but execution is gated; set PISTORM_M68XK_EXEC=1 to execute compiled blocks.\n");
-      }
-    }
-
-    if (m68xk_exec_enabled) {
-      int ran = jit_execute((uint32_t)m68k_get_reg(NULL, M68K_REG_PC), cycles);
-      if (ran > 0) {
-        return;
-      }
+    int ran = jit_execute((uint32_t)m68k_get_reg(NULL, M68K_REG_PC), cycles);
+    if (ran > 0) {
+      return;
     }
   }
 #endif
@@ -2095,7 +2084,7 @@ switch_config:
         int rc = jit_init(&m68ki_cpu, 0);
         if (rc == 0) {
           use_m68xk_jit = 1;
-          LOG_INFO("[CPU] m68xkcpu JIT backend selected (execution currently gated; set PISTORM_M68XK_EXEC=1 to run compiled blocks)\n");
+          LOG_INFO("[CPU] m68xkcpu JIT backend selected (active execution path)\n");
         } else {
           enable_jit_backend = 0;
           LOG_ERROR("[CPU] m68xkcpu JIT init failed (rc=%d), falling back to Musashi\n", rc);

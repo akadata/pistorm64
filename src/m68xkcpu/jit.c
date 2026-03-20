@@ -84,16 +84,12 @@ static int jit_safe_interp_enabled(void)
 {
     if (g_jit_safe_interp_enabled < 0) {
         const char *e = getenv("PISTORM_M68XK_SAFE_INTERP");
-        /* Safety-first default: keep m68xkcpu in interpret-only mode unless explicitly disabled. */
-        g_jit_safe_interp_enabled = (e && atoi(e) == 0) ? 0 : 1;
+        /* Active JIT by default; optional interpret-only mode remains for diagnostics. */
+        g_jit_safe_interp_enabled = (e && atoi(e) != 0) ? 1 : 0;
         if (g_jit_safe_interp_enabled) {
-            if (e) {
-                LOG_INFO("[CPU] m68xkcpu safe interpret-only mode enabled via PISTORM_M68XK_SAFE_INTERP=1\n");
-            } else {
-                LOG_INFO("[CPU] m68xkcpu safe interpret-only mode enabled by default (set PISTORM_M68XK_SAFE_INTERP=0 to allow decode/emit path)\n");
-            }
+            LOG_INFO("[CPU] m68xkcpu safe interpret-only mode enabled via PISTORM_M68XK_SAFE_INTERP=1\n");
         } else {
-            LOG_WARN("[CPU] m68xkcpu safe interpret-only mode disabled via PISTORM_M68XK_SAFE_INTERP=0\n");
+            LOG_INFO("[CPU] m68xkcpu safe interpret-only mode disabled (default active JIT path)\n");
         }
     }
     return g_jit_safe_interp_enabled;
