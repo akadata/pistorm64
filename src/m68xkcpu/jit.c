@@ -277,24 +277,6 @@ static int jit_fallback_interpreter_step(jit_context_t *jit, int cycles_budget)
     return ran;
 }
 
-static int jit_fallback_interpreter_step_full(jit_context_t *jit, int cycles_budget)
-{
-    int ran;
-    if (!jit || !jit->cpu) {
-        return -1;
-    }
-    if (cycles_budget <= 0) {
-        return 0;
-    }
-
-    /* Loop-break path: consume the full remaining budget in one Musashi slice. */
-    extern void musashi_backend_execute(m68ki_cpu_core *state, int cycles);
-    musashi_backend_execute(jit->cpu, cycles_budget);
-    ran = cycles_budget;
-    jit->current_pc = (uint32_t)m68k_get_reg(jit->cpu, M68K_REG_PC);
-    return ran;
-}
-
 static inline int jit_flag_c(const m68ki_cpu_core *cpu) { return (cpu->c_flag & 0x100u) != 0; }
 static inline int jit_flag_v(const m68ki_cpu_core *cpu) { return (cpu->v_flag & 0x80u) != 0; }
 static inline int jit_flag_n(const m68ki_cpu_core *cpu) { return (cpu->n_flag & 0x80u) != 0; }
@@ -851,7 +833,6 @@ int jit_execute(uint32_t pc, int cycles)
         if (block != NULL) {
             if (block->flags & JIT_BLOCK_INTERPRET_ONLY) {
                 uint32_t pc_before = pc;
-                const char *loop_reason = NULL;
                 int ran;
                 ran = jit_faststep_enabled() ? jit_try_fast_step(&g_jit, pc, cycles_remaining) : 0;
                 if (ran > 0) {
@@ -866,20 +847,9 @@ int jit_execute(uint32_t pc, int cycles)
                 if (ran <= 0) {
                     break;
                 }
-                loop_reason = jit_progress_update_and_detect(progress, pc_before, g_jit.current_pc);
+                (void)jit_progress_update_and_detect(progress, pc_before, g_jit.current_pc);
                 jit_trace_block_exec("fallback", "cached-interpret", pc, g_jit.current_pc, ran, block,
                                      "cached interpret-only");
-                if (loop_reason != NULL && (cycles_remaining - ran) > 0) {
-                    int boost = jit_fallback_interpreter_step_full(&g_jit, cycles_remaining - ran);
-                    jit_trace_fallback(&g_jit, pc_before, loop_reason);
-                    jit_mark_interpret_only_pc(&g_jit, pc_before, loop_reason);
-                    if (boost > 0) {
-                        jit_trace_block_exec("fallback", "loop-boost", g_jit.current_pc, g_jit.current_pc, boost, block,
-                                             loop_reason);
-                        ran += boost;
-                        memset(progress, 0, sizeof(*progress));
-                    }
-                }
                 cycles_remaining -= ran;
                 pc = g_jit.current_pc;
                 continue;
@@ -941,7 +911,6 @@ int jit_execute(uint32_t pc, int cycles)
             if (block != NULL) {
                 if (block->flags & JIT_BLOCK_INTERPRET_ONLY) {
                     uint32_t pc_before = pc;
-                    const char *loop_reason = NULL;
                     int ran;
                     ran = jit_faststep_enabled() ? jit_try_fast_step(&g_jit, pc, cycles_remaining) : 0;
                     if (ran > 0) {
@@ -956,20 +925,9 @@ int jit_execute(uint32_t pc, int cycles)
                     if (ran <= 0) {
                         break;
                     }
-                    loop_reason = jit_progress_update_and_detect(progress, pc_before, g_jit.current_pc);
+                    (void)jit_progress_update_and_detect(progress, pc_before, g_jit.current_pc);
                     jit_trace_block_exec("fallback", "new-interpret", pc, g_jit.current_pc, ran, block,
                                          "new interpret-only");
-                    if (loop_reason != NULL && (cycles_remaining - ran) > 0) {
-                        int boost = jit_fallback_interpreter_step_full(&g_jit, cycles_remaining - ran);
-                        jit_trace_fallback(&g_jit, pc_before, loop_reason);
-                        jit_mark_interpret_only_pc(&g_jit, pc_before, loop_reason);
-                        if (boost > 0) {
-                            jit_trace_block_exec("fallback", "loop-boost", g_jit.current_pc, g_jit.current_pc, boost, block,
-                                                 loop_reason);
-                            ran += boost;
-                            memset(progress, 0, sizeof(*progress));
-                        }
-                    }
                     cycles_remaining -= ran;
                     pc = g_jit.current_pc;
                     continue;

@@ -168,7 +168,8 @@ void jit_emit_prologue(jit_emit_context_t *ctx)
 
 void jit_emit_epilogue(jit_emit_context_t *ctx)
 {
-    jit_emit_mov64(ctx, AARCH64_R0, 0);
+    /* Return a positive cycle count so jit_execute() keeps block execution on JIT path. */
+    jit_emit_mov64(ctx, AARCH64_R0, 1);
     jit_emit_dword(ctx, AARCH64_RET);
 }
 

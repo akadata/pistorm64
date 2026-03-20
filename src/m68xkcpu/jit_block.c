@@ -128,11 +128,10 @@ static void jit_log_block_done(jit_block_t *block, struct m68ki_cpu_core *cpu, i
 
 static inline int jit_family_codegen_supported(uint8_t family)
 {
-    /* Keep compiled set intentionally minimal until EA/memory/control-flow semantics
-     * are validated against 68040 behavior. Everything else runs via fallback paths. */
-    return (family == JIT_FAMILY_NOP ||
-            family == JIT_FAMILY_MOVEQ ||
-            family == JIT_FAMILY_MOVEC);
+    /* Let translator dispatch decide support; only hard-trap families are denied here. */
+    return (family != JIT_FAMILY_ILLEGAL &&
+            family != JIT_FAMILY_LINE_A &&
+            family != JIT_FAMILY_LINE_F);
 }
 
 jit_block_t *jit_block_alloc(jit_context_t *jit, uint32_t pc)
