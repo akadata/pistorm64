@@ -501,16 +501,8 @@ static void warn_kickstart_cpu_mismatch(const struct emulator_config* cfg_) {
 }
 
 static int m68xkcpu_jit_cpu_supported(unsigned int type) {
-  /* JIT supports 68000-68040. Unsupported instructions fall back to Musashi. */
+  /* TASK-01 boundary: m68xkcpu JIT is eligible only for 68040. */
   switch (type) {
-  case M68K_CPU_TYPE_68000:
-  case M68K_CPU_TYPE_68010:
-  case M68K_CPU_TYPE_68EC020:
-  case M68K_CPU_TYPE_68020:
-  case M68K_CPU_TYPE_68EC030:
-  case M68K_CPU_TYPE_68030:
-  case M68K_CPU_TYPE_68EC040:
-  case M68K_CPU_TYPE_68LC040:
   case M68K_CPU_TYPE_68040:
     return 1;
   default:
@@ -2088,18 +2080,18 @@ switch_config:
 
 #if USE_M68XK_JIT
     if (enable_jit_backend && jit_backend_request == JIT_REQ_M68XKCPU) {
-      const char *allow_unsupported = getenv("PISTORM_M68XK_ALLOW_UNSUPPORTED_CPU");
-      int allow_non68000 = (allow_unsupported && atoi(allow_unsupported) != 0) ? 1 : 0;
-      if (!m68xkcpu_jit_cpu_supported(cpu_type) && !allow_non68000) {
+      if (!m68xkcpu_jit_cpu_supported(cpu_type)) {
         enable_jit_backend = 0;
-        LOG_WARN("[CPU] m68xkcpu JIT is currently 68000-only; cpu=%s requested. "
-                 "Falling back to Musashi. Set PISTORM_M68XK_ALLOW_UNSUPPORTED_CPU=1 to override.\n",
-                 cpu_type_name(cpu_type));
-      } else {
-        if (!m68xkcpu_jit_cpu_supported(cpu_type) && allow_non68000) {
-          LOG_WARN("[CPU] m68xkcpu JIT override enabled for cpu=%s; behavior is experimental.\n",
-                   cpu_type_name(cpu_type));
+        if (cpu_type == M68K_CPU_TYPE_68000 || cpu_type == M68K_CPU_TYPE_68010 ||
+            cpu_type == M68K_CPU_TYPE_68EC020 || cpu_type == M68K_CPU_TYPE_68020 ||
+            cpu_type == M68K_CPU_TYPE_68EC030 || cpu_type == M68K_CPU_TYPE_68030) {
+          LOG_WARN("[CPU] m68xkcpu JIT requires 68040; configured CPU=%s (<68040). "
+                   "Forcing Musashi backend.\n", cpu_type_name(cpu_type));
+        } else {
+          LOG_WARN("[CPU] m68xkcpu JIT requires exact CPU=68040; configured CPU=%s is not eligible. "
+                   "Forcing Musashi backend.\n", cpu_type_name(cpu_type));
         }
+      } else {
         int rc = jit_init(&m68ki_cpu, 0);
         if (rc == 0) {
           use_m68xk_jit = 1;
