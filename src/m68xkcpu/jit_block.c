@@ -1139,56 +1139,56 @@ int jit_translate_branch(jit_translate_context_t *tctx)
                 jit_emit_store_pc(ctx, AARCH64_R0);
                 break;
             case 0x4: /* BCC/BHS: !C */
-                jit_emit_dword(ctx, AARCH64_CBNZ(AARCH64_R3, 4));
+                jit_emit_dword(ctx, AARCH64_CBNZ(AARCH64_R3, 16));
                 jit_emit_load_pc(ctx, AARCH64_R0);
                 jit_emit_mov64(ctx, AARCH64_R1, disp);
                 jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R0, AARCH64_R0, AARCH64_R1));
                 jit_emit_store_pc(ctx, AARCH64_R0);
                 break;
             case 0x5: /* BCS/BLO: C */
-                jit_emit_dword(ctx, AARCH64_CBZ(AARCH64_R3, 4));
+                jit_emit_dword(ctx, AARCH64_CBZ(AARCH64_R3, 16));
                 jit_emit_load_pc(ctx, AARCH64_R0);
                 jit_emit_mov64(ctx, AARCH64_R1, disp);
                 jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R0, AARCH64_R0, AARCH64_R1));
                 jit_emit_store_pc(ctx, AARCH64_R0);
                 break;
             case 0x6: /* BNE: !Z */
-                jit_emit_dword(ctx, AARCH64_CBNZ(AARCH64_R1, 4));
+                jit_emit_dword(ctx, AARCH64_CBNZ(AARCH64_R1, 16));
                 jit_emit_load_pc(ctx, AARCH64_R0);
                 jit_emit_mov64(ctx, AARCH64_R1, disp);
                 jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R0, AARCH64_R0, AARCH64_R1));
                 jit_emit_store_pc(ctx, AARCH64_R0);
                 break;
             case 0x7: /* BEQ: Z */
-                jit_emit_dword(ctx, AARCH64_CBZ(AARCH64_R1, 4));
+                jit_emit_dword(ctx, AARCH64_CBZ(AARCH64_R1, 16));
                 jit_emit_load_pc(ctx, AARCH64_R0);
                 jit_emit_mov64(ctx, AARCH64_R1, disp);
                 jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R0, AARCH64_R0, AARCH64_R1));
                 jit_emit_store_pc(ctx, AARCH64_R0);
                 break;
             case 0x8: /* BVC: !V */
-                jit_emit_dword(ctx, AARCH64_CBNZ(AARCH64_R2, 4));
+                jit_emit_dword(ctx, AARCH64_CBNZ(AARCH64_R2, 16));
                 jit_emit_load_pc(ctx, AARCH64_R0);
                 jit_emit_mov64(ctx, AARCH64_R1, disp);
                 jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R0, AARCH64_R0, AARCH64_R1));
                 jit_emit_store_pc(ctx, AARCH64_R0);
                 break;
             case 0x9: /* BVS: V */
-                jit_emit_dword(ctx, AARCH64_CBZ(AARCH64_R2, 4));
+                jit_emit_dword(ctx, AARCH64_CBZ(AARCH64_R2, 16));
                 jit_emit_load_pc(ctx, AARCH64_R0);
                 jit_emit_mov64(ctx, AARCH64_R1, disp);
                 jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R0, AARCH64_R0, AARCH64_R1));
                 jit_emit_store_pc(ctx, AARCH64_R0);
                 break;
             case 0xA: /* BPL: !N */
-                jit_emit_dword(ctx, AARCH64_CBNZ(AARCH64_R0, 4));
+                jit_emit_dword(ctx, AARCH64_CBNZ(AARCH64_R0, 16));
                 jit_emit_load_pc(ctx, AARCH64_R0);
                 jit_emit_mov64(ctx, AARCH64_R1, disp);
                 jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R0, AARCH64_R0, AARCH64_R1));
                 jit_emit_store_pc(ctx, AARCH64_R0);
                 break;
             case 0xB: /* BMI: N */
-                jit_emit_dword(ctx, AARCH64_CBZ(AARCH64_R0, 4));
+                jit_emit_dword(ctx, AARCH64_CBZ(AARCH64_R0, 16));
                 jit_emit_load_pc(ctx, AARCH64_R0);
                 jit_emit_mov64(ctx, AARCH64_R1, disp);
                 jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R0, AARCH64_R0, AARCH64_R1));
@@ -1198,7 +1198,7 @@ int jit_translate_branch(jit_translate_context_t *tctx)
                 jit_emit_dword(ctx, AARCH64_EOR_W(AARCH64_R4, AARCH64_R0, AARCH64_R2));
                 jit_emit_mov64(ctx, AARCH64_R7, 1);
                 jit_emit_dword(ctx, AARCH64_AND_W(AARCH64_R4, AARCH64_R4, AARCH64_R7));
-                jit_emit_dword(ctx, AARCH64_CBZ(AARCH64_R4, 4));
+                jit_emit_dword(ctx, AARCH64_CBZ(AARCH64_R4, 16));
                 jit_emit_load_pc(ctx, AARCH64_R0);
                 jit_emit_mov64(ctx, AARCH64_R1, disp);
                 jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R0, AARCH64_R0, AARCH64_R1));
@@ -1208,7 +1208,7 @@ int jit_translate_branch(jit_translate_context_t *tctx)
                 jit_emit_dword(ctx, AARCH64_EOR_W(AARCH64_R4, AARCH64_R0, AARCH64_R2));
                 jit_emit_mov64(ctx, AARCH64_R7, 1);
                 jit_emit_dword(ctx, AARCH64_AND_W(AARCH64_R4, AARCH64_R4, AARCH64_R7));
-                jit_emit_dword(ctx, AARCH64_CBNZ(AARCH64_R4, 4));
+                jit_emit_dword(ctx, AARCH64_CBNZ(AARCH64_R4, 16));
                 jit_emit_load_pc(ctx, AARCH64_R0);
                 jit_emit_mov64(ctx, AARCH64_R1, disp);
                 jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R0, AARCH64_R0, AARCH64_R1));
@@ -1219,7 +1219,7 @@ int jit_translate_branch(jit_translate_context_t *tctx)
                 jit_emit_mov64(ctx, AARCH64_R7, 1);
                 jit_emit_dword(ctx, AARCH64_AND_W(AARCH64_R4, AARCH64_R4, AARCH64_R7));
                 jit_emit_dword(ctx, AARCH64_ORR_W(AARCH64_R4, AARCH64_R4, AARCH64_R1));
-                jit_emit_dword(ctx, AARCH64_CBNZ(AARCH64_R4, 4));
+                jit_emit_dword(ctx, AARCH64_CBNZ(AARCH64_R4, 16));
                 jit_emit_load_pc(ctx, AARCH64_R0);
                 jit_emit_mov64(ctx, AARCH64_R1, disp);
                 jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R0, AARCH64_R0, AARCH64_R1));
@@ -1230,7 +1230,7 @@ int jit_translate_branch(jit_translate_context_t *tctx)
                 jit_emit_mov64(ctx, AARCH64_R7, 1);
                 jit_emit_dword(ctx, AARCH64_AND_W(AARCH64_R4, AARCH64_R4, AARCH64_R7));
                 jit_emit_dword(ctx, AARCH64_ORR_W(AARCH64_R4, AARCH64_R4, AARCH64_R1));
-                jit_emit_dword(ctx, AARCH64_CBZ(AARCH64_R4, 4));
+                jit_emit_dword(ctx, AARCH64_CBZ(AARCH64_R4, 16));
                 jit_emit_load_pc(ctx, AARCH64_R0);
                 jit_emit_mov64(ctx, AARCH64_R1, disp);
                 jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R0, AARCH64_R0, AARCH64_R1));
