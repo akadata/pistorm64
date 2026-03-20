@@ -59,6 +59,10 @@ typedef struct {
     
     /* CPU state sync */
     struct m68ki_cpu_core *cpu;
+
+    /* 68040 MMU tracking for cache safety */
+    uint64_t mmu_state_sig;
+    bool mmu_state_valid;
     
     /* Flags */
     bool initialized;

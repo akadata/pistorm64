@@ -181,6 +181,54 @@ static inline int jit_flag_v(const m68ki_cpu_core *cpu) { return (cpu->v_flag & 
 static inline int jit_flag_n(const m68ki_cpu_core *cpu) { return (cpu->n_flag & 0x80u) != 0; }
 static inline int jit_flag_z(const m68ki_cpu_core *cpu) { return cpu->not_z_flag == 0; }
 
+static inline uint64_t jit_hash_u32(uint64_t acc, uint32_t v)
+{
+    /* Small, stable combiner for MMU-visible state fields. */
+    return (acc ^ (uint64_t)v) * 1099511628211ULL;
+}
+
+static uint64_t jit_mmu_state_signature(const m68ki_cpu_core *cpu)
+{
+    uint64_t sig = 1469598103934665603ULL;
+    if (!cpu) {
+        return 0;
+    }
+
+    sig = jit_hash_u32(sig, cpu->mmu_tc);
+    sig = jit_hash_u32(sig, cpu->mmu_itt0);
+    sig = jit_hash_u32(sig, cpu->mmu_itt1);
+    sig = jit_hash_u32(sig, cpu->mmu_dtt0);
+    sig = jit_hash_u32(sig, cpu->mmu_dtt1);
+    sig = jit_hash_u32(sig, cpu->mmu_sr_040);
+    sig = jit_hash_u32(sig, cpu->mmu_urp_aptr);
+    sig = jit_hash_u32(sig, cpu->mmu_srp_aptr);
+    sig = jit_hash_u32(sig, cpu->sfc);
+    sig = jit_hash_u32(sig, cpu->dfc);
+    return sig;
+}
+
+static void jit_refresh_mmu_tracking(jit_context_t *jit)
+{
+    uint64_t sig_now;
+
+    if (!jit || !jit->cpu) {
+        return;
+    }
+
+    sig_now = jit_mmu_state_signature(jit->cpu);
+    if (!jit->mmu_state_valid) {
+        jit->mmu_state_sig = sig_now;
+        jit->mmu_state_valid = true;
+        return;
+    }
+
+    if (sig_now != jit->mmu_state_sig) {
+        LOG_INFO("[CPU][m68xkcpu][MMU] state change detected; invalidating JIT cache\n");
+        jit_invalidate_all();
+        jit->mmu_state_sig = sig_now;
+    }
+}
+
 static int jit_eval_cond(const m68ki_cpu_core *cpu, uint8_t cond)
 {
     int c = jit_flag_c(cpu);
@@ -497,6 +545,8 @@ int jit_init(struct m68ki_cpu_core *cpu, size_t cache_size)
     
     g_jit.enabled = true;
     g_jit.initialized = true;
+    g_jit.mmu_state_sig = 0;
+    g_jit.mmu_state_valid = false;
     
     printf("JIT: Initialized with %zu KB cache\n", g_jit.cache_size / 1024);
     
@@ -540,6 +590,8 @@ void jit_reset(void)
     
     /* Invalidate all compiled blocks on reset */
     jit_invalidate_all();
+    g_jit.mmu_state_sig = 0;
+    g_jit.mmu_state_valid = false;
     
     printf("JIT: Reset complete\n");
 }
@@ -571,6 +623,9 @@ int jit_execute(uint32_t pc, int cycles)
     
     /* Main execution loop */
     while (cycles_remaining > 0) {
+        /* 68040 MMU control changes must invalidate stale translated blocks. */
+        jit_refresh_mmu_tracking(&g_jit);
+
         /* Look up compiled block - use PC from CPU struct for consistency */
         pc = g_jit.cpu->pc;
         block = jit_cache_lookup(&g_jit, pc);
