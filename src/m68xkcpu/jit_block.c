@@ -128,34 +128,11 @@ static void jit_log_block_done(jit_block_t *block, struct m68ki_cpu_core *cpu, i
 
 static inline int jit_family_codegen_supported(uint8_t family)
 {
-    /* Control-flow families are intentionally excluded for now.
-     * They execute via Musashi fallback until semantics are fully validated. */
-    return (family == JIT_FAMILY_NOP || 
-            family == JIT_FAMILY_MOVEQ || 
-            family == JIT_FAMILY_MOVE ||
-            family == JIT_FAMILY_ADD ||
-            family == JIT_FAMILY_ADDQ ||
-            family == JIT_FAMILY_SUB ||
-            family == JIT_FAMILY_SUBQ ||
-            family == JIT_FAMILY_CMP ||
-            family == JIT_FAMILY_CMPI ||
-            family == JIT_FAMILY_CMPM ||
-            family == JIT_FAMILY_AND ||
-            family == JIT_FAMILY_OR ||
-            family == JIT_FAMILY_EOR ||
-            family == JIT_FAMILY_ANDI ||
-            family == JIT_FAMILY_ORI ||
-            family == JIT_FAMILY_EORI ||
-            family == JIT_FAMILY_MOVEC ||
-            family == JIT_FAMILY_LEA ||
-            family == JIT_FAMILY_CLR ||
-            family == JIT_FAMILY_TST ||
-            family == JIT_FAMILY_BTST ||
-            family == JIT_FAMILY_BSET ||
-            family == JIT_FAMILY_BCLR ||
-            family == JIT_FAMILY_BCHG ||
-            family == JIT_FAMILY_EXT ||
-            family == JIT_FAMILY_EXTB);
+    /* Keep compiled set intentionally minimal until EA/memory/control-flow semantics
+     * are validated against 68040 behavior. Everything else runs via fallback paths. */
+    return (family == JIT_FAMILY_NOP ||
+            family == JIT_FAMILY_MOVEQ ||
+            family == JIT_FAMILY_MOVEC);
 }
 
 jit_block_t *jit_block_alloc(jit_context_t *jit, uint32_t pc)

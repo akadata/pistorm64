@@ -67,14 +67,16 @@ static int jit_faststep_enabled(void)
 {
     if (g_jit_faststep_enabled < 0) {
         const char *e = getenv("PISTORM_M68XK_FASTSTEP");
-        /* Safety-first default: disabled unless explicitly enabled. */
-        g_jit_faststep_enabled = (e && atoi(e) != 0) ? 1 : 0;
+        /* Default on: this is the primary semantic guard path for interpret-only hot loops. */
+        g_jit_faststep_enabled = (!e || atoi(e) != 0) ? 1 : 0;
         if (g_jit_faststep_enabled) {
-            LOG_INFO("[CPU] m68xkcpu fast-step enabled via PISTORM_M68XK_FASTSTEP=1\n");
-        } else if (e) {
-            LOG_WARN("[CPU] m68xkcpu fast-step disabled via PISTORM_M68XK_FASTSTEP=0\n");
+            if (e) {
+                LOG_INFO("[CPU] m68xkcpu fast-step enabled via PISTORM_M68XK_FASTSTEP=1\n");
+            } else {
+                LOG_INFO("[CPU] m68xkcpu fast-step enabled by default (set PISTORM_M68XK_FASTSTEP=0 to disable)\n");
+            }
         } else {
-            LOG_INFO("[CPU] m68xkcpu fast-step disabled by default (set PISTORM_M68XK_FASTSTEP=1 to enable)\n");
+            LOG_WARN("[CPU] m68xkcpu fast-step disabled via PISTORM_M68XK_FASTSTEP=0\n");
         }
     }
     return g_jit_faststep_enabled;
