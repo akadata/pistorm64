@@ -639,6 +639,14 @@ static int jit_pc_preflight(jit_context_t *jit, uint32_t pc, const char **reason
         return 0;
     }
 
+    /* Keep low-vector exception space on Musashi for now. */
+    if (pc < 0x00000400u) {
+        if (reason_out) {
+            *reason_out = "vector-space";
+        }
+        return 0;
+    }
+
     fc_prog = jit_get_fc(jit->cpu->s_flag ? 1 : 0, 1);
     if (jit_mem_read16(pc, fc_prog, &probe) != 0) {
         if (reason_out) {
