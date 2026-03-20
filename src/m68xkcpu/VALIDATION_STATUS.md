@@ -2,17 +2,18 @@
 
 ## Overview
 
-This is the validation infrastructure for a staged AArch64 JIT effort, beginning with **68000 correctness first**. Later CPU and FPU variants may be added only after the 68000 JIT path is stable and fully validated.
+This is the validation infrastructure for a staged AArch64 JIT effort with **68040 correctness first**.
 
 **Design Principles (from QWEN.md):**
 - Musashi remains the architectural reference / oracle
 - Correctness is always more important than speed
-- JIT support for 020/030/040 comes later
-- FPU support is later still
+- m68xkcpu JIT eligibility is locked to 68040 only
+- 68030 and lower remain on Musashi only
 
 **Runtime Scope (Current):**
-- `m68xkcpu` runtime execution is currently `68000`-focused.
-- Non-68000 CPU models are expected to use Musashi by default unless explicitly overridden for debug experiments.
+- `m68xkcpu` runtime execution path is currently **68040-only**.
+- `68000/010/020/030` must execute on Musashi only.
+- `jitfpu` is currently gated to the 68040 internal FPU model when m68xkcpu JIT is active.
 
 **Critical Architecture Note:**
 
@@ -36,6 +37,20 @@ The validation harness validates instruction semantics in isolation.
 The real emulator integrates the validated JIT with actual hardware.
 
 See `jit_arch.h` for environment abstraction and `jit_mem_*.h` for implementations.
+
+## Staged 68040 Checkpoints (Current Branch)
+
+| Task | Status | Checkpoint |
+|------|--------|------------|
+| TASK-01 CPU boundary | ✅ Complete | JIT eligibility locked to 68040 only |
+| TASK-02 emitter validation | ✅ Complete | Invalid W-op and CBZ/CBNZ encodings corrected |
+| TASK-03 block progress | ✅ Complete | Block enter/exit tracing + tight-loop fallback guard |
+| TASK-04 control-flow containment | ✅ Complete | Control-flow families routed to Musashi fallback |
+| TASK-05 MOVEC 68040 | ✅ Complete | Privileged MOVEC decode + 68040 control register handling |
+| TASK-06 fallback/exception discipline | ✅ Complete | Removed silent NOP substitution paths |
+| TASK-07 68040 FPU selection | ✅ Complete | `jitfpu` activation constrained to 68040 internal-FPU JIT path |
+| TASK-08 MMU invalidation | ✅ Complete | MMU-visible state signature tracking + cache invalidation |
+| TASK-09 validation | ⏳ In progress | Staged command set and regression checkpoints defined below |
 
 ## Current Implementation Status
 
@@ -72,6 +87,42 @@ The Musashi core uses macros for instruction fetch that need state parameter. Fi
 2. Or modifying m68kconf.h to use direct memory functions
 
 ## Usage
+
+### 68040 JIT Staged Validation (TASK-09)
+
+1. Baseline Musashi reference quick suite:
+```bash
+make musashi-ref-tests-quick
+```
+
+2. Baseline Musashi 68040 suite (xfail-gated):
+```bash
+make musashi-ref-tests-68040-ci
+```
+
+3. Run emulator with m68xkcpu selected but safe interpret mode:
+```bash
+sudo env PISTORM_M68XK_EXEC=1 PISTORM_M68XK_SAFE_INTERP=1 PISTORM_M68XK_FASTSTEP=0 ./emulator --log-level info --log jit68xk_safe.log
+```
+
+4. Run emitter execution path (host-code path) to check for host SIGILL regressions:
+```bash
+sudo env PISTORM_M68XK_EXEC=1 PISTORM_M68XK_SAFE_INTERP=0 PISTORM_M68XK_FASTSTEP=0 ./emulator --log-level info --log jit68xk_exec.log
+```
+
+5. Optional block/fallback tracing for regressions:
+```bash
+sudo env PISTORM_M68XK_EXEC=1 PISTORM_M68XK_SAFE_INTERP=0 PISTORM_M68XK_TRACE_BLOCKS=1 PISTORM_M68XK_TRACE_FALLBACK=1 ./emulator --log-level info --log jit68xk_trace.log
+```
+
+### Required PASS/FAIL Gates (Current Stage)
+
+- **PASS:** no host `SIGILL` in emitted AArch64 path.
+- **PASS:** no silent translator substitution (`jit_emit_unimplemented` is not used as a NOP path).
+- **PASS:** MMU-visible state changes emit invalidation log and flush stale JIT blocks.
+- **PASS:** MOVEC control-register sites do not regress into decode-level illegal handling in JIT translation stage.
+- **FAIL:** repeated tight-loop fallback storms without forward PC progress.
+- **FAIL:** stale-block execution after MMU control updates.
 
 ### Validate JSON Structure (Current Capability)
 
