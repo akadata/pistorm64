@@ -460,6 +460,12 @@ int jit_block_execute(jit_block_t *block, int max_cycles)
     
     typedef int (*jit_func_t)(int cycles);
     jit_func_t func = (jit_func_t)block->code_ptr;
+
+#if defined(__aarch64__)
+    /* JIT ABI contract: compiled blocks expect CPU state pointer in X19. */
+    register m68ki_cpu_core *cpu_ptr_reg asm("x19") = &m68ki_cpu;
+    asm volatile("" : : "r"(cpu_ptr_reg) : "x19");
+#endif
     
     int cycles = func(max_cycles);
     
