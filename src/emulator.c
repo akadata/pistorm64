@@ -510,6 +510,11 @@ static int m68xkcpu_jit_cpu_supported(unsigned int type) {
   }
 }
 
+static int m68xkcpu_jit_fpu_supported(unsigned int type) {
+  /* TASK-07 boundary: m68xkcpu FPU path currently models only 68040 internal FPU. */
+  return (type == M68K_CPU_TYPE_68040) ? 1 : 0;
+}
+
 static int read_kernel_param_bool(const char* name) {
   char path[128];
   char buf[8];
@@ -1914,11 +1919,6 @@ switch_config:
       enable_fpu_jit_backend = 1;
       printf("[CFG] FPU JIT backend enabled via config.\n");
     }
-    if (enable_fpu_jit_backend) {
-      fpu_exec_hook = fpu_backend_execute;
-    } else {
-      fpu_exec_hook = NULL;
-    }
 
     if (!cfg->platform) {
       cfg->platform = make_platform_config("none", "generic");
@@ -2108,6 +2108,20 @@ switch_config:
       enable_jit_backend = 0;
     }
 #endif
+
+    if (enable_fpu_jit_backend) {
+      if (!use_m68xk_jit) {
+        LOG_WARN("[CPU] jitfpu requested, but active backend is not m68xkcpu JIT; disabling FPU JIT hook.\n");
+        enable_fpu_jit_backend = 0;
+      } else if (!m68xkcpu_jit_fpu_supported(cpu_type)) {
+        LOG_WARN("[CPU] jitfpu requested for CPU=%s, but m68xkcpu FPU path is 68040-internal only; disabling.\n",
+                 cpu_type_name(cpu_type));
+        enable_fpu_jit_backend = 0;
+      } else {
+        LOG_INFO("[CPU] m68xkcpu jitfpu enabled for 68040 internal FPU model (not external 68882).\n");
+      }
+    }
+    fpu_exec_hook = enable_fpu_jit_backend ? fpu_backend_execute : NULL;
 
     cpu_pulse_reset();
   }
