@@ -82,9 +82,9 @@ typedef struct {
 #define AARCH64_RET                  0xD65F03C0u
 #define AARCH64_NOP                  0xD503201Fu
 #define AARCH64_REV(rd, rn)          (0xDAC00C00u | ((rn) << 5) | ((rd) & 0x1F))
-#define AARCH64_LSL(rd, rn, shift)   (0xD320F800u | (((shift) & 0x3F) << 10) | ((rn) << 5) | ((rd) & 0x1F))
-#define AARCH64_LSR(rd, rn, shift)   (0xD320FC00u | (((shift) & 0x3F) << 10) | ((rn) << 5) | ((rd) & 0x1F))
-#define AARCH64_ASR(rd, rn, shift)   (0xD340FC00u | (((shift) & 0x3F) << 10) | ((rn) << 5) | ((rd) & 0x1F))
+#define AARCH64_LSL(rd, rn, shift)   (0x53000000u | ((((32u - ((uint32_t)(shift) & 0x1Fu)) & 0x1Fu)) << 16) | ((((31u - ((uint32_t)(shift) & 0x1Fu)) & 0x1Fu)) << 10) | ((rn) << 5) | ((rd) & 0x1F))
+#define AARCH64_LSR(rd, rn, shift)   (0x53000000u | ((((uint32_t)(shift)) & 0x1Fu) << 16) | (31u << 10) | ((rn) << 5) | ((rd) & 0x1F))
+#define AARCH64_ASR(rd, rn, shift)   (0x13000000u | ((((uint32_t)(shift)) & 0x1Fu) << 16) | (31u << 10) | ((rn) << 5) | ((rd) & 0x1F))
 
 void jit_emit_init(jit_emit_context_t *ctx, uint8_t *buffer, size_t size);
 void jit_emit_byte(jit_emit_context_t *ctx, uint8_t byte);

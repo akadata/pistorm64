@@ -577,13 +577,13 @@ int jit_translate_move(jit_translate_context_t *tctx)
             /* MOVE <Dn>, <Dn> */
             jit_emit_load_dn(ctx, AARCH64_R0, src_reg);
             if (size == 0) {
-                /* Byte: zero-extend using LSL/LSR */
+                /* Byte: zero-extend using LSL/ASR */
                 jit_emit_dword(ctx, AARCH64_LSL(AARCH64_R0, AARCH64_R0, 24));
-                jit_emit_dword(ctx, AARCH64_LSR(AARCH64_R0, AARCH64_R0, 24));
+                jit_emit_dword(ctx, AARCH64_ASR(AARCH64_R0, AARCH64_R0, 24));
             } else if (size == 1) {
-                /* Word: zero-extend using LSL/LSR */
+                /* Word: zero-extend using LSL/ASR */
                 jit_emit_dword(ctx, AARCH64_LSL(AARCH64_R0, AARCH64_R0, 16));
-                jit_emit_dword(ctx, AARCH64_LSR(AARCH64_R0, AARCH64_R0, 16));
+                jit_emit_dword(ctx, AARCH64_ASR(AARCH64_R0, AARCH64_R0, 16));
             }
             /* Long: already 32-bit */
             jit_emit_store_dn(ctx, AARCH64_R0, dst_reg);
@@ -995,7 +995,6 @@ int jit_translate_logic(jit_translate_context_t *tctx)
 {
     jit_emit_context_t *ctx = tctx->emit;
     uint16_t opcode = tctx->opcode;
-    uint16_t *ext_words = tctx->ext_words;
     int ext_count = tctx->ext_count;
     /* AND/OR/EOR: 1100/1000/1100 size(2) dst_mode(3) dst_reg(3) src_mode(3) src_reg(3) */
     uint8_t op = (opcode >> 13) & 0x7; /* 0=AND, 1=OR, 2=EOR */

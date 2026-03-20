@@ -593,7 +593,7 @@ all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest pistorm_truth_tes
 
 clean:
 	rm -f $(DELETEFILES) $(TARGET).tmp
-	rm -rf src/a314/files_pi/__pycache__
+	rm -rf src/a314/files_pi/__pycache__ src/m68xkcpu/__pycache__
 	find . \( -name '*.o' -o -name '*.tmp' \) -print0 | xargs -0 -r rm -f --
 
 # Ensure generated m68k files are built before other files that depend on them
