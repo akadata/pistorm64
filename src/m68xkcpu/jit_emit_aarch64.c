@@ -1,4 +1,9 @@
 #include "jit_emit_aarch64.h"
+#include "musashi/m68kcpu.h"
+#include <stddef.h>
+
+#define JIT_CPU_OFF(member) ((int)offsetof(struct m68ki_cpu_core, member))
+#define JIT_CPU_OFF_DAR(index) ((int)(offsetof(struct m68ki_cpu_core, dar) + ((index) * sizeof(((struct m68ki_cpu_core *)0)->dar[0]))))
 
 void jit_emit_init(jit_emit_context_t *ctx, uint8_t *buffer, size_t size)
 {
@@ -58,92 +63,92 @@ void jit_emit_store_cpu_reg(jit_emit_context_t *ctx, uint8_t rt, int offset)
 
 void jit_emit_load_dn(jit_emit_context_t *ctx, uint8_t rt, int dn)
 {
-    jit_emit_load_cpu_reg(ctx, rt, dn * 4);
+    jit_emit_load_cpu_reg(ctx, rt, JIT_CPU_OFF_DAR(dn & 0xF));
 }
 
 void jit_emit_store_dn(jit_emit_context_t *ctx, uint8_t rt, int dn)
 {
-    jit_emit_store_cpu_reg(ctx, rt, dn * 4);
+    jit_emit_store_cpu_reg(ctx, rt, JIT_CPU_OFF_DAR(dn & 0xF));
 }
 
 void jit_emit_load_an(jit_emit_context_t *ctx, uint8_t rt, int an)
 {
-    jit_emit_load_cpu_reg(ctx, rt, 64 + an * 4);
+    jit_emit_load_cpu_reg(ctx, rt, JIT_CPU_OFF_DAR(8 + (an & 0x7)));
 }
 
 void jit_emit_store_an(jit_emit_context_t *ctx, uint8_t rt, int an)
 {
-    jit_emit_store_cpu_reg(ctx, rt, 64 + an * 4);
+    jit_emit_store_cpu_reg(ctx, rt, JIT_CPU_OFF_DAR(8 + (an & 0x7)));
 }
 
 void jit_emit_load_pc(jit_emit_context_t *ctx, uint8_t rt)
 {
-    jit_emit_dword(ctx, AARCH64_LDR_W(rt, AARCH64_CPU_PTR, 132));
+    jit_emit_dword(ctx, AARCH64_LDR_W(rt, AARCH64_CPU_PTR, JIT_CPU_OFF(pc)));
 }
 
 void jit_emit_store_pc(jit_emit_context_t *ctx, uint8_t rt)
 {
-    jit_emit_dword(ctx, AARCH64_STR_W(rt, AARCH64_CPU_PTR, 132));
+    jit_emit_dword(ctx, AARCH64_STR_W(rt, AARCH64_CPU_PTR, JIT_CPU_OFF(pc)));
 }
 
 void jit_emit_store_itt0(jit_emit_context_t *ctx, uint8_t rt)
 {
-    jit_emit_store_cpu_reg(ctx, rt, 320);
+    jit_emit_store_cpu_reg(ctx, rt, JIT_CPU_OFF(mmu_itt0));
 }
 
 void jit_emit_load_itt0(jit_emit_context_t *ctx, uint8_t rt)
 {
-    jit_emit_load_cpu_reg(ctx, rt, 320);
+    jit_emit_load_cpu_reg(ctx, rt, JIT_CPU_OFF(mmu_itt0));
 }
 
 void jit_emit_store_itt1(jit_emit_context_t *ctx, uint8_t rt)
 {
-    jit_emit_store_cpu_reg(ctx, rt, 324);
+    jit_emit_store_cpu_reg(ctx, rt, JIT_CPU_OFF(mmu_itt1));
 }
 
 void jit_emit_load_itt1(jit_emit_context_t *ctx, uint8_t rt)
 {
-    jit_emit_load_cpu_reg(ctx, rt, 324);
+    jit_emit_load_cpu_reg(ctx, rt, JIT_CPU_OFF(mmu_itt1));
 }
 
 void jit_emit_store_dtt0(jit_emit_context_t *ctx, uint8_t rt)
 {
-    jit_emit_store_cpu_reg(ctx, rt, 328);
+    jit_emit_store_cpu_reg(ctx, rt, JIT_CPU_OFF(mmu_dtt0));
 }
 
 void jit_emit_load_dtt0(jit_emit_context_t *ctx, uint8_t rt)
 {
-    jit_emit_load_cpu_reg(ctx, rt, 328);
+    jit_emit_load_cpu_reg(ctx, rt, JIT_CPU_OFF(mmu_dtt0));
 }
 
 void jit_emit_store_dtt1(jit_emit_context_t *ctx, uint8_t rt)
 {
-    jit_emit_store_cpu_reg(ctx, rt, 332);
+    jit_emit_store_cpu_reg(ctx, rt, JIT_CPU_OFF(mmu_dtt1));
 }
 
 void jit_emit_load_dtt1(jit_emit_context_t *ctx, uint8_t rt)
 {
-    jit_emit_load_cpu_reg(ctx, rt, 332);
+    jit_emit_load_cpu_reg(ctx, rt, JIT_CPU_OFF(mmu_dtt1));
 }
 
 void jit_emit_store_tc(jit_emit_context_t *ctx, uint8_t rt)
 {
-    jit_emit_store_cpu_reg(ctx, rt, 336);
+    jit_emit_store_cpu_reg(ctx, rt, JIT_CPU_OFF(mmu_tc));
 }
 
 void jit_emit_load_tc(jit_emit_context_t *ctx, uint8_t rt)
 {
-    jit_emit_load_cpu_reg(ctx, rt, 336);
+    jit_emit_load_cpu_reg(ctx, rt, JIT_CPU_OFF(mmu_tc));
 }
 
 void jit_emit_store_acr(jit_emit_context_t *ctx, uint8_t rt, int acr_num)
 {
-    jit_emit_store_cpu_reg(ctx, rt, 340 + acr_num * 4);
+    jit_emit_store_cpu_reg(ctx, rt, JIT_CPU_OFF(mmu_acr0) + (acr_num * (int)sizeof(((struct m68ki_cpu_core *)0)->mmu_acr0)));
 }
 
 void jit_emit_load_acr(jit_emit_context_t *ctx, uint8_t rt, int acr_num)
 {
-    jit_emit_load_cpu_reg(ctx, rt, 340 + acr_num * 4);
+    jit_emit_load_cpu_reg(ctx, rt, JIT_CPU_OFF(mmu_acr0) + (acr_num * (int)sizeof(((struct m68ki_cpu_core *)0)->mmu_acr0)));
 }
 
 void jit_emit_load_sr(jit_emit_context_t *ctx, uint8_t rt)
@@ -169,10 +174,10 @@ void jit_emit_epilogue(jit_emit_context_t *ctx)
 
 void jit_emit_inc_pc(jit_emit_context_t *ctx, int instr_size)
 {
-    jit_emit_dword(ctx, AARCH64_LDR_W(AARCH64_R0, AARCH64_CPU_PTR, 132));
+    jit_emit_dword(ctx, AARCH64_LDR_W(AARCH64_R0, AARCH64_CPU_PTR, JIT_CPU_OFF(pc)));
     jit_emit_mov64(ctx, AARCH64_R1, instr_size);
     jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R0, AARCH64_R0, AARCH64_R1));
-    jit_emit_dword(ctx, AARCH64_STR_W(AARCH64_R0, AARCH64_CPU_PTR, 132));
+    jit_emit_dword(ctx, AARCH64_STR_W(AARCH64_R0, AARCH64_CPU_PTR, JIT_CPU_OFF(pc)));
 }
 
 void jit_emit_unimplemented(jit_emit_context_t *ctx, uint16_t opcode)

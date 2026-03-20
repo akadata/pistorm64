@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stddef.h>
 
 /* Hash function for PC lookup */
 static inline uint32_t jit_hash_pc(uint32_t pc)
@@ -1385,6 +1386,7 @@ int jit_translate_jmp(jit_translate_context_t *tctx)
 int jit_translate_movec(jit_translate_context_t *tctx)
 {
     jit_emit_context_t *ctx = tctx->emit;
+    m68ki_cpu_core *cpu = tctx->jit ? tctx->jit->cpu : NULL;
     uint16_t opcode = tctx->opcode;
     uint16_t *ext_words = tctx->ext_words;
     int ext_count = tctx->ext_count;
@@ -1393,8 +1395,22 @@ int jit_translate_movec(jit_translate_context_t *tctx)
     uint16_t creg;
     int rn_to_cr;
     int handled = 1;
+    const int off_sp = (int)offsetof(struct m68ki_cpu_core, sp);
+    const int off_sp_elem = (int)sizeof(((struct m68ki_cpu_core *)0)->sp[0]);
+    const int off_vbr = (int)offsetof(struct m68ki_cpu_core, vbr);
+    const int off_sfc = (int)offsetof(struct m68ki_cpu_core, sfc);
+    const int off_dfc = (int)offsetof(struct m68ki_cpu_core, dfc);
+    const int off_cacr = (int)offsetof(struct m68ki_cpu_core, cacr);
+    const int off_mmu_mmusr = (int)offsetof(struct m68ki_cpu_core, mmu_sr_040);
+    const int off_mmu_urp = (int)offsetof(struct m68ki_cpu_core, mmu_urp_aptr);
+    const int off_mmu_srp = (int)offsetof(struct m68ki_cpu_core, mmu_srp_aptr);
 
-    if (ext_count < 1) {
+    if (!cpu || ext_count < 1) {
+        return -1;
+    }
+
+    /* MOVEC is privileged; force fallback outside supervisor mode. */
+    if (!cpu->s_flag) {
         return -1;
     }
 
@@ -1415,29 +1431,31 @@ int jit_translate_movec(jit_translate_context_t *tctx)
         /* MOVEC CR,Rn */
         switch (creg) {
         case 0x000: /* SFC */
+            jit_emit_load_cpu_reg(ctx, AARCH64_R0, off_sfc);
+            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
+            break;
         case 0x001: /* DFC */
-            jit_emit_mov64(ctx, AARCH64_R0, 0);
+            jit_emit_load_cpu_reg(ctx, AARCH64_R0, off_dfc);
             jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
             break;
         case 0x800: /* USP */
-            jit_emit_load_an(ctx, AARCH64_R0, 7);
+            jit_emit_load_cpu_reg(ctx, AARCH64_R0, off_sp + (0 * off_sp_elem));
             jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
             break;
         case 0x801: /* VBR */
-            jit_emit_load_cpu_reg(ctx, AARCH64_R0, 256);
-            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
-            break;
-        case 0x802: /* CAAR (020/030) */
-            jit_emit_mov64(ctx, AARCH64_R0, 0);
+            jit_emit_load_cpu_reg(ctx, AARCH64_R0, off_vbr);
             jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
             break;
         case 0x803: /* MSP */
+            jit_emit_load_cpu_reg(ctx, AARCH64_R0, off_sp + (6 * off_sp_elem));
+            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
+            break;
         case 0x804: /* ISP */
-            jit_emit_load_an(ctx, AARCH64_R0, 7);
+            jit_emit_load_cpu_reg(ctx, AARCH64_R0, off_sp + (4 * off_sp_elem));
             jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
             break;
         case 0x002: /* CACR */
-            jit_emit_mov64(ctx, AARCH64_R0, 0);
+            jit_emit_load_cpu_reg(ctx, AARCH64_R0, off_cacr);
             jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
             break;
         case 0x808: /* PCR */
@@ -1465,9 +1483,15 @@ int jit_translate_movec(jit_translate_context_t *tctx)
             jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
             break;
         case 0x805: /* MMUSR */
+            jit_emit_load_cpu_reg(ctx, AARCH64_R0, off_mmu_mmusr);
+            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
+            break;
         case 0x806: /* URP */
+            jit_emit_load_cpu_reg(ctx, AARCH64_R0, off_mmu_urp);
+            jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
+            break;
         case 0x807: /* SRP */
-            jit_emit_mov64(ctx, AARCH64_R0, 0);
+            jit_emit_load_cpu_reg(ctx, AARCH64_R0, off_mmu_srp);
             jit_movec_store_gpr(ctx, reg_field, AARCH64_R0);
             break;
         default:
@@ -1479,24 +1503,25 @@ int jit_translate_movec(jit_translate_context_t *tctx)
         jit_movec_load_gpr(ctx, reg_field, AARCH64_R0);
         switch (creg) {
         case 0x000: /* SFC */
+            jit_emit_store_cpu_reg(ctx, AARCH64_R0, off_sfc);
+            break;
         case 0x001: /* DFC */
-            /* Accepted, no side effect in JIT path. */
+            jit_emit_store_cpu_reg(ctx, AARCH64_R0, off_dfc);
             break;
         case 0x800: /* USP */
-            jit_emit_store_an(ctx, AARCH64_R0, 7);
+            jit_emit_store_cpu_reg(ctx, AARCH64_R0, off_sp + (0 * off_sp_elem));
             break;
         case 0x801: /* VBR */
-            jit_emit_store_cpu_reg(ctx, AARCH64_R0, 256);
-            break;
-        case 0x802: /* CAAR (020/030) */
-            /* Accepted, no CAAR model in JIT path. */
+            jit_emit_store_cpu_reg(ctx, AARCH64_R0, off_vbr);
             break;
         case 0x803: /* MSP */
+            jit_emit_store_cpu_reg(ctx, AARCH64_R0, off_sp + (6 * off_sp_elem));
+            break;
         case 0x804: /* ISP */
-            jit_emit_store_an(ctx, AARCH64_R0, 7);
+            jit_emit_store_cpu_reg(ctx, AARCH64_R0, off_sp + (4 * off_sp_elem));
             break;
         case 0x002: /* CACR */
-            /* Accepted, cache model is not implemented in JIT path. */
+            jit_emit_store_cpu_reg(ctx, AARCH64_R0, off_cacr);
             break;
         case 0x003: /* TC */
             jit_emit_store_tc(ctx, AARCH64_R0);
@@ -1514,9 +1539,13 @@ int jit_translate_movec(jit_translate_context_t *tctx)
             jit_emit_store_dtt1(ctx, AARCH64_R0);
             break;
         case 0x805: /* MMUSR */
+            jit_emit_store_cpu_reg(ctx, AARCH64_R0, off_mmu_mmusr);
+            break;
         case 0x806: /* URP */
+            jit_emit_store_cpu_reg(ctx, AARCH64_R0, off_mmu_urp);
+            break;
         case 0x807: /* SRP */
-            /* Accepted, MMU root/sr registers are not modeled in JIT path. */
+            jit_emit_store_cpu_reg(ctx, AARCH64_R0, off_mmu_srp);
             break;
         default:
             handled = 0;
