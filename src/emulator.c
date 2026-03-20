@@ -2057,9 +2057,9 @@ switch_config:
 
   if (!use_uae_jit) {
     m68k_init();
-    printf("Setting CPU type to %d.\n", cpu_type);
+    printf("Setting CPU model to %d.\n", cpu_type);
     m68k_set_cpu_type(&m68ki_cpu, cpu_type);
-    LOG_INFO("[CPU] Musashi configured: model=%s PMMU=%s FPU=%s\n",
+    LOG_INFO("[CPU] Core state configured: model=%s PMMU=%s FPU=%s\n",
              cpu_type_name(cpu_type),
              m68ki_cpu.has_pmmu ? "on" : "off",
              m68ki_cpu.has_fpu ? "on" : "off");

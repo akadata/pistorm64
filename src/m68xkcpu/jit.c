@@ -310,10 +310,18 @@ static const char *jit_progress_update_and_detect(jit_progress_tracker_t *tracke
 int jit_no_fallback_enabled(void)
 {
     if (g_jit_no_fallback_enabled < 0) {
-        const char *e = getenv("PISTORM_M68XK_NO_FALLBACK");
-        g_jit_no_fallback_enabled = (e && atoi(e) != 0) ? 1 : 0;
+        const char *strict_env = getenv("PISTORM_M68XK_NO_FALLBACK");
+        const char *allow_env = getenv("PISTORM_M68XK_ALLOW_FALLBACK");
+        if (strict_env) {
+            g_jit_no_fallback_enabled = (atoi(strict_env) != 0) ? 1 : 0;
+        } else {
+            /* Default to strict JIT-only execution unless explicitly relaxed. */
+            g_jit_no_fallback_enabled = (allow_env && atoi(allow_env) != 0) ? 0 : 1;
+        }
         if (g_jit_no_fallback_enabled) {
-            LOG_WARN("[CPU] m68xkcpu NO_FALLBACK mode enabled - unsupported instructions will abort()\n");
+            LOG_WARN("[CPU] m68xkcpu strict mode enabled - Musashi fallback disabled; unsupported paths will abort()\n");
+        } else {
+            LOG_WARN("[CPU] m68xkcpu fallback explicitly enabled via PISTORM_M68XK_ALLOW_FALLBACK=1\n");
         }
     }
     return g_jit_no_fallback_enabled;
@@ -344,7 +352,16 @@ static int jit_fallback_interpreter_step(jit_context_t *jit, int cycles_budget)
 {
     int ran;
     int slice;
+    uint8_t fc_prog;
+    uint16_t opcode = 0;
     if (!jit || !jit->cpu) {
+        return -1;
+    }
+
+    if (jit_no_fallback_enabled()) {
+        fc_prog = jit_get_fc(jit->cpu->s_flag ? 1 : 0, 1);
+        opcode = jit_fetch_word(jit->cpu->pc, fc_prog);
+        jit_hard_fail(jit->cpu->pc, opcode, "fallback-disabled");
         return -1;
     }
 
@@ -812,6 +829,9 @@ int jit_init(struct m68ki_cpu_core *cpu, size_t cache_size)
     g_jit.initialized = true;
     g_jit.mmu_state_sig = 0;
     g_jit.mmu_state_valid = false;
+
+    /* Emit startup policy once so strict-vs-fallback mode is explicit in logs. */
+    (void)jit_no_fallback_enabled();
     
     printf("JIT: Initialized with %zu KB cache\n", g_jit.cache_size / 1024);
     
