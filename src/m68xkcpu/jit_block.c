@@ -377,6 +377,8 @@ int jit_block_emit(jit_context_t *jit, jit_block_t *block)
                 return 0;
         }
         
+        block->host_offsets[i] = (uint16_t)emit.offset;
+
         if (translator) {
             jit_translate_context_t tctx = {
                 .jit = jit,
@@ -400,6 +402,8 @@ int jit_block_emit(jit_context_t *jit, jit_block_t *block)
             return -1;
         }
     }
+
+    block->host_offsets[block->instruction_count] = (uint16_t)emit.offset;
     
     /* Emit epilogue */
     jit_emit_epilogue(&emit);
@@ -442,10 +446,12 @@ int jit_block_execute(jit_block_t *block, int max_cycles)
     asm volatile("mov x19, %0" : : "r"(&m68ki_cpu) : "x19");
 #endif
     
+    extern jit_context_t g_jit;
+    g_jit.current_block = block;
     int cycles = func(max_cycles);
+    g_jit.current_block = NULL;
     
     /* Sync PC from CPU state after execution */
-    extern jit_context_t g_jit;
     g_jit.current_pc = (uint32_t)m68ki_cpu.pc;
     
     jit_log_block_done(block, &m68ki_cpu, cycles);
@@ -732,25 +738,26 @@ int jit_translate_add(jit_translate_context_t *tctx)
         /* ADD (An),Dn */
         jit_emit_load_an(ctx, AARCH64_R2, src_reg);
         if (opmode == 0) {
-            jit_emit_dword(ctx, AARCH64_LDRB(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read8(ctx, AARCH64_R1, AARCH64_R2);
         } else if (opmode == 1) {
-            jit_emit_dword(ctx, AARCH64_LDRH(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read16(ctx, AARCH64_R1, AARCH64_R2);
         } else {
-            jit_emit_dword(ctx, AARCH64_LDR(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read32(ctx, AARCH64_R1, AARCH64_R2);
         }
     } else if (src_mode == 3) {
         /* ADD (An)+,Dn */
         jit_emit_load_an(ctx, AARCH64_R2, src_reg);
         if (opmode == 0) {
-            jit_emit_dword(ctx, AARCH64_LDRB(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read8(ctx, AARCH64_R1, AARCH64_R2);
             incr = (src_reg == 7) ? 2 : 1;
         } else if (opmode == 1) {
-            jit_emit_dword(ctx, AARCH64_LDRH(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read16(ctx, AARCH64_R1, AARCH64_R2);
             incr = 2;
         } else {
-            jit_emit_dword(ctx, AARCH64_LDR(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read32(ctx, AARCH64_R1, AARCH64_R2);
             incr = 4;
         }
+        jit_emit_load_an(ctx, AARCH64_R2, src_reg);
         jit_emit_mov64(ctx, AARCH64_R3, (uint64_t)incr);
         jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R2, AARCH64_R2, AARCH64_R3));
         jit_emit_store_an(ctx, AARCH64_R2, src_reg);
@@ -761,11 +768,11 @@ int jit_translate_add(jit_translate_context_t *tctx)
         jit_emit_mov64(ctx, AARCH64_R3, (uint64_t)(int32_t)disp);
         jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R2, AARCH64_R2, AARCH64_R3));
         if (opmode == 0) {
-            jit_emit_dword(ctx, AARCH64_LDRB(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read8(ctx, AARCH64_R1, AARCH64_R2);
         } else if (opmode == 1) {
-            jit_emit_dword(ctx, AARCH64_LDRH(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read16(ctx, AARCH64_R1, AARCH64_R2);
         } else {
-            jit_emit_dword(ctx, AARCH64_LDR(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read32(ctx, AARCH64_R1, AARCH64_R2);
         }
     } else {
         return -1;
@@ -957,24 +964,25 @@ int jit_translate_cmp(jit_translate_context_t *tctx)
     } else if (src_mode == 2) {
         jit_emit_load_an(ctx, AARCH64_R2, src_reg);
         if (opmode == 0) {
-            jit_emit_dword(ctx, AARCH64_LDRB(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read8(ctx, AARCH64_R1, AARCH64_R2);
         } else if (opmode == 1) {
-            jit_emit_dword(ctx, AARCH64_LDRH(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read16(ctx, AARCH64_R1, AARCH64_R2);
         } else {
-            jit_emit_dword(ctx, AARCH64_LDR(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read32(ctx, AARCH64_R1, AARCH64_R2);
         }
     } else if (src_mode == 3) {
         jit_emit_load_an(ctx, AARCH64_R2, src_reg);
         if (opmode == 0) {
-            jit_emit_dword(ctx, AARCH64_LDRB(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read8(ctx, AARCH64_R1, AARCH64_R2);
             incr = (src_reg == 7) ? 2 : 1;
         } else if (opmode == 1) {
-            jit_emit_dword(ctx, AARCH64_LDRH(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read16(ctx, AARCH64_R1, AARCH64_R2);
             incr = 2;
         } else {
-            jit_emit_dword(ctx, AARCH64_LDR(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read32(ctx, AARCH64_R1, AARCH64_R2);
             incr = 4;
         }
+        jit_emit_load_an(ctx, AARCH64_R2, src_reg);
         jit_emit_mov64(ctx, AARCH64_R3, (uint64_t)incr);
         jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R2, AARCH64_R2, AARCH64_R3));
         jit_emit_store_an(ctx, AARCH64_R2, src_reg);
@@ -984,11 +992,11 @@ int jit_translate_cmp(jit_translate_context_t *tctx)
         jit_emit_mov64(ctx, AARCH64_R3, (uint64_t)(int32_t)disp);
         jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R2, AARCH64_R2, AARCH64_R3));
         if (opmode == 0) {
-            jit_emit_dword(ctx, AARCH64_LDRB(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read8(ctx, AARCH64_R1, AARCH64_R2);
         } else if (opmode == 1) {
-            jit_emit_dword(ctx, AARCH64_LDRH(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read16(ctx, AARCH64_R1, AARCH64_R2);
         } else {
-            jit_emit_dword(ctx, AARCH64_LDR(AARCH64_R1, AARCH64_R2, 0));
+            jit_emit_call_read32(ctx, AARCH64_R1, AARCH64_R2);
         }
     } else {
         return -1;

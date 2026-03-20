@@ -50,6 +50,11 @@ struct jit_block {
         uint8_t ext_count;
         uint8_t cycles;
     } instructions[JIT_MAX_BLOCK_INSTRUCTIONS];
+
+    /* Host code byte offsets per translated 68k instruction start.
+     * host_offsets[i] is start offset of instructions[i], and
+     * host_offsets[instruction_count] is end of translated instruction region. */
+    uint16_t host_offsets[JIT_MAX_BLOCK_INSTRUCTIONS + 1];
 };
 
 /* Block allocation */

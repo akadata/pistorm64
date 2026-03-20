@@ -25,6 +25,54 @@ static int g_jit_safe_interp_enabled = -1;
 static int g_jit_no_fallback_enabled = -1;
 static int g_jit_trace_blocks_enabled = -1;
 
+static void jit_dump_current_block_fault(uint64_t fault_pc)
+{
+    jit_block_t *block = g_jit.current_block;
+    uintptr_t base;
+    uintptr_t end;
+    size_t byte_off;
+    size_t word_idx;
+    int instr_idx = -1;
+
+    if (!block || !block->code_ptr || block->code_size == 0) {
+        fprintf(stderr, "Current JIT block: unavailable\n");
+        return;
+    }
+
+    base = (uintptr_t)block->code_ptr;
+    end = base + block->code_size;
+    fprintf(stderr, "Current JIT block: entry=0x%08X host=%p size=%zu\n",
+            block->start_pc, (void *)block->code_ptr, block->code_size);
+
+    if ((uintptr_t)fault_pc < base || (uintptr_t)fault_pc >= end) {
+        fprintf(stderr, "Fault PC is outside current JIT block range.\n");
+        return;
+    }
+
+    byte_off = (size_t)((uintptr_t)fault_pc - base);
+    word_idx = byte_off / 4u;
+    fprintf(stderr, "Fault offset in block: +0x%zX (word[%zu])\n", byte_off, word_idx);
+    fprintf(stderr, "Fault word: 0x%08X\n", ((uint32_t *)block->code_ptr)[word_idx]);
+
+    for (int i = 0; i < block->instruction_count; i++) {
+        uint32_t start = block->host_offsets[i];
+        uint32_t stop = block->host_offsets[i + 1];
+        if (byte_off >= start && byte_off < stop) {
+            instr_idx = i;
+            break;
+        }
+    }
+
+    if (instr_idx >= 0) {
+        fprintf(stderr, "Mapped 68k instruction index: %d opcode=0x%04X ext_count=%u\n",
+                instr_idx,
+                block->instructions[instr_idx].opcode,
+                (unsigned)block->instructions[instr_idx].ext_count);
+    } else {
+        fprintf(stderr, "Mapped 68k instruction index: none (likely epilogue/return path)\n");
+    }
+}
+
 /* Signal handler for illegal instruction (SIGILL) */
 static void jit_sigill_handler(int sig, siginfo_t *info, void *context)
 {
@@ -36,6 +84,7 @@ static void jit_sigill_handler(int sig, siginfo_t *info, void *context)
     fprintf(stderr, "JIT enabled: %d\n", g_jit.enabled);
     fprintf(stderr, "Safe interp: %d\n", g_jit_safe_interp_enabled);
     fprintf(stderr, "Current 68k PC: 0x%08X\n", g_jit.current_pc);
+    jit_dump_current_block_fault(fault_pc);
     
     if (g_jit.cpu) {
         fprintf(stderr, "\n68k CPU State:\n");
@@ -48,9 +97,39 @@ static void jit_sigill_handler(int sig, siginfo_t *info, void *context)
         fprintf(stderr, "PC: %08X\n", g_jit.cpu->pc);
     }
     
-    fprintf(stderr, "\nThis is likely a JIT code generation bug.\n");
-    fprintf(stderr, "Use PISTORM_M68XK_SAFE_INTERP=1 for stable (slow) operation.\n");
+    fprintf(stderr, "\nThis is a JIT code generation/runtime bug.\n");
     
+    (void)sig;
+    (void)info;
+    
+    _exit(1);
+}
+
+static void jit_sigsegv_handler(int sig, siginfo_t *info, void *context)
+{
+    ucontext_t *uc = (ucontext_t *)context;
+    uint64_t fault_pc = uc->uc_mcontext.pc;
+
+    fprintf(stderr, "\n\n!!! SIGSEGV - Segmentation Fault in JIT path !!!\n");
+    fprintf(stderr, "Fault PC: 0x%016lX (AArch64)\n", fault_pc);
+    fprintf(stderr, "Fault address: %p\n", info ? info->si_addr : NULL);
+    fprintf(stderr, "JIT enabled: %d\n", g_jit.enabled);
+    fprintf(stderr, "Safe interp: %d\n", g_jit_safe_interp_enabled);
+    fprintf(stderr, "Current 68k PC: 0x%08X\n", g_jit.current_pc);
+    jit_dump_current_block_fault(fault_pc);
+
+    if (g_jit.cpu) {
+        fprintf(stderr, "\n68k CPU State:\n");
+        fprintf(stderr, "D0-D7: %08X %08X %08X %08X %08X %08X %08X %08X\n",
+                g_jit.cpu->dar[0], g_jit.cpu->dar[1], g_jit.cpu->dar[2], g_jit.cpu->dar[3],
+                g_jit.cpu->dar[4], g_jit.cpu->dar[5], g_jit.cpu->dar[6], g_jit.cpu->dar[7]);
+        fprintf(stderr, "A0-A7: %08X %08X %08X %08X %08X %08X %08X %08X\n",
+                g_jit.cpu->dar[8], g_jit.cpu->dar[9], g_jit.cpu->dar[10], g_jit.cpu->dar[11],
+                g_jit.cpu->dar[12], g_jit.cpu->dar[13], g_jit.cpu->dar[14], g_jit.cpu->dar[15]);
+        fprintf(stderr, "PC: %08X\n", g_jit.cpu->pc);
+    }
+
+    (void)sig;
     _exit(1);
 }
 
@@ -61,6 +140,11 @@ static void jit_install_signal_handler(void)
     sa.sa_sigaction = jit_sigill_handler;
     sa.sa_flags = SA_SIGINFO;
     sigaction(SIGILL, &sa, NULL);
+
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_sigaction = jit_sigsegv_handler;
+    sa.sa_flags = SA_SIGINFO;
+    sigaction(SIGSEGV, &sa, NULL);
 }
 
 static int jit_faststep_enabled(void)

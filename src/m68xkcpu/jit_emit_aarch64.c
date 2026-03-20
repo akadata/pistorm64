@@ -5,6 +5,10 @@
 #define JIT_CPU_OFF(member) ((int)offsetof(struct m68ki_cpu_core, member))
 #define JIT_CPU_OFF_DAR(index) ((int)(offsetof(struct m68ki_cpu_core, dar) + ((index) * sizeof(((struct m68ki_cpu_core *)0)->dar[0]))))
 
+extern unsigned int m68k_read_memory_8(unsigned int address);
+extern unsigned int m68k_read_memory_16(unsigned int address);
+extern unsigned int m68k_read_memory_32(unsigned int address);
+
 void jit_emit_init(jit_emit_context_t *ctx, uint8_t *buffer, size_t size)
 {
     ctx->buffer = buffer;
@@ -185,6 +189,41 @@ void jit_emit_unimplemented(jit_emit_context_t *ctx, uint16_t opcode)
 {
     ctx->error = true;
     (void)opcode;
+}
+
+static void jit_emit_call_read_common(jit_emit_context_t *ctx,
+                                      uint8_t dst_reg,
+                                      uint8_t addr_reg,
+                                      uintptr_t fn_addr)
+{
+    /* Place address argument in X0/W0. */
+    if (addr_reg != AARCH64_R0) {
+        jit_emit_dword(ctx, AARCH64_ORR(AARCH64_R0, addr_reg, addr_reg));
+    }
+
+    /* Indirect call through a scratch register. */
+    jit_emit_mov64(ctx, AARCH64_R6, (uint64_t)fn_addr);
+    jit_emit_dword(ctx, AARCH64_BLR(AARCH64_R6));
+
+    /* Move return value from X0/W0 if needed. */
+    if (dst_reg != AARCH64_R0) {
+        jit_emit_dword(ctx, AARCH64_ORR(dst_reg, AARCH64_R0, AARCH64_R0));
+    }
+}
+
+void jit_emit_call_read8(jit_emit_context_t *ctx, uint8_t dst_reg, uint8_t addr_reg)
+{
+    jit_emit_call_read_common(ctx, dst_reg, addr_reg, (uintptr_t)&m68k_read_memory_8);
+}
+
+void jit_emit_call_read16(jit_emit_context_t *ctx, uint8_t dst_reg, uint8_t addr_reg)
+{
+    jit_emit_call_read_common(ctx, dst_reg, addr_reg, (uintptr_t)&m68k_read_memory_16);
+}
+
+void jit_emit_call_read32(jit_emit_context_t *ctx, uint8_t dst_reg, uint8_t addr_reg)
+{
+    jit_emit_call_read_common(ctx, dst_reg, addr_reg, (uintptr_t)&m68k_read_memory_32);
 }
 
 void jit_emit_store_nzcv_flags(jit_emit_context_t *ctx, int invert_carry)

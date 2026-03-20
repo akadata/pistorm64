@@ -61,6 +61,7 @@ typedef struct {
 
 #define AARCH64_B(imm)                (0x14000000u | ((imm) & 0x03FFFFFF))
 #define AARCH64_BL(imm)               (0x94000000u | ((imm) & 0x03FFFFFF))
+#define AARCH64_BLR(rn)               (0xD63F0000u | (((rn) & 0x1F) << 5))
 #define AARCH64_BCOND(cond, imm)      (0x54000000u | ((cond) & 0xF) | (((imm) & 0x7FFFF) << 5))
 #define AARCH64_CBZ(rt, imm)          (0x34000000u | ((((uint32_t)(imm) >> 2) & 0x7FFFFu) << 5) | ((rt) & 0x1F))
 #define AARCH64_CBNZ(rt, imm)         (0x35000000u | ((((uint32_t)(imm) >> 2) & 0x7FFFFu) << 5) | ((rt) & 0x1F))
@@ -125,5 +126,8 @@ void jit_emit_epilogue(jit_emit_context_t *ctx);
 void jit_emit_inc_pc(jit_emit_context_t *ctx, int instr_size);
 void jit_emit_unimplemented(jit_emit_context_t *ctx, uint16_t opcode);
 void jit_emit_store_nzcv_flags(jit_emit_context_t *ctx, int invert_carry);
+void jit_emit_call_read8(jit_emit_context_t *ctx, uint8_t dst_reg, uint8_t addr_reg);
+void jit_emit_call_read16(jit_emit_context_t *ctx, uint8_t dst_reg, uint8_t addr_reg);
+void jit_emit_call_read32(jit_emit_context_t *ctx, uint8_t dst_reg, uint8_t addr_reg);
 
 #endif /* JIT_EMIT_AARCH64_H */
