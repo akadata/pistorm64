@@ -186,3 +186,44 @@ void jit_emit_unimplemented(jit_emit_context_t *ctx, uint16_t opcode)
     ctx->error = true;
     (void)opcode;
 }
+
+void jit_emit_store_nzcv_flags(jit_emit_context_t *ctx, int invert_carry)
+{
+    const int off_n = JIT_CPU_OFF(n_flag);
+    const int off_notz = JIT_CPU_OFF(not_z_flag);
+    const int off_v = JIT_CPU_OFF(v_flag);
+    const int off_c = JIT_CPU_OFF(c_flag);
+    const int off_x = JIT_CPU_OFF(x_flag);
+
+    /* R3 <= NZCV (bits 31..28 are N,Z,C,V). */
+    jit_emit_dword(ctx, AARCH64_MRS_NZCV(AARCH64_R3));
+    jit_emit_mov64(ctx, AARCH64_R7, 1);
+
+    /* n_flag = (N << 7) */
+    jit_emit_dword(ctx, AARCH64_LSR(AARCH64_R4, AARCH64_R3, 31));
+    jit_emit_dword(ctx, AARCH64_AND_W(AARCH64_R4, AARCH64_R4, AARCH64_R7));
+    jit_emit_dword(ctx, AARCH64_LSL(AARCH64_R4, AARCH64_R4, 7));
+    jit_emit_store_cpu_reg(ctx, AARCH64_R4, off_n);
+
+    /* not_z_flag = !Z (0 when equal, 1 when not equal). */
+    jit_emit_dword(ctx, AARCH64_LSR(AARCH64_R4, AARCH64_R3, 30));
+    jit_emit_dword(ctx, AARCH64_AND_W(AARCH64_R4, AARCH64_R4, AARCH64_R7));
+    jit_emit_dword(ctx, AARCH64_EOR_W(AARCH64_R4, AARCH64_R4, AARCH64_R7));
+    jit_emit_store_cpu_reg(ctx, AARCH64_R4, off_notz);
+
+    /* v_flag = (V << 7) */
+    jit_emit_dword(ctx, AARCH64_LSR(AARCH64_R4, AARCH64_R3, 28));
+    jit_emit_dword(ctx, AARCH64_AND_W(AARCH64_R4, AARCH64_R4, AARCH64_R7));
+    jit_emit_dword(ctx, AARCH64_LSL(AARCH64_R4, AARCH64_R4, 7));
+    jit_emit_store_cpu_reg(ctx, AARCH64_R4, off_v);
+
+    /* c_flag/x_flag = (C << 8), with optional inversion for SUB/CMP semantics. */
+    jit_emit_dword(ctx, AARCH64_LSR(AARCH64_R4, AARCH64_R3, 29));
+    jit_emit_dword(ctx, AARCH64_AND_W(AARCH64_R4, AARCH64_R4, AARCH64_R7));
+    if (invert_carry) {
+        jit_emit_dword(ctx, AARCH64_EOR_W(AARCH64_R4, AARCH64_R4, AARCH64_R7));
+    }
+    jit_emit_dword(ctx, AARCH64_LSL(AARCH64_R4, AARCH64_R4, 8));
+    jit_emit_store_cpu_reg(ctx, AARCH64_R4, off_c);
+    jit_emit_store_cpu_reg(ctx, AARCH64_R4, off_x);
+}

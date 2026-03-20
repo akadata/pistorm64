@@ -82,6 +82,7 @@ typedef struct {
 
 #define AARCH64_RET                  0xD65F03C0u
 #define AARCH64_NOP                  0xD503201Fu
+#define AARCH64_MRS_NZCV(rt)         (0xD53B4200u | ((rt) & 0x1F))
 #define AARCH64_REV(rd, rn)          (0xDAC00C00u | ((rn) << 5) | ((rd) & 0x1F))
 #define AARCH64_LSL(rd, rn, shift)   (0x53000000u | ((((32u - ((uint32_t)(shift) & 0x1Fu)) & 0x1Fu)) << 16) | ((((31u - ((uint32_t)(shift) & 0x1Fu)) & 0x1Fu)) << 10) | ((rn) << 5) | ((rd) & 0x1F))
 #define AARCH64_LSR(rd, rn, shift)   (0x53000000u | ((((uint32_t)(shift)) & 0x1Fu) << 16) | (31u << 10) | ((rn) << 5) | ((rd) & 0x1F))
@@ -123,5 +124,6 @@ void jit_emit_prologue(jit_emit_context_t *ctx);
 void jit_emit_epilogue(jit_emit_context_t *ctx);
 void jit_emit_inc_pc(jit_emit_context_t *ctx, int instr_size);
 void jit_emit_unimplemented(jit_emit_context_t *ctx, uint16_t opcode);
+void jit_emit_store_nzcv_flags(jit_emit_context_t *ctx, int invert_carry);
 
 #endif /* JIT_EMIT_AARCH64_H */
