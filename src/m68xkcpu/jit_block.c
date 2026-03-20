@@ -821,7 +821,7 @@ int jit_translate_addq(jit_translate_context_t *tctx)
         jit_emit_dword(ctx, AARCH64_ADDS(AARCH64_R0, AARCH64_R0, AARCH64_R1));
         jit_emit_store_dn(ctx, AARCH64_R0, ea_reg);
     } else {
-        jit_emit_unimplemented(ctx, opcode);
+        return -1;
     }
     
     /* Increment PC */
@@ -913,7 +913,7 @@ int jit_translate_subq(jit_translate_context_t *tctx)
         jit_emit_dword(ctx, AARCH64_SUBS(AARCH64_R0, AARCH64_R0, AARCH64_R1));
         jit_emit_store_dn(ctx, AARCH64_R0, ea_reg);
     } else {
-        jit_emit_unimplemented(ctx, opcode);
+        return -1;
     }
     
     /* Increment PC */
@@ -1654,8 +1654,7 @@ int jit_translate_lea(jit_translate_context_t *tctx)
             
         default:
             /* Unsupported EA mode - fall back */
-            jit_emit_unimplemented(ctx, opcode);
-            break;
+            return -1;
     }
     
     /* Increment PC */

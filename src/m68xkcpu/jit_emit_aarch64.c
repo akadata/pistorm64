@@ -182,6 +182,6 @@ void jit_emit_inc_pc(jit_emit_context_t *ctx, int instr_size)
 
 void jit_emit_unimplemented(jit_emit_context_t *ctx, uint16_t opcode)
 {
-    jit_emit_dword(ctx, AARCH64_NOP);
+    ctx->error = true;
     (void)opcode;
 }
