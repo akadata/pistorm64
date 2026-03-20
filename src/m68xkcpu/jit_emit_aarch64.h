@@ -54,15 +54,15 @@ typedef struct {
 #define AARCH64_ORR(rd, rn, rm)       (0xAA000000u | ((rm) << 16) | ((rn) << 5) | ((rd) & 0x1F))
 #define AARCH64_EOR(rd, rn, rm)       (0xCA000000u | ((rm) << 16) | ((rn) << 5) | ((rd) & 0x1F))
 
-#define AARCH64_AND_W(rd, rn, rm)     (0x2A000000u | ((rm) << 16) | ((rn) << 5) | ((rd) & 0x1F))
-#define AARCH64_ORR_W(rd, rn, rm)     (0x6A000000u | ((rm) << 16) | ((rn) << 5) | ((rd) & 0x1F))
+#define AARCH64_AND_W(rd, rn, rm)     (0x0A000000u | ((rm) << 16) | ((rn) << 5) | ((rd) & 0x1F))
+#define AARCH64_ORR_W(rd, rn, rm)     (0x2A000000u | ((rm) << 16) | ((rn) << 5) | ((rd) & 0x1F))
 #define AARCH64_EOR_W(rd, rn, rm)     (0x4A000000u | ((rm) << 16) | ((rn) << 5) | ((rd) & 0x1F))
 
 #define AARCH64_B(imm)                (0x14000000u | ((imm) & 0x03FFFFFF))
 #define AARCH64_BL(imm)               (0x94000000u | ((imm) & 0x03FFFFFF))
 #define AARCH64_BCOND(cond, imm)      (0x54000000u | ((cond) & 0xF) | (((imm) & 0x7FFFF) << 5))
-#define AARCH64_CBZ(rt, imm)          (0x34000000u | (((rt) & 0x1F) << 5) | (((imm >> 2) & 0x7FFFF) << 5))
-#define AARCH64_CBNZ(rt, imm)         (0x35000000u | (((rt) & 0x1F) << 5) | (((imm >> 2) & 0x7FFFF) << 5))
+#define AARCH64_CBZ(rt, imm)          (0x34000000u | ((((uint32_t)(imm) >> 2) & 0x7FFFFu) << 5) | ((rt) & 0x1F))
+#define AARCH64_CBNZ(rt, imm)         (0x35000000u | ((((uint32_t)(imm) >> 2) & 0x7FFFFu) << 5) | ((rt) & 0x1F))
 
 #define AARCH64_COND_EQ  0x0
 #define AARCH64_COND_NE  0x1

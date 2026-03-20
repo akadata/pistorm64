@@ -48,12 +48,12 @@ void jit_emit_mov64(jit_emit_context_t *ctx, uint8_t rd, uint64_t imm)
 
 void jit_emit_load_cpu_reg(jit_emit_context_t *ctx, uint8_t rt, int offset)
 {
-    jit_emit_dword(ctx, AARCH64_LDR(rt, AARCH64_CPU_PTR, offset));
+    jit_emit_dword(ctx, AARCH64_LDR_W(rt, AARCH64_CPU_PTR, offset));
 }
 
 void jit_emit_store_cpu_reg(jit_emit_context_t *ctx, uint8_t rt, int offset)
 {
-    jit_emit_dword(ctx, AARCH64_STR(rt, AARCH64_CPU_PTR, offset));
+    jit_emit_dword(ctx, AARCH64_STR_W(rt, AARCH64_CPU_PTR, offset));
 }
 
 void jit_emit_load_dn(jit_emit_context_t *ctx, uint8_t rt, int dn)
