@@ -1520,7 +1520,7 @@ void a314_write_memory_32(unsigned int address, unsigned int value)
     // Not implemented.
 }
 
-void a314_set_config_file(char *filename)
+void a314_set_config_file(const char *filename)
 {
     printf ("[A314] Set A314 config filename to %s.\n", filename);
     a314_config_file = std::string(filename);
