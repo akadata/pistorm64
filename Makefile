@@ -286,6 +286,10 @@ MAINFILES += src/platforms/shared/common.c
 # self-tests
 MAINFILES += src/selftest.c
 
+ifeq ($(USE_MUSASHI),0)
+MAINFILES += src/m68xkcpu/m68k_compat.c
+endif
+
 
 ifeq ($(USE_RAYLIB),0)
 MAINFILES := $(filter-out src/platforms/amiga/pirtg64/pirtg64-output-raylib.c,$(MAINFILES))
@@ -320,6 +324,7 @@ ifeq ($(USE_EC_FPU),1)
 DEFINES += -DPISTORM_ENABLE_020_FPU -DPISTORM_ENABLE_EC040_FPU
 endif
 
+ifeq ($(USE_MUSASHI),1)
 MUSASHIFILES     =  src/musashi/m68kcpu.c 
 MUSASHIFILES     += src/musashi/m68kdasm.c 
 ifeq ($(M68K_ENHANCE),1)
@@ -330,6 +335,11 @@ MUSASHIFILES     += src/musashi/softfloat/softfloat_fpsp.c
 
 MUSASHIGENCFILES = src/musashi/m68kops.c
 MUSASHIGENHFILES = src/musashi/m68kops.h
+else
+MUSASHIFILES     :=
+MUSASHIGENCFILES :=
+MUSASHIGENHFILES :=
+endif
 MUSASHIGENERATOR = m68kmake
 
 EXE =
@@ -607,7 +617,7 @@ DELETEFILES += $(UAE_FPP_NATIVE_CPP)
 DELETEFILES += $(MUSASHI_REF_TEST_DRIVER)
 DELETEFILES += $(M68XK_JIT_OBJS) $(M68XK_JIT_OBJS:%.o=%.d)
 
-all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest pistorm_truth_test 
+all: $(TARGET) buptest pistorm_truth_test 
 
 clean:
 	rm -f $(DELETEFILES) $(TARGET).tmp
@@ -682,23 +692,30 @@ $(UAE_FPP_NATIVE_CPP): $(UAE_FPP_NATIVE_IN)
 
 endif
 # Explicit rules to keep the generated 68k core quiet on unused-temp warnings.
+ifeq ($(USE_MUSASHI),1)
+MUSASHI_LOCAL_INCLUDES := -Isrc/musashi
+
 src/musashi/m68kcpu.o: src/musashi/m68kcpu.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) $(NO_LTO_FLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(M68K_CFLAGS) $(MUSASHI_LOCAL_INCLUDES) $(NO_LTO_FLAGS) -c -o $@ $<
 
 src/musashi/m68kops.o: src/musashi/m68kops.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) $(NO_LTO_FLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(M68K_CFLAGS) $(MUSASHI_LOCAL_INCLUDES) $(NO_LTO_FLAGS) -c -o $@ $<
 
 src/musashi/m68kdasm.o: src/musashi/m68kdasm.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) $(NO_LTO_FLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(M68K_CFLAGS) $(MUSASHI_LOCAL_INCLUDES) $(NO_LTO_FLAGS) -c -o $@ $<
 
 src/musashi/softfloat/softfloat.o: src/musashi/softfloat/softfloat.c
-	$(CC) -MMD -MP $(CFLAGS) $(NO_LTO_FLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(CFLAGS) $(MUSASHI_LOCAL_INCLUDES) $(NO_LTO_FLAGS) -c -o $@ $<
 
 src/musashi/softfloat/softfloat_fpsp.o: src/musashi/softfloat/softfloat_fpsp.c
-	$(CC) -MMD -MP $(CFLAGS) $(NO_LTO_FLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(CFLAGS) $(MUSASHI_LOCAL_INCLUDES) $(NO_LTO_FLAGS) -c -o $@ $<
 
 src/emulator.o: src/emulator.c src/musashi/m68kops.h
 	$(CC) -MMD -MP $(CFLAGS) -c -o $@ $<
+else
+src/emulator.o: src/emulator.c
+	$(CC) -MMD -MP $(CFLAGS) -c -o $@ $<
+endif
 
 buptest: src/buptest/buptest.c $(PS_PROTOCOL_SRC) $(PS_BACKEND_SRCS) src/log.c
 	@if [ -f src/buptest/buptest.c ]; then \
@@ -712,6 +729,9 @@ pistorm_truth_test: tools/pistorm_truth_test.c $(PS_PROTOCOL_SRC) $(PS_BACKEND_S
 
 # Musashi JSON test driver for ProcessorTests
 MUSASHI_JSON_DRIVER = build/musashi_json_driver
+# JIT JSON test driver for ProcessorTests
+JIT_JSON_DRIVER = build/jit_json_driver
+ifeq ($(USE_MUSASHI),1)
 $(MUSASHI_JSON_DRIVER): tools/musashi_json_driver.c $(MUSASHIFILES:%.c=%.o) $(MUSASHIGENCFILES:%.c=%.o) src/musashi/softfloat/softfloat.o src/musashi/softfloat/softfloat_fpsp.o
 	@mkdir -p $(dir $@)
 	$(CC) $(EMU_WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) -I. -Isrc -Isrc/musashi \
@@ -721,8 +741,6 @@ $(MUSASHI_JSON_DRIVER): tools/musashi_json_driver.c $(MUSASHIFILES:%.c=%.o) $(MU
 
 musashi-json-driver: $(MUSASHI_JSON_DRIVER)
 
-# JIT JSON test driver for ProcessorTests
-JIT_JSON_DRIVER = build/jit_json_driver
 $(JIT_JSON_DRIVER): tools/jit_json_driver.c $(M68XK_JIT_OBJS) $(MUSASHIFILES:%.c=%.o) $(MUSASHIGENCFILES:%.c=%.o) src/musashi/softfloat/softfloat.o src/musashi/softfloat/softfloat_fpsp.o src/log.o src/pistorm/backend.o src/pistorm/backend_kmod.o src/pistorm/backend_userspace_mmio.o src/gpio/ps_protocol_kmod.o
 	@mkdir -p $(dir $@)
 	$(CC) $(EMU_WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) -I. -Isrc -Isrc/musashi -Isrc/m68xkcpu \
@@ -736,6 +754,15 @@ $(JIT_JSON_DRIVER): tools/jit_json_driver.c $(M68XK_JIT_OBJS) $(MUSASHIFILES:%.c
 		src/gpio/ps_protocol_kmod.o -lm
 
 jit-json-driver: $(JIT_JSON_DRIVER)
+else
+musashi-json-driver:
+	@echo "musashi-json-driver requires USE_MUSASHI=1"
+	@exit 1
+
+jit-json-driver:
+	@echo "jit-json-driver currently requires USE_MUSASHI=1"
+	@exit 1
+endif
 
 piscsi-remote: tools/piscsi_remote/piscsi_remote_server.c
 	$(CC) -MMD -MP $(CFLAGS) -o $@ $< -lssl -lcrypto
@@ -782,11 +809,13 @@ $(UAE_BUILDDIR)/%.o: $(UAE_SRCDIR)/%.cxx
 	@mkdir -p $(dir $@)
 	$(CXX) -MMD -MP $(UAE_CXXFLAGS) -c -o $@ $<
 
+ifeq ($(USE_MUSASHI),1)
 $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) &: | $(MUSASHIGENERATOR)$(EXE)
 	cp $(MUSASHIGENERATOR)$(EXE) src/musashi/ && cd src/musashi && ./$(MUSASHIGENERATOR)$(EXE) && rm -f ./$(MUSASHIGENERATOR)$(EXE)
 
 $(MUSASHIGENERATOR)$(EXE): src/musashi/$(MUSASHIGENERATOR).c
 	$(CC) -MMD -MP  -o $(MUSASHIGENERATOR)$(EXE) src/musashi/$(MUSASHIGENERATOR).c
+endif
 
 install: all amiga-piscsi
 	$(INSTALL) -d $(INSTALL_DIR)
@@ -1029,6 +1058,7 @@ processortests-compare-sets:
 		--old-dir "$(PROCESSORTESTS_COMPARE_OLD)" \
 		--new-dir "$(PROCESSORTESTS_COMPARE_NEW)"
 
+ifeq ($(USE_MUSASHI),1)
 $(MUSASHI_REF_TEST_DRIVER): tools/musashi_ref_test_driver.c tools/musashi_ref_test_stubs.c src/musashi/m68kcpu.c src/musashi/m68kdasm.c src/musashi/m68kops.c src/musashi/softfloat/softfloat.c src/musashi/softfloat/softfloat_fpsp.c
 	@mkdir -p $(dir $@)
 	$(CC) $(EMU_WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) -I. -Isrc -Isrc/musashi \
@@ -1058,6 +1088,11 @@ musashi-ref-tests-68040-ci:
 
 musashi-ref-tests-68040-pmmu:
 	$(MAKE) USE_PMMU=1 MUSASHI_REF_TEST_MODE=68040 musashi-ref-tests
+else
+musashi-ref-tests musashi-ref-tests-quick musashi-ref-tests-68040 musashi-ref-tests-68040-ci musashi-ref-tests-68040-pmmu:
+	@echo "$@ requires USE_MUSASHI=1"
+	@exit 1
+endif
 
 stage1-680x0: processortests-quick musashi-ref-tests-quick
 	@echo "stage1-680x0 complete"

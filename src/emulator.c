@@ -62,7 +62,9 @@ extern "C" {
 #include <unistd.h>
 
 
+#if USE_MUSASHI
 #include "musashi/m68kops.h"
+#endif
 #include "emulator_fc.h"
 #include "config_file/rominfo.h"
 
@@ -885,7 +887,9 @@ static void cli_add_line(const char* fmt, ...);
 static void apply_cli_overrides(struct emulator_config* cfg);
 static int cli_collect_tokens(int argc, char* argv[], int* index, char* out, size_t out_len);
 
+#if USE_MUSASHI
 #define MUSASHI_HAX
+#endif
 
 #ifdef MUSASHI_HAX
 #include "m68kcpu.h"
@@ -1164,6 +1168,7 @@ static void* ipl_task(void* args) {
 }
 
 static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
+#if USE_MUSASHI
   /* eat up any reset cycles */
   if (RESET_CYCLES) {
     int rc = (int)RESET_CYCLES;
@@ -1237,6 +1242,12 @@ static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
 
   /* return how many clocks we used */
   //return;
+#else
+  (void)state;
+  (void)num_cycles;
+  LOG_ERROR("[CPU] m68k_execute_bef called while USE_MUSASHI=0\n");
+  abort();
+#endif
 }
 
 // Backend wrappers ( Musashi default, JIT stub delegates to Musashi for now ).
@@ -1275,11 +1286,17 @@ static inline int fpu_translate_fastpath(m68ki_cpu_core* state, uint16_t opcode)
 }
 
 static inline int fpu_backend_execute(m68ki_cpu_core* state, uint16_t opcode) {
+#if USE_MUSASHI
   if (fpu_translate_fastpath(state, opcode)) {
     return 1;
   }
   m68ki_instruction_jump_table[opcode](state);
   return 1;
+#else
+  (void)state;
+  (void)opcode;
+  return 0;
+#endif
 }
 
 void jit_backend_execute(m68ki_cpu_core* state, int cycles) {
