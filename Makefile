@@ -319,7 +319,9 @@ LDLIBS_VC :=
 
 
 ifeq ($(USE_PMMU),1)
+ifeq ($(USE_MUSASHI),1)
 DEFINES += -DPISTORM_EXPERIMENT_PMMU
+endif
 endif
 
 
