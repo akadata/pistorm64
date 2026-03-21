@@ -202,7 +202,10 @@ PISTORM_GPCLK_DIV ?= 6
 PISTORM_KMOD_PARAMS ?= run_batch_enable=1 berr_reset_input=1 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV)
 
 PS_PROTOCOL_SRC := src/gpio/ps_protocol_kmod.c
-PS_BACKEND_SRCS := src/pistorm/backend.c src/pistorm/backend_kmod.c src/pistorm/backend_userspace_mmio.c
+PS_BACKEND_SRCS := src/pistorm/backend.c src/pistorm/backend_userspace_mmio.c
+ifeq ($(PISTORM_KMOD),1)
+PS_BACKEND_SRCS += src/pistorm/backend_kmod.c
+endif
 PROCESSORTESTS_ROOT ?= $(CURDIR)/third_party/ProcessorTests
 PROCESSORTESTS_SOURCE ?= $(PROCESSORTESTS_ROOT)/680x0/68000/v1
 PROCESSORTESTS_SOURCE_NEW ?= $(PROCESSORTESTS_ROOT)/m68000/v1
@@ -741,7 +744,7 @@ $(MUSASHI_JSON_DRIVER): tools/musashi_json_driver.c $(MUSASHIFILES:%.c=%.o) $(MU
 
 musashi-json-driver: $(MUSASHI_JSON_DRIVER)
 
-$(JIT_JSON_DRIVER): tools/jit_json_driver.c $(M68XK_JIT_OBJS) $(MUSASHIFILES:%.c=%.o) $(MUSASHIGENCFILES:%.c=%.o) src/musashi/softfloat/softfloat.o src/musashi/softfloat/softfloat_fpsp.o src/log.o src/pistorm/backend.o src/pistorm/backend_kmod.o src/pistorm/backend_userspace_mmio.o src/gpio/ps_protocol_kmod.o
+$(JIT_JSON_DRIVER): tools/jit_json_driver.c $(M68XK_JIT_OBJS) $(MUSASHIFILES:%.c=%.o) $(MUSASHIGENCFILES:%.c=%.o) src/musashi/softfloat/softfloat.o src/musashi/softfloat/softfloat_fpsp.o src/log.o $(PS_BACKEND_SRCS:%.c=%.o) $(PS_PROTOCOL_SRC:%.c=%.o)
 	@mkdir -p $(dir $@)
 	$(CC) $(EMU_WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) -I. -Isrc -Isrc/musashi -Isrc/m68xkcpu \
 		-o $@ tools/jit_json_driver.c \
@@ -750,8 +753,8 @@ $(JIT_JSON_DRIVER): tools/jit_json_driver.c $(M68XK_JIT_OBJS) $(MUSASHIFILES:%.c
 		src/musashi/m68kcpu.o src/musashi/m68kops.o src/musashi/m68kdasm.o \
 		src/musashi/softfloat/softfloat.o src/musashi/softfloat/softfloat_fpsp.o \
 		src/log.o src/emulator.o src/emulator_fc.o src/memory_mapped.o \
-		src/pistorm/backend.o src/pistorm/backend_kmod.o src/pistorm/backend_userspace_mmio.o \
-		src/gpio/ps_protocol_kmod.o -lm
+		$(PS_BACKEND_SRCS:%.c=%.o) \
+		$(PS_PROTOCOL_SRC:%.c=%.o) -lm
 
 jit-json-driver: $(JIT_JSON_DRIVER)
 else

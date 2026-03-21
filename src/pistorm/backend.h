@@ -43,7 +43,9 @@ struct ps_ctx {
   void* impl;
 };
 
+#ifdef PISTORM_KMOD
 extern const struct ps_backend_ops ps_backend_kmod_ops;
+#endif
 extern const struct ps_backend_ops ps_backend_userspace_mmio_ops;
 
 int ps_backend_select(const char* name, int from_config);

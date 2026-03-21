@@ -6,10 +6,11 @@ PLATFORM ?= PI4_64BIT_NATIVE
 
 # Build JIT
 USE_UAE_JIT = 0
-USE_M68XK_JIT = 1
+USE_M68XK_JIT ?= 1
+USE_MUSASHI ?= 0
 
 # Kernel backend is default; legacy userspace GPIO is optional
-PISTORM_KMOD = 1
+PISTORM_KMOD ?= 0
 PISTORM_ENABLE_QUEUE ?= 1 
 # Batching and IPL rate limiting defaults
 PISTORM_ENABLE_BATCH ?= 1

@@ -9,11 +9,17 @@
 #include <strings.h>
 
 typedef enum ps_backend_kind {
+#ifdef PISTORM_KMOD
   PS_BACKEND_KIND_KMOD = 0,
+#endif
   PS_BACKEND_KIND_USERSPACE_MMIO,
 } ps_backend_kind_t;
 
+#ifdef PISTORM_KMOD
 static ps_backend_kind_t g_selected_kind = PS_BACKEND_KIND_KMOD;
+#else
+static ps_backend_kind_t g_selected_kind = PS_BACKEND_KIND_USERSPACE_MMIO;
+#endif
 static struct ps_ctx g_ctx;
 static int g_setup_done;
 
@@ -25,8 +31,12 @@ static int ps_backend_name_to_kind(const char* name, ps_backend_kind_t* kind_out
   if (strcasecmp(name, "kmod") == 0 ||
       strcasecmp(name, "kernel") == 0 ||
       strcasecmp(name, "kerrnel") == 0) {
+#ifdef PISTORM_KMOD
     *kind_out = PS_BACKEND_KIND_KMOD;
     return 0;
+#else
+    return -ENOTSUP;
+#endif
   }
 
   if (strcasecmp(name, "userspace") == 0 ||
@@ -41,12 +51,14 @@ static int ps_backend_name_to_kind(const char* name, ps_backend_kind_t* kind_out
 
 static const char* ps_backend_kind_name(ps_backend_kind_t kind) {
   switch (kind) {
+#ifdef PISTORM_KMOD
   case PS_BACKEND_KIND_KMOD:
     return "kmod";
+#endif
   case PS_BACKEND_KIND_USERSPACE_MMIO:
     return "userspace-mmio";
   default:
-    return "kmod";
+    return "userspace-mmio";
   }
 }
 
@@ -60,10 +72,12 @@ static int ps_backend_ensure_init(void) {
   memset(&g_ctx, 0x00, sizeof(g_ctx));
 
   switch (g_selected_kind) {
+#ifdef PISTORM_KMOD
   case PS_BACKEND_KIND_KMOD:
     g_ctx.ops = &ps_backend_kmod_ops;
     g_ctx.backend_name = "kmod";
     break;
+#endif
   case PS_BACKEND_KIND_USERSPACE_MMIO:
     g_ctx.ops = &ps_backend_userspace_mmio_ops;
     g_ctx.backend_name = "userspace-mmio";
@@ -118,7 +132,21 @@ int ps_backend_select(const char* name, int from_config) {
   }
 
   if (ps_backend_name_to_kind(name, &kind) < 0) {
-    fprintf(stderr, "[ps_backend] unknown backend '%s' (valid: kernel|userspace)\n", name);
+    if ((strcasecmp(name, "kmod") == 0 ||
+         strcasecmp(name, "kernel") == 0 ||
+         strcasecmp(name, "kerrnel") == 0)) {
+#ifdef PISTORM_KMOD
+      fprintf(stderr, "[ps_backend] unknown backend '%s' (valid: kernel|userspace)\n", name);
+#else
+      fprintf(stderr, "[ps_backend] backend '%s' requested but this build was made with PISTORM_KMOD=0\n", name);
+#endif
+    } else {
+#ifdef PISTORM_KMOD
+      fprintf(stderr, "[ps_backend] unknown backend '%s' (valid: kernel|userspace)\n", name);
+#else
+      fprintf(stderr, "[ps_backend] unknown backend '%s' (valid: userspace)\n", name);
+#endif
+    }
     return -EINVAL;
   }
 
