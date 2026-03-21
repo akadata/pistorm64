@@ -793,6 +793,7 @@ int jit_translate_add(jit_translate_context_t *tctx)
     uint8_t src_mode = (opcode >> 3) & 0x7;
     uint8_t src_reg = opcode & 0x7;
     int incr;
+    int src_via_helper = 0;
 
     /* Only ADD.<ea>,Dn path is handled here. */
     if (opmode > 2) {
@@ -809,6 +810,7 @@ int jit_translate_add(jit_translate_context_t *tctx)
     } else if (src_mode == 2) {
         /* ADD (An),Dn */
         jit_emit_load_an(ctx, AARCH64_R2, src_reg);
+        src_via_helper = 1;
         if (opmode == 0) {
             jit_emit_call_read8(ctx, AARCH64_R1, AARCH64_R2);
         } else if (opmode == 1) {
@@ -819,6 +821,7 @@ int jit_translate_add(jit_translate_context_t *tctx)
     } else if (src_mode == 3) {
         /* ADD (An)+,Dn */
         jit_emit_load_an(ctx, AARCH64_R2, src_reg);
+        src_via_helper = 1;
         if (opmode == 0) {
             jit_emit_call_read8(ctx, AARCH64_R1, AARCH64_R2);
             incr = (src_reg == 7) ? 2 : 1;
@@ -839,6 +842,7 @@ int jit_translate_add(jit_translate_context_t *tctx)
         jit_emit_load_an(ctx, AARCH64_R2, src_reg);
         jit_emit_mov64(ctx, AARCH64_R3, (uint64_t)(int32_t)disp);
         jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R2, AARCH64_R2, AARCH64_R3));
+        src_via_helper = 1;
         if (opmode == 0) {
             jit_emit_call_read8(ctx, AARCH64_R1, AARCH64_R2);
         } else if (opmode == 1) {
@@ -848,6 +852,10 @@ int jit_translate_add(jit_translate_context_t *tctx)
         }
     } else {
         return -1;
+    }
+
+    if (src_via_helper) {
+        jit_emit_load_dn(ctx, AARCH64_R0, dst_reg);
     }
 
     /* Width-normalize for byte/word operations before ADDS. */
@@ -925,6 +933,7 @@ int jit_translate_sub(jit_translate_context_t *tctx)
     uint8_t dst_reg = (opcode >> 9) & 0x7;
     uint8_t src_mode = (opcode >> 3) & 0x7;
     uint8_t src_reg = opcode & 0x7;
+    int src_via_helper = 0;
     
     /* SUB <ea>, Dn - most common form */
     if (dst_mode == 0) {
@@ -937,6 +946,7 @@ int jit_translate_sub(jit_translate_context_t *tctx)
         } else if (src_mode == 2) {
             /* SUB (An), Dn */
             jit_emit_load_an(ctx, AARCH64_R1, src_reg);
+            src_via_helper = 1;
             if (size == 0) {
                 jit_emit_call_read8(ctx, AARCH64_R1, AARCH64_R1);
             } else if (size == 1) {
@@ -950,6 +960,7 @@ int jit_translate_sub(jit_translate_context_t *tctx)
             jit_emit_load_an(ctx, AARCH64_R1, src_reg);
             jit_emit_mov64(ctx, AARCH64_R2, (uint64_t)(int32_t)disp);
             jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R1, AARCH64_R1, AARCH64_R2));
+            src_via_helper = 1;
             if (size == 0) {
                 jit_emit_call_read8(ctx, AARCH64_R1, AARCH64_R1);
             } else if (size == 1) {
@@ -959,6 +970,10 @@ int jit_translate_sub(jit_translate_context_t *tctx)
             }
         } else {
             return -1;
+        }
+
+        if (src_via_helper) {
+            jit_emit_load_dn(ctx, AARCH64_R0, dst_reg);
         }
         
         /* Perform sub with flags */
