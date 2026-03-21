@@ -62,7 +62,7 @@ extern "C" {
 #include <unistd.h>
 
 
-#include "m68kops.h"
+#include "musashi/m68kops.h"
 #include "emulator_fc.h"
 #include "config_file/rominfo.h"
 
