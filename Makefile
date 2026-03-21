@@ -17,6 +17,7 @@
 #   make PLATFORM=ZEROW2_64
 
 # Build defaults live in config.mk (override there or via make VAR=...)
+include config.mk
 
 
 #EXTRA_CFLAGS ?=  -g -O0
@@ -86,7 +87,6 @@ USE_LTO    ?= 0
 USE_NO_PLT ?= 1 
 OMIT_FP    ?= 1
 USE_PIPE   ?= 1
-include config.mk
 # Base warnings
 VERBOSE ?= 0
 
@@ -520,14 +520,18 @@ endif
 
 LIBS := $(BASE_LIBS)
 
-INCLUDES  = -I. -Isrc -Isrc/musashi -Isrc/uae/include $(RAYLIB_INC) $(VC_INC)
+INCLUDES  = -I. -Isrc -Iinclude $(RAYLIB_INC) $(VC_INC)
 LDSEARCH  = -L/usr/local/lib $(VC_LIBDIR) $(RAYLIB_LIBDIR)
 
 ifeq ($(PISTORM_KMOD),1)
-INCLUDES += -Iinclude -Iinclude/uapi
+INCLUDES += -Iinclude/uapi
 DEFINES  += -DPISTORM_KMOD
 endif
+ifeq ($(USE_MUSASHI),1)
+INCLUDES += -Isrc/musashi
+endif
 ifeq ($(USE_UAE_JIT),1)
+INCLUDES += -Isrc/uae/include
 INCLUDES += $(UAE_INCLUDES)
 endif
 
@@ -778,8 +782,8 @@ $(UAE_BUILDDIR)/%.o: $(UAE_SRCDIR)/%.cxx
 	@mkdir -p $(dir $@)
 	$(CXX) -MMD -MP $(UAE_CXXFLAGS) -c -o $@ $<
 
-$(MUSASHIGENCFILES) $(MUSASHIGENHFILES): $(MUSASHIGENERATOR)$(EXE)
-	cp $(MUSASHIGENERATOR)$(EXE) src/musashi/ && cd src/musashi && ./$(MUSASHIGENERATOR)$(EXE) && rm -f src/musashi/$(MUSASHIGENERATOR)$(EXE)
+$(MUSASHIGENCFILES) $(MUSASHIGENHFILES) &: $(MUSASHIGENERATOR)$(EXE)
+	cp $(MUSASHIGENERATOR)$(EXE) src/musashi/ && cd src/musashi && ./$(MUSASHIGENERATOR)$(EXE) && rm -f ./$(MUSASHIGENERATOR)$(EXE)
 
 $(MUSASHIGENERATOR)$(EXE): src/musashi/$(MUSASHIGENERATOR).c
 	$(CC) -MMD -MP  -o $(MUSASHIGENERATOR)$(EXE) src/musashi/$(MUSASHIGENERATOR).c
