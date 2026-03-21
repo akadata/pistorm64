@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "m68k.h"
+#include "cpu_map_iface.h"
 #include "platforms/platforms.h"
 #include <errno.h>
 #include <stdio.h>
@@ -1126,8 +1127,8 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
     }
     // This may look a bit weird, but it adds a read range for the WTC RAM. Writes still go
     // through to the mapped read/write functions.
-    m68k_add_rom_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
-                       cfg->map_data[index]);
+    cpu_map_add_rom_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
+                          cfg->map_data[index]);
     break;
   case MAPTYPE_RAM:
     printf("[CFG] Allocating %d bytes for RAM mapping (%d MB)...\n", size, size / 1024 / 1024);
@@ -1199,8 +1200,8 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
   skip_file_ops:
     displayRomInfo(cfg->map_data[index], cfg->rom_size[index]);
     if (cfg->map_size[index] == cfg->rom_size[index])
-      m68k_add_rom_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
-                         cfg->map_data[index]);
+      cpu_map_add_rom_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
+                            cfg->map_data[index]);
     if (cfg->map_data[index] && cfg->map_size[index]) {
       if (mlock(cfg->map_data[index], cfg->map_size[index]) != 0) {
         printf("[CFG] Warning: mlock on ROM mapping failed (%s)\n", strerror(errno));
@@ -1274,7 +1275,7 @@ void free_config_file(struct emulator_config* cfg) {
     cfg->keyboard_file = NULL;
   }
 
-  m68k_clear_ranges();
+  cpu_map_clear_ranges();
 
   printf("[CFG] Config file freed. Maybe.\n");
 }

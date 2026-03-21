@@ -5,6 +5,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "m68k.h"
+#include "cpu_map_iface.h"
 #include "log.h"
 #include "platforms/platforms.h"
 #include "platforms/shared/rtc.h"
@@ -96,9 +97,9 @@ void handle_ovl_mappings_mac68k(struct emulator_config* cfg) {
   if (index != -1) {
     cfg->map_offset[index] = (ovl) ? 0x0 : ovl_sysrom_pos;
     cfg->map_high[index] = cfg->map_size[index];
-    m68k_remove_range(cfg->map_data[index]);
-    m68k_add_rom_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
-                       cfg->map_data[index]);
+    cpu_map_remove_range(cfg->map_data[index]);
+    cpu_map_add_rom_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
+                          cfg->map_data[index]);
     printf("[MAC68K] Added memory mapping for Mac68k System ROM.\n");
   } else {
     printf("[MAC68K] No sysrom mapping found. If you intended to memory map a system ROM, make "
@@ -108,9 +109,9 @@ void handle_ovl_mappings_mac68k(struct emulator_config* cfg) {
   if (index != -1) {
     cfg->map_offset[index] = (ovl) ? ovl_sysrom_pos : 0x0;
     cfg->map_high[index] = cfg->map_size[index];
-    m68k_remove_range(cfg->map_data[index]);
-    m68k_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
-                       cfg->map_data[index]);
+    cpu_map_remove_range(cfg->map_data[index]);
+    cpu_map_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
+                          cfg->map_data[index]);
     printf("[MAC68K] Added memory mapping for Mac68k System RAM.\n");
   } else {
     printf("[MAC68K] No sysram mapping found. If you intended to memory map a system RAM, make "

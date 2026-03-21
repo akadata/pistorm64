@@ -5,6 +5,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include "cpu_map_iface.h"
 #include "atari-autoconf.h"
 #include "atari-registers.h"
 //#include "atari-interrupts.h"
@@ -172,7 +173,7 @@ int setup_platform_atari(struct emulator_config *cfg) {
 
     int index = get_named_mapped_item(cfg, "cpu_slot_ram");
     if (index != -1) {
-        m68k_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index], cfg->map_data[index]);
+        cpu_map_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index], cfg->map_data[index]);
     }
 
     adjust_ranges_atari(cfg);

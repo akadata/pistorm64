@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "m68k.h"
+#include "cpu_map_iface.h"
 #include "platforms/platforms.h"
 #include "pistorm-dev/pistorm-dev-enums.h"
 #include "platforms/amiga/amiga-autoconf.h"
@@ -548,8 +549,8 @@ void autoconfig_write_memory_z3_8(struct emulator_config* cfg, unsigned int addr
       }
       log_autoconf_assignment("Z3 RAM", (uint32_t)cfg->map_offset[index], cfg->map_size[index],
                               cfg->map_data[index]);
-      m68k_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
-                         cfg->map_data[index]);
+      cpu_map_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
+                            cfg->map_data[index]);
     }
     ac_z3_current_pic++;
     if (ac_z3_current_pic == ac_z3_pic_count) {
@@ -607,8 +608,8 @@ void autoconfig_write_memory_z3_16(struct emulator_config* cfg, unsigned int add
       }
       log_autoconf_assignment("Z3 RAM", (uint32_t)cfg->map_offset[index], cfg->map_size[index],
                               cfg->map_data[index]);
-      m68k_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
-                         cfg->map_data[index]);
+      cpu_map_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
+                            cfg->map_data[index]);
     }
     ac_z3_current_pic++;
     if (ac_z3_current_pic == ac_z3_pic_count) {
@@ -827,9 +828,9 @@ void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address
                  layout->z2_mem_base + layout->z2_mem_size - 1u);
       }
 
-      m68k_add_ram_range((uint32_t)cfg->map_offset[index],
-                         (uint32_t)cfg->map_high[index],
-                         cfg->map_data[index]);
+      cpu_map_add_ram_range((uint32_t)cfg->map_offset[index],
+                            (uint32_t)cfg->map_high[index],
+                            cfg->map_data[index]);
       log_autoconf_assignment("Z2 RAM", (uint32_t)cfg->map_offset[index], cfg->map_size[index],
                               cfg->map_data[index]);
 
@@ -977,9 +978,9 @@ void autoconfig_write_memory_8(struct emulator_config* cfg,
       LOG_INFO("[AUTOCONF] Address of Z2 autoconf RAM assigned to $%.8X\n",
                ac_base[ac_z2_current_pic]);
 
-      m68k_add_ram_range((uint32_t)cfg->map_offset[index],
-                         (uint32_t)cfg->map_high[index],
-                         cfg->map_data[index]);
+      cpu_map_add_ram_range((uint32_t)cfg->map_offset[index],
+                            (uint32_t)cfg->map_high[index],
+                            cfg->map_data[index]);
 
       LOG_INFO("[AUTOCONF] Z2 PIC %d at $%.8lX-%.8lX, Size: %d MB\n",
                ac_z2_current_pic,

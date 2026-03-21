@@ -25,6 +25,7 @@
 #include "pirtg64.h"
 
 #include "m68k.h"
+#include "cpu_map_iface.h"
 
 /*
 static zorro_device_t z3_rtg_device = {
@@ -288,11 +289,11 @@ int init_rtg_data(struct emulator_config* cfg_) {
     cfg_->map_size[map_index] = size;
     cfg_->map_high[map_index] = base + size;
     cfg_set_map_data_allocation(cfg_, map_index, rtg_mem, 0, MAPALLOC_EXTERNAL);
-    m68k_add_ram_range(base, base + size, rtg_mem);
+    cpu_map_add_ram_range(base, base + size, rtg_mem);
     LOG_INFO("[RTG] Bound existing rtg_mem map[%d] to allocated RTG buffer (%u MB).\n",
              map_index, size / SIZE_MEGA);
   } else {
-    m68k_add_ram_range(RTG_BASE + RTG_REG_SIZE, RTG_UPPER, rtg_mem);
+    cpu_map_add_ram_range(RTG_BASE + RTG_REG_SIZE, RTG_UPPER, rtg_mem);
     add_mapping(cfg_, MAPTYPE_RAM_NOALLOC, RTG_BASE + RTG_REG_SIZE, rtg_mem_size,
                 (unsigned int)-1, (char*)rtg_mem, "rtg_mem", 0);
   }

@@ -1241,11 +1241,24 @@ static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
 
 // Backend wrappers ( Musashi default, JIT stub delegates to Musashi for now ).
 void musashi_backend_execute(m68ki_cpu_core* state, int cycles) {
+#if USE_MUSASHI
   m68k_execute_bef(state, cycles);
+#else
+  (void)state;
+  (void)cycles;
+  LOG_ERROR("[CPU] Musashi backend disabled at build time (USE_MUSASHI=0)\n");
+  abort();
+#endif
 }
 
 void musashi_backend_set_irq(int level) {
+#if USE_MUSASHI
   M68K_SET_IRQ(level);
+#else
+  (void)level;
+  LOG_ERROR("[CPU] Musashi IRQ backend disabled at build time (USE_MUSASHI=0)\n");
+  abort();
+#endif
 }
 
 // FPU backend stub: routes F-line opcodes through JIT path when enabled.
@@ -1278,7 +1291,14 @@ void jit_backend_execute(m68ki_cpu_core* state, int cycles) {
     }
   }
 #endif
+#if USE_MUSASHI
   musashi_backend_execute(state, cycles);
+#else
+  (void)state;
+  (void)cycles;
+  LOG_ERROR("[CPU] JIT execution did not retire a block and Musashi fallback is disabled (USE_MUSASHI=0)\n");
+  abort();
+#endif
 }
 
 void jit_backend_set_irq(int level) {
@@ -1289,7 +1309,14 @@ static inline void cpu_backend_execute(m68ki_cpu_core* state, int cycles) {
   if (enable_jit_backend) {
     jit_backend_execute(state, cycles);
   } else {
+#if USE_MUSASHI
     musashi_backend_execute(state, cycles);
+#else
+    (void)state;
+    (void)cycles;
+    LOG_ERROR("[CPU] CPU backend is Musashi-disabled and JIT is not active\n");
+    abort();
+#endif
   }
 }
 
@@ -1297,7 +1324,13 @@ static inline void cpu_backend_set_irq(int level) {
   if (enable_jit_backend) {
     jit_backend_set_irq(level);
   } else {
+#if USE_MUSASHI
     musashi_backend_set_irq(level);
+#else
+    (void)level;
+    LOG_ERROR("[CPU] IRQ dispatch requires Musashi backend while USE_MUSASHI=0\n");
+    abort();
+#endif
   }
 }
 
@@ -2059,10 +2092,17 @@ switch_config:
     m68k_init();
     printf("Setting CPU model to %d.\n", cpu_type);
     m68k_set_cpu_type(&m68ki_cpu, cpu_type);
+#if USE_MUSASHI
     LOG_INFO("[CPU] Core state configured: model=%s PMMU=%s FPU=%s\n",
              cpu_type_name(cpu_type),
              m68ki_cpu.has_pmmu ? "on" : "off",
              m68ki_cpu.has_fpu ? "on" : "off");
+#else
+    LOG_INFO("[CPU] Core state configured for JIT-only build: model=%s PMMU=%s FPU=%s (Musashi backend disabled)\n",
+             cpu_type_name(cpu_type),
+             m68ki_cpu.has_pmmu ? "on" : "off",
+             m68ki_cpu.has_fpu ? "on" : "off");
+#endif
     m68k_set_instr_hook_callback(&m68ki_cpu, instr_hook_callback);
     m68k_set_fc_callback(&m68ki_cpu, fc_callback_wrapper);  // Use wrapper to call cpu_set_fc
     m68k_set_illg_instr_callback(&m68ki_cpu, illg_instr_callback);
@@ -2070,6 +2110,7 @@ switch_config:
 #if USE_M68XK_JIT
     if (enable_jit_backend && jit_backend_request == JIT_REQ_M68XKCPU) {
       if (!m68xkcpu_jit_cpu_supported(cpu_type)) {
+#if USE_MUSASHI
         enable_jit_backend = 0;
         if (cpu_type == M68K_CPU_TYPE_68000 || cpu_type == M68K_CPU_TYPE_68010 ||
             cpu_type == M68K_CPU_TYPE_68EC020 || cpu_type == M68K_CPU_TYPE_68020 ||
@@ -2080,14 +2121,24 @@ switch_config:
           LOG_WARN("[CPU] m68xkcpu JIT requires exact CPU=68040; configured CPU=%s is not eligible. "
                    "Forcing Musashi backend.\n", cpu_type_name(cpu_type));
         }
+#else
+        LOG_ERROR("[CPU] m68xkcpu JIT requires exact CPU=68040; configured CPU=%s is not eligible and USE_MUSASHI=0 leaves no fallback.\n",
+                  cpu_type_name(cpu_type));
+        return 1;
+#endif
       } else {
         int rc = jit_init(&m68ki_cpu, 0);
         if (rc == 0) {
           use_m68xk_jit = 1;
           LOG_INFO("[CPU] m68xkcpu JIT backend selected (active execution path)\n");
         } else {
+#if USE_MUSASHI
           enable_jit_backend = 0;
           LOG_ERROR("[CPU] m68xkcpu JIT init failed (rc=%d), falling back to Musashi\n", rc);
+#else
+          LOG_ERROR("[CPU] m68xkcpu JIT init failed (rc=%d) and USE_MUSASHI=0 leaves no fallback.\n", rc);
+          return 1;
+#endif
         }
       }
     }
@@ -2111,6 +2162,13 @@ switch_config:
       }
     }
     fpu_exec_hook = enable_fpu_jit_backend ? fpu_backend_execute : NULL;
+
+#if !USE_MUSASHI
+    if (!use_m68xk_jit && !use_uae_jit) {
+      LOG_ERROR("[CPU] No executable CPU backend available (USE_MUSASHI=0 and JIT not active)\n");
+      return 1;
+    }
+#endif
 
     cpu_pulse_reset();
   }

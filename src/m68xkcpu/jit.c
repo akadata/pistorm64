@@ -309,6 +309,13 @@ static const char *jit_progress_update_and_detect(jit_progress_tracker_t *tracke
 
 int jit_no_fallback_enabled(void)
 {
+#if !USE_MUSASHI
+    if (g_jit_no_fallback_enabled < 0) {
+        g_jit_no_fallback_enabled = 1;
+        LOG_WARN("[CPU] m68xkcpu strict mode forced: USE_MUSASHI=0 disables Musashi fallback\n");
+    }
+    return 1;
+#else
     if (g_jit_no_fallback_enabled < 0) {
         const char *strict_env = getenv("PISTORM_M68XK_NO_FALLBACK");
         const char *allow_env = getenv("PISTORM_M68XK_ALLOW_FALLBACK");
@@ -325,6 +332,7 @@ int jit_no_fallback_enabled(void)
         }
     }
     return g_jit_no_fallback_enabled;
+#endif
 }
 
 void jit_hard_fail(uint32_t pc, uint16_t opcode, const char *reason)

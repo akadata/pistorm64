@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include <limits.h>
 #include "m68k.h"
+#include "cpu_map_iface.h"
 #include "log.h"
 #include "amiga-autoconf.h"
 #include "amiga-registers.h"
@@ -633,9 +634,9 @@ int setup_platform_amiga(struct emulator_config* cfg) {
     LOG_INFO("[AMIGA] Mainboard Fast RAM configured at $%08lX (%lu MB)\n",
              cfg->map_offset[index],
              cfg->map_size[index] / SIZE_MEGA);
-    m68k_add_ram_range((uint32_t)cfg->map_offset[index],
-                       (uint32_t)cfg->map_high[index],
-                       cfg->map_data[index]);
+    cpu_map_add_ram_range((uint32_t)cfg->map_offset[index],
+                          (uint32_t)cfg->map_high[index],
+                          cfg->map_data[index]);
     mainboard_fast_found = 1;
   }
   if (!mainboard_fast_found) {
@@ -658,9 +659,9 @@ int setup_platform_amiga(struct emulator_config* cfg) {
     LOG_INFO("[AMIGA] CPU slot RAM configured at $%08lX (%lu MB)\n",
              cfg->map_offset[index],
              cfg->map_size[index] / SIZE_MEGA);
-    m68k_add_ram_range((uint32_t)cfg->map_offset[index],
-                       (uint32_t)cfg->map_high[index],
-                       cfg->map_data[index]);
+    cpu_map_add_ram_range((uint32_t)cfg->map_offset[index],
+                          (uint32_t)cfg->map_high[index],
+                          cfg->map_data[index]);
     cpu_slot_ram_found = 1;
   }
   if (!cpu_slot_ram_found) {

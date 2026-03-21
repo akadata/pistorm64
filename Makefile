@@ -39,6 +39,7 @@
 # USE_NO_PLT : set to 1 to pass -fno-plt for direct calls (glibc-specific; default off).
 # OMIT_FP    : set to 1 to omit frame pointers (-fomit-frame-pointer) for perf.
 # USE_PIPE   : set to 1 to add -pipe to compile steps.
+# USE_MUSASHI: set to 0 to disable Musashi execution fallback paths (JIT-only mode).
 # M68K_WARN_SUPPRESS : extra warning suppressions for the generated Musashi core.
 #
 M68K_ENHANCE ?= 0 
@@ -61,6 +62,19 @@ USE_UAE_JIT ?= 0
 # Optional: build m68xkcpu JIT (our AArch64 JIT for 68000).
 # This is the new test-driven JIT implementation.
 USE_M68XK_JIT ?= 0
+
+# Optional: keep Musashi execution backend enabled.
+USE_MUSASHI ?= 1
+# Backward-compatible typo alias used in local workflows.
+ifneq ($(origin USE_MUSHASHI), undefined)
+USE_MUSASHI := $(USE_MUSHASHI)
+endif
+
+ifeq ($(USE_MUSASHI),0)
+ifneq ($(USE_M68XK_JIT),1)
+$(error USE_MUSASHI=0 requires USE_M68XK_JIT=1)
+endif
+endif
 
 # Force FPU on EC/020/EC040/LC040 for 68881/68882 emulation (optional).
 USE_EC_FPU ?= 0
@@ -412,7 +426,7 @@ endif
 CC  ?= gcc
 CXX ?= g++
 
-DEFINES  += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 
+DEFINES  += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -DUSE_MUSASHI=$(USE_MUSASHI)
 # Allow command-line override of batching and rate limiting for performance tuning
 PISTORM_USE_DIRECT_OPS ?= 1
 DEFINES  += -DPISTORM_ENABLE_BATCH=$(PISTORM_ENABLE_BATCH) -DPISTORM_IPL_RATELIMIT_US=$(PISTORM_IPL_RATELIMIT_US) -DPISTORM_USE_DIRECT_OPS=$(PISTORM_USE_DIRECT_OPS)
