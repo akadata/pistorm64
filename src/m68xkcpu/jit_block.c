@@ -618,12 +618,25 @@ int jit_translate_move(jit_translate_context_t *tctx)
      * Bits 2-0 = src mode, but src mode is in bits 5-3 actually
      * Correct: bits 14-12 = size, 11-9 = dst mode, 8-6 = dst reg, 5-3 = src mode, 2-0 = src reg
      */
-    uint8_t size = (opcode >> 12) & 0x3;  /* 0=byte, 1=word, 2=long */
+    uint8_t size_field = (opcode >> 12) & 0x3;
+    uint8_t size;
     uint8_t dst_mode = (opcode >> 6) & 0x7;
     uint8_t dst_reg = (opcode >> 9) & 0x7;
     uint8_t src_mode = (opcode >> 3) & 0x7;
     uint8_t src_reg = opcode & 0x7;
     
+    /*
+     * MOVE size decode uses bits 13..12:
+     *   01 = byte, 11 = word, 10 = long
+     */
+    switch (size_field) {
+        case 1: size = 0; break; /* byte */
+        case 3: size = 1; break; /* word */
+        case 2: size = 2; break; /* long */
+        default:
+            return -1; /* invalid MOVE size encoding */
+    }
+
     /* For now, implement common Dn/An modes */
     if (dst_mode == 0) {
         /* MOVE to Dn */
