@@ -241,6 +241,27 @@ int jit_block_translate(jit_context_t *jit, jit_block_t *block)
             }
         }
 
+        /*
+         * Branch-family displacement sizing is opcode-dependent:
+         *   disp8  -> no extension
+         *   disp16 -> one extension word (low byte == 0x00)
+         *   disp32 -> two extension words (low byte == 0xFF, 68020+)
+         * Generated opinfo currently encodes these as fixed ext_words, which
+         * misaligns decode for common short branches (e.g. 0x6402).
+         */
+        if (opinfo->family == JIT_FAMILY_BRA ||
+            opinfo->family == JIT_FAMILY_BCC ||
+            opinfo->family == JIT_FAMILY_BSR) {
+            uint8_t low = opcode & 0xFF;
+            if (low == 0x00) {
+                ext_count = 1;
+            } else if (low == 0xFF) {
+                ext_count = 2;
+            } else {
+                ext_count = 0;
+            }
+        }
+
         /* DBcc always carries a 16-bit displacement extension. */
         if ((opcode & 0xF0F8) == 0x50C8) {
             ext_count = 1;
@@ -990,6 +1011,7 @@ int jit_translate_cmp(jit_translate_context_t *tctx)
     uint16_t opcode = tctx->opcode;
     uint16_t *ext_words = tctx->ext_words;
     int ext_count = tctx->ext_count;
+    int src_via_helper = 0;
     /* CMP decode:
      * opmode bits 8..6:
      *   000 CMP.B <ea>,Dn
@@ -1014,6 +1036,7 @@ int jit_translate_cmp(jit_translate_context_t *tctx)
         jit_emit_load_dn(ctx, AARCH64_R1, src_reg);
     } else if (src_mode == 2) {
         jit_emit_load_an(ctx, AARCH64_R2, src_reg);
+        src_via_helper = 1;
         if (opmode == 0) {
             jit_emit_call_read8(ctx, AARCH64_R1, AARCH64_R2);
         } else if (opmode == 1) {
@@ -1023,6 +1046,7 @@ int jit_translate_cmp(jit_translate_context_t *tctx)
         }
     } else if (src_mode == 3) {
         jit_emit_load_an(ctx, AARCH64_R2, src_reg);
+        src_via_helper = 1;
         if (opmode == 0) {
             jit_emit_call_read8(ctx, AARCH64_R1, AARCH64_R2);
             incr = (src_reg == 7) ? 2 : 1;
@@ -1042,6 +1066,7 @@ int jit_translate_cmp(jit_translate_context_t *tctx)
         jit_emit_load_an(ctx, AARCH64_R2, src_reg);
         jit_emit_mov64(ctx, AARCH64_R3, (uint64_t)(int32_t)disp);
         jit_emit_dword(ctx, AARCH64_ADD(AARCH64_R2, AARCH64_R2, AARCH64_R3));
+        src_via_helper = 1;
         if (opmode == 0) {
             jit_emit_call_read8(ctx, AARCH64_R1, AARCH64_R2);
         } else if (opmode == 1) {
@@ -1051,6 +1076,14 @@ int jit_translate_cmp(jit_translate_context_t *tctx)
         }
     } else {
         return -1;
+    }
+
+    /*
+     * Helper reads return in R0 and clobber caller-saved registers.
+     * Reload destination Dn so CMP subtracts dst-src with the original destination value.
+     */
+    if (src_via_helper) {
+        jit_emit_load_dn(ctx, AARCH64_R0, dst_reg);
     }
 
     /* Width-normalize to top bits so SUBS carries byte/word flag semantics. */
