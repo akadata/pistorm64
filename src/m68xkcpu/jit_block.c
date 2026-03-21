@@ -203,6 +203,43 @@ int jit_block_translate(jit_context_t *jit, jit_block_t *block)
         }
         
         ext_count = opinfo->ext_words;
+
+        /*
+         * Some generated opinfo entries currently under-specify LEA extension
+         * words for absolute long mode (e.g. 0x41F9). Compute LEA ext words
+         * from EA mode/reg here so block decode stays instruction-aligned.
+         */
+        if (opinfo->family == JIT_FAMILY_LEA) {
+            uint8_t src_mode = (opcode >> 3) & 0x7;
+            uint8_t src_reg = opcode & 0x7;
+
+            switch (src_mode) {
+                case 5: /* (d16,An) */
+                case 6: /* (d8,An,Xn) */
+                    ext_count = 1;
+                    break;
+                case 7:
+                    switch (src_reg) {
+                        case 0: /* (xxx).W */
+                            ext_count = 1;
+                            break;
+                        case 1: /* (xxx).L */
+                            ext_count = 2;
+                            break;
+                        case 2: /* (d16,PC) */
+                        case 3: /* (d8,PC,Xn) */
+                            ext_count = 1;
+                            break;
+                        default:
+                            ext_count = 0;
+                            break;
+                    }
+                    break;
+                default:
+                    ext_count = 0;
+                    break;
+            }
+        }
         
         /* Mark BSR as interpret-only (not yet implemented) */
         /* BRA and BCC are implemented and will be compiled */
