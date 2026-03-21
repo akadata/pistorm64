@@ -220,8 +220,8 @@ DECODE_TABLE = [
     # BCC (BLE): 0x6B00-0x6BFF
     (0xFF00, 0x6B00, FAMILY_BCC, EA_NONE, EA_NONE, 1, CCR_ALL, 0, 0b101),
     
-    # DBcc: 0x54C8-0x54FF (specific form - must come BEFORE general SCC)
-    (0xFFF8, 0x54C8, FAMILY_DBCC, EA_IMM, EA_NONE, 1, CCR_ALL, 0, 0b101),
+    # DBcc: 0x50C8-0x5FCF with bits [7:3]=11001 (must come BEFORE general SCC)
+    (0xF0F8, 0x50C8, FAMILY_DBCC, EA_IMM, EA_NONE, 1, CCR_ALL, 0, 0b101),
     # SCC: 0x50C0-0x5FC0 (bits 6-7 = 11)
     (0xF0C0, 0x50C0, FAMILY_SCC, EA_IMM, EA_DN, 0, CCR_ALL, 0, 0),
     
@@ -354,6 +354,12 @@ DECODE_TABLE = [
     (0xFFF8, 0x49C0, FAMILY_EXTB, EA_NONE, EA_DN, 0, 0, CCR_N|CCR_Z|CCR_V, 0),
     # PEA: 0x4840-0x487F
     (0xFFC0, 0x4840, FAMILY_PEA, EA_NONE, EA_AN, 1, 0, 0, 0),
+    # LEA absolute forms (all destination An variants): ext sizing must be exact.
+    # LEA (xxx).W,An -> source EA = 111000
+    (0xF1FF, 0x41F8, FAMILY_LEA, EA_AW, EA_AN, 1, 0, 0, 0),
+    # LEA (xxx).L,An -> source EA = 111001
+    (0xF1FF, 0x41F9, FAMILY_LEA, EA_AL, EA_AN, 2, 0, 0, 0),
+
     # LEA: 0x41xx, 0x45xx, 0x49xx, 0x4Dxx, 0x4Fxx (bits 11-8 = 1,5,9,D,F)
     # LEA d16(An),An: 0100 0001 MMMRRR (0x41xx)
     (0xF100, 0x4100, FAMILY_LEA, EA_NONE, EA_AN, 1, 0, 0, 0),
