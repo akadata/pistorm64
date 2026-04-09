@@ -1701,11 +1701,19 @@ class Handler(BaseHTTPRequestHandler):
             path = socket.getfqdn() and path  # noop; keep lint calm
             path = bytes(path, "utf-8").decode("utf-8")
             # we already encoded in JS; parse_qs decodes %xx automatically
-            p = Path(path)
+            base_dir = Path(self.cfg["dir"]).resolve()
+            raw_path = Path(path)
+            if not raw_path.is_absolute():
+                p = (base_dir / raw_path).resolve(strict=False)
+            else:
+                p = raw_path.resolve(strict=False)
+            try:
+                # Ensure the resolved path is within the configured image directory
+                p.relative_to(base_dir)
+            except ValueError:
+                return self._json({"error": "path must be inside image directory"}, code=400)
             if not p.exists():
                 return self._json({"error": f"not found: {p}"}, code=400)
-            if not path_within_dir(Path(self.cfg["dir"]), p):
-                return self._json({"error": "path must be inside image directory"}, code=400)
             status = get_status(self.cfg["host"], self.cfg["port"])
             preferred = int(unit_raw) if unit_raw.isdigit() else None
             unit = pick_unit(preferred, status)
